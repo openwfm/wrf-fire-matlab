@@ -1,5 +1,5 @@
-cwd=pwd
-cd ~/wrf-fire/wrfv2_fire/test/em_fire
+cwd__=pwd
+cd ..
 startup
-cd(cwd)
-clear cwd
+cd(cwd__)
+clear cwd__
