@@ -1,4 +1,7 @@
 function check_mesh(X)
+% Check cell array X of size 3 with x,y,z coordinates for correct dimensions
+% and positive increments
+% This does not check for increments to be equal in any way
 
 x = X{1}; y = X{2}; z = X{3};
 if ndims(x)~=3|ndims(y)~=3|ndims(z)~=3,
@@ -15,7 +18,7 @@ end
 if ~all(all((y(:,2:end,:)>y(:,1:end-1,:)))),
     error('check_mesh: y increments in array y must be positive')
 end
-if ~all(all((y(:,2:end,:)>y(:,1:end-1,:)))),
+if ~all(all((z(:,:,2:end)>z(:,:,1:end-1)))),
     error('check_mesh: z increments in array z must be positive')
 end
 

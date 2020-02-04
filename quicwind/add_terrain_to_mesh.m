@@ -22,7 +22,7 @@ if ischar(kind),
             hz = max(z(:))-min(z(:));
             rx = mean(abs((x(:)-cx)));
             ry = mean(abs((y(:)-cy)));
-            a = ((x-cx)./rx).^2 + ((y-cy)./ry).^2 ;
+            a = ((x-cx)./rx).^2 + 0 * ((y-cy)./ry).^2 ;
             t = hz*exp(-a*2)*val;
         otherwise
             error('add_terrain_to_mesh: unknown kind')

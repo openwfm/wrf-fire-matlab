@@ -1,4 +1,8 @@
-prefix = '/home/jhaley/JPSSdata/';
+
+%local machine
+%prefix = '/home/jhaley/JPSSdata/';
+%colibri
+prefix = '/bigdisk/james.haley/wrfcycling/wrf-fire/wrfv2_fire/test/TIFs/';
 
 
 %Longitude = hdfread('/home/jhaley/JPSSdata/MOD03.A2013222.0545.006.2013222112442.hdf', 'MODIS_Swath_Type_GEO', 'Fields', 'Longitude');
@@ -33,14 +37,16 @@ for k = 1:nfiles
         v = readl2data(prefix,file,file2);
         
         dets = v.data >= 7;
-        v
+        v;
         if sum(v.pixels.fire) > 0
-            fires = [fires; v.lons(dets) v.lats(dets)];
+            fires = [fires; v.lon(dets) v.lat(dets)];
+            %fires = [fires; v.lons(dets) v.lats(dets)];
         end
         
     end
 end
 
 fires = fires(2:end,:);
+fprintf('%d fires in %d granules \n',length(fires), length(d))
 figure,scatter(fires(:,1),fires(:,2))
 
