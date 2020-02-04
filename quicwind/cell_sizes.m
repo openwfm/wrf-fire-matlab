@@ -1,6 +1,7 @@
 function s=cell_sizes(X)
 % s=cell_sizes(X) 
-% compute averaged sizes and areas of cell sizes for a deformed mesh
+% compute averaged sizes and areas projected on cartesian planes of cells in a deformed 
+% and vertical stretched mesh
 % 
 % input:
 %   X   cell array, nodal coordinatees x y z

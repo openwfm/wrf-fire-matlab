@@ -1,5 +1,5 @@
 function res = Amul_v(X,A,v)
-% multiplies the flux matrix (or its transpose) and a vector
+% multiplies the penalty weight diagonal matrix and a vector
 % the operation is res = A * v, where A is a diagonal matrix
 % set:
 %    X   mesh
