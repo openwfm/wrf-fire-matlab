@@ -37,7 +37,7 @@ for k = 1:nfiles
         v = readl2data(prefix,file,file2);
         
         dets = v.data >= 7;
-        v
+        v;
         if sum(v.pixels.fire) > 0
             fires = [fires; v.lon(dets) v.lat(dets)];
             %fires = [fires; v.lons(dets) v.lats(dets)];
@@ -47,5 +47,6 @@ for k = 1:nfiles
 end
 
 fires = fires(2:end,:);
+fprintf('%d fires in %d granules \n',length(fires), length(d))
 figure,scatter(fires(:,1),fires(:,2))
 
