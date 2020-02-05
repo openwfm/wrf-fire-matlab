@@ -17,6 +17,9 @@ if ~exist('var','var'),
             relerr(i)=inf;
         end
     end
+    disp('Finished comparing files')
+    disp(file1)
+    disp(file2)
     return
 end
 v1=ncread(file1,var);
