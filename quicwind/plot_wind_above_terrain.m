@@ -6,7 +6,7 @@ function plot_wind_above_terrain(U,X,n_d)
 
 check_mesh(X);
 
-clf, hold off
+figure,
 mesh(X{1}(:,:,1),X{2}(:,:,1),X{3}(:,:,1)); % terrain
 
 [nx1,ny1,nz1]=size(X{1}); % mesh size
@@ -20,9 +20,10 @@ d = (size(X{1})-1)./n_d;
 
 px=1+d(1)/2:d(1):nx;
 py=1+d(2)/2:d(2):ny;
-pz=1+d(3)/2:d(3):nx;
+pz=1+d(3)/2:d(3):nz;
 
 [iq,jq,kq]=ndgrid(px,py,pz);  % query in index space
+nq=size(iq);
 iq=iq(:);
 jq=jq(:);
 kq=kq(:);
@@ -36,15 +37,29 @@ ud = interp3(iu,ju,ku,permute(U{1},p),iq,jq,kq);
 vd = interp3(iv,jv,kv,permute(U{2},p),iq,jq,kq);
 wd = interp3(iw,jw,kw,permute(U{3},p),iq,jq,kq);
 
-
 hold on 
-quiver3(xd,yd,zd,ud,vd,wd)
-hold off
+quiver3(xd,yd,zd,ud,vd,wd,0)
 
-axis equal
+axis square
 xlabel('x'),ylabel('y'),zlabel('z')
 title('Wind field')
-a=gcf;fprintf('Figure %i: wind field\n',a.Number)
+a=gcf;fprintf('Figure %i: wind field 3D\n',a.Number)
+hold off
+
+ud2 = reshape(ud,nq);
+wd2 = reshape(wd,nq);
+xd2 = reshape(xd,nq);
+zd2 = reshape(zd,nq);
+mid = ceil((nq(2))/2);
+
+figure,
+plot(X{1}(:,mid,1),X{3}(:,mid,1))
+hold on
+quiver(xd2(:,mid,:),zd2(:,mid,:),ud2(:,mid,:),wd2(:,mid,:),0)
+xlabel('x'),ylabel('z')
+title('Wind field')
+a=gcf;fprintf('Figure %i: wind field 2D\n',a.Number)
+hold off
 
 end
 

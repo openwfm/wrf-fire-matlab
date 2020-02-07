@@ -68,8 +68,8 @@ switch method
         [Lambda,FLAG,RELRES,ITER,RESVEC] = pcg(L, rhs, 1e-6, 400);
         figure;
         semilogy(RESVEC)
-        title('residuals')
-        figure
+        title('Residuals using PCG')
+        xlabel('Iterations'),ylabel('Residuals')
         Uvec = U0vec - Ainv * DM' * Lambda;
         U = vec2cell(Uvec,U0);
     otherwise
