@@ -22,7 +22,15 @@ if ischar(kind),
             hz = max(z(:))-min(z(:));
             rx = mean(abs((x(:)-cx)));
             ry = mean(abs((y(:)-cy)));
-            a = ((x-cx)./rx).^2 + 0 * ((y-cy)./ry).^2 ;
+            a = ((x-cx)./rx).^2 + ((y-cy)./ry).^2 ;
+            t = hz*exp(-a*2)*val;
+        case 'xhill'
+            cx = mean(x(:));
+            cy = mean(y(:));
+            hz = max(z(:))-min(z(:));
+            rx = mean(abs((x(:)-cx)));
+            ry = mean(abs((y(:)-cy)));
+            a = ((x-cx)./rx).^2;
             t = hz*exp(-a*2)*val;
         otherwise
             error('add_terrain_to_mesh: unknown kind')
@@ -40,6 +48,9 @@ switch how
             XX{3}(:,:,k)=X{3}(:,:,k)+t;
         end
     case {'compress','c','squash'}
+        if any(any(t > X{3}(:,:,end))),
+            error('shift values are too large to be compressed')
+        end
         disp('compressing mesh keeping top unchanged')
         XX=X;
         for k=1:kmax

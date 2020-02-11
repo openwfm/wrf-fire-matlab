@@ -23,19 +23,24 @@ function testing_wind(U)
     d=div3(fl);
     disp('divergence zero except at the bottom')
     err=big(d(:,:,2:end))
+    
+    maxh = max(X{3}(:))-hh(3);
 
     disp('terrain slope in x direction')
     disp('divergence zero except at the bottom')
     thx = 0.1*hh(1)*[0:nx]'*ones(1,ny+1);
+    thx = thx/max(thx(:))*maxh;
     test_terrain(thx)
 
     disp('terrain slope in y direction')
     disp('divergence zero except at the bottom')
     thy = 0.1*hh(2)*ones(nx+1,1)*[0:ny]; 
+    thy = thy/max(thy(:))*maxh;
     test_terrain(thy)
 
     disp('terrain slope in random constant direction')
     thxy = rand*thx + rand*thy;
+    thxy = thxy/max(thxy(:))*maxh;
     test_terrain(thxy)
 
     disp('roof slope in x direction')
@@ -43,6 +48,7 @@ function testing_wind(U)
     xs=hh(1)*[0:half,half-1:-1:2*half-nx];
     ys=ones(1,ny+1);
     th = 0.1*xs'*ys;
+    
     test_terrain(th)
 
     disp('roof slope in y direction')
@@ -50,17 +56,20 @@ function testing_wind(U)
     xs=ones(1,nx+1);
     ys=hh(2)*[0:half,half-1:-1:2*half-ny];
     th = 0.1*xs'*ys;
+    th = th/max(th(:))*maxh;
     test_terrain(th)
 
     disp('pyramid roof slope')
     half = floor(ny/2);
-     xs=[0:nx]; ys=[0:ny];
+    xs=[0:nx]; ys=[0:ny];
     [ii,jj]=ndgrid(xs,ys);
     th = nx+ny-abs(ii-nx/2)-abs(jj-ny/2);
+    th = th/max(th(:))*maxh;
     test_terrain(th)
 
     disp('random terrain')
     th = min(hh)*0.1*rand(size(X{1}(:,:,1)));
+    th = th/max(th(:))*maxh;
     test_terrain(th)
 
     function test_terrain(t)

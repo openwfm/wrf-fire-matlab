@@ -5,12 +5,12 @@ disp('mass_cons_flux_test - testing mass consistent flux approximation with terr
 % hh=[1,1,1];
 % [x,y,z]   = ndgrid(hh(1)*[0:nx],hh(2)*[0:ny],hh(3)*[0:nz]);
 % X={x,y,z};
-mesh_len=[50,50,50];
-mesh_disp=[20,20,20];
+mesh_len=[50,40,20];
+mesh_disp=[50,40,20];
 %h=rand(1,3);
 h=ones(1,3);
 X = regular_mesh(mesh_len,h,1.2);
-X = add_terrain_to_mesh(X,'hill','squash',0.05);
+X = add_terrain_to_mesh(X,'xhill','squash',0.1);
 x = X{1};
 y = X{2};
 z = X{3};

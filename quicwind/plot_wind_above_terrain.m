@@ -4,6 +4,10 @@ function plot_wind_above_terrain(U,X,n_d)
 %   X  cell array size 3 with the mesh coordinates
 %   n_d  row vector size 3, mesh display size    
 
+if ~exist('n_d','var')
+    n_d = size(X{1});
+end
+
 check_mesh(X);
 
 figure,
@@ -50,12 +54,14 @@ ud2 = reshape(ud,nq);
 wd2 = reshape(wd,nq);
 xd2 = reshape(xd,nq);
 zd2 = reshape(zd,nq);
-mid = ceil((nq(2))/2);
+
+mid = ceil(ny1/2);
+midq = ceil(nq(2)/2);
 
 figure,
 plot(X{1}(:,mid,1),X{3}(:,mid,1))
 hold on
-quiver(xd2(:,mid,:),zd2(:,mid,:),ud2(:,mid,:),wd2(:,mid,:),0)
+quiver(xd2(:,midq,:),zd2(:,midq,:),ud2(:,midq,:),wd2(:,midq,:),0)
 xlabel('x'),ylabel('z')
 title('Wind field')
 a=gcf;fprintf('Figure %i: wind field 2D\n',a.Number)
