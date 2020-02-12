@@ -1,5 +1,9 @@
-function cycles(varargin)
+% copy cycles to here
+
+function cycle_ros(varargin)
+close all
 ! date
+q = 0;
 base_datestr='2013-08-11 00:00:00';
 base=datenum(base_datestr);
 num_cycles=5;
@@ -43,6 +47,7 @@ if i==0,
 else
     print_times(i)
     system('ls -l wrfout*')
+    wc = load('new_w.mat');
     wrfout_time = base+t(i).forecast_time;
     wrfout{i}=['wrfout_d01_',datestr(wrfout_time,times_format)];
     if ~exist(wrfout{i},'file')
@@ -59,17 +64,19 @@ else
        rewrite=wrfrst{i};
        restart='.true.';
     end
-    fprintf('%s %s\n','Will write modified time into     ',rewrite)
+    %fprintf('%s %s\n','Will write modified time into     ',rewrite)
     rewrite_bak=[rewrite,'.bak'];
-    q=input_num(['1 to copy ',rewrite,' to ',rewrite_bak],1,force);
+    %q=input_num(['1 to copy ',rewrite,' to ',rewrite_bak],1,force);
     if q,
        if system(['cp ',rewrite,' ',rewrite_bak]),
            warning('copy failed')
        end
     end
     w=read_wrfout_tign(wrfout{i},forecast_times{i});
+    %%%%%%% remove this
+    %w.tign_g = wc.new_w.tign_g
     wrfout_bak=[wrfout{i},'.bak'];
-    q=input_num(['1 to move ',wrfout{i},' to ',wrfout_bak],1,force);
+    %q=input_num(['1 to move ',wrfout{i},' to ',wrfout_bak],1,force);
     if q,
        movefile(wrfout{i},wrfout_bak);
     end
@@ -85,14 +92,14 @@ else
     print_times(i)
     fprintf('perimeter_time=%10.3f\nrestart=%s\n',t(i).perimeter_time,restart)
     q=sprintf('replace TIGN_G in %s and run\n %s\n [0/1]',rewrite,link_namelist_command);
-    if input_num(q,1,force)
-        ncreplace(rewrite,'TIGN_G',p.spinup)
-        if system(link_namelist_command),
-             error('link failed')
-        end
-    end
+%     if input_num(q,1,force)
+%         %         ncreplace(rewrite,'TIGN_G',p.spinup)
+%         if system(link_namelist_command),
+%             error('link failed')
+%         end
+%     end
     %compute ros adjustment factor
-    %ra = ros_adjust(p.forecast,p.analysis,p.observations_end_time,w.nfuel_cat);
+    ra = ros_adjust(p.forecast,p.analysis,p.observations_end_time,w.nfuel_cat,p,w);
     %fprintf('Recomended ROS adjust factor: %f \n',ra);
     disp('Run WRF-SFIRE and continue when done\n')
 end

@@ -1,6 +1,5 @@
 function red=subset_domain(w,varargin)
 % red=subset_domain(w)
-% red=subset_domain(w,force)
 % find rectangular domain around fire with some user guidance
 % and convert fire arrival time to datenum
 %
@@ -9,8 +8,6 @@ function red=subset_domain(w,varargin)
 %    tign_g        - fire arrival time
 %    nfuel_cat     - fuel categories
 %    times         - time at simulation end as string
-%        red reduced structure
-%        force (optional) force defaults to no ask
 %
 % ouput: red structure with fields
 %    ispan,jspan   - list i,j indices selected
@@ -23,13 +20,24 @@ function red=subset_domain(w,varargin)
 %    min_tign      - min
 %    max_tign      - max 
 %    base_time     - base time for displays
+%
+% Changes made %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% original had red=subset_domain(w,red)
+% changed to red=subset_domain(varargin)
+% 
+% comment out margin
+% comment out bounds, take default_bounds{2}
+% 
 
-
-if nargin>=2,
-    force=varargin{1};
+% arguments
+if nargin >=2
+    force = varargin{1},
 else
-    force=0;
+    force = 0;
 end
+
+%for lots of evaluations of a single fire:
+%load red.mat
 
 sim.min_lat = min(w.fxlat(:));
 sim.max_lat = max(w.fxlat(:));
@@ -51,11 +59,15 @@ max_lat=min(sim.max_lat,act.max_lat+margin*(act.max_lat-act.min_lat));
 default_bounds{1}=[min_lon,max_lon,min_lat,max_lat];
 default_bounds{2}=[sim.min_lon,sim.max_lon,sim.min_lat,sim.max_lat];
 for i=1:length(default_bounds),fprintf('default bounds %i: %8.5f %8.5f %8.5f %8.5f\n',i,default_bounds{i});end
-
-bounds=input_num('bounds [min_lon,max_lon,min_lat,max_lat] or number of bounds above (1)> ',1,force);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%commenting out input
+bounds=input('enter bounds [min_lon,max_lon,min_lat,max_lat] or number of bounds above (1)> ');
+if isempty(bounds),bounds=1;end
 if length(bounds)==1,
-    bounds=default_bounds{bounds};
+   bounds=default_bounds{bounds};
 end
+%take the second default_bounds
+%bounds = default_bounds{2};
 [ii,jj]=find(w.fxlong>=bounds(1) & w.fxlong<=bounds(2) & w.fxlat >=bounds(3) & w.fxlat <=bounds(4));
 ispan=min(ii):max(ii);
 jspan=min(jj):max(jj);
@@ -63,6 +75,7 @@ if isempty(ispan) | isempty(jspan), error('selection empty'),end
 
 % restrict simulation
 
+%commenting out next 5 lines
 red.max_tign=sim.max_tign;
 red.ispan=ispan;
 red.jspan=jspan;
@@ -72,12 +85,15 @@ red.tign_g=w.tign_g(ispan,jspan);
 if isfield(w,'nfuel_cat')
     red.nfuel_cat=w.nfuel_cat(ispan,jspan);
 
+    %commenting out next 4 lines
 red.min_lat = min(red.fxlat(:));
 red.max_lat = max(red.fxlat(:));
 red.min_lon = min(red.fxlong(:));
 red.max_lon = max(red.fxlong(:));
 
 % convert tign_g to datenum 
+
+%comment out here to the end
 red.end_datenum=datenum(char(w.times(:))'); % this time step end
 red.end_time=w.dt*w.itimestep; % time from simulation start in seconds
 red.start_time=0;

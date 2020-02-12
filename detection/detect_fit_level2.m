@@ -80,7 +80,10 @@ fprintf('display bounds %g %g %g %g\n',red.disp_bounds);
 
 disp('Loading and subsetting detections')
     
-prefix='TIFs/';
+%prefix='../campTIFs/';
+prefix='../TIFs/';
+%prefix='../TIFpoint/';
+%prefix='../perimTIFs/';
 % the level2 file names processed by geotiff2mat.py
 p=sort_rsac_files(prefix); 
 
@@ -93,12 +96,15 @@ print_time_bounds(red,'Spinup    ',time_bounds(3),time_bounds(4))
 red.time_bounds=time_bounds;
 
 g = load_subset_detections(prefix,p,red,time_bounds,fig);
+save g.mat g;
        
 [m,n]=size(red.fxlong);
     
 % find ignition point
 tign=red.tign;
-[i_ign,j_ign]=find(tign == min(tign(:)));
+%%%% remove this
+%tign(478,383)=tign(478,383)-1e4;
+[i_ign,j_ign]=find(tign ==min(tign(:)));
 if length(i_ign)~=1,error('assuming single ignition point here'),end
     
 % set up constraint on ignition point being the same
@@ -134,12 +140,24 @@ maxiter =2;
 maxdepth=3;
 h_stor = zeros(m,n,maxiter);
 
+new_like = input_num('Use new likelihood? No == 0 ',0);
 for istep=1:maxiter
     
     fprintf('********** Iteration %g/%g **************\n', istep, maxiter);
     
+    if new_like
+        fprintf('Using new likelihood function\n')
+        [p_like_spline,p_deriv_spline,n_deriv_spline] = make_spline(100,1000);
+        %load splines.mat
+        [Js,search]=detection_objective(tign,h,g,params,red,p_like_spline,p_deriv_spline,n_deriv_spline);
+    else
+        [Js,search]=detection_objective(tign,h,g,params,red);
+    end
+        
+
+    
     % initial search direction, normed so that max(abs(search(:))) = 1.0
-    [Js,search]=detection_objective(tign,h,g,params,red); 
+    %[Js,search]=detection_objective(tign,h,g,params,red); 
     search = -search/big(search); 
 
     print('-dpng', sprintf('%s_search_dir_%d.png', prefix, istep));
@@ -151,12 +169,40 @@ for istep=1:maxiter
         break;
     end
     h = h + best_stepsize*search;
+    
+    %%   %dealing with the bump here
+    bump_remove = 0;
+    temp_analysis = tign+h;
+    if bump_remove
+        %figure,mesh(temp_analysis)
+        corner_time = min([temp_analysis(1,1),temp_analysis(1,end),...
+            temp_analysis(end,1),temp_analysis(end,end)]);
+        if max(temp_analysis(:)) > corner_time
+            fprintf('Bump forming \n');
+            %figure,mesh(temp_analysis);
+            mask_h = temp_analysis >= corner_time;
+            h(mask_h) = 0;
+            %figure,mesh(h);
+        end
+    end %bump removal
+    
     plot_state(10+istep,red,sprintf('Analysis iteration %i [Js=%g]',istep,Jsbest),tign+h,g,time_bounds(1:2));
     print('-dpng',sprintf('%s_descent_iter_%d.png', prefix, istep));
     h_stor(:,:,istep) = h;
 end
 
 analysis=tign+h;
+%figure,mesh(analysis);
+
+%cutting the top off of the "lid"
+bump_remove = 0;
+if bump_remove
+    corner_time = min([temp_analysis(1,1),temp_analysis(1,end),...
+        temp_analysis(end,1),temp_analysis(end,end)]);
+    mask = analysis >= corner_time;
+    analysis(mask) = corner_time;
+end
+
 % w.tign_g = max_sim_time + (24*60*60)*(tign - w_time_datenum)
 
 plot_state(6,red,'Analysis',analysis,g,time_bounds(1:2))
@@ -187,6 +233,8 @@ va=1-wa./(wf+wa); %  1  outside of analysis fire area at restart time, ADDING UP
 
 % combine the forecast and analysis
 spinup = vf.*forecast + va.*analysis; 
+
+figure,mesh(spinup),title('spinup mesh')
 
 plot_state(8,red,'Spinup',spinup,g,time_bounds(3:4))
 savefig('spinup',cycle)
@@ -251,6 +299,7 @@ return
             Jsls(1) = Jslow;
             % Jsls(nmesh+2) = Jshigh;
             for i=2:nmesh+2
+                %% possibly change h or tign here
                 Jsls(i) = detection_objective(tign,h+step_sizes(i)*search,g,params,red);
             end
             Jshigh=Jsls(nmesh+2);
