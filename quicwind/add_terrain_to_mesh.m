@@ -29,7 +29,6 @@ if ischar(kind),
             cy = mean(y(:));
             hz = max(z(:))-min(z(:));
             rx = mean(abs((x(:)-cx)));
-            ry = mean(abs((y(:)-cy)));
             a = ((x-cx)./rx).^2;
             t = hz*exp(-a*2)*val;
         otherwise

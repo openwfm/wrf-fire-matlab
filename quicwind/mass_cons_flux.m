@@ -66,7 +66,7 @@ switch method
 %        Lambda = pcg(lhs_mat, rhs, 1e-10, 100, PC_L, PC_L');
 %        Lambda = pcg(lhs_mat, rhs, 1e-8, 400);
 %        [Lambda,FLAG,RELRES,ITER,RESVEC] = pcg(lhs_mat, rhs, 1e-6, 400);
-        [Lambda,FLAG,RELRES,ITER,RESVEC] = pcg(L, rhs, 1e-6, 500);
+        [Lambda,FLAG,RELRES,ITER,RESVEC] = pcg(L, rhs, 1e-6, 400);
         figure;
         semilogy(RESVEC)
         title('Residuals using PCG')
