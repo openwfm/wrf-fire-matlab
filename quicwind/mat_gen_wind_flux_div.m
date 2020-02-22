@@ -2,6 +2,9 @@ function DM=mat_gen_wind_flux_div(X,type)
 % get matrix of flux divergence
 % input:
 %     X   mesh
+%     type 'D' create divergence matrix D
+%          'M' create wind to flux matrix M
+%          'DM' create D*M (default)
 % output:
 %     DM  flux divergence matrix
 %
