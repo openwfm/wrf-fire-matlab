@@ -1,4 +1,5 @@
 B=zeros(6);
+A=eye(6);
 for i=1:2:6
     B(i:i+1,i:i+1)=rand(2);
 end
