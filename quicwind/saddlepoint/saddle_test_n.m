@@ -4,6 +4,7 @@ fprintf('linear array of %i cells with %i faces each\n',n,f)
 B=sparse(f*n);
 D=sparse(n,f*n);
 C=sparse(n,f*n);
+A=speye(f*n);
 if n<200, B=full(B);D=full(D);C=full(C); end
 for i=1:n
     s=(i-1)*f+1:i*f;    % span of local dofs
