@@ -1,4 +1,5 @@
-disp('run a setup first!')
+% matrix implementation of the saddlepoint method
+
 % repeated subexpressions
 Bt=B.';
 Dt=D.';
@@ -21,4 +22,4 @@ res=[Bt*B*v + Dt*p + Ct*q - Bt*v0
     D*v
     C*v];
 err=norm(res,inf)
-disp('see matrix M for the system to be solved')
+disp('see matrix M of the system solved')
