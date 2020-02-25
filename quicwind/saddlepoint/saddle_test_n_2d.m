@@ -34,7 +34,7 @@ for i=1:prod(n)
     B(s,s)=[-1,0,0,0;0,1,0,0;0,0,-1,0;0,0,0,1];
     D(i,s)=[1,1,1,1];
     E(t,s)=[-.5,.5,0,0;0,0,-.5,.5];
-    v0f(s)=[-1,1,-1,1]; % initial wind flux
+    v0f(s)=[0,0,1,-1]; % initial wind flux
     % continuity conditions
     [xi,yi]=ind2sub(n,i);    
     if xi > 1
