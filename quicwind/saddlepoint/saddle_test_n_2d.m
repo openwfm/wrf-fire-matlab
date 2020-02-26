@@ -84,5 +84,5 @@ figure, mesh(xx,yy,reshape(p,n)), xlabel('x'), ylabel('y'), title('Lagrange mult
 qq = Ct*q;
 qqm = (qq(1:4:end-1)+qq(2:4:end)+qq(3:4:end)+qq(4:4:end))/4;
 figure, mesh(xx,yy,reshape(qqm,n)), xlabel('x'), ylabel('y'), title('Lagrange multiplier q')
-%figure, for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi]=ind2sub(n,i); mesh([xi-.5,xi+.5;xi,xi],[yi,yi;yi-.5,yi+.5],[qq(s(1:2))';qq(s(3:4))']), hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier q')
+figure, for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi]=ind2sub(n,i); plot3([xi-.5,xi+.5;xi,xi],[yi,yi;yi-.5,yi+.5],[qq(s(1:2))';qq(s(3:4))'],'.'), hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier q')
 

@@ -1,5 +1,5 @@
 % dimension
-n = [4,3,2];
+n = [5,5,3];
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
 % grid (regular for the moment)
 [x,y,z] = meshgrid(1:n(1),1:n(2),1:n(3));
@@ -86,3 +86,6 @@ figure, quiver3(xx(:),yy(:),zz(:),u(1:3:end),u(2:3:end),u(3:3:end)), xlabel('x')
 vv = B*v;
 % plot resulting fluxes
 figure, for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi,zi]=ind2sub(n,i); quiver3([xi-.5,xi+.5,xi,xi,xi,xi],[yi,yi,yi-.5,yi+.5,yi,yi],[zi,zi,zi,zi,zi-.5,zi+.5],[vv(s(1:2))',0,0,0,0],[0,0,vv(s(3:4))',0,0],[0,0,0,0,vv(s(5:6))'],.5,'LineWidth',2), hold on, end, xlabel('x'), ylabel('y'), title('Mass-consistent solution fluxes')
+% plot lagrange multiplier p
+p3 = reshape(p,n);
+figure, for i=1:n(3), mesh(xx(:,:,i),yy(:,:,i),p3(:,:,i)+2*i); hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier p')
