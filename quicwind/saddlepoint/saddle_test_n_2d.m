@@ -1,3 +1,6 @@
+% settings
+plot_all = true;
+
 % dimension
 n = [10,5];
 fprintf('linear array of %ix%i cells\n',n(1),n(2))
@@ -25,16 +28,24 @@ t2 = sparse(nt2,factor*prod(n));
 t3 = sparse(nt3,factor*prod(n));
 v0f = zeros(factor*prod(n),1);
 % make them full if small
-if prod(n)<200, B=full(B);D=full(D);E=full(E);A=full(A);t1=full(t1);t2=full(t2);t3=full(t3); end
+if prod(n)<200, B=full(B);D=full(D);E=full(E);A=full(A);t1=full(t1);t2=full(t2);t3=full(t3); else, plot_all=false; end
 % create block matrices
 for i=1:prod(n)
     s=(i-1)*factor+1:i*factor; % span of local dofs
     t=(i-1)*size(n,2)+1:i*size(n,2);
-    A(s,s)=diag([1,1,2,2]);
+    A(s,s)=diag([1,1,1,1]);
     B(s,s)=[-1,0,0,0;0,1,0,0;0,0,-1,0;0,0,0,1];
     D(i,s)=[1,1,1,1];
     E(t,s)=[-.5,.5,0,0;0,0,-.5,.5];
-    v0f(s)=[0,0,1,-1]; % initial wind flux
+    v0f(s)=[-1,1,0,0];
+    %{
+    % hole 
+    if i == 24 || i == 25 || i == 26
+        v0f(s)=[0,0,0,0]; % initial wind flux
+    else
+        v0f(s)=[-1,1,0,0];
+    end
+    %}
     % continuity conditions
     [xi,yi]=ind2sub(n,i);    
     if xi > 1
@@ -62,9 +73,14 @@ end
 u0=E*v0f;
 % plot initial wind
 figure, quiver(xx(:),yy(:),u0(1:2:end),u0(2:2:end)), xlabel('x'), ylabel('y'), title('Initial wind')
-% plot initial fluxes
-vv0f = B*v0f;
-figure, for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi]=ind2sub(n,i); quiver([xi-.5,xi+.5,xi,xi],[yi,yi,yi-.5,yi+.5],[vv0f(s(1:2))',0,0],[0,0,vv0f(s(3:4))'],.5,'LineWidth',2), hold on, end, xlabel('x'), ylabel('y'), title('Initial wind fluxes')
+if plot_all
+    % initial wind coordinates at the edges of the cell
+    vv0f = B*v0f;
+    % plot initial fluxes
+    xv = []; yv = []; zv1 = []; zv2 = [];
+    for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi]=ind2sub(n,i); xv = [xv,[xi-.5,xi+.5,xi,xi]]; yv = [yv,[yi,yi,yi-.5,yi+.5]]; zv1 = [zv1,[vv0f(s(1:2))',0,0]]; zv2 = [zv2,[0,0,vv0f(s(3:4))']]; end
+    figure, quiver(xv,yv,zv1,zv2,.5,'LineWidth',2), xlabel('x'), ylabel('y'), title('Initial wind fluxes')
+end
 % need initial Cartesian wind instead of flux
 v0=B*v0f; 
 % solve mass-consistent using saddle problem
@@ -75,14 +91,28 @@ if prod(n)<10,M,end
 u=E*v;
 % plot resulting wind
 figure, quiver(xx(:),yy(:),u(1:2:end),u(2:2:end)), xlabel('x'), ylabel('y'), title('Mass-consistent solution')
-vv = B*v;
-% plot resulting fluxes
-figure, for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi]=ind2sub(n,i); quiver([xi-.5,xi+.5,xi,xi],[yi,yi,yi-.5,yi+.5],[vv(s(1:2))',0,0],[0,0,vv(s(3:4))'],.5,'LineWidth',2), hold on, end, xlabel('x'), ylabel('y'), title('Mass-consistent solution fluxes')
-% plot lagrange multiplier p
-figure, mesh(xx,yy,reshape(p,n)), xlabel('x'), ylabel('y'), title('Lagrange multiplier p')
-% plot lagrange multiplier q
-qq = Ct*q;
-qqm = (qq(1:4:end-1)+qq(2:4:end)+qq(3:4:end)+qq(4:4:end))/4;
-figure, mesh(xx,yy,reshape(qqm,n)), xlabel('x'), ylabel('y'), title('Lagrange multiplier q')
-figure, for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi]=ind2sub(n,i); plot3([xi-.5,xi+.5;xi,xi],[yi,yi;yi-.5,yi+.5],[qq(s(1:2))';qq(s(3:4))'],'.'), hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier q')
+if plot_all
+    vv = B*v;
+    % plot resulting fluxes
+    xv = []; yv = []; zv1 = []; zv2 = [];
+    for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi]=ind2sub(n,i); xv = [xv,[xi-.5,xi+.5,xi,xi]]; yv = [yv,[yi,yi,yi-.5,yi+.5]]; zv1 = [zv1,[vv(s(1:2))',0,0]]; zv2 = [zv2,[0,0,vv(s(3:4))']]; end
+    figure, quiver(xv,yv,zv1,zv2,.5,'LineWidth',2), xlabel('x'), ylabel('y'), title('Mass-consistent solution fluxes')
+    % plot lagrange multiplier p
+    figure, mesh(xx,yy,reshape(p,n)), xlabel('x'), ylabel('y'), title('Lagrange multiplier p')
+    % plot lagrange multiplier q
+    qq = Ct*q;
+    qqm = (qq(1:4:end-1)+qq(2:4:end)+qq(3:4:end)+qq(4:4:end))/4;
+    figure, mesh(xx,yy,reshape(qqm,n)), xlabel('x'), ylabel('y'), title('Lagrange multiplier q')
+    figure, for i=1:prod(n), s=(i-1)*factor+1:i*factor; [xi,yi]=ind2sub(n,i); plot3([xi-.5,xi+.5;xi,xi],[yi,yi;yi-.5,yi+.5],[qq(s(1:2))';qq(s(3:4))'],'.'), hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier q')
+    xq = []; yq = []; zq = [];
+    for i=1:prod(n)
+        s=(i-1)*factor+1:i*factor; 
+        [xi,yi]=ind2sub(n,i);
+        xq = [xq,[xi-.5,xi+.5,xi,xi]];
+        yq = [yq,[yi,yi,yi-.5,yi+.5]];
+        zq = [zq,[qq(s(1:2))',qq(s(3:4))']];
+    end 
+    tri = delaunay(xq, yq);
+    figure, trimesh(tri, xq, yq, zq);
+end
 
