@@ -16,6 +16,7 @@ fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
 
 % creating grid
 X = regular_mesh(n,h,vstretch);
+X = add_terrain_to_mesh(X,'hill','squash',0.1);
 CX = cell(1,3);
 for k = 1:3
     CX{k} = (X{k}(1:end-1,1:end-1,1:end-1)+X{k}(2:end,1:end-1,1:end-1)+X{k}(1:end-1,2:end,1:end-1)+X{k}(1:end-1,1:end-1,2:end)+X{k}(2:end,2:end,1:end-1)+X{k}(2:end,1:end-1,2:end)+X{k}(1:end-1,2:end,2:end)+X{k}(2:end,2:end,2:end))/8;

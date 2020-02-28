@@ -34,6 +34,9 @@ if d == 3
 end
 v0f = zeros(factor*prod(n),1);
 
+% compute thetas
+thetax = X{3}(2:end,:,:)-X{3}(1:end-1,:,:);
+
 % create matrices
 for i=1:prod(n)
     s=(i-1)*factor+1:i*factor; % span of local dofs
