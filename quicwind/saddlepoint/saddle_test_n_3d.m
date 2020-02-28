@@ -1,3 +1,7 @@
+% ordering
+% rows: u, v, w.
+% columns: low x, high x, low y, high y, low z, high z.
+
 % dimension
 n = [10,10,5];
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
