@@ -1,5 +1,14 @@
 function [like,deriv]= evaluate_likes(psi,t,p_like_spline,p_deriv_spline,n_deriv_spline)
 
+% function evaluates data likelihood and derivative
+% inputs:
+%   psi - matrix with 'fire mask', positive is fire
+%   t - time matrix
+%   p_like_spline,p_deriv_spline,n_deriv_spline - splines with likelihood function(s)
+% outputs:
+%   like - data likelihood for each time
+%   deriv -derivative of like wrt time
+
 %tic
 %convert to seconds
 t = 3600*t;
