@@ -3,10 +3,12 @@
 % columns: low x, high x, low y, high y, low z, high z.
 
 % settings
-plot_all = true;
+if ~exist('plot_all','var')
+    plot_all = false;
+end
 
 % dimension
-n = [2,2,2];
+n = [8,6,4];
 h = [1,1,1];
 vstretch = 1.2;
 factor = 6;
@@ -30,11 +32,11 @@ v0=B*v0f;
 u0=E*v0f;
 figure, 
 plot_mesh_3d(X), hold on, 
-quiver3(xx(:),yy(:),zz(:),u0(1:3:end),u0(2:3:end),u0(3:3:end)), xlabel('x'), ylabel('y'), zlabel('z'), title('Initial wind')
+quiver3(xx(:),yy(:),zz(:),u0(1:3:end),u0(2:3:end),u0(3:3:end),'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Initial wind')
 
 if plot_all
     % plot initial wind from each cell
-    figure, plot_fluxes_3d(X,v0), title('Initial wind fluxes')
+    figure, plot_fluxes_3d(X,v0,h), title('Initial wind fluxes')
 end
 
 % solve mass-consistent using saddle problem
@@ -46,13 +48,13 @@ u=E*v;
 % plot resulting wind
 figure, 
 plot_mesh_3d(X), hold on,  
-quiver3(xx(:),yy(:),zz(:),u(1:3:end),u(2:3:end),u(3:3:end)), xlabel('x'), ylabel('y'), zlabel('z'), title('Mass-consistent solution')
+quiver3(xx(:),yy(:),zz(:),u(1:3:end),u(2:3:end),u(3:3:end),'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Mass-consistent solution')
 if plot_all
     % wind direction fluxes
     vv = B*v;
     % plot resulting fluxes
-    figure, plot_fluxes_3d(X,vv),title('Mass-consistent solution fluxes')
+    figure, plot_fluxes_3d(X,vv,h),title('Mass-consistent solution fluxes')
     % plot lagrange multiplier p
     p3 = reshape(p,n);
-    figure, for i=1:n(3), mesh(xx(:,:,i),yy(:,:,i),p3(:,:,i)+100*i); hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier p')
+    figure, for i=1:n(3), mesh(xx(:,:,i),yy(:,:,i),p3(:,:,i)+10*i); hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier p')
 end

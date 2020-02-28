@@ -1,6 +1,14 @@
-function plot_fluxes_3d(X,U,scales)
+function plot_fluxes_3d(X,U,h,scales)
+if ~exist('h','var')
+    h = [1,1,1];
+end
 if ~exist('scales','var')
-    scales=[.5,.5,.5];
+    max_u = max([U(1:6:end);U(2:6:end)]);
+    max_v = max([U(3:6:end);U(4:6:end)]);
+    max_w = max([U(5:6:end);U(6:6:end)]);
+    max_wind = [max_u,max_v,max_w];
+    scales = h./(2*max_wind);
+    scales(max_wind < eps) = eps;
 end
 plot_mesh_3d(X), 
 hold on
