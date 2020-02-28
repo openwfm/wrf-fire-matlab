@@ -39,6 +39,8 @@ thetax = X{3}(2:end,:,:)-X{3}(1:end-1,:,:);
 
 % create matrices
 for i=1:prod(n)
+    [xi,yi,zi]=ind2sub(n,i);
+    B=cell_B({X{1}(xi:xi+1,yi:yi+1,zi:zi+1),X{2}(xi:xi+1,yi:yi+1,zi:zi+1),X{3}(xi:xi+1,yi:yi+1,zi:zi+1)});
     s=(i-1)*factor+1:i*factor; % span of local dofs
     t=(i-1)*d+1:i*d; % span of dimension coordinates
     % matrix of areas and moduli
