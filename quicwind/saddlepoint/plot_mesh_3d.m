@@ -18,4 +18,5 @@ for i=1:n(1)
 end
 hold off
 view(3)
+xlabel('x'), ylabel('y'), zlabel('z'),
 end

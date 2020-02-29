@@ -26,6 +26,7 @@ A=sparse(factor*prod(n));
 D=sparse(prod(n),factor*prod(n));
 E=sparse(size(n,2)*prod(n),factor*prod(n));
 B=sparse(factor*prod(n));
+B2=sparse(factor*prod(n));
 cg = sparse(ncg,factor*prod(n));
 cx = sparse(ncx,factor*prod(n));
 cy = sparse(ncy,factor*prod(n));
@@ -34,23 +35,27 @@ if d == 3
 end
 v0f = zeros(factor*prod(n),1);
 
-% compute thetas
-thetax = X{3}(2:end,:,:)-X{3}(1:end-1,:,:);
-
 % create matrices
 for i=1:prod(n)
     [xi,yi,zi]=ind2sub(n,i);
-    B=cell_B({X{1}(xi:xi+1,yi:yi+1,zi:zi+1),X{2}(xi:xi+1,yi:yi+1,zi:zi+1),X{3}(xi:xi+1,yi:yi+1,zi:zi+1)});
+    B2(s,s) = cell_B({X{1}(xi:xi+1,yi:yi+1,zi:zi+1),X{2}(xi:xi+1,yi:yi+1,zi:zi+1),X{3}(xi:xi+1,yi:yi+1,zi:zi+1)});
     s=(i-1)*factor+1:i*factor; % span of local dofs
     t=(i-1)*d+1:i*d; % span of dimension coordinates
-    % matrix of areas and moduli
-    A(s,s)=diag([1,1,1,1,1e4,1e4]); 
+    % matrix of areas and moduli (u1,u2,v1,v2,w1,w2)
+    A(s,s)=diag([1,1,1,1,1e4,1e4]); % v1(1), v2(1), v1(2), v2(2), v1(3), v2(3) 
     % matrix of flux to wind transformation
-    B(s,s)=[-1,0,0,0,0,0;0,1,0,0,0,0;0,0,-1,0,0,0;0,0,0,1,0,0;0,0,0,0,-1,0;0,0,0,0,0,1];
+    B(s,s)=[-1,0,0,0,0,0;   % left face flux to x1 of the wind
+            0,1,0,0,0,0;    % right face flux to x1 of the wind
+            0,0,-1,0,0,0;   % front face flux to x2 of the wind
+            0,0,0,1,0,0;    % back face flux to x2 of the wind
+            0,0,0,0,-1,0;   % bottom face flux to x3 of the wind
+            0,0,0,0,0,1];   % top face flux to x3 of the wind
     % matrix of divergence free
     D(i,s)=[1,1,1,1,1,1];
     % matrix of resulting winds to winds at the center of the cells
-    E(t,s)=[-.5,.5,0,0,0,0;0,0,-.5,.5,0,0;0,0,0,0,-.5,.5];
+    E(t,s)=[-.5,.5,0,0,0,0;
+            0,0,-.5,.5,0,0;
+            0,0,0,0,-.5,.5];
     % initial wind flux
     v0f(s)=[-1,1,0,0,1,-1]; 
     % continuity conditions
