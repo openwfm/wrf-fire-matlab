@@ -1,4 +1,4 @@
-function [A,D,E,B,C,v0f]=sparse_assembly(X)
+function [A,D,E,B,C,v0f]=sparse_assembly(X,h)
 
 % sizes and dimensions
 d = size(X,2);
@@ -38,7 +38,6 @@ v0f = zeros(factor*prod(n),1);
 % create matrices
 for i=1:prod(n)
     [xi,yi,zi]=ind2sub(n,i);
-    B2(s,s) = cell_B({X{1}(xi:xi+1,yi:yi+1,zi:zi+1),X{2}(xi:xi+1,yi:yi+1,zi:zi+1),X{3}(xi:xi+1,yi:yi+1,zi:zi+1)});
     s=(i-1)*factor+1:i*factor; % span of local dofs
     t=(i-1)*d+1:i*d; % span of dimension coordinates
     % matrix of areas and moduli (u1,u2,v1,v2,w1,w2)
@@ -50,6 +49,7 @@ for i=1:prod(n)
             0,0,0,1,0,0;    % back face flux to x2 of the wind
             0,0,0,0,-1,0;   % bottom face flux to x3 of the wind
             0,0,0,0,0,1];   % top face flux to x3 of the wind
+    B2(s,s) = cell_B(h(1),h(2),X{3},xi,yi,zi);
     % matrix of divergence free
     D(i,s)=[1,1,1,1,1,1];
     % matrix of resulting winds to winds at the center of the cells
