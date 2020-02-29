@@ -13,10 +13,17 @@ function [ score ] = time_score(perim_path,wrfout_path)
 %%%%% read the wrfout file and create interpolant
 close all
 w = read_wrfout_tign(wrfout_path);
-red = subset_domain(w);
-cone_mask = red.tign < (max(red.tign(:))-0.5);
+red = subset_domain(w,1);
+%% set cone_mask < to use only the cone, no flat part at top
+cone_mask = red.tign_g <= max(red.tign_g(:));
+flat_top = red.tign_g == max(red.tign_g(:));
 %Fw = scatteredInterpolant(w.fxlong(:),w.fxlat(:),w.tign_g(:));
-Fr = scatteredInterpolant(red.fxlong(cone_mask),red.fxlat(cone_mask),red.tign_g(cone_mask));
+Fr = scatteredInterpolant(red.fxlong(cone_mask),red.fxlat(cone_mask),red.tign(cone_mask));
+
+%%%% testing the interpolation object
+%zq = Fr(red.fxlong,red.fxlat);
+%figure,mesh(red.fxlong,red.fxlat,red.tign_g),title('org cone')
+%figure,mesh(red.fxlong,red.fxlat,zq),title('interpolated new cone')
 
 %%%%%% convert kml file to a struct
 temp_struct = kml2struct(perim_path);
@@ -59,7 +66,10 @@ fprintf('There were %d perimetrs in the kml file \n',perim_count)
 
 perim_scores = zeros(perim_count,1);
 figure(perim_count+1)
-mesh(red.fxlong,red.fxlat,red.tign)
+mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
+%legend('Forecast')
+title('Forecast and Perimeters');
+xlabel('Lon'),ylabel('Lat'),zlabel('Simulation Time [days]')
 for i = 1:perim_count
     %p_lon = temp_struct(perim_idx(i)).Lon(1:end-1);
     p_lon = perim_struct(i).Lon(1:end-1);
@@ -71,15 +81,20 @@ for i = 1:perim_count
     if perim_struct(i).time <= red.end_datenum - 0.2
         %% ??? perim_time(i)-max(red.max_tign)
         z = perim_struct(i).time*ones(size(p_lon));
-        z_interp = Fr(p_lon,p_lat);
-        diff = (z_interp-z)/3600;
+        z_interp = Fr(p_lon,p_lat);        
+        diff = (z_interp-z)*24;
         perim_scores(i) = mean(abs(diff));
-        figure(i),histogram(diff),title(perim_struct(i).Name)
+        title_spec = sprintf('Histogram of errors %s',perim_struct(i).Name);
+        figure(i),histogram(diff),title(title_spec)
+        xlabel('Forecast difference from IR perimeter [hours]')
+        ylabel('Number of perimeter points')
         figure(perim_count+1),hold on
         %scatter3(p_lon,p_lat,z_interp,'*')
-        scatter3(p_lon,p_lat,z,'.')
+        scatter3(p_lon,p_lat,(z-red.start_datenum),'.')
         hold off;
         fprintf('%s : Score %f \n', perim_struct(i).Name, perim_scores(i) );
+    else
+        fprintf('%s perimter after simulation end \n',perim_struct(i).Name);
     end 
     
 
@@ -97,3 +112,4 @@ hold off
 
 score = mean(perim_scores(perim_scores > 0));
 
+end % function
