@@ -61,6 +61,7 @@ end
 
 perim_time = datenum(perim_date);
 fprintf('There were %d perimetrs in the kml file \n',perim_count)
+[sorted_times,sort_idx] = sort(perim_date);
 
 %% compute scores and plot the data
 
@@ -70,7 +71,8 @@ mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
 %legend('Forecast')
 title('Forecast and Perimeters');
 xlabel('Lon'),ylabel('Lat'),zlabel('Simulation Time [days]')
-for i = 1:perim_count
+for j = 1:perim_count
+    i = sort_idx(j);
     %p_lon = temp_struct(perim_idx(i)).Lon(1:end-1);
     p_lon = perim_struct(i).Lon(1:end-1);
     %p_lat = temp_struct(perim_idx(i)).Lat(1:end-1);
