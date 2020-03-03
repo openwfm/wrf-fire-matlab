@@ -52,11 +52,11 @@ B2 = [-1,0,0,0,0,0; % 1: wind in x direction caused by left flux
       0,1,0,0,0,0; % 2: wind in x direction caused by right flux
       0,0,-1,0,0,0; % 3: wind in y direction caused by front flux
       0,0,0,1,0,0; % 4: wind in y direction caused by back flux
-      0,0,0,0,-sxk,0; % 5: wind in x direction caused by bottom flux 
-      0,0,0,0,-syk,0; % 6: wind in y direction caused by bottom flux 
+      0,0,0,0,sxk,0; % 5: wind in x direction caused by bottom flux 
+      0,0,0,0,syk,0; % 6: wind in y direction caused by bottom flux 
       0,0,0,0,-sqrt(1-sxk*sxk-syk*syk),0; % 7: wind in z direction caused by bottom flux 
-      0,0,0,0,0,sxk1; % 8: wind in x direction caused by top flux 
-      0,0,0,0,0,syk1; % 9: wind in y direction caused by top flux 
+      0,0,0,0,0,-sxk1; % 8: wind in x direction caused by top flux 
+      0,0,0,0,0,-syk1; % 9: wind in y direction caused by top flux 
       0,0,0,0,0,sqrt(1-sxk1*sxk1-syk1*syk1)]; % 10: wind in z direction caused by top flux 
 % combine left, front, and bottom into a single wind vector v1, and 
 % combine right, back, and top into a single wind vector v2
@@ -66,5 +66,7 @@ B3 = [1,0,0,0,1,0,0,0,0,0; % v1(1)
       0,0,0,1,0,0,0,0,1,0; % v2(2)
       0,0,0,0,0,0,1,0,0,0; % v1(3)
       0,0,0,0,0,0,0,0,0,1]; % v2(3)
+% columns are: left, right, front, back, bottom, and top
+% rows are: v1(1), v2(1), v1(2), v2(2), v1(3), and v2(3) 
 B = B3*B2*B1;
 end

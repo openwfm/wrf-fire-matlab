@@ -41,23 +41,23 @@ for i=1:prod(n)
     s=(i-1)*factor+1:i*factor; % span of local dofs
     t=(i-1)*d+1:i*d; % span of dimension coordinates
     % matrix of areas and moduli (u1,u2,v1,v2,w1,w2)
-    A(s,s)=diag([1,1,1,1,1e4,1e4]); % v1(1), v2(1), v1(2), v2(2), v1(3), v2(3) 
+    A(s,s)=diag([1,1,1,1,1,1]); % v1(1), v2(1), v1(2), v2(2), v1(3), v2(3) 
     % matrix of flux to wind transformation
-    B(s,s)=[-1,0,0,0,0,0;   % left face flux to x1 of the wind
-            0,1,0,0,0,0;    % right face flux to x1 of the wind
-            0,0,-1,0,0,0;   % front face flux to x2 of the wind
-            0,0,0,1,0,0;    % back face flux to x2 of the wind
-            0,0,0,0,-1,0;   % bottom face flux to x3 of the wind
-            0,0,0,0,0,1];   % top face flux to x3 of the wind
-    B2(s,s) = cell_B(h(1),h(2),X{3},xi,yi,zi);
+    B2(s,s)=[-1,0,0,0,0,0;   % left face flux to x1 of the wind
+             0,1,0,0,0,0;    % right face flux to x1 of the wind
+             0,0,-1,0,0,0;   % front face flux to x2 of the wind
+             0,0,0,1,0,0;    % back face flux to x2 of the wind
+             0,0,0,0,-1,0;   % bottom face flux to x3 of the wind
+             0,0,0,0,0,1];   % top face flux to x3 of the wind
+    B(s,s) = cell_B(h(1),h(2),X{3},xi,yi,zi);
     % matrix of divergence free
     D(i,s)=[1,1,1,1,1,1];
     % matrix of resulting winds to winds at the center of the cells
-    E(t,s)=[-.5,.5,0,0,0,0;
-            0,0,-.5,.5,0,0;
-            0,0,0,0,-.5,.5];
+    E(t,s)=[.5,.5,0,0,0,0;
+            0,0,.5,.5,0,0;
+            0,0,0,0,.5,.5];
     % initial wind flux
-    v0f(s)=[-1,1,0,0,1,-1]; 
+    v0f(s)=[-1,1,0,0,-1,1]; 
     % continuity conditions
     if d == 3
         [cx,cy,cz,cg]=c_conditions_3d(n,i,s,cx,cy,cz,cg);
