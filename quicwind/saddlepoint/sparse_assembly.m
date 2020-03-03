@@ -1,4 +1,4 @@
-function [A,D,E,B,C,v0f]=sparse_assembly(X,h)
+function [A,D,E,B,C,v0]=sparse_assembly(X,h)
 
 % sizes and dimensions
 d = size(X,2);
@@ -33,7 +33,8 @@ cy = sparse(ncy,factor*prod(n));
 if d == 3
     cz = sparse(ncz,factor*prod(n));
 end
-v0f = zeros(factor*prod(n),1);
+%v0f = zeros(factor*prod(n),1);
+v0 = zeros(factor*prod(n),1);
 
 % create matrices
 for i=1:prod(n)
@@ -56,8 +57,10 @@ for i=1:prod(n)
     E(t,s)=[.5,.5,0,0,0,0;
             0,0,.5,.5,0,0;
             0,0,0,0,.5,.5];
+    % initial wind
+    v0(s)=[1,1,0,0,.5,.5]';
     % initial wind flux
-    v0f(s)=[-1,1,0,0,-1,1]; 
+    %v0f(s)=[-1,1,0,0,-1,1]; 
     % continuity conditions
     if d == 3
         [cx,cy,cz,cg]=c_conditions_3d(n,i,s,cx,cy,cz,cg);

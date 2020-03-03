@@ -16,7 +16,7 @@ fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
 
 % creating grid
 X = regular_mesh(n,h,vstretch);
-thx = h(1)*[0:n(1)]'*ones(1,n(2)+1);
+thx = .5*h(1)*[0:n(1)]'*ones(1,n(2)+1);
 X = add_terrain_to_mesh(X,thx,'shift');
 %X = add_terrain_to_mesh(X,'hill','squash',0.5);
 figure, plot_mesh_3d(X);
@@ -27,10 +27,10 @@ end
 xx = CX{1}; yy = CX{2}; zz = CX{3};
 
 % assembly sparse matrices
-[A,D,E,B,C,v0f] = sparse_assembly(X,h);
+[A,D,E,B,C,v0] = sparse_assembly(X,h);
 
 % initial Cartesian wind
-v0=B*v0f; 
+%v0=B*v0f; 
 
 % plot initial wind at the middle of the cells
 u0=E*v0;

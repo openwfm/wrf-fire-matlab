@@ -23,13 +23,16 @@ txk = (z(i+1,j,k)-z(i,j,k)+z(i+1,j+1,k)-z(i,j+1,k))/(2*dx); % tangent of thetax 
 tyk = (z(i,j+1,k)-z(i,j,k)+z(i+1,j+1,k)-z(i+1,j,k))/(2*dy); % tangent of thetay at k
 txk1 = (z(i+1,j,k+1)-z(i,j,k+1)+z(i+1,j+1,k+1)-z(i,j+1,k+1))/(2*dx); % tangent of thetax at k+1
 tyk1 = (z(i,j+1,k+1)-z(i,j,k+1)+z(i+1,j+1,k+1)-z(i+1,j,k+1))/(2*dy); % tangent of thetay at k+1
+thetax = atan(txk), thetay = atan(tyk)
 % sines
 sxk = txk/sqrt(1+txk*txk);
 syk = tyk/sqrt(1+tyk*tyk);
+err = sxk-sin(thetax), err = syk-sin(thetay)
 sxk1 = txk1/sqrt(1+txk1*txk1);
 syk1 = tyk1/sqrt(1+tyk1*tyk1);
 % secants 
 sck = sqrt((1+txk*txk)*(1+tyk*tyk)); % sec(thetax)*sec(thetay) at k 
+err = sck-sec(thetax)*sec(thetay)
 sck1 = sqrt((1+txk1*txk1)*(1+tyk1*tyk1)); % sec(thetax)*sec(thetay) at k+1
 % areas at the faces
 a1 = dy*.5*(z(i,j,k+1)-z(i,j,k)+z(i,j+1,k+1)-z(i,j+1,k)); % left face area
@@ -45,7 +48,7 @@ B1 = diag(1./a); % scale flux to wind vectors into the normal direction on sides
 % the bottom flux is in cartesian components: 
 %       ux = sin(thetax)*u
 %       uy = sin(thetay)*u
-%       uz = sqrt(1-sin(thetax)^2-sin(thetay)^2)*u
+%       uz = -sqrt(1-sin(thetax)^2-sin(thetay)^2)*u
 % B2*u = wind through 
 %   (leftx,rightx,fronty,backy,bottomx,bottomy,bottomz,topx,topy,topz)
 B2 = [-1,0,0,0,0,0; % 1: wind in x direction caused by left flux
@@ -66,7 +69,7 @@ B3 = [1,0,0,0,1,0,0,0,0,0; % v1(1)
       0,0,0,1,0,0,0,0,1,0; % v2(2)
       0,0,0,0,0,0,1,0,0,0; % v1(3)
       0,0,0,0,0,0,0,0,0,1]; % v2(3)
-% columns are: left, right, front, back, bottom, and top
-% rows are: v1(1), v2(1), v1(2), v2(2), v1(3), and v2(3) 
+disp('columns are: left, right, front, back, bottom, and top');
+disp('rows are: v1(1), v2(1), v1(2), v2(2), v1(3), and v2(3)');
 B = B3*B2*B1;
 end
