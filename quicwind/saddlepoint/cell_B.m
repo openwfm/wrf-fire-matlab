@@ -34,6 +34,17 @@ a4 = dx*.5*(z(i,j+1,k+1)-z(i,j+1,k)+z(i+1,j+1,k+1)-z(i+1,j+1,k)); % front face a
 a5 = (dx*dy)*sck; % bottom face area 
 a6 = (dx*dy)*sck1; % top face area
 a = [a1,a2,a3,a4,a5,a6];
+B =  ...
+        [-1,0,0,0,0,0;       % 1: flux through the left face from v1
+         0,1,0,0,0,0;        % 2: flux through the right face from v2
+         0,0,-1,0,0,0;       % 3: flux through the front face from v1
+         0,0,0,1,0,0;        % 4: flux through the back face from v2
+         -txk,0,-tyk,0,-1,0;   % 5: flux through the bottom face from v1
+         0,txk1,0,tyk1,0,1]...
+         * diag(1./a); % 6: flux through the top face from v2
+%disp('columns are: left, right, front, back, bottom, and top');
+%disp('rows are: v1(1), v2(1), v1(2), v2(2), v1(3), and v2(3)');
+if false,
 Binv = diag(a)* ...
         [-1,0,0,0,0,0;       % 1: flux through the left face from v1
          0,1,0,0,0,0;        % 2: flux through the right face from v2
@@ -43,5 +54,7 @@ Binv = diag(a)* ...
          0,-txk1,0,-tyk1,0,1]; % 6: flux through the top face from v2
 %disp('columns are: left, right, front, back, bottom, and top');
 %disp('rows are: v1(1), v2(1), v1(2), v2(2), v1(3), and v2(3)');
-B = inv(Binv);
+err_B_inv=norm(B*Binv-eye(6),'fro')
+end
+
 end
