@@ -4,7 +4,9 @@ function [ score ] = time_score(perim_path,wrfout_path)
 % times of the model compared with satellite observations
 % needs the kml2struct function to work
 % Inputs:
-%       perim - string, path to kml file with perim(s)
+%       perim - string, path to kml file with perim(s) or to a directory
+%          with kmls files or shape file, shape files should be downloaded
+%          from geomac as zip, then put into a common directory
 %       wrfout - string, path to a wrfout file for a simulation
 % Outputs:
 %       score - average of the differences in fire arrival times for each
@@ -25,8 +27,29 @@ Fr = scatteredInterpolant(red.fxlong(cone_mask),red.fxlat(cone_mask),red.tign(co
 %figure,mesh(red.fxlong,red.fxlat,red.tign_g),title('org cone')
 %figure,mesh(red.fxlong,red.fxlat,zq),title('interpolated new cone')
 
-%%%%%% convert kml file to a struct
-temp_struct = kml2struct(perim_path);
+%%% reading the perimeters
+if perim_path(end) == 'l'
+    fprintf('Using a kml file for perimeters \n')
+    %%%%%% convert kml file to a struct
+    temp_struct = kml2struct(perim_path);
+
+    
+elseif perim_path(end) == '/'
+    
+    perim_dat = ['kml';'shp'];
+    p_type = input_num('Type of perimeter file to use? (1) kml (2) shp', 1)
+    fprintf('Reading %s files in  directory %s \n',perim_dat(p_type,:),perim_path)
+    if p_type == 1
+        d = dir([perim_path,'*.kml'])
+    else
+        p_struct = shape2struct(perim_path)
+        temp_struct = p_struct;
+    end
+    
+    
+end % if perim_path...
+    
+
 
 %%%%%% find the perimeters in the struct, make new struct, find times of
 %%%%%% perim in UTC
@@ -40,8 +63,14 @@ for i = 1:length(temp_struct)
        perim_count = perim_count + 1;
        
        perim_idx = [perim_idx,i];
-       time_str = temp_struct(i).Name(end-13:end);
-       perim_date(perim_count) = datetime(time_str,'InputFormat','MM-dd-yyyy HHmm');
+       
+       if perim_path(end) == 'l'
+          time_str = temp_struct(i).Name(end-13:end);
+          perim_date(perim_count) = datetime(time_str,'InputFormat','MM-dd-yyyy HHmm');
+       else
+          time_str = temp_struct(i).Name(end-12:end);
+          perim_date(perim_count) = datetime(time_str,'InputFormat','yyyyMMdd HHmm');
+       end
        
        %create new stuct with only perims
        perim_struct(perim_count).Lon = temp_struct(i).Lon;
@@ -85,7 +114,7 @@ for j = 1:perim_count
         z = perim_struct(i).time*ones(size(p_lon));
         z_interp = Fr(p_lon,p_lat);        
         diff = (z_interp-z)*24;
-        perim_scores(i) = mean(abs(diff));
+        perim_scores(i) = mean(abs(diff(~isnan(diff))));
         title_spec = sprintf('Histogram of errors %s',perim_struct(i).Name);
         figure(i),histogram(diff),title(title_spec)
         xlabel('Forecast difference from IR perimeter [hours]')
