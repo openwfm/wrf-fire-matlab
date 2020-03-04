@@ -34,3 +34,4 @@ for r=1:levels
     wp(r,2) = Fy(fp); 
     wp(r,3) = Fz(fp);
 end
+save('test_A','wp');
