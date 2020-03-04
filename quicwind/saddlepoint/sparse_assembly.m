@@ -10,13 +10,10 @@ ncg = n(1)*n(2);
 ncx = (n(1)-1)*n(2)*n(3);
 % # y continuity constraints
 ncy = n(1)*(n(2)-1)*n(3);
+% # z continuity constraints
+ncz = n(1)*n(2)*(n(3)-1);
 % total number of constraints
-c_constraints = ncg + ncx + ncy;
-if d == 3
-    % # z continuity constraints
-    ncz = n(1)*n(2)*(n(3)-1);
-    c_constraints = c_constraints + ncz;
-end
+c_constraints = ncg + ncx + ncy + ncz;
 
 % # fluxes per element
 factor = 2*d;
@@ -26,25 +23,23 @@ A=sparse(factor*prod(n));
 D=sparse(prod(n),factor*prod(n));
 E=sparse(size(n,2)*prod(n),factor*prod(n));
 B=sparse(factor*prod(n));
-B2=sparse(factor*prod(n));
 cg = sparse(ncg,factor*prod(n));
 cx = sparse(ncx,factor*prod(n));
 cy = sparse(ncy,factor*prod(n));
-if d == 3
-    cz = sparse(ncz,factor*prod(n));
-end
-%v0f = zeros(factor*prod(n),1);
+cz = sparse(ncz,factor*prod(n));
 v0 = zeros(factor*prod(n),1);
+
+% moduli for penalization
+moduli = [1e3,1e3,1];
 
 % create matrices
 for i=1:prod(n)
     [xi,yi,zi]=ind2sub(n,i);
     s=(i-1)*factor+1:i*factor; % span of local dofs
     t=(i-1)*d+1:i*d; % span of dimension coordinates
-    % matrix of areas and moduli (u1,u2,v1,v2,w1,w2)
-    A(s,s)=diag([1e4,1e4,1e4,1e4,1,1]); % v1(1), v2(1), v1(2), v2(2), v1(3), v2(3) 
-    % matrix of flux to wind transformation
-    B(s,s) = cell_B(h(1),h(2),X{3},xi,yi,zi);
+    % matrix A of areas and moduli (u1,u2,v1,v2,w1,w2), and
+    % matrix B of flux to wind transformation
+    [A(s,s),B(s,s)] = cell_A_B(h(1),h(2),X{3},xi,yi,zi,moduli);
     % matrix of divergence operator
     D(i,s)=[1,1,1,1,1,1];
     % matrix of resulting winds to winds at the center of the cells
@@ -52,13 +47,13 @@ for i=1:prod(n)
             0,0,.5,.5,0,0;
             0,0,0,0,.5,.5];
     % initial wind
-    v0(s)=[1,1,1,1,0,0]';
+    v0(s)=[1,1,0,0,0,0]';
     % continuity conditions
-    if d == 3
-        [cx,cy,cz,cg]=c_conditions_3d(n,i,s,cx,cy,cz,cg);
-    end
+    [cx,cy,cz,cg]=c_conditions_3d(n,i,s,cx,cy,cz,cg);
 end
+% continuity operator
 C = [cx;cy;cz;cg];
+% check number of continuity constraints
 if size(C,1) ~= c_constraints
     error('number of constraints different than indices computed!') 
 end

@@ -8,18 +8,16 @@ if ~exist('plot_all','var')
 end
 
 % dimension
-n = [9,8,5];
+n = [5,5,5];
 h = [1,1,1];
-vstretch = 1;
 factor = 6;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
 
 % creating grid
-X = regular_mesh(n,h,vstretch);
-thx = .5*h(1)*[0:n(1)]'*ones(1,n(2)+1);
+X = regular_mesh(n,h,1);
+thx = h(1)*[0:n(1)]'*ones(1,n(2)+1);
 X = add_terrain_to_mesh(X,thx,'shift');
-X = add_terrain_to_mesh(X,'hill','squash',0.2);
-figure, plot_mesh_3d(X);
+X = add_terrain_to_mesh(X,'hill','squash',0.1);
 CX = cell(1,3);
 for k = 1:3
     CX{k} = (X{k}(1:end-1,1:end-1,1:end-1)+X{k}(2:end,1:end-1,1:end-1)+X{k}(1:end-1,2:end,1:end-1)+X{k}(1:end-1,1:end-1,2:end)+X{k}(2:end,2:end,1:end-1)+X{k}(2:end,1:end-1,2:end)+X{k}(1:end-1,2:end,2:end)+X{k}(2:end,2:end,2:end))/8;
@@ -28,9 +26,6 @@ xx = CX{1}; yy = CX{2}; zz = CX{3};
 
 % assembly sparse matrices
 [A,D,E,B,C,v0] = sparse_assembly(X,h);
-
-% initial Cartesian wind
-%v0=B*v0f; 
 
 % plot initial wind at the middle of the cells
 u0=E*v0;
@@ -55,7 +50,7 @@ plot_mesh_3d(X), hold on,
 quiver3(xx(:),yy(:),zz(:),u(1:3:end),u(2:3:end),u(3:3:end),'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Mass-consistent solution')
 if plot_all
     % wind direction fluxes
-    vv = B*v;
+    vv = v;
     % plot resulting fluxes
     figure, plot_fluxes_3d(X,vv,h),title('Mass-consistent solution fluxes')
     % plot lagrange multiplier p
