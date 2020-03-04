@@ -114,7 +114,14 @@ for j = 1:perim_count
         z = perim_struct(i).time*ones(size(p_lon));
         z_interp = Fr(p_lon,p_lat);        
         diff = (z_interp-z)*24;
-        perim_scores(i) = mean(abs(diff(~isnan(diff))));
+        diff = diff(~isnan(diff));
+        % test only fire arrival times before simulation end
+        cut_top = 0;
+        if cut_top
+            cone = diff < max(diff)-0.1;
+            diff = diff(cone);
+        end
+        perim_scores(i) = mean(abs(diff));
         title_spec = sprintf('Histogram of errors %s',perim_struct(i).Name);
         figure(i),histogram(diff),title(title_spec)
         xlabel('Forecast difference from IR perimeter [hours]')
@@ -124,6 +131,7 @@ for j = 1:perim_count
         scatter3(p_lon,p_lat,(z-red.start_datenum),'.')
         hold off;
         fprintf('%s : Score %f \n', perim_struct(i).Name, perim_scores(i) );
+        fprintf('   mean %f var %f \n',mean(diff),var(diff));
     else
         fprintf('%s perimter after simulation end \n',perim_struct(i).Name);
     end 
