@@ -22,4 +22,3 @@ res=[Bt*A*B*v + Dt*p + Ct*q - Bt*A*v0
     D*v
     C*v];
 err=norm(res,inf)
-disp('see matrix M of the system solved')

@@ -11,7 +11,6 @@ function [A,B] = cell_A_B(dx,dy,z,i,j,k,moduli)
 %   cell to 2 wind vectors in Cartesian coordinates
 
 % A is a diagonal matrix with volume and moduli
-
 % volum
 v = dx*dy*(z(i,j,k+1)-z(i,j,k)+z(i+1,j,k+1)-z(i+1,j,k)+z(i+1,j+1,k+1)-z(i+1,j+1,k)+z(i,j+1,k+1)-z(i,j+1,k))/4;
 A = v*diag([moduli(1),moduli(1),moduli(2),moduli(2),moduli(3),moduli(3)]);
