@@ -1,10 +1,11 @@
-function score = evaluate_sim( wrfout_s, wrfout_c, perim )
+function score = evaluate_sim( wrfout_s, wrfout_c, perim, wrf_time_step )
 %score = evaluate_sim( wrfout, perim )
 % inputs:
-%   wrfout_s - wrfout from a simulation w/o cycling, string with file path
-%   wrfout_c - wrfout from a simulation with cycling, string with file path
+%   wrfout_s - wrfout from a simulation w/o cycling or spinup, string with file path
+%   wrfout_c - wrfout from a simulation with cycling or spinup, string with file path
 %   perim - kml with fire perimter data, string wih file path or (to be
 %   programmed ) path to directory with shape files
+%   wrf_time_step - optional string with time step to be read
 % output:
 %   score - number which gives how good the simulation matches the perimter
 %   data
@@ -24,10 +25,19 @@ close all
 spinup_compare = input_num('Compare spinup?',1,0);
 
 %read wrfout section
-w_c =read_wrfout_tign(wrfout_c)
-red_c = subset_domain(w_c,1);
-w_s =read_wrfout_tign(wrfout_s)
-red_s = subset_domain(w_s,1);
+if nargin > 3
+    w_c =read_wrfout_tign(wrfout_c,wrf_time_step)
+    red_c = subset_domain(w_c,1);
+    w_s =read_wrfout_tign(wrfout_s,wrf_time_step)
+    red_s = subset_domain(w_s,1);
+else
+    w_c =read_wrfout_tign(wrfout_c)
+    red_c = subset_domain(w_c,1);
+    w_s =read_wrfout_tign(wrfout_s)
+    red_s = subset_domain(w_s,1);
+end
+
+
 
 %collect information about simulations
 max_tign = max(red_s.max_tign,red_c.max_tign);

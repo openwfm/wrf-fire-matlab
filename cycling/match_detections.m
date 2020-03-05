@@ -1,16 +1,21 @@
-function [ score ] = match_detections( wrfout )
+function [ score ] = match_detections( wrfout, wrf_time_step )
 %function score = match_detections( input_args )
 %Function evaluates a simulation by finding how well it was able to predict
 %where satellites detections would indicate a fire was burning
 %Inputs:
 %  wrfout: string with path to wrfout file containing the fire arrival
 %      time variable tign
+%  wrf_time-step: optional string with time step in wrfout to be read
 %Output:
 %  score: evaluation of the goodness of the fit
 
 %read the wrfout file
 % use which time step?
-w = read_wrfout_tign(wrfout);
+if nargin > 2
+    w = read_wrfout_tign(wrfout,wrf_time_step);
+else
+    w = read_wrfout_tign(wrfout);
+end
 red = subset_domain(w,1);
 
 

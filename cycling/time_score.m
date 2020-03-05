@@ -24,7 +24,7 @@ end
 
 
 close all
-w = read_wrfout_tign(wrfout_path);
+
 red = subset_domain(w,1);
 %% set cone_mask < to use only the cone, no flat part at top
 cone_mask = red.tign_g <= max(red.tign_g(:));
