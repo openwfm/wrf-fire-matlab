@@ -1,4 +1,4 @@
-function [ score ] = time_score(perim_path,wrfout_path)
+function [ score ] = time_score(perim_path,wrfout_path,wrfout_time_step)
 %function [ score ] = time_score(perim_kml,wrfout)
 % Function computes a score for a fire simulation based on fire arrival
 % times of the model compared with satellite observations
@@ -8,11 +8,21 @@ function [ score ] = time_score(perim_path,wrfout_path)
 %          with kmls files or shape file, shape files should be downloaded
 %          from geomac as zip, then put into a common directory
 %       wrfout - string, path to a wrfout file for a simulation
+%       wrfout_time_step - optional, string with the timestep to be read
 % Outputs:
 %       score - average of the differences in fire arrival times for each
 %       pixel in the perimeter
 
 %%%%% read the wrfout file and create interpolant
+if nargin > 2
+    ts = wrfout_time_step;
+    fprintf('Will read wrfout at %s \n',ts)
+    w = read_wrfout_tign(wrfout_path,ts);
+else
+    w = read_wrfout_tign(wrfout_path);
+end
+
+
 close all
 w = read_wrfout_tign(wrfout_path);
 red = subset_domain(w,1);
@@ -120,7 +130,7 @@ for j = 1:perim_count
         diff = (z_interp-z)*24;
         diff = diff(~isnan(diff));
         % test only fire arrival times before simulation end
-        cut_top = 0;
+        cut_top = 1;
         if cut_top
             cone = diff < max(diff)-0.1;
             diff = diff(cone);
