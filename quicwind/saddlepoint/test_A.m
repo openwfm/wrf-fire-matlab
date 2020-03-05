@@ -1,11 +1,12 @@
 function test_A
 % settings
-levels = 3;
+levels = 4;
 fp = [2,2,2];
 
 % initialize
 wp = cell(levels,3);
 F = cell(levels,3);
+e = zeros(levels,1);
 for r=1:levels
     % dimension
     n = [4,4,4]*2^(r-1);
@@ -26,6 +27,8 @@ for r=1:levels
     saddle_sparse
     % transform resulting fluxes into cartesian winds at the centers
     u=E*B*v;
+    % save errors
+    e(r) = err;
     % create interpolant elements from wind at the center of the cells
     F{r,1} = scatteredInterpolant(CX{1}(:),CX{2}(:),CX{3}(:),u(1:3:end));
     F{r,2} = scatteredInterpolant(CX{1}(:),CX{2}(:),CX{3}(:),u(2:3:end));
@@ -34,6 +37,6 @@ for r=1:levels
     wp{r,2} = F{r,2}(fp); 
     wp{r,3} = F{r,3}(fp);
 end
-d.F = F; d.wp = wp;
+d.F = F; d.wp = wp; d.err = e;
 save('test_A','-struct','d');
 end
