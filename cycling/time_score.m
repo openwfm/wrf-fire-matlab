@@ -96,7 +96,11 @@ fprintf('There were %d perimetrs in the kml file \n',perim_count)
 
 perim_scores = zeros(perim_count,1);
 figure(perim_count+1)
-mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
+if size(red.fxlong) < 500
+    mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
+else
+    mesh(red.fxlong(1:10:end,1:10:end),red.fxlat(1:10:end,1:10:end),(red.tign(1:10:end,1:10:end)-red.start_datenum))
+end
 %legend('Forecast')
 title('Forecast and Perimeters');
 xlabel('Lon'),ylabel('Lat'),zlabel('Simulation Time [days]')
