@@ -49,7 +49,7 @@ for i=1:prod(n)
     % initial wind
     v0(s)=[1,1,0,0,0,0]';
     % continuity conditions
-    [cx,cy,cz,cg]=c_conditions_3d(n,i,s,cx,cy,cz,cg);
+    [cx,cy,cz,cg]=c_conditions_3d(n,xi,yi,zi,s,cx,cy,cz,cg);
 end
 % continuity operator
 C = [cx;cy;cz;cg];

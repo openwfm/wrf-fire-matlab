@@ -8,7 +8,7 @@ if ~exist('plot_all','var')
 end
 
 % dimension
-n = [5,5,5];
+n = [6,5,4];
 h = [1,1,1];
 factor = 6;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
@@ -17,7 +17,7 @@ fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
 X = regular_mesh(n,h,1);
 %thx = h(1)*[0:n(1)]'*ones(1,n(2)+1);
 %X = add_terrain_to_mesh(X,thx,'shift');
-X = add_terrain_to_mesh(X,'xhill','squash',0.1);
+X = add_terrain_to_mesh(X,'hill','squash',0.1);
 CX = cell(1,3);
 for k = 1:3
     CX{k} = (X{k}(1:end-1,1:end-1,1:end-1)+X{k}(2:end,1:end-1,1:end-1)+X{k}(1:end-1,2:end,1:end-1)+X{k}(1:end-1,1:end-1,2:end)+X{k}(2:end,2:end,1:end-1)+X{k}(2:end,1:end-1,2:end)+X{k}(1:end-1,2:end,2:end)+X{k}(2:end,2:end,2:end))/8;

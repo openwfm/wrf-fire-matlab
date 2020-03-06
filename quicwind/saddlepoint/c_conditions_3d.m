@@ -1,5 +1,4 @@
-function [cx,cy,cz,cg]=c_conditions_3d(n,i,s,cx,cy,cz,cg)
-    [xi,yi,zi]=ind2sub(n,i);
+function [cx,cy,cz,cg]=c_conditions_3d(n,xi,yi,zi,s,cx,cy,cz,cg)
     if xi > 1
         cx((xi-1)+(yi-1)*(n(1)-1)+(zi-1)*n(2)*(n(1)-1),s(1)) = 1;
     end
