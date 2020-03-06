@@ -1,9 +1,13 @@
-function cell_P(A,B,D)
+function P=cell_P(A,B,D)
 
-Bt=B.';
-Dt=D.';
-ib=inv(Bt*A*B);
-ibd=inv(D*ib*Dt);
-P=ib - ib*Dt*ibd*D*ib;
+X = B'*A*B;
+L = chol(X,'lower');
+U = L\eye(size(X));
+ib = L'\U;
+X = D*ib*D';
+L = chol(X,'lower');
+U = L\eye(size(X));
+ibd = L'\U;
+P=ib - ib*D'*ibd*D*ib;
 
 end
