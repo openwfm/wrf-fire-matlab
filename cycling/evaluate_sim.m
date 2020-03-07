@@ -26,14 +26,14 @@ spinup_compare = input_num('Compare spinup?',1,0);
 
 %read wrfout section
 if nargin > 3
-    w_c =read_wrfout_tign(wrfout_c,wrf_time_step)
+    w_c =read_wrfout_tign(wrfout_c,wrf_time_step);
     red_c = subset_domain(w_c,1);
-    w_s =read_wrfout_tign(wrfout_s,wrf_time_step)
+    w_s =read_wrfout_tign(wrfout_s,wrf_time_step);
     red_s = subset_domain(w_s,1);
 else
-    w_c =read_wrfout_tign(wrfout_c)
+    w_c =read_wrfout_tign(wrfout_c);
     red_c = subset_domain(w_c,1);
-    w_s =read_wrfout_tign(wrfout_s)
+    w_s =read_wrfout_tign(wrfout_s);
     red_s = subset_domain(w_s,1);
 end
 
@@ -44,18 +44,22 @@ max_tign = max(red_s.max_tign,red_c.max_tign);
 min_tign = min(red_s.min_tign,red_c.min_tign);
 
 % need to plot detections too, this will be moved elsewhere
-det_prefix = '../TIFs/';
+%det_prefix = '../TIFs/';
+det_prefix = '../campTIFs/';
 det_list=sort_rsac_files(det_prefix);
 fig.fig_map=0;
 fig.fig_3d=0;
 fig.fig_interp=0;
 
 
-
+if perim(end) == 'l'
 %read kml section, *.kml file
 a = kml2struct(perim);
+else
 % or
-%a = shape2struct(perim);
+fprintf('Reading directory of shape files \n')
+a = shape2struct(perim);
+end
 
 %find perimeters from perim file
 p_count = 0;
@@ -67,18 +71,22 @@ for i = 1:length(a)
     %i, a(i)
     if strcmp(a(i).Geometry,'Polygon')
         p_count = p_count + 1;
-        i,a(i)
+        i,a(i);
         
         % get perimeter time
         a(i).p_string = a(i).Name(end-14:end)
         if a(i).p_string(1) ~= '1'
-            a(i).p_string(1) = '0'
+            a(i).p_string(1) = '0';
         end
         formatIn = 'mm-dd-yyyy HHMM';
         %perim times are local, need to convert to UTC
-        zone_shift = -6;
-        if a(i).Name(1:2) == 'CA'
-            zone_shift = -8
+        zone_shift = 6;
+        if a(i).Name(1:2) == 'ca'
+            a(i).p_string = a(i).Name(end-12:end);
+            zone_shift = 8;
+            formatIn = 'yyyymmdd HHMM';
+            %a(i).p_string = a(i).p_string(end-13:end);
+            
         end
         a(i).p_time = datenum(a(i).p_string,formatIn)+zone_shift/24;
         
@@ -128,7 +136,7 @@ for i = 1:length(a)
         p_struct(p_count).lats = lats;
         p_struct(p_count).lons = lons;
         p_struct(p_count).file = replace(a(i).Name,' ','_');
-        p_struct(p_count).Name = a(i).Name
+        p_struct(p_count).Name = a(i).Name;
         
     end
 end %for

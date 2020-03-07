@@ -89,25 +89,25 @@ for i = 1:length(temp_struct)
        perim_struct(perim_count).time = datenum(perim_date(perim_count));
        %perim_time = datenum(perim_date);
        %perim_struct(perim_count) = temp_struct(i);
-       %perim_struct(perim_count).time = 0;
-       % look for nan/inf in data last entry seems to always be a nan....
-           %inf_lat = ~isfinite(temp_struct(i).Lat);
-           %sum(inf_lat)
-   end %if
-end
+           %perim_struct(perim_count).time = 0;
+           % look for nan/inf in data last entry seems to always be a nan....
+               %inf_lat = ~isfinite(temp_struct(i).Lat);
+               %sum(inf_lat)
+       end %if
+    end
 
-%sort the perimeters
+    %sort the perimeters
 
-perim_time = datenum(perim_date);
-fprintf('There were %d perimetrs in the kml file \n',perim_count)
-[sorted_times,sort_idx] = sort(perim_date);
+    perim_time = datenum(perim_date);
+    fprintf('There were %d perimetrs in the kml file \n',perim_count)
+    [sorted_times,sort_idx] = sort(perim_date);
 
-%% compute scores and plot the data
+    %% compute scores and plot the data
 
-perim_scores = zeros(perim_count,1);
-figure(perim_count+1)
-if size(red.fxlong) < 500
-    mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
+    perim_scores = zeros(perim_count,1);
+    figure(perim_count+1)
+    if size(red.fxlong) < 500
+        mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
 else
     mesh(red.fxlong(1:10:end,1:10:end),red.fxlat(1:10:end,1:10:end),(red.tign(1:10:end,1:10:end)-red.start_datenum))
 end
@@ -130,7 +130,7 @@ for j = 1:perim_count
         diff = (z_interp-z)*24;
         diff = diff(~isnan(diff));
         % test only fire arrival times before simulation end
-        cut_top = 1;
+        cut_top = 0;
         if cut_top
             cone = diff < max(diff)-0.1;
             diff = diff(cone);
