@@ -44,8 +44,13 @@ max_tign = max(red_s.max_tign,red_c.max_tign);
 min_tign = min(red_s.min_tign,red_c.min_tign);
 
 % need to plot detections too, this will be moved elsewhere
-%det_prefix = '../TIFs/';
-det_prefix = '../campTIFs/';
+sim = input_num('Patch [1] or Camp [2] ? ',1);
+if sim == 1
+    det_prefix = '../TIFs/';
+else
+    det_prefix = '../campTIFs/';
+end
+
 det_list=sort_rsac_files(det_prefix);
 fig.fig_map=0;
 fig.fig_3d=0;
@@ -292,7 +297,7 @@ for i = 1:p_count
         if spinup_compare ~= 1
             save_str = [p_struct(i).file '_s'];
         else
-            save_str = [p_struct(i).file '_No_spinup']
+            save_str = [p_struct(i).file '_No_spinup'];
         end
         
         savefig(save_str);
