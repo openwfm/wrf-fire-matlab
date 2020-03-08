@@ -22,8 +22,11 @@ function score = evaluate_sim( wrfout_s, wrfout_c, perim, wrf_time_step )
 
 close all
 
-spinup_compare = input_num('Compare spinup?',1,0);
-
+spinup_compare = input_num('Compare spin-up vs analysis [1] Cycle vs No cycle? [2] Two diff cycles? [3]?',1,0);
+if spinup_compare == 3
+   cycle_s = input_num('Cycle number for wrfout_s?',0);
+   cycle_c = input_num('Cycle number for wrfout_c?',1);
+end
 %read wrfout section
 if nargin > 3
     w_c =read_wrfout_tign(wrfout_c,wrf_time_step);
@@ -278,12 +281,19 @@ for i = 1:p_count
         scatter(scatter_lon,scatter_lat,'m','*');        alpha(1.0);
         plot(sim_x_s,sim_y_s,'b');
         plot(perim_x ,perim_y,'r');
-        if spinup_compare ~= 1
+        if spinup_compare == 2
             title_str = ('Perimeter observation and Forecast without cycling');
             legend({'Satellite Fire Detections','Forecast without cycling','Infrared perimeter'});
-        else
-            title_str = ('Perimeter observation and Forecast without spinup');
-            legend({'Satellite Fire Detections','Forecast without spinup','Infrared perimeter'});
+            save_str = [p_struct(i).file '_s']; %% _s is for single run
+        elseif spinup_compare == 1
+            title_str = ('Perimeter observation and Forecast without spin-up');
+            legend({'Satellite Fire Detections','Forecast without spin-up','Infrared perimeter'});
+            save_str = [p_struct(i).file '_No_spinup'];
+        else %spinup_compare == 3
+            title_str = sprintf('Perimeter observation and Forecast for Cycle %d ',cycle_s);
+            %title_str = ('Perimeter observation and Forecast without spin-up');
+            legend({'Satellite Fire Detections','Forecast','Infrared perimeter'});
+            save_str = sprintf('%s_cycle_%d',p_struct(i).file,cycle_s);
         end
         
         %legend({'Forecast without cycling','Infrared perimeter'});
@@ -294,11 +304,11 @@ for i = 1:p_count
         
         score_str = sprintf('Score = %f',score_s(i));
         title({title_str,p_struct(i).Name,score_str});
-        if spinup_compare ~= 1
-            save_str = [p_struct(i).file '_s'];
-        else
-            save_str = [p_struct(i).file '_No_spinup'];
-        end
+%         if spinup_compare ~= 1
+%             save_str = [p_struct(i).file '_s'];
+%         else
+%             save_str = [p_struct(i).file '_No_spinup'];
+%         end
         
         savefig(save_str);
         saveas(gcf,[save_str '.png']);
@@ -313,12 +323,19 @@ for i = 1:p_count
         alpha(1.0);
         plot(sim_x_c,sim_y_c,'b');
         plot(perim_x ,perim_y,'r');
-        if spinup_compare ~=1
+        if spinup_compare == 2
             legend({'Satellite Fire Detections','Forecast with cycling','Infrared perimeter'});
             title_str = ('Perimeter observation and Forecast with cycling');
-        else
-            legend({'Satellite Fire Detections','Forecast using spinup','Infrared perimeter'});
-            title_str = ('Perimeter observation and Forecast using spinup');
+            save_str = [p_struct(i).file '_c'];
+        elseif spinup_compare == 1
+            legend({'Satellite Fire Detections','Forecast using spin-up','Infrared perimeter'});
+            title_str = ('Perimeter observation and Forecast using spin-up');
+            save_str = [p_struct(i).file '_with_spinup'];
+        else %spinup_compare == 3
+            title_str = sprintf('Perimeter observation and Forecast for Cycle %d ',cycle_c);
+            %title_str = ('Perimeter observation and Forecast without spin-up');
+            legend({'Satellite Fire Detections','Forecast','Infrared perimeter'});
+            save_str = sprintf('%s_cycle_%d',p_struct(i).file,cycle_c);
         end
         
         %legend({'Forecast with cycling','Infrared perimeter'});
@@ -326,11 +343,11 @@ for i = 1:p_count
         ylabel('Lat')
         xlim([min_lon max_lon])
         ylim([min_lat max_lat])
-        if spinup_compare ~= 1
-            save_str = [p_struct(i).file '_c'];
-        else
-            save_str = [p_struct(i).file '_with_spinup'];
-        end
+%         if spinup_compare ~= 1
+%             save_str = [p_struct(i).file '_c'];
+%         else
+%             save_str = [p_struct(i).file '_with_spinup'];
+%         end
             
         score_str = sprintf('Score = %f',score_c(i));
         title({title_str,p_struct(i).Name,score_str});
