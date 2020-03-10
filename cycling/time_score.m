@@ -1,4 +1,4 @@
-function [ score ] = time_score(perim_path,wrfout_path,wrfout_time_step)
+function [ score,diff_var ] = time_score(perim_path,wrfout_path,wrfout_time_step)
 %function [ score ] = time_score(perim_kml,wrfout)
 % Function computes a score for a fire simulation based on fire arrival
 % times of the model compared with satellite observations
@@ -106,6 +106,7 @@ for i = 1:length(temp_struct)
     %% compute scores and plot the data
 
     perim_scores = zeros(perim_count,1);
+    perim_vars = zeros(perim_count,1);
     figure(perim_count+1)
     if size(red.fxlong) < 500
         mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
@@ -161,6 +162,8 @@ for j = 1:perim_count
         %%%% output results %%%%
         if like_score == 0
             perim_scores(i) = mean(abs(diff));
+            %perim_scores(i) = mean(diff);
+            perim_vars(i) = var(diff);
             title_spec = sprintf('Histogram of errors %s',perim_struct(i).Name);
             figure(i),histogram(diff),title(title_spec)
             xlabel('Forecast difference from IR perimeter [hours]')
@@ -173,10 +176,15 @@ for j = 1:perim_count
             fprintf('   mean %f var %f \n',mean(diff),var(diff));
             
         else  %%% using likelihood approach
+            %using old like
+            %stretch=[0.5,10,5,10];
+            %dw = ones(size(diff));2
+            %likes = like2(dw,diff,stretch);
             likes = p_spline(diff);
             %%exp(likes) give "probabilty"
-            likes = exp(likes);
+            %likes = exp(likes);
             perim_scores(i) = mean(likes);
+            perim_vars(i) = var(likes);
             title_spec = sprintf('Histogram of likelihoods %s',perim_struct(i).Name);
             figure(i),histogram(likes),title(title_spec)
             xlabel('Perimter point likelihood')
@@ -198,7 +206,19 @@ for j = 1:perim_count
 end
 hold off
 
-score = mean(perim_scores(perim_scores > 0));
+%% use all perims foir the final score ???
+% perim_struct.Name
+% score_mask = zeros(length(perim_struct),1);
+% for k = 1:length(perim_struct)
+%     query_string = sprintf('Use %s in score?',perim_struct(k).Name);
+%     score_mask(k) = input_num(query_string,1);
+% end
+% score_mask = logical(score_mask);
+    
+score_mask = logical([0 0 1 0 0]);
+score = perim_scores(score_mask);
+diff_var = perim_vars(score_mask);
+%score = mean(perim_scores(perim_scores ~= 0));
 
 
 

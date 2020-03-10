@@ -281,6 +281,7 @@ for i = 1:p_count
         scatter(scatter_lon,scatter_lat,'m','*');        alpha(1.0);
         plot(sim_x_s,sim_y_s,'b');
         plot(perim_x ,perim_y,'r');
+        xticks(-112.72:0.02:-112.58)
         if spinup_compare == 2
             title_str = ('Perimeter observation and Forecast without cycling');
             legend({'Satellite Fire Detections','Forecast without cycling','Infrared perimeter'});
@@ -323,6 +324,7 @@ for i = 1:p_count
         alpha(1.0);
         plot(sim_x_c,sim_y_c,'b');
         plot(perim_x ,perim_y,'r');
+        xticks(-112.72:0.02:-112.58)
         if spinup_compare == 2
             legend({'Satellite Fire Detections','Forecast with cycling','Infrared perimeter'});
             title_str = ('Perimeter observation and Forecast with cycling');
