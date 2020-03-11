@@ -8,7 +8,7 @@ if ~exist('plot_all','var')
 end
 
 % dimension
-n = [6,5,4];
+n = [10,5,5];
 h = [1,1,1];
 factor = 6;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
@@ -17,11 +17,8 @@ fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
 X = regular_mesh(n,h,1);
 %thx = h(1)*[0:n(1)]'*ones(1,n(2)+1);
 %X = add_terrain_to_mesh(X,thx,'shift');
-X = add_terrain_to_mesh(X,'hill','squash',0.1);
-CX = cell(1,3);
-for k = 1:3
-    CX{k} = (X{k}(1:end-1,1:end-1,1:end-1)+X{k}(2:end,1:end-1,1:end-1)+X{k}(1:end-1,2:end,1:end-1)+X{k}(1:end-1,1:end-1,2:end)+X{k}(2:end,2:end,1:end-1)+X{k}(2:end,1:end-1,2:end)+X{k}(1:end-1,2:end,2:end)+X{k}(2:end,2:end,2:end))/8;
-end
+X = add_terrain_to_mesh(X,'xhill','squash',0.3);
+CX = center_mesh(X);
 xx = CX{1}; yy = CX{2}; zz = CX{3};
 
 % assembly sparse matrices
@@ -35,7 +32,7 @@ quiver3(xx(:),yy(:),zz(:),u0(1:3:end),u0(2:3:end),u0(3:3:end),'LineWidth',2), xl
 
 if plot_all
     % plot initial wind from each cell
-    figure, plot_fluxes_3d(X,v0,h), title('Initial wind fluxes')
+    figure, plot_fluxes_3d(X,B'*v0,h), title('Initial wind fluxes')
 end
 
 % solve mass-consistent using saddle problem
@@ -49,11 +46,12 @@ figure,
 plot_mesh_3d(X), hold on,  
 quiver3(xx(:),yy(:),zz(:),u(1:3:end),u(2:3:end),u(3:3:end),'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Mass-consistent solution')
 if plot_all
-    % wind direction fluxes
-    vv = v;
     % plot resulting fluxes
-    figure, plot_fluxes_3d(X,vv,h),title('Mass-consistent solution fluxes')
+    figure, plot_fluxes_3d(X,v,h),title('Mass-consistent solution fluxes')
     % plot lagrange multiplier p
     p3 = reshape(p,n);
-    figure, for i=1:n(3), mesh(xx(:,:,i),yy(:,:,i),p3(:,:,i)+10*i); hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier p')
+    figure, for i=1:n(3), mesh(xx(:,:,i),yy(:,:,i),p3(:,:,i)+.05*i); hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier p')
+    %{
+    figure, for i=1:n(3), qq = Ct*q(:,:,i); qqm = (qq(1:4:end-1)+qq(2:4:end)+qq(3:4:end)+qq(4:4:end))/4; mesh(xx,yy,reshape(qqm,n)), hold on, end, xlabel('x'), ylabel('y'), title('Lagrange multiplier q')
+    %}
 end
