@@ -1,8 +1,8 @@
-ifile = 'wrfinput_d01';
-si = nc2struct(ifile,{'XLONG','XLAT','HGT','U','V','W','PH','PHB'},{'DX','DY'});
+%ifile = 'wrfinput_d01';
+%si = nc2struct(ifile,{'XLONG','XLAT','HGT','U','V','W','PH','PHB'},{'DX','DY'});
 %ofile = 'wrfout_d01_2010-07-01_01:00:00';
 %so = nc2struct(ofile,{'U','V','W'},{});
-so = load('wind.mat');
+s = load('wind.mat');
 
 % transformation matrix from wind at x,y,z coordinates to two constant
 % winds at the faces
@@ -13,27 +13,27 @@ T=[1,0,0;
    0,0,1;
    0,0,1];
 % intial wind at the faces 
-v0x = (si.u(1:end-1,:,:)+si.u(2:end,:,:))/2;
-v0y = (si.v(:,1:end-1,:)+si.v(:,2:end,:))/2;
-v0z = (si.w(:,:,1:end-1)+si.w(:,:,2:end))/2;
+v0x = (s.u0(1:end-1,:,:)+s.u0(2:end,:,:))/2;
+v0y = (s.v0(:,1:end-1,:)+s.v0(:,2:end,:))/2;
+v0z = (s.w0(:,:,1:end-1)+s.w0(:,:,2:end))/2;
 v0 = T*[v0x(:),v0y(:),v0z(:)]';
 v0 = v0(:);
 % final wind at the center from WRF
-uWx = (so.u(1:end-1,:,:)+so.u(2:end,:,:))/2;
-uWy = (so.v(:,1:end-1,:)+so.v(:,2:end,:))/2;
-uWz = (so.w(:,:,1:end-1)+so.w(:,:,2:end))/2;
+uWx = (s.u(1:end-1,:,:)+s.u(2:end,:,:))/2;
+uWy = (s.v(:,1:end-1,:)+s.v(:,2:end,:))/2;
+uWz = (s.w(:,:,1:end-1)+s.w(:,:,2:end))/2;
 uW = T*[uWx(:),uWy(:),uWz(:)]';
 uW = uW(:);
 % geopotential height
-gh = (si.ph+si.phb)/9.81;
+gh = (s.ph+s.phb)/9.81;
 
 % dimensions and spacings
 n = size(v0x);
-h = [si.dx,si.dy];
+h = [s.dx,s.dy];
 
 % create meshes from input file
-xm = repmat(si.xlong,[1,1,n(3)]);
-ym = repmat(si.xlat,[1,1,n(3)]);
+xm = repmat(s.xlong,[1,1,n(3)]);
+ym = repmat(s.xlat,[1,1,n(3)]);
 zm = (gh(:,:,1:end-1)+gh(:,:,2:end))/2;
 Xm = {xm,ym,zm};
 [xx,yy,~] = ndgrid(h(1)*(0:n(1)),h(2)*(0:n(2)),0:n(3));
@@ -72,7 +72,7 @@ plot_wind_3d(Xm,u,'Final mass-consistent wind',1);
 figure(4), 
 mesh(xx(:,:,1),yy(:,:,1),zz(:,:,1)) 
 hold on
-plot_wind_3d(Xm,u-uWc,'Final mass-consistent wind',1,0);
+plot_wind_3d(Xm,u-uWc,'Final mass-consistent wind',1);
 
 % differences
 ux = reshape(u(1:3:end),n); uy = reshape(u(2:3:end),n); uz = reshape(u(3:3:end),n);

@@ -30,7 +30,7 @@ cz = sparse(ncz,factor*prod(n));
 v0 = zeros(factor*prod(n),1);
 
 % moduli for penalization
-moduli = [1e3,1e3,1];
+moduli = [1e2,1e2,1];
 
 % create matrices
 tstart=tic;
