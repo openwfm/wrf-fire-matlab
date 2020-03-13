@@ -2,7 +2,7 @@
 %si = nc2struct(ifile,{'XLONG','XLAT','HGT','U','V','W','PH','PHB'},{'DX','DY'});
 %ofile = 'wrfout_d01_2010-07-01_01:00:00';
 %so = nc2struct(ofile,{'U','V','W'},{});
-s = load('wind.mat');
+s = load('WRF_20.mat');
 
 % transformation matrix from wind at x,y,z coordinates to two constant
 % winds at the faces
@@ -72,7 +72,7 @@ plot_wind_3d(Xm,u,'Final mass-consistent wind',1);
 figure(4), 
 mesh(xx(:,:,1),yy(:,:,1),zz(:,:,1)) 
 hold on
-plot_wind_3d(Xm,u-uWc,'Final mass-consistent wind',1);
+plot_wind_3d(Xm,u-uWc,'Mass-consistent vs WRF wind',1);
 
 % differences
 ux = reshape(u(1:3:end),n); uy = reshape(u(2:3:end),n); uz = reshape(u(3:3:end),n);
