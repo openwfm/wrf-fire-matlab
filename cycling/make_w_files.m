@@ -23,18 +23,25 @@ for i = 3:length(d)
         %fprintf('moved to %s \n',pwd)
         
         %%%strcmp can avoid this...
-    elseif length(d(i).name) > 6
-        if d(i).name(1:6) == 'wrfout'
+    elseif strcmp(d(i).name(1:6),'wrfout')
+    %elseif length(d(i).name) > 6
+        if d(i).name(end) ~= 't'
             
             %dir_name = ([d(i).name,'/']);
             wrf_fold = ([d(i).folder,'/']);
             wrf_path = ([wrf_fold,d(i).name]);
-            
-            w = read_wrfout_tign(wrf_path);
             save_str = ([wrf_path,'.mat']);
             fprintf('Working in %s \n', cwd)
-            fprintf('Saving %s \n',save_str)
-            save(save_str,'w');
+            if ~exist(save_str,'file')
+                w = read_wrfout_tign(wrf_path);
+                fprintf('Saving %s \n',save_str)
+                save(save_str,'w');
+            else
+                fprintf('%s already exists \n',save_str)
+            end
+            
+            
+
         end
         %
     end
