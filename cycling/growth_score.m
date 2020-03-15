@@ -13,7 +13,12 @@ function [ growth_struct] = growth_score( wrfout,prefix )
 %       as units)
 
 % make reduced structure
-w = read_wrfout_tign(wrfout);
+if wrfout(end) ~= 't'
+    w = read_wrfout_tign(wrfout);
+else
+    fprintf('wrfout is a mat file, loading \n');
+    load(wrfout);
+end
 red = subset_domain(w);
 time_bounds = [red.start_datenum red.end_datenum];
 

@@ -14,7 +14,13 @@ function [ score ] = match_detections( wrfout, wrf_time_step )
 if nargin > 2
     w = read_wrfout_tign(wrfout,wrf_time_step);
 else
-    w = read_wrfout_tign(wrfout);
+    if wrfout(end) ~= 't'
+        w = read_wrfout_tign(wrfout);
+    else
+        fprintf('wrfout is already a .mat file, loading \n')
+        load(wrfout)
+        
+    end
 end
 red = subset_domain(w,1);
 
