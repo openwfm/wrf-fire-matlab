@@ -6,6 +6,12 @@ function w=read_wrfout_tign(f,ts)
     %    f file name
     %    ts time step (string, optional). Read last time step if not given.
     % 
+    
+    if f(end) == 't'
+        fprintf('Matlab file as input, loading \n')
+        load(f)
+        return
+    end
     t=nc2struct(f,{'Times'},{});  nframes=size(t.times,2);
     alltimes=char(t.times')
     fprintf('Last time step in %s is %i at %s\n',f,nframes,alltimes(nframes,:))
