@@ -161,6 +161,7 @@ for j = 1:perim_count
         
         %%%% output results %%%%
         if like_score == 0
+            rel_error = abs(diff(~isnan(diff)))./z(~isnan(diff));
             perim_scores(i) = mean(abs(diff));
             %perim_scores(i) = mean(diff);
             perim_vars(i) = var(diff);

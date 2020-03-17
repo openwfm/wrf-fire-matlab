@@ -78,7 +78,7 @@ for i=1:length(d),
             else
                 %this next line breaks the plotting of detections
                 %downstream in fire_pixels3d.m
-                %[x.xlon,x.xlat]=meshgrid(x.lon,x.lat);
+                [x.xlon,x.xlat]=meshgrid(x.lon,x.lat);
                 x.fxdata=griddata(double(x.lon(:)),double(x.lat(:)),double(x.data(:)),red.fxlong,red.fxlat,'nearest');
             end
             if fig.fig_interp,  % map interpolated data to reduced domain
