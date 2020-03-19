@@ -75,6 +75,7 @@ hold on
 plot_wind_3d(Xm,u-uWc,'Mass-consistent vs WRF wind',1);
 
 % differences
+%{
 ux = reshape(u(1:3:end),n); uy = reshape(u(2:3:end),n); uz = reshape(u(3:3:end),n);
 figure(5)
 mesh(Xm{1}(:,:,1),Xm{2}(:,:,1),ux(:,:,1)-uWx(:,:,1))
@@ -88,5 +89,42 @@ figure(7)
 mesh(Xm{1}(:,:,1),Xm{2}(:,:,1),uz(:,:,1)-uWz(:,:,1))
 xlabel('x'), ylabel('y'), zlabel('z')
 title('Differences in z direction')
+%}
 
-max_diff = max(max(max(u-uWc))),
+max_diff = max(max(max(u-uWc)))
+
+% save previous results 
+v0p = v0;
+vp = v;
+up = u;
+
+% new initial wind
+v0 = uW;
+
+% solve new
+saddle_sparse
+
+% transform resulting fluxes into cartesian winds at the centers
+u=E*B*v;
+
+% plot
+figure(5), 
+mesh(xx(:,:,1),yy(:,:,1),zz(:,:,1)) 
+hold on
+plot_wind_3d(Xm,u,'Final mass-consistent wind new initial',1);
+figure(6), 
+mesh(xx(:,:,1),yy(:,:,1),zz(:,:,1)) 
+hold on
+plot_wind_3d(Xm,u-uWc,'Mass-consistent new initial vs WRF wind',1);
+max_diff_new = max(max(max(u-uWc)))
+figure(7),
+mesh(xx(:,:,1),yy(:,:,1),zz(:,:,1)) 
+hold on
+plot_wind_3d(Xm,up-u,'Mass-consistent vs Mass-consistent new initial',1);
+max_diff_mcs = max(max(max(up-u)))
+
+% conditions
+plot_conditions(n,B*v0p,C,D,'WRF input')
+plot_conditions(n,B*uW,C,D,'WRF final')
+plot_conditions(n,vp,C,D,'Mass-consistent')
+plot_conditions(n,v,C,D,'Mass-consistent new input')
