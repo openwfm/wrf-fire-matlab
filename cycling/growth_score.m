@@ -13,12 +13,14 @@ function [ growth_struct] = growth_score( wrfout,prefix )
 %       as units)
 
 % make reduced structure
-if wrfout(end) ~= 't'
-    w = read_wrfout_tign(wrfout);
-else
-    fprintf('wrfout is a mat file, loading \n');
-    load(wrfout);
-end
+% if wrfout(end) ~= 't'
+%     w = read_wrfout_tign(wrfout);
+% else
+%     fprintf('wrfout is a mat file, loading \n');
+%     load(wrfout);
+% end
+
+w = read_wrfout_tign(wrfout);
 red = subset_domain(w);
 time_bounds = [red.start_datenum red.end_datenum];
 
@@ -103,6 +105,7 @@ hold on, plot(data_time(1:term),fore_area(1:term))
 legend('Area within detection perimeter','Area within forecast perimeter')
 xlabel('Simulation Time [days]')
 ylabel('Simulation Area [grid nodes]')
+title(wrfout);
 hold off
 
 % figure,plot(data_time(1:term),diff_sat_area(1:term))
@@ -113,10 +116,20 @@ hold off
 % hold off
 gs = mean(abs(sat_area-fore_area));
 
+%compute rates
+sat_rate = sat_area;
+fore_rate = fore_area;
+for i = 2:length(sat_area)
+    sat_rate(i) = sat_area(i) - sat_area(i-1);
+    fore_rate(i) = fore_area(i) - fore_area(i-1);
+end
+
 
 growth_struct.gs = gs;
 growth_struct.data_time = data_time;
 growth_struct.sat_area = sat_area;
 growth_struct.fore_area = fore_area;
+growth_struct.sat_rate = sat_rate;
+growth_struct.fore_rate = fore_rate;
 end
 
