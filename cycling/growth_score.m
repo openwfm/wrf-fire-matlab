@@ -93,7 +93,7 @@ end
 
 %convert data_time to days since simulation
 data_time = (data_time - red.start_datenum);
-if strcmp(prefix,'../TIFs/')
+if strcmp(prefix(end-5:end),'/TIFs/')
     term = 40;
 else
     term = length(data_time);
