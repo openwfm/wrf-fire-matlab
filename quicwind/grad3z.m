@@ -14,7 +14,7 @@ end
 
 % wrap in zeros
 n = size(f);
-fz = zeros(n+2); 
+% fz = zeros(n+2); 
 fz(2:n(1)+1,2:n(2)+1,2:n(3)+1)=f;
 if b,
     fz(:,:,1) = fz(:,:,2);
