@@ -2,7 +2,7 @@
 
 function cycle_ros(varargin)
 close all
-! date
+%! date
 q = 0;
 base_datestr='2013-08-11 00:00:00';
 base=datenum(base_datestr);
