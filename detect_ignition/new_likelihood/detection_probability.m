@@ -14,7 +14,7 @@ heat_up = 0;
 
 %for new burn model, set to zero for old model
 % length of time heat is maximum, constant
-const_time = 10;
+const_time = 0;
 
 %needed for computing with time instead of heat
 decay = 0.3;
@@ -41,7 +41,7 @@ end
 %b = 2.2; %controls false positive rate  2.2 for patch
 
 %can comput false pos rate as 
-false_rate = 0.0002;
+false_rate = 0.02;
 b = log(false_rate/(1-false_rate));
 
 %can compute a as

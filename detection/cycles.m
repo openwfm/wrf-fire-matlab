@@ -86,6 +86,11 @@ else
     fprintf('perimeter_time=%10.3f\nrestart=%s\n',t(i).perimeter_time,restart)
     q=sprintf('replace TIGN_G in %s and run\n %s\n [0/1]',rewrite,link_namelist_command);
     if input_num(q,1,force)
+        use_analysis = input_num('Use analyis for restart? [0]',0)
+        if use_analysis
+            p.analysis= max(p.forecast,p.analysis);
+            p.spinup = p.analysis;
+        end
         ncreplace(rewrite,'TIGN_G',p.spinup)
         if system(link_namelist_command),
              error('link failed')
