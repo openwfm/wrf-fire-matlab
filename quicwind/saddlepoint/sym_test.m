@@ -1,9 +1,32 @@
-function [A,D,E,B,C,v0]=sparse_assembly(X,h)
+%% symbolic settings
+% dimensions and symbolic step sizes
+n = [5,4,3];
+h = [sym('dx'),sym('dy'),sym('dz')];
 
+%% regular_mesh function
+val = 1;
+zz = sym(zeros(1,n(3)));
+zz(1) = 0;
+for i=2:n(3)+1
+    zz(i) = zz(i-1) + h(3) * val^(i-2);
+end
+[x,y,z] = ndgrid(h(1)*[0:n(1)],h(2)*[0:n(2)],zz);
+X = {x,y,z};
+
+%% add_terrain_to_mesh function
+thx = h(1)*[0:n(1)]'*ones(1,n(2)+1);
+kmax=size(X{1},3);
+XX=X;
+for k=1:kmax
+    XX{3}(:,:,k)=X{3}(:,:,k)+thx;
+end
+X=XX;
+
+%% sparse_assembly
+% moduli for penalization
+moduli = [sym('alpha_1'),sym('alpha_1'),sym('alpha_2')];
 % sizes and dimensions
 d = size(X,2);
-n = size(X{1})-1;
-
 % # ground flux conditions
 ncg = n(1)*n(2);
 % # x continuity constraints
@@ -14,26 +37,19 @@ ncy = n(1)*(n(2)-1)*n(3);
 ncz = n(1)*n(2)*(n(3)-1);
 % total number of constraints
 c_constraints = ncg + ncx + ncy + ncz;
-
 % # fluxes per element
 factor = 2*d;
-
 % initialize matrices
-A=sparse(factor*prod(n));
-D=sparse(prod(n),factor*prod(n));
-E=sparse(size(n,2)*prod(n),factor*prod(n));
-B=sparse(factor*prod(n));
+A = sym(sparse(factor*prod(n)));
+B = sym(sparse(factor*prod(n)));
+D = sparse(prod(n),factor*prod(n));
+E = sparse(size(n,2)*prod(n),factor*prod(n));
 cg = sparse(ncg,factor*prod(n));
 cx = sparse(ncx,factor*prod(n));
 cy = sparse(ncy,factor*prod(n));
 cz = sparse(ncz,factor*prod(n));
-v0 = zeros(factor*prod(n),1);
-
-% moduli for penalization
-moduli = [1,1,1];
-
+v0 = sym(zeros(factor*prod(n),1));
 % create matrices
-tstart=tic;
 for i=1:prod(n)
     [xi,yi,zi]=ind2sub(n,i);
     s=(i-1)*factor+1:i*factor; % span of local dofs
@@ -48,24 +64,13 @@ for i=1:prod(n)
             0,0,.5,.5,0,0;
             0,0,0,0,.5,.5];
     % initial wind
-    v0(s)=[1,1,0,0,0,0]';
+    v0(s)=[sym('vx_1'),sym('vx_2'),sym('vy_1'),sym('vy_2'),sym('vz_1'),sym('vz_2')]';
     % continuity conditions
     [cx,cy,cz,cg]=c_conditions_3d(n,xi,yi,zi,s,cx,cy,cz,cg);
-    if mod(i,100)==0, 
-        done=i/prod(n);
-        tel = toc(tstart);
-        tot=tel/done;
-        rem=(1-done)*tot;
-        disp(['done ',num2str(100*done),'% time ',num2str(tel),...
-            's remaining ',num2str(rem),'s to ',num2str(tot),'s'] )
-    end
 end
-disp('creating C')
 % continuity operator
 C = [cx;cy;cz;cg];
 % check number of continuity constraints
-disp(['size ',num2str(size(C))]);
 if size(C,1) ~= c_constraints
     error('number of constraints different than indices computed!') 
-end
 end
