@@ -24,20 +24,36 @@ if ~exist('var','var'),
 end
 v1=ncread(file1,var);
 v2=ncread(file2,var);
-[relerr,ssq]=comp(v1,v2);
+s1=size(v1);
+s2=size(v2);
+if length(s1) ~=  length(s2) | any(s1 ~= s1),
+    error([var,' must be same size 1: ',num2str(s1),' 2: ',num2str(s2)]) 
+end 
+[relerr,ssq]=comp('total',v1,v2);
+if relerr>0,
+    for i=1:s1(end)    
+        s=['slice ',num2str(i)];
+        switch length(s1)
+            case 4
+                comp(s,v1(:,:,:,i),v2(:,:,:,i));
+            case 3
+                comp(s,v1(:,:,i),v2(:,:,i));
+        end
+    end
+end
 names=var;
 end
 
-function [relerr,ssq]=comp(v1,v2)
-s1=size(v1);
-s2=size(v2);
-d=(v2(:)-v1(:))/(max(big(v1),big(v2))+realmin); % scaled diff
+function [relerr,ssq]=comp(s,v1,v2)
+scale=max(big(v1),big(v2));
+relerr=big(v2(:)-v1(:))/(scale+realmin); 
+ssq=norm(v2(:)-v1(:))/(max(norm(v1(:)),norm(v2(:)))+realmin); 
+d=(v2(:)-v1(:))/(scale+realmin); % scaled diff
 avgdiff=mean(d);
-ssq=std(d);
+stdev=std(d);
 n=length(v1(:));
-t=sqrt(n)*avgdiff/(ssq+realmin);
+t=sqrt(n)*avgdiff/(stdev+realmin);
 p=erf(t);
-relerr=big(d);
-fprintf('relative error max %g min %g ssq %g avg diff %g t-stats %g p-value %g\n',...
-    max(d),min(d),ssq,avgdiff,t,p) 
+fprintf('%s max abs %g relative diff %g max %g stdev %g avg %g t-stats %g p-value %g\n',...
+    s,scale,relerr,max(d),stdev,avgdiff,t,p) 
 end
