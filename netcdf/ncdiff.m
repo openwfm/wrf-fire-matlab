@@ -24,6 +24,13 @@ if ~exist('var','var'),
 end
 v1=ncread(file1,var);
 v2=ncread(file2,var);
+[relerr,ssq]=comp(v1,v2);
+names=var;
+end
+
+function [relerr,ssq]=comp(v1,v2)
+s1=size(v1);
+s2=size(v2);
 d=(v2(:)-v1(:))/(max(big(v1),big(v2))+realmin); % scaled diff
 avgdiff=mean(d);
 ssq=std(d);
@@ -31,7 +38,6 @@ n=length(v1(:));
 t=sqrt(n)*avgdiff/(ssq+realmin);
 p=erf(t);
 relerr=big(d);
-names=var;
 fprintf('relative error max %g min %g ssq %g avg diff %g t-stats %g p-value %g\n',...
     max(d),min(d),ssq,avgdiff,t,p) 
 end
