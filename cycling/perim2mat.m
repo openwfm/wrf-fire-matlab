@@ -1,8 +1,8 @@
 % make .mat files from a kml for use in data assimilation
 % requires mapping toolbox and the kml2struct.m function
 
-kmlFile = 'doc.kml';
-%a = kml2struct(kmlFile);
+kmlFile = '../cycling_data/TIFs/doc.kml';
+a = kml2struct(kmlFile);
 %load('perim_struct.mat');
 
 %look at the kml file
