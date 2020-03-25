@@ -1,10 +1,10 @@
 % file in: /home/math/farguella/wrf-fire-matlab/quicwind/saddlepoint/test_A.mat
 % produced by running: test_A.m
-load('test_A.mat')
+% load('test_A.mat')
 
 n = [8,8,8];
 h = [.5,.5,.5];
-levels = 5;
+levels = size(F,1);
 
 X = regular_mesh(n,h,1);
 thx = h(1)*[0:n(1)]'*ones(1,n(2)+1);
