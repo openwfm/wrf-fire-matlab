@@ -38,6 +38,12 @@ else
     save g_full.mat g;
 end
 
+if exist('growth.mat','file')
+    fprintf('Growth structure file exists \n')
+    load growth.mat
+end
+
+
 
 %granules with active fire detections
 data_count = 0;
@@ -62,13 +68,24 @@ for i=1:length(g)
         sat_lons = double([sat_lons(:);lon_update(:)]);
         sat_lats = double([sat_lats(:);lat_update(:)]);
         
-        fprintf('Computing Satellite area \n')
-        %draw polygon around the fire grid detections
-        sat_boundary = boundary(sat_lons,sat_lats);
-        [sat_in,sat_on] = inpolygon(red.fxlong(:),red.fxlat(:),sat_lons,sat_lats);
-        %figure,scatter(
-        sat_area(data_count) = sum(sat_in) + sum(sat_on);
-        data_time(data_count) = g(i).time;
+        %% get satellite fire area
+        if exist('temp_struct','var') & strcmp(g(i).file,temp_struct.data_file(data_count))
+            fprintf('Temp struct has area already \n')
+            sat_area(data_count) = temp_struct.sat_area(data_count);
+            %temp_struct has data_time as days since sim start
+            data_time(data_count) = temp_struct.data_time(data_count)+red.start_datenum;
+            data_file{data_count} = temp_struct.data_file{data_count};
+        else
+            fprintf('Computing Satellite area in %s \n',g(i).file)
+            %draw polygon around the fire grid detections
+            sat_boundary = boundary(sat_lons,sat_lats);
+            [sat_in,sat_on] = inpolygon(red.fxlong(:),red.fxlat(:),sat_lons,sat_lats);
+            %figure,scatter(
+            sat_area(data_count) = sum(sat_in) + sum(sat_on);
+            % recor time and file name
+            data_time(data_count) = g(i).time;
+            data_file{data_count} = g(i).file;
+        end
         
         fprintf('Computing forecast area \n')
         fore_mask = red.tign < g(i).time;
@@ -132,5 +149,13 @@ growth_struct.sat_area = sat_area;
 growth_struct.fore_area = fore_area;
 growth_struct.sat_rate = sat_rate;
 growth_struct.fore_rate = fore_rate;
+growth_struct.data_file = data_file;
+
+if ~exist('growth.mat','file')
+    temp_struct = growth_struct;
+    save growth.mat temp_struct;
+end
+
+
 end
 
