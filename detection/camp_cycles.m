@@ -6,7 +6,7 @@ function cycles(varargin)
 base_datestr='2018-11-08 12:00:00';
 
 %multiplier to go to different time frame(s)
-mult = 2/3;
+mult = 1/3;
 
 base=datenum(base_datestr);
 num_cycles=5;

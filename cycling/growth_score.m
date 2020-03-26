@@ -105,7 +105,8 @@ hold on, plot(data_time(1:term),fore_area(1:term))
 legend('Area within detection perimeter','Area within forecast perimeter')
 xlabel('Simulation Time [days]')
 ylabel('Simulation Area [grid nodes]')
-title(wrfout);
+title_str = sprintf('%s',wrfout)
+title(title_str);
 hold off
 
 % figure,plot(data_time(1:term),diff_sat_area(1:term))
