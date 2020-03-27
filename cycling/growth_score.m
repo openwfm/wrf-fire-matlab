@@ -68,6 +68,17 @@ for i=1:length(g)
         sat_lons = double([sat_lons(:);lon_update(:)]);
         sat_lats = double([sat_lats(:);lat_update(:)]);
         
+        %% posibly add new granules
+        if length(temp_struct.data_time) < i
+            temp_struct.data_time(i) = 0;
+            temp_struct.sat_area(i) = 0;
+            temp_struct.fore_area(i) = 0;
+            temp_struct.sat_rate(i) = 0;
+            temp_struct.fore_rate(i) = 0;
+            temp_struct.data_file{i} = 'temp';
+        end %% adding new granule
+            
+        
         %% get satellite fire area
         if exist('temp_struct','var') & strcmp(g(i).file,temp_struct.data_file(data_count))
             fprintf('Temp struct has area already \n')
