@@ -82,19 +82,21 @@ for i = 1:length(a)
         i,a(i);
         
         % get perimeter time
-        a(i).p_string = a(i).Name(end-14:end)
-        if a(i).p_string(1) ~= '1'
-            a(i).p_string(1) = '0';
-        end
-        formatIn = 'mm-dd-yyyy HHMM';
+        a(i).p_string = a(i).Name(end-12:end)
+        
+%        only for kml file
+%         if a(i).p_string(1) ~= '1'
+%             a(i).p_string(1) = '0';
+%         end
+%         formatIn = 'mm-dd-yyyy HHMM';
+        formatIn = 'yyyymmdd HHMM';
         %perim times are local, need to convert to UTC
         zone_shift = 6;
-        if a(i).Name(1:2) == 'ca'
-            a(i).p_string = a(i).Name(end-12:end);
+        if strcmp(a(i).Name(1:2),'ca')
+            %a(i).p_string = a(i).Name(end-12:end);
             zone_shift = 8;
-            formatIn = 'yyyymmdd HHMM';
-            %a(i).p_string = a(i).p_string(end-13:end);
-            
+            %formatIn = 'yyyymmdd HHMM';
+            %a(i).p_string = a(i).p_string(end-12:end)
         end
         a(i).p_time = datenum(a(i).p_string,formatIn)+zone_shift/24;
         
