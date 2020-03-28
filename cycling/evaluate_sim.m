@@ -74,7 +74,7 @@ p_count = 0;
 
 %%%%%%% start 13 for special point %%%%%%%%
 %n gives  size of grid to use
-n = 200;
+n = 100;
 for i = 1:length(a)
     %i, a(i)
     if strcmp(a(i).Geometry,'Polygon')
