@@ -74,7 +74,7 @@ p_count = 0;
 
 %%%%%%% start 13 for special point %%%%%%%%
 %n gives  size of grid to use
-n = 100;
+n = 200;
 for i = 1:length(a)
     %i, a(i)
     if strcmp(a(i).Geometry,'Polygon')
@@ -102,7 +102,7 @@ for i = 1:length(a)
         
         %set decimate to an  postive integer to use just a subset of points
         %  in perimeter
-        decimate = 1;
+        decimate = 10;
         lats = a(i).Lat(1:decimate:end);
         lons = a(i).Lon(1:decimate:end);
         
@@ -136,7 +136,7 @@ for i = 1:length(a)
             scatter(x,y);
             scatter(x(fires),y(fires),'*','r');
             title(a(i).Name);
-            plot(lons,lats)
+            %plot(lons,lats)
             hold off
             %figure,mesh(data)
         end %if plot_on
@@ -257,7 +257,7 @@ for i = 1:p_count
 
         for j = 1:length(g_c)
             if j == 1
-                det_g_c = g_c(j).data >= 7;
+                det_g_c = g_c(j).data >= 8;
                 scatter_lon = g_c(j).xlon(det_g_c);
                 scatter_lat = g_c(j).xlat(det_g_c);
             end
@@ -283,7 +283,7 @@ for i = 1:p_count
         scatter(scatter_lon,scatter_lat,'m','*');        alpha(1.0);
         plot(sim_x_s,sim_y_s,'b');
         plot(perim_x ,perim_y,'r');
-        xticks(-112.72:0.02:-112.58)
+        %xticks(-112.72:0.02:-112.58)
         if spinup_compare == 2
             title_str = ('Perimeter observation and Forecast without cycling');
             legend({'Satellite Fire Detections','Forecast without cycling','Infrared perimeter'});
@@ -326,7 +326,7 @@ for i = 1:p_count
         alpha(1.0);
         plot(sim_x_c,sim_y_c,'b');
         plot(perim_x ,perim_y,'r');
-        xticks(-112.72:0.02:-112.58)
+        %xticks(-112.72:0.02:-112.58)
         if spinup_compare == 2
             legend({'Satellite Fire Detections','Forecast with cycling','Infrared perimeter'});
             title_str = ('Perimeter observation and Forecast with cycling');
