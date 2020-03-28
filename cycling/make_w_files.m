@@ -23,7 +23,7 @@ for i = 3:length(d)
         %fprintf('moved to %s \n',pwd)
         
         %%%strcmp can avoid this...
-    elseif strcmp(d(i).name(1:6),'wrfout')
+    elseif length(d(i).name) > 6 & strcmp(d(i).name(1:6),'wrfout')
     %elseif length(d(i).name) > 6
         if d(i).name(end) ~= 't'
             
