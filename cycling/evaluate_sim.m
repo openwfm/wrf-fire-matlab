@@ -22,6 +22,8 @@ function score = evaluate_sim( wrfout_s, wrfout_c, perim, wrf_time_step )
 
 close all
 
+min_fire_confidence = 8;
+
 spinup_compare = input_num('Compare spin-up vs analysis [1] Cycle vs No cycle? [2] Two diff cycles? [3]?',1,0);
 if spinup_compare == 3
    cycle_s = input_num('Cycle number for wrfout_s?',0);
@@ -257,11 +259,11 @@ for i = 1:p_count
 
         for j = 1:length(g_c)
             if j == 1
-                det_g_c = g_c(j).data >= 8;
+                det_g_c = g_c(j).data >= min_fire_confidence;
                 scatter_lon = g_c(j).xlon(det_g_c);
                 scatter_lat = g_c(j).xlat(det_g_c);
             end
-            det_g_c = g_c(j).data >= 7;
+            det_g_c = g_c(j).data >= min_fire_confidence;
             lon_g_c = g_c(j).xlon(det_g_c);
             lat_g_c = g_c(j).xlat(det_g_c);
             %scatter_det = [scatter_det det_g_c(:)];

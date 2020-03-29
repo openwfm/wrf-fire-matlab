@@ -150,7 +150,7 @@ for j = 1:perim_count
                     load p_spline.mat
                 else
                     fprintf('Making and saving spline \n')
-                    [p_spline,~,~]=make_spline(72,400);
+                    [p_spline,~,~]= make_spline(72,400);
                     save p_spline.mat p_spline
                 end
             else
