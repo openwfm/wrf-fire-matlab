@@ -33,13 +33,17 @@ end
 if nargin > 3
     w_c =read_wrfout_tign(wrfout_c,wrf_time_step);
     red_c = subset_domain(w_c,1);
+    clear('w_c')
     w_s =read_wrfout_tign(wrfout_s,wrf_time_step);
     red_s = subset_domain(w_s,1);
+    clear('w_s');
 else
     w_c =read_wrfout_tign(wrfout_c);
     red_c = subset_domain(w_c,1);
+    clear('w_c');
     w_s =read_wrfout_tign(wrfout_s);
     red_s = subset_domain(w_s,1);
+    clear('w_s');
 end
 
 
