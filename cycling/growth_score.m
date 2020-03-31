@@ -69,7 +69,7 @@ for i=1:length(g)
         sat_lats = double([sat_lats(:);lat_update(:)]);
         
         %% posibly add new granules
-        if length(temp_struct.data_time) < i
+        if exist('temp_struct','var')&length(temp_struct.data_time) < i
             temp_struct.data_time(i) = 0;
             temp_struct.sat_area(i) = 0;
             temp_struct.fore_area(i) = 0;
@@ -123,6 +123,7 @@ end
 data_time = (data_time - red.start_datenum);
 if strcmp(prefix(end-5:end),'/TIFs/')
     term = 40;
+    term = length(data_time);
 else
     term = length(data_time);
 end
