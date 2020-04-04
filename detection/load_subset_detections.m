@@ -33,6 +33,11 @@ for i=1:length(d),
                v.data = v.data(mask);
                v.lon = v.lon(mask);
                v.lat = v.lat(mask);
+               %check for filter fail
+               fail = sum(v.data(:)==unclass(uu));
+               if fail
+                   fprintf('Data corruption in %, class %d',file,unclass(uu));
+               end
             end
         end
     end
