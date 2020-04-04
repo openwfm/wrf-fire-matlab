@@ -75,7 +75,7 @@ else
     end
     time_bounds=[t(i).obs_start,t(i).obs_end,t(i).replay_start,t(i).replay_end]+base;
     savew=sprintf('w_%i',i);
-    fprintf('saving to %s\n',savew)ls
+    fprintf('saving to %s\n',savew)
     cycle=i;
     save(savew,'w','cycle','time_bounds','t')
     p=detect_fit_level2(cycle,time_bounds,[],w,force)
