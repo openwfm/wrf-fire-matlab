@@ -11,7 +11,7 @@ k=0;
 for i=1:length(d),
     
     file=d{i};
-    fprintf('%s file %s ',stime(t(i),red),file);
+    fprintf('%s file %s \n',stime(t(i),red),file);
     %v=readmod14(prefix,file,'silent'); original line
     if file(end) == 't'
         v=readmod14(prefix,file);
@@ -25,6 +25,20 @@ for i=1:length(d),
         if mod(i,2) == 1
             file2 = d{i+1};
             v = readl2data(prefix,file,file2);
+            % loop over unclassified data to filter
+            % this will turn matrices to vectors
+            unclass = [0,1,2,6];
+            for uu = 1:length(unclass)
+               mask = v.data(:) ~= unclass(uu);
+               v.data = v.data(mask);
+               v.lon = v.lon(mask);
+               v.lat = v.lat(mask);
+               %check for filter fail
+               fail = sum(v.data(:)==unclass(uu));
+               if fail
+                   fprintf('Data corruption in %, class %d',file,unclass(uu));
+               end
+            end
         end
     end
     % select fire detection within the domain
@@ -68,7 +82,7 @@ for i=1:length(d),
                 x.lon = v.lon(idx);
                 x.lat = v.lat(idx);
             end
-            
+            %interpolate to fire mesh, projection????
             if l2 == 0
                 [x.xlon,x.xlat]=meshgrid(x.lon,x.lat);
                 %use scatter interpolation instead, seems to make no
@@ -78,7 +92,12 @@ for i=1:length(d),
             else
                 %this next line breaks the plotting of detections
                 %downstream in fire_pixels3d.m
-                [x.xlon,x.xlat]=meshgrid(x.lon,x.lat);
+                du = 0.001;
+                dv = 0.001;
+                u_space = red.min_lat:du:red.max_lat;
+                v_space = red.min_lon:dv:red.max_lon;
+                [x.xlon,x.xlat]=meshgrid(v_space,u_space);
+                %[x.xlon,x.xlat]=meshgrid(x.lon,x.lat);
                 x.fxdata=griddata(double(x.lon(:)),double(x.lat(:)),double(x.data(:)),red.fxlong,red.fxlat,'nearest');
             end
             if fig.fig_interp,  % map interpolated data to reduced domain

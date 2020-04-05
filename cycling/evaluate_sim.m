@@ -22,7 +22,7 @@ function score = evaluate_sim( wrfout_s, wrfout_c, perim, wrf_time_step )
 
 close all
 
-min_fire_confidence = 8;
+min_fire_confidence = 7;
 
 spinup_compare = input_num('Compare spin-up vs analysis [1] Cycle vs No cycle? [2] Two diff cycles? [3]?',1,0);
 if spinup_compare == 3
