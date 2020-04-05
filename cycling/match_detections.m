@@ -19,7 +19,6 @@ else
     else
         fprintf('wrfout is already a .mat file, loading \n')
         load(wrfout)
-        
     end
 end
 red = subset_domain(w,1);
@@ -27,11 +26,11 @@ red = subset_domain(w,1);
 
 %use the wrfout file to find subset of detections
 
-time_bounds(2) = red.max_tign - 2;
+time_bounds(2) = red.max_tign;
 %time_bounds(2) = 7.354637292824074e+05
-time_bounds(1) = red.min_tign
-time_bounds(1) = time_bounds(2)-3;
-det_prefix = '../TIFs/';
+time_bounds(1) = red.min_tign;
+%time_bounds(1) = time_bounds(2)-3;
+det_prefix = '../campTIFs/';
 det_list=sort_rsac_files(det_prefix);
 fig.fig_map=0;
 fig.fig_3d=0;
@@ -52,7 +51,7 @@ for i = 1:length(g)
         lons = [lons(:);lon_update(:)];
         lats = [lats(:);lat_update(:)];
     end
-    %scatter(lons,lats);
+    scatter(lons,lats);
     
 end %for i...
 

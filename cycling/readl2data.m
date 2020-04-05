@@ -14,6 +14,8 @@ if file(1) == 'M'
     %v.frp = hdfread(pfile2, '/FP_power', 'Index', {[1  1],[1  1],[size(v.lon)]});
 else
     fprintf('Reading VIIRS data\n')
+    fprintf('fires : %s \n',pfile2)
+    fprintf('geo   : %s \n',pfile)
     v.lon = h5read(pfile,'/HDFEOS/SWATHS/VNP_750M_GEOLOCATION/Geolocation Fields/Longitude');
     v.lat = h5read(pfile,'/HDFEOS/SWATHS/VNP_750M_GEOLOCATION/Geolocation Fields/Latitude');
     v.data = h5read(pfile2,'/fire mask');
