@@ -1,8 +1,9 @@
-
+function outs = l2_detect()
 %local machine
 %prefix = '/home/jhaley/JPSSdata/';
+prefix = '~/work/cycling_data/campTIFs/';
 %colibri
-prefix = '/bigdisk/james.haley/wrfcycling/wrf-fire/wrfv2_fire/test/TIFs/';
+%prefix = '/bigdisk/james.haley/wrfcycling/wrf-fire/wrfv2_fire/test/TIFs/';
 
 
 %Longitude = hdfread('/home/jhaley/JPSSdata/MOD03.A2013222.0545.006.2013222112442.hdf', 'MODIS_Swath_Type_GEO', 'Fields', 'Longitude');
@@ -49,4 +50,6 @@ end
 fires = fires(2:end,:);
 fprintf('%d fires in %d granules \n',length(fires), length(d))
 figure,scatter(fires(:,1),fires(:,2))
+
+end
 
