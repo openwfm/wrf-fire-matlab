@@ -93,8 +93,8 @@ for i=1:length(d),
             else
                 %this next line breaks the plotting of detections
                 %downstream in fire_pixels3d.m
-                du = 0.01;
-                dv = 0.01;
+                du = 0.005;
+                dv = 0.005;
                 u_space = red.min_lat:du:red.max_lat;
                 v_space = red.min_lon:dv:red.max_lon;
                 [x.xlon,x.xlat]=meshgrid(v_space,u_space);

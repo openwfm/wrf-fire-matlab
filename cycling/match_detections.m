@@ -51,12 +51,12 @@ for i = 1:length(g)
         lons = [lons(:);lon_update(:)];
         lats = [lats(:);lat_update(:)];
     end
-    scatter(lons,lats);
+    %scatter(lons,lats);
     
 end %for i...
 
 %find polygon containing fire perimter from wrf
-fire_area = red.tign <= time_bounds(2);
+fire_area = red.tign <= time_bounds(2)-0.001;
 % cells within simulation perimeter
 fire_lon = red.fxlong(fire_area);
 fire_lat = red.fxlat(fire_area);
