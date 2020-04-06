@@ -79,9 +79,12 @@ end
 fprintf('display bounds %g %g %g %g\n',red.disp_bounds);
 
 disp('Loading and subsetting detections')
-    
-%prefix='../campTIFs/';
-prefix='../TIFs/';
+fire_choice = input_num('which fire? Patch: [0], Camp: [1]',0)
+if fire_choice == 1
+    prefix='../campTIFs/';
+else
+    prefix='../TIFs/';
+end
 %prefix='../TIFpoint/';
 %prefix='../perimTIFs/';
 % the level2 file names processed by geotiff2mat.py
