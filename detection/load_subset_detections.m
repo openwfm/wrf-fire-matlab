@@ -24,6 +24,7 @@ for i=1:length(d),
         l2 = 1;
         if mod(i,2) == 1
             file2 = d{i+1};
+            fprintf('send to readl2data , i = %d \n',i)
             v = readl2data(prefix,file,file2);
             % loop over unclassified data to filter
             % this will turn matrices to vectors
@@ -92,13 +93,17 @@ for i=1:length(d),
             else
                 %this next line breaks the plotting of detections
                 %downstream in fire_pixels3d.m
-                du = 0.001;
-                dv = 0.001;
+                du = 0.005;
+                dv = 0.005;
                 u_space = red.min_lat:du:red.max_lat;
                 v_space = red.min_lon:dv:red.max_lon;
                 [x.xlon,x.xlat]=meshgrid(v_space,u_space);
                 %[x.xlon,x.xlat]=meshgrid(x.lon,x.lat);
+                data = griddata(double(x.lon(:)),double(x.lat(:)),double(x.data(:)),x.xlon,x.xlat,'nearest');
                 x.fxdata=griddata(double(x.lon(:)),double(x.lat(:)),double(x.data(:)),red.fxlong,red.fxlat,'nearest');
+                x.data = data;
+                x.lon = v_space;
+                x.lat = u_space;
             end
             if fig.fig_interp,  % map interpolated data to reduced domain
                 figure(fig.fig_interp)
