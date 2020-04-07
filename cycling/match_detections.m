@@ -30,13 +30,22 @@ time_bounds(2) = red.max_tign;
 %time_bounds(2) = 7.354637292824074e+05
 time_bounds(1) = red.min_tign;
 %time_bounds(1) = time_bounds(2)-3;
-det_prefix = '../TIFs/ingest/';
-det_list=sort_rsac_files(det_prefix);
+fire_choice = input_num('which fire? Patch: [0], Camp: [1]',0)
+if fire_choice == 1
+    prefix='../campTIFs/';
+else
+    prefix='../TIFs/';
+end
+det_list=sort_rsac_files(prefix);
 fig.fig_map=0;
 fig.fig_3d=0;
 fig.fig_interp=0;
-g = load_subset_detections(det_prefix,det_list,red,time_bounds,fig);
-
+if exist('g_match.mat','file')
+    load('g_match.mat')
+else
+    g = load_subset_detections(prefix,det_list,red,time_bounds,fig);
+    save g_match.mat g
+end
 %find list of detections
 for i = 1:length(g)
     if i == 1
