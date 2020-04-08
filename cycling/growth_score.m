@@ -30,10 +30,11 @@ fig.fig_3d=0;
 fig.fig_interp=0;
 
 %find detections
-p = sort_rsac_files(prefix);
+
 if exist('g_full.mat','file')
     load g_full.mat
 else
+    p = sort_rsac_files(prefix);
     g = load_subset_detections(prefix,p,red,time_bounds,fig);
     save g_full.mat g;
 end

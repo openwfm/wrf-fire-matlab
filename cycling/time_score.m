@@ -23,7 +23,7 @@ else
 end
 
 %%% compute score using data likelihood
-like_score = input_num('Use likelihood approach? No = [0] Yes = [1]',0)
+like_score = input_num('Use likelihood approach? No = [0] Yes = [1]',1,1)
 close all
 
 red = subset_domain(w,1);
@@ -48,7 +48,7 @@ if perim_path(end) == 'l'
 elseif perim_path(end) == '/'
     
     perim_dat = ['kml';'shp'];
-    p_type = input_num('Type of perimeter file to use? (1) kml (2) shp', 1)
+    p_type = input_num('Type of perimeter file to use? (1) kml (2) shp', 2,1)
     fprintf('Reading %s files in  directory %s \n',perim_dat(p_type,:),perim_path)
     if p_type == 1
         d = dir([perim_path,'*.kml'])
