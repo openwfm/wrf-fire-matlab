@@ -30,7 +30,8 @@ time_bounds(2) = red.max_tign;
 %time_bounds(2) = 7.354637292824074e+05
 time_bounds(1) = red.min_tign;
 %time_bounds(1) = time_bounds(2)-3;
-fire_choice = input_num('which fire? Patch: [0], Camp: [1]',0)
+fire_choice = input_num('which fire? Patch: [0], Camp: [1]',1,1)
+cycle = input_num('Which cycle? ',0)
 if fire_choice == 1
     prefix='../campTIFs/';
 else
@@ -84,8 +85,9 @@ y = fire_lat(fire_boundary);
 %perim_y = fire_lat(fire_on);
 %calculate score
 
+
 score = (sum(in)+sum(on))/numel(lats);
-score_str = sprintf('%f percent of detections within perimeter',score*100);
+score_str = sprintf('Cycle %d: %f percent of detections within perimeter',cycle,score*100);
 figure
 hold on
 plot(x,y,'r')
@@ -93,6 +95,8 @@ scatter(lons(in),lats(in),'g*')
 scatter(lons(~in),lats(~in),'b*')
 title({'Satellite Fire Detections and Forecast Perimeter',score_str});
 legend({'Forecast perimeter','Detections inside perimeter','Detections outside perimeter'});
+ylim([39.5 39.95])
+xlim([-121.9 -121.3])
 hold off
 
 % plots simulation perimeter
