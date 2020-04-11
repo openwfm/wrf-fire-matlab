@@ -237,7 +237,7 @@ va=1-wa./(wf+wa); %  1  outside of analysis fire area at restart time, ADDING UP
 % combine the forecast and analysis
 spinup = vf.*forecast + va.*analysis; 
 
-figure,mesh(spinup),title('spinup mesh')
+%figure,mesh(spinup),title('spinup mesh')
 
 plot_state(8,red,'Spinup',spinup,g,time_bounds(3:4))
 savefig('spinup',cycle)

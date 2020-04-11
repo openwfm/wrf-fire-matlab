@@ -1,4 +1,4 @@
-function [ growth_struct] = growth_score( wrfout,prefix )
+function [ growth_struct] = growth_score( wrfout,cycle, prefix )
 %function [ gs ] = growth_score( wrfout,prefix )
 % inputs:
 %   wrfout - string, parth to wrfout file for evaluation
@@ -135,8 +135,11 @@ hold on, plot(data_time(1:term),fore_area(1:term))
 legend('Area within detection perimeter','Area within forecast perimeter')
 xlabel('Simulation Time [days]')
 ylabel('Simulation Area [grid nodes]')
-title_str = sprintf('%s',wrfout)
+title_str = sprintf('Camp Fire -- Cycle %d',cycle)
 title(title_str);
+save_str = sprintf('camp_growth_c_%d',cycle);
+savefig(save_str);
+saveas(gcf,[save_str '.png']);
 hold off
 
 % figure,plot(data_time(1:term),diff_sat_area(1:term))
@@ -157,6 +160,7 @@ end
 
 
 growth_struct.gs = gs;
+growth_struct.cycle = cycle;
 growth_struct.data_time = data_time;
 growth_struct.sat_area = sat_area;
 growth_struct.fore_area = fore_area;

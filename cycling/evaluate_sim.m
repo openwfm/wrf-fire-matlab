@@ -293,16 +293,16 @@ for i = 1:p_count
         plot(perim_x ,perim_y,'r');
         %xticks(-112.72:0.02:-112.58)
         if spinup_compare == 2
-            title_str = ('Perimeter observation and Forecast without cycling');
+            title_str = ('Perimeter Observation and Forecast without cycling');
             legend({'Satellite Fire Detections','Forecast without cycling','Infrared perimeter'});
             save_str = [p_struct(i).file '_s']; %% _s is for single run
         elseif spinup_compare == 1
-            title_str = ('Perimeter observation and Forecast without spin-up');
+            title_str = ('Perimeter Observation and Forecast without spin-up');
             legend({'Satellite Fire Detections','Forecast without spin-up','Infrared perimeter'});
             save_str = [p_struct(i).file '_No_spinup'];
         else %spinup_compare == 3
-            title_str = sprintf('Perimeter observation and Forecast for Cycle %d ',cycle_s);
-            %title_str = ('Perimeter observation and Forecast without spin-up');
+            title_str = sprintf('Perimeter Observation and Forecast for Cycle %d ',cycle_s);
+            %title_str = ('Perimeter Observation and Forecast without spin-up');
             legend({'Satellite Fire Detections','Forecast','Infrared perimeter'});
             save_str = sprintf('%s_cycle_%d',p_struct(i).file,cycle_s);
         end
@@ -337,15 +337,15 @@ for i = 1:p_count
         %xticks(-112.72:0.02:-112.58)
         if spinup_compare == 2
             legend({'Satellite Fire Detections','Forecast with cycling','Infrared perimeter'});
-            title_str = ('Perimeter observation and Forecast with cycling');
+            title_str = ('Perimeter Observation and Forecast with cycling');
             save_str = [p_struct(i).file '_c'];
         elseif spinup_compare == 1
             legend({'Satellite Fire Detections','Forecast using spin-up','Infrared perimeter'});
-            title_str = ('Perimeter observation and Forecast using spin-up');
+            title_str = ('Perimeter Observation and Forecast using spin-up');
             save_str = [p_struct(i).file '_with_spinup'];
         else %spinup_compare == 3
-            title_str = sprintf('Perimeter observation and Forecast for Cycle %d ',cycle_c);
-            %title_str = ('Perimeter observation and Forecast without spin-up');
+            title_str = sprintf('Perimeter Observation and Forecast for Cycle %d ',cycle_c);
+            %title_str = ('Perimeter Observation and Forecast without spin-up');
             legend({'Satellite Fire Detections','Forecast','Infrared perimeter'});
             save_str = sprintf('%s_cycle_%d',p_struct(i).file,cycle_c);
         end
