@@ -53,11 +53,13 @@ max_tign = max(red_s.max_tign,red_c.max_tign);
 min_tign = min(red_s.min_tign,red_c.min_tign);
 
 % need to plot detections too, this will be moved elsewhere
-sim = input_num('Patch [1] or Camp [2] ? ',1);
+sim = input_num('Patch [1] or Camp [2] or Cougar [3] ? ',1);
 if sim == 1
     det_prefix = '../TIFs/';
-else
+elseif sim == 2
     det_prefix = '../campTIFs/';
+else
+    det_prefix = '../cougarTIFs/'
 end
 
 det_list=sort_rsac_files(det_prefix);
@@ -98,7 +100,7 @@ for i = 1:length(a)
         formatIn = 'yyyymmdd HHMM';
         %perim times are local, need to convert to UTC
         zone_shift = 6;
-        if strcmp(a(i).Name(1:2),'ca')
+        if strcmp(a(i).Name(1:2),'ca') | strcmp(a(i).Name(1:2),'wa')
             %a(i).p_string = a(i).Name(end-12:end);
             zone_shift = 8;
             %formatIn = 'yyyymmdd HHMM';

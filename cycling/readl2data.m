@@ -1,5 +1,14 @@
 function v = readl2data(prefix,file,file2,silent)
+%v = readl2data(prefix,file,file2,silent)
 %read L2 data and return v.lon v.lat v.data
+% inputs:
+%    prefix - string, path to directory with data files
+%    file, file2 - strings, file names of geolocation and active fire dat,
+%        respectively
+%    silent - character to print output, optional
+%
+% output:
+%    v      - struct, contains geolocation dat and fire mask.
 fprintf('Reading l2 data\n')
 
 
