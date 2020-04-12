@@ -100,8 +100,12 @@ print_time_bounds(red,'Detections',time_bounds(1),time_bounds(2))
 print_time_bounds(red,'Spinup    ',time_bounds(3),time_bounds(4))
 red.time_bounds=time_bounds;
 
-g = load_subset_detections(prefix,p,red,time_bounds,fig);
-save g.mat g;
+if ~exist('g.mat','file')
+    g = load_subset_detections(prefix,p,red,time_bounds,fig);
+    save g.mat g;
+else
+    load g.mat
+end
        
 [m,n]=size(red.fxlong);
     
@@ -132,7 +136,7 @@ forecast=tign;
 disp('optimization loop')
 h =zeros(m,n); % initial increment
 plot_state(3,red,'Forecast',forecast,g,time_bounds(1:2));
-%savefig('forecast',cycle)
+savefig('forecast',cycle)
 plot_state_2d(4,red,'Forecast',forecast,g,time_bounds(2));
 savefig('forecast2d',cycle)
 

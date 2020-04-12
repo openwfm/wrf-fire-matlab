@@ -1,10 +1,10 @@
 function plot_state_2d(fig,red,s,tign,obs,time_now)
 
 
-[m,n] = size(tign);
-if m*n > 500^2
-    tign = tign(1:10:end,1:10:end);
-end
+% [m,n] = size(tign);
+% if m*n > 500^2
+%     tign = tign(1:10:end,1:10:end);
+% end
 figure(fig),clf
 for i=1:length(obs)
     x=obs(i);
@@ -25,8 +25,19 @@ if ~iscell(s),
 end
 
 color={'k','b','-.r'};
+
+
 for i=1:length(tign)
-    [c,h]=contour(red.fxlong,red.fxlat,tign{i},[time_now,time_now],color{i});
+    lon = red.fxlong;
+    lat = red.fxlat;
+    z = tign{i};
+    [m,n] = size(z);
+    if m*n > 500^2
+        z = z(1:10:end,1:10:end);
+        lon = lon(1:10:end,1:10:end);
+        lat = lat(1:10:end,1:10:end);
+    end
+    [c,h]=contour(lon,lat,z,[time_now,time_now],color{i});
     set(h,'linewidth',2)
 end
 h_legend=legend(s{:});
