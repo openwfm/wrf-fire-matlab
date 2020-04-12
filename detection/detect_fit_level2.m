@@ -79,11 +79,13 @@ end
 fprintf('display bounds %g %g %g %g\n',red.disp_bounds);
 
 disp('Loading and subsetting detections')
-fire_choice = input_num('which fire? Patch: [0], Camp: [1]',0)
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar [3]',0)
 if fire_choice == 1
     prefix='../campTIFs/';
-else
+elseif fire_choice == 0
     prefix='../TIFs/';
+else
+    prefix = '../cougarTIFs/';
 end
 %prefix='../TIFpoint/';
 %prefix='../perimTIFs/';
@@ -130,7 +132,7 @@ forecast=tign;
 disp('optimization loop')
 h =zeros(m,n); % initial increment
 plot_state(3,red,'Forecast',forecast,g,time_bounds(1:2));
-savefig('forecast',cycle)
+%savefig('forecast',cycle)
 plot_state_2d(4,red,'Forecast',forecast,g,time_bounds(2));
 savefig('forecast2d',cycle)
 

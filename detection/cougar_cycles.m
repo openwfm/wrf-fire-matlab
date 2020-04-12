@@ -2,18 +2,18 @@ function cycles(varargin)
 ! date
 
 % base_datestr='2013-08-11 00:00:00';
-% for the Camp fire
-base_datestr='2018-11-08 12:00:00';
+% for the cougar fire
+base_datestr='2015-08-11 00:00:00';
 
 %multiplier to go to different time frame(s)
-mult = 1/3;
+mult = 1;
 
 base=datenum(base_datestr);
 num_cycles=5;
 spinup_time=ones(1,num_cycles)*mult;
 cycle_length=ones(1,num_cycles)*mult;
-cycle_start =[0,2,3,4,5,6]*mult
-spinup_time =[2,1,1,1,1,1]*mult
+cycle_start =[0,3,6,9,12,15]*mult
+spinup_time =[3,3,3,3,3,3]*mult
 times_format='yyyy-mm-dd_HH:MM:SS';
 for i=1:num_cycles
     t(i).forecast_time=cycle_start(i+1)+1*mult;
@@ -21,7 +21,7 @@ for i=1:num_cycles
     t(i).obs_end=cycle_start(i+1)-1e-6;
     t(i).replay_start=cycle_start(i);
     t(i).replay_end=cycle_start(i+1);
-    t(i).run_end=cycle_start(i+1)+2*mult;
+    t(i).run_end=cycle_start(i+1)+3*mult;
     t(i).perimeter_time=t(i).replay_end*24*3600;
     forecast_times{i}=datestr(base+t(i).forecast_time,times_format);
     print_times(i)
@@ -51,16 +51,16 @@ else
     print_times(i)
     system('ls -lh wrfout*')
     wrfout_time = base+t(i).forecast_time;
-    wrfout{i}=['wrfout_d03_',datestr(wrfout_time,times_format)];
+    wrfout{i}=['wrfout_d04_',datestr(wrfout_time,times_format)];
     if ~exist(wrfout{i},'file')
         fprintf('file %s does not exist\n',wrfout{i})
         wrfout_time = wrfout_time - 23.5/24;  % no wrfout produced on restart => written 30 min later
-        wrfout{i}=['wrfout_d03_',datestr(wrfout_time,times_format)];
+        wrfout{i}=['wrfout_d04_',datestr(wrfout_time,times_format)];
     end
-    wrfrst{i}=['wrfrst_d03_',datestr(base+t(i).replay_start,times_format)];
+    wrfrst{i}=['wrfrst_d04_',datestr(base+t(i).replay_start,times_format)];
     fprintf('%s %s %s %s\n','Reading fire arrival time at',forecast_times{i},' from ',wrfout{i})
     if t(i).replay_start==0;
-       rewrite='wrfinput_d03';
+       rewrite='wrfinput_d04';
        restart='.false.';
     else
        rewrite=wrfrst{i};
@@ -109,7 +109,7 @@ ptime(ii,'Observations end  ',t(ii).obs_end)
 ptime(ii,'Replay start      ',t(ii).replay_start)
 ptime(ii,'Replay end        ',t(ii).replay_end)
 ptime(ii,'Run end           ',t(ii).run_end)
-fprintf('perimeter_time=%10.3f\n',t(ii).perimeter_time)
+fprintf('perimeter_time=%10.3f =  %d days \n',t(ii).perimeter_time,(t(ii).perimeter_time)/3600/24)
 end
 
 function print_times_table
