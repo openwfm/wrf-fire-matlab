@@ -1,15 +1,20 @@
 function plot_state_2d(fig,red,s,tign,obs,time_now)
 
+
+[m,n] = size(tign);
+if m*n > 500^2
+    tign = tign(1:10:end,1:10:end);
+end
 figure(fig),clf
 for i=1:length(obs)
     x=obs(i);
     kk=find(x.data(:)>=7);
     if ~isempty(kk),
-            x.data=double(x.data);
-            x.data(x.data<7)=NaN;
-            x.data=x.data+3*floor((time_now-x.time)/0.25);
-            showmod14(x,0.5)
-            hold on
+        x.data=double(x.data);
+        x.data(x.data<7)=NaN;
+        x.data=x.data+3*floor((time_now-x.time)/0.25);
+        showmod14(x,0.5)
+        hold on
     end
 end
 if ~iscell(tign),

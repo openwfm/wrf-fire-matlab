@@ -5,6 +5,10 @@
         % obs   observations structure
         % red   reduced structure, for bounds
         % c     contour heights
+        [m,n] = size(T);
+        if m*n > 500^2
+            T = T(1:10:end,1:10:end);
+        end
         base_time=red.min_tign;
         fprintf('Figure %i %s',fig,s) 
         figure(fig), clf
