@@ -30,12 +30,14 @@ time_bounds(2) = red.max_tign;
 %time_bounds(2) = 7.354637292824074e+05
 time_bounds(1) = red.min_tign;
 %time_bounds(1) = time_bounds(2)-3;
-fire_choice = input_num('which fire? Patch: [0], Camp: [1]',1,1)
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1)
 cycle = input_num('Which cycle? ',0)
 if fire_choice == 1
     prefix='../campTIFs/';
-else
+elseif fire_choice == 0
     prefix='../TIFs/';
+else
+    prefix = '../cougarTIFs/'
 end
 det_list=sort_rsac_files(prefix);
 fig.fig_map=0;
@@ -48,15 +50,20 @@ else
     save g_match.mat g
 end
 %find list of detections
+min_con = 7;
 for i = 1:length(g)
     if i == 1
-        fire_mask = g(i).data >=7;
+        fire_mask = g(i).data >=min_con;
         lons = g(i).xlon(fire_mask);
         lats = g(i).xlat(fire_mask);
     end
-    fire_mask = g(i).data >= 7;
+    fire_mask = g(i).data >= min_con;
     lon_update = g(i).xlon(fire_mask);
     lat_update = g(i).xlat(fire_mask);
+    %looking for bad cougar granule
+    if max(lat_update(:)) > 46.2 | min(lat_update(:)) < 46.05
+        fprintf('bad granule : %s \n',g(i).file)
+    end
     if sum(fire_mask(:)) > 0
         lons = [lons(:);lon_update(:)];
         lats = [lats(:);lat_update(:)];
@@ -95,8 +102,8 @@ scatter(lons(in),lats(in),'g*')
 scatter(lons(~in),lats(~in),'b*')
 title({'Satellite Fire Detections and Forecast Perimeter',score_str});
 legend({'Forecast perimeter','Detections inside perimeter','Detections outside perimeter'});
-ylim([39.5 39.95])
-xlim([-121.9 -121.3])
+%ylim([39.5 39.95])
+%xlim([-121.9 -121.3])
 hold off
 
 % plots simulation perimeter
