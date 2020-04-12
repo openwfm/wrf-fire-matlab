@@ -105,6 +105,10 @@ if ~exist('g.mat','file')
     save g.mat g;
 else
     load g.mat
+    fprintf('Loaded existing g.mat file \n')
+    if input_num('Enter [1] to load from scratch',1)
+        g = load_subset_detections(prefix,p,red,time_bounds,fig);
+    end
 end
        
 [m,n]=size(red.fxlong);
