@@ -36,7 +36,8 @@ if exist('g_full.mat','file')
 else
     p = sort_rsac_files(prefix);
     g = load_subset_detections(prefix,p,red,time_bounds,fig);
-    save g_full.mat g;
+    save('g_full.mat', 'g', '-v7.3')
+    %save g_full.mat g;
 end
 
 if exist('growth.mat','file')
