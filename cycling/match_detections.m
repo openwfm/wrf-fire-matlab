@@ -48,7 +48,7 @@ if exist('g_match.mat','file')
 else
     det_list=sort_rsac_files(prefix);
     g = load_subset_detections(prefix,det_list,red,time_bounds,fig);
-    save g_match.mat g
+    save('g_match.mat', 'g', '-v7.3')
 end
 %find list of detections
 min_con = 7;
