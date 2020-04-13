@@ -39,13 +39,14 @@ elseif fire_choice == 0
 else
     prefix = '../cougarTIFs/'
 end
-det_list=sort_rsac_files(prefix);
+
 fig.fig_map=0;
 fig.fig_3d=0;
 fig.fig_interp=0;
 if exist('g_match.mat','file')
     load('g_match.mat')
 else
+    det_list=sort_rsac_files(prefix);
     g = load_subset_detections(prefix,det_list,red,time_bounds,fig);
     save g_match.mat g
 end
