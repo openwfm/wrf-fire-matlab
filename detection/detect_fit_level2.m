@@ -100,6 +100,7 @@ print_time_bounds(red,'Detections',time_bounds(1),time_bounds(2))
 print_time_bounds(red,'Spinup    ',time_bounds(3),time_bounds(4))
 red.time_bounds=time_bounds;
 
+gstr = sprintf('g_%d.mat',cycle);
 if ~exist('g.mat','file')
     g = load_subset_detections(prefix,p,red,time_bounds,fig);
     save g.mat g;
