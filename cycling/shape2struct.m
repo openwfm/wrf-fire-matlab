@@ -35,7 +35,7 @@ p.time=t;
 
 %combine into struct
 for i = 1:length(p.file)
-    perim_struct(i) = shaperead(f{i})
+    perim_struct(i) = shaperead(f{i});
     %perim_struct(i).Lon = perim_struct(i).X
     %perim_struct(i).Lat = perim_struct(i).Y 
 end

@@ -1,4 +1,4 @@
-function score = evaluate_sim( wrfout_s, wrfout_c, perim, wrf_time_step )
+function score = evaluate_sim( wrfout_s, wrfout_c, wrf_time_step )
 %score = evaluate_sim( wrfout, perim )
 % inputs:
 %   wrfout_s - wrfout from a simulation w/o cycling or spinup, string with file path
@@ -30,7 +30,7 @@ if spinup_compare == 3
    cycle_c = input_num('Cycle number for wrfout_c?',1);
 end
 %read wrfout section
-if nargin > 3
+if nargin > 2
     w_c =read_wrfout_tign(wrfout_c,wrf_time_step);
     red_c = subset_domain(w_c,1);
     clear('w_c')
@@ -56,10 +56,13 @@ min_tign = min(red_s.min_tign,red_c.min_tign);
 sim = input_num('Patch [1] or Camp [2] or Cougar [3] ? ',1);
 if sim == 1
     det_prefix = '../TIFs/';
+    perim = '../PERIMs/patch_perims/';
 elseif sim == 2
     det_prefix = '../campTIFs/';
+    perim = '../PERIMs/camp_perims/';
 else
-    det_prefix = '../cougarTIFs/'
+    det_prefix = '../cougarTIFs/';
+    perim = '../PERIMs/cougar_perims/';
 end
 
 det_list=sort_rsac_files(det_prefix);
@@ -69,12 +72,12 @@ fig.fig_interp=0;
 
 
 if perim(end) == 'l'
-%read kml section, *.kml file
-a = kml2struct(perim);
+    %read kml section, *.kml file
+    a = kml2struct(perim);
 else
-% or
-fprintf('Reading directory of shape files \n')
-a = shape2struct(perim);
+    % or
+    fprintf('Reading directory of shape files \n')
+    a = shape2struct(perim);
 end
 
 %find perimeters from perim file
@@ -87,10 +90,10 @@ for i = 1:length(a)
     %i, a(i)
     if strcmp(a(i).Geometry,'Polygon')
         p_count = p_count + 1;
-        i,a(i);
+        %i,a(i)
         
         % get perimeter time
-        a(i).p_string = a(i).Name(end-12:end)
+        a(i).p_string = a(i).Name(end-12:end);
         
 %        only for kml file
 %         if a(i).p_string(1) ~= '1'
@@ -110,9 +113,15 @@ for i = 1:length(a)
         
         %set decimate to an  postive integer to use just a subset of points
         %  in perimeter
-        decimate = 10;
-        lats = a(i).Lat(1:decimate:end);
-        lons = a(i).Lon(1:decimate:end);
+        fprintf('Perimeter %s: %d points in the perimeter \n',a(i).p_string,length(a(i).Lon));
+        if length(a(i).Lat) > 500
+            decimate = 10;
+            lats = a(i).Lat(1:decimate:end);
+            lons = a(i).Lon(1:decimate:end);
+        else
+            lats = a(i).Lat;
+            lons = a(i).Lon;
+        end
         
         %create regularly spaced data
         dx = (a(i).BoundingBox(2,1)-a(i).BoundingBox(1,1))/n;
@@ -218,12 +227,12 @@ for i = 1:p_count
         area_sim_c = sum(sim_fires_c(:));
         x_fires_sim_c = x_grid(sim_fires_c);
         y_fires_sim_c = y_grid(sim_fires_c);
-        %shrink = 1.0;
+        shrink = 1.0;
         %find boundaries
-        sim_boundary_s = boundary(x_fires_sim_s,y_fires_sim_s);
+        sim_boundary_s = boundary(x_fires_sim_s,y_fires_sim_s,shrink);
         sim_x_s = x_fires_sim_s(sim_boundary_s);
         sim_y_s = y_fires_sim_s(sim_boundary_s);
-        sim_boundary_c = boundary(x_fires_sim_c,y_fires_sim_c);
+        sim_boundary_c = boundary(x_fires_sim_c,y_fires_sim_c,shrink);
         sim_x_c = x_fires_sim_c(sim_boundary_c);
         sim_y_c = y_fires_sim_c(sim_boundary_c);
         
@@ -236,7 +245,7 @@ for i = 1:p_count
         x_fires_perim = x_grid(perim_fires);
         y_fires_perim = y_grid(perim_fires);
         shrink = 1.0;
-        perim_boundary = boundary(x_fires_perim,y_fires_perim);
+        perim_boundary = boundary(x_fires_perim,y_fires_perim,shrink);
         perim_x = x_fires_perim(perim_boundary);
         perim_y = y_fires_perim(perim_boundary);
         
