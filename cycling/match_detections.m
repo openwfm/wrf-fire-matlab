@@ -37,7 +37,7 @@ if fire_choice == 1
 elseif fire_choice == 0
     prefix='../TIFs/';
 else
-    prefix = '../cougarTIFs/'
+    prefix = '../cougarTIFs/';
 end
 
 fig.fig_map=0;
@@ -62,9 +62,9 @@ for i = 1:length(g)
     lon_update = g(i).xlon(fire_mask);
     lat_update = g(i).xlat(fire_mask);
     %looking for bad cougar granule
-    if max(lat_update(:)) > 46.2 | min(lat_update(:)) < 46.05
-        fprintf('bad granule : %s \n',g(i).file)
-    end
+    %if max(lat_update(:)) > 46.2 | min(lat_update(:)) < 46.05
+    %    fprintf('bad granule : %s \n',g(i).file)
+    %end
     if sum(fire_mask(:)) > 0
         lons = [lons(:);lon_update(:)];
         lats = [lats(:);lat_update(:)];

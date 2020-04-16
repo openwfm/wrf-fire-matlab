@@ -227,7 +227,7 @@ for i = 1:p_count
         area_sim_c = sum(sim_fires_c(:));
         x_fires_sim_c = x_grid(sim_fires_c);
         y_fires_sim_c = y_grid(sim_fires_c);
-        shrink = 1.0;
+        shrink = 0.75;
         %find boundaries
         sim_boundary_s = boundary(x_fires_sim_s,y_fires_sim_s,shrink);
         sim_x_s = x_fires_sim_s(sim_boundary_s);
@@ -244,7 +244,7 @@ for i = 1:p_count
         area_perim = sum(perim_fires(:));
         x_fires_perim = x_grid(perim_fires);
         y_fires_perim = y_grid(perim_fires);
-        shrink = 1.0;
+        shrink = 0.75;
         perim_boundary = boundary(x_fires_perim,y_fires_perim,shrink);
         perim_x = x_fires_perim(perim_boundary);
         perim_y = y_fires_perim(perim_boundary);
@@ -409,13 +409,16 @@ end
 
 
 %m_s = score_s > 0;
-m_c = score_c > 0.2;
+m_c = score_c > 0.02;
 
 mean_score_s = mean(score_s(m_c));
 mean_score_c = mean(score_c(m_c));
 
 
-score = [mean_score_s mean_score_c];
-
+score.score_s = score_s;
+score.score_c = score_c;
+score.mean_score_s = mean(score_s(m_c));
+score.mean_score_c = mean(score_c(m_c));
+score.file = p_struct.file;
 end
 

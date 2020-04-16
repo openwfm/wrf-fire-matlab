@@ -1,8 +1,8 @@
-function [ growth_struct] = growth_score( wrfout,cycle, prefix )
+function [ growth_struct] = growth_score( wrfout )
 %function [ gs ] = growth_score( wrfout,prefix )
 % inputs:
 %   wrfout - string, parth to wrfout file for evaluation
-%   prefix - string, path to directory with stellite dat
+%  
 % outputs:
 %   growth_struct- struct with the following:
 %      gs - mean error in area gowth rate of forecast vs. area
@@ -19,6 +19,22 @@ function [ growth_struct] = growth_score( wrfout,cycle, prefix )
 %     fprintf('wrfout is a mat file, loading \n');
 %     load(wrfout);
 % end
+
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1)
+cycle = input_num('Which cycle? ',0)
+if fire_choice == 1
+    prefix='../campTIFs/';
+    title_str = sprintf('Camp Fire -- Cycle %d',cycle)
+    save_str = sprintf('camp_growth_c_%d',cycle);
+elseif fire_choice == 0
+    prefix='../TIFs/';
+    title_str = sprintf('Patch Springs Fire -- Cycle %d',cycle)
+    save_str = sprintf('patch_growth_c_%d',cycle);
+else
+    prefix = '../cougarTIFs/';
+    title_str = sprintf('Cougar Creek Fire -- Cycle %d',cycle)
+    save_str = sprintf('cougar_growth_c_%d',cycle);
+end
 
 w = read_wrfout_tign(wrfout);
 red = subset_domain(w);
@@ -136,9 +152,8 @@ hold on, plot(data_time(1:term),fore_area(1:term))
 legend('Area within detection perimeter','Area within forecast perimeter')
 xlabel('Simulation Time [days]')
 ylabel('Simulation Area [grid nodes]')
-title_str = sprintf('Camp Fire -- Cycle %d',cycle)
+
 title(title_str);
-save_str = sprintf('camp_growth_c_%d',cycle);
 savefig(save_str);
 saveas(gcf,[save_str '.png']);
 hold off
