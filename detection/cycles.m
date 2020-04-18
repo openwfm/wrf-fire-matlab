@@ -81,7 +81,7 @@ else
     p=detect_fit_level2(cycle,time_bounds,[],w,force)
     fprintf('Saving p\n');
     pstr = sprintf('p_%i.mat',i);
-    %save(pstr,'p')
+    save(pstr,'p')
     print_times(i)
     fprintf('perimeter_time=%10.3f\nrestart=%s\n',t(i).perimeter_time,restart)
     q=sprintf('replace TIGN_G in %s and run\n %s\n [0/1]',rewrite,link_namelist_command);
