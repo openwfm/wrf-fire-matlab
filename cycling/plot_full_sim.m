@@ -22,6 +22,7 @@ else
     prefix = '../cougarTIFs/';
 end
 
+fig_num = input_num('Figure number? ',113,1);
 % make reduced structure
 w = read_wrfout_tign(wrfout);
 red = subset_domain(w);
@@ -42,16 +43,11 @@ else
     load g_full.mat
 end
 
-if fire(1) == 'P'
-    plot_state(fig_num,red,title_string,red.tign,g,time_bounds(1:2))
-else
-    red.fxlong = red.fxlong(1:10:end,1:10:end);
-    red.fxlat = red.fxlat(1:10:end,1:10:end);
-    plot_state(fig_num,red,title_string,red.tign(1:10:end,1:10:end),g,time_bounds(1:2))
-    figure(fig_num)
-    zlim([0 2.2]);
-    %zlim([min(red.tign(:))/(24*3600) max(red.tign(:))/(24*3600)])
-end
+title_string = sprintf('%s , cycle %i',fire_name,cycle);
+plot_state(fig_num,red,title_string,red.tign,g,time_bounds(1:2))
+save_str = sprintf('%s_full_sim_cyc_%d',save_name,cycle)
+savefig(save_str);
+saveas(gcf,[save_str '.png']);
 
 end
 

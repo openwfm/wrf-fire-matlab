@@ -4,10 +4,16 @@ function [wf,wa,ws] = p2w(p,w)
 % detect_fit_level2
 
 wf = w;
+save w_forecast.mat w;
+
+w.tign_g = p.analysis;
 wa = w;
-wa.tign_g = p.analysis;
+save w_analysis.mat w;
+
+w.tign_g = p.spinup;
 ws = w;
-ws.tign_g = p.spinup;
+save w_spinup.mat w;
+
 
 
 end
