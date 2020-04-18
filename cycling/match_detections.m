@@ -27,16 +27,23 @@ red = subset_domain(w,1);
 %use the wrfout file to find subset of detections
 
 time_bounds(2) = red.max_tign;
+end_date = datestr(time_bounds(2));
 %time_bounds(2) = 7.354637292824074e+05
 time_bounds(1) = red.min_tign;
 %time_bounds(1) = time_bounds(2)-3;
 fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1)
 cycle = input_num('Which cycle? ',0)
 if fire_choice == 1
+    fire_name = 'Camp fire';
+    save_name = 'camp';
     prefix='../campTIFs/';
 elseif fire_choice == 0
+    fire_name = 'Patch Springs fire';
+    save_name = 'patch';
     prefix='../TIFs/';
 else
+    fire_name = 'Cougar Creek fire';
+    save_name = 'cougar';
     prefix = '../cougarTIFs/';
 end
 
@@ -101,19 +108,19 @@ hold on
 plot(x,y,'r')
 scatter(lons(in),lats(in),'g*')
 scatter(lons(~in),lats(~in),'b*')
-title({'Satellite Fire Detections and Forecast Perimeter',score_str});
+% t1 = 
+% t2 =
+% t3 =
+title_str = sprintf('Satellite Fire Detections and Forecast Perimeters \n %s \n %s, %s',score_str,fire_name,end_date);
+title(title_str)
 legend({'Forecast perimeter','Detections inside perimeter','Detections outside perimeter'});
 %ylim([39.5 39.95])
 %xlim([-121.9 -121.3])
+save_str = sprintf('match_%s_%s_%s.fig',save_name,num2str(time_bounds(2)),num2str(cycle))
+fprintf('Saving figure as: %s \n',save_str)
+savefig(save_str);
+saveas(gcf,[save_str '.png']);
 hold off
-
-% plots simulation perimeter
-% scatter(fire_lon(fire_on),fire_lat(fire_on),'r*')
-
-
-    
-
-
 
 end
 

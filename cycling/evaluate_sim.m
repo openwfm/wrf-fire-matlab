@@ -407,7 +407,7 @@ end
 %     
 % end %for j
 
-
+whos
 %m_s = score_s > 0;
 m_c = score_c > 0.02;
 

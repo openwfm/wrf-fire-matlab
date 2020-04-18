@@ -1,4 +1,4 @@
-function [ plotters ] = plot_full_sim(fig_num, fire, wrfout, title_string )
+function [ plotters ] = plot_full_sim(wrfout )
 % inputs:
 %   fig_num - integer, figure number
 %   fire - string, either "Patch" or "Camp"
@@ -6,16 +6,26 @@ function [ plotters ] = plot_full_sim(fig_num, fire, wrfout, title_string )
 %   title_string, string, title of figure
 %plots fire cone
 
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1)
+cycle = input_num('Which cycle? ',0)
+if fire_choice == 1
+    fire_name = 'Camp fire';
+    save_name = 'camp';
+    prefix='../campTIFs/';
+elseif fire_choice == 0
+    fire_name = 'Patch Springs fire';
+    save_name = 'patch';
+    prefix='../TIFs/';
+else
+    fire_name = 'Cougar Creek fire';
+    save_name = 'cougar';
+    prefix = '../cougarTIFs/';
+end
+
 % make reduced structure
 w = read_wrfout_tign(wrfout);
 red = subset_domain(w);
 
-% get detection data
-if fire(1) == 'P'
-    prefix = '../TIFs/';
-else 
-    prefix = '../campTIFs/';
-end
 
 % figures
 fig.fig_map=0;

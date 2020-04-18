@@ -23,7 +23,7 @@ else
 end
 
 %%% compute score using data likelihood
-like_score = input_num('Use likelihood approach? No = [0] Yes = [1]',1,1)
+like_score = input_num('Use likelihood approach? No = [0] Yes = [1]',1,0)
 close all
 
 red = subset_domain(w,1);

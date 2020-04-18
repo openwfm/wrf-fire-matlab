@@ -25,15 +25,15 @@ cycle = input_num('Which cycle? ',0)
 if fire_choice == 1
     prefix='../campTIFs/';
     title_str = sprintf('Camp Fire -- Cycle %d',cycle)
-    save_str = sprintf('camp_growth_c_%d',cycle);
+    save_str = sprintf('camp_growth_c%d',cycle);
 elseif fire_choice == 0
     prefix='../TIFs/';
     title_str = sprintf('Patch Springs Fire -- Cycle %d',cycle)
-    save_str = sprintf('patch_growth_c_%d',cycle);
+    save_str = sprintf('patch_growth_c%d',cycle);
 else
     prefix = '../cougarTIFs/';
     title_str = sprintf('Cougar Creek Fire -- Cycle %d',cycle)
-    save_str = sprintf('cougar_growth_c_%d',cycle);
+    save_str = sprintf('cougar_growth_c%d',cycle);
 end
 
 w = read_wrfout_tign(wrfout);
