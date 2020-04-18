@@ -101,14 +101,15 @@ print_time_bounds(red,'Spinup    ',time_bounds(3),time_bounds(4))
 red.time_bounds=time_bounds;
 
 gstr = sprintf('g_%d.mat',cycle);
-if ~exist('g.mat','file')
+if ~exist(gstr,'file')
     g = load_subset_detections(prefix,p,red,time_bounds,fig);
-    save g.mat g;
+    save(gstr,'g')
 else
-    load g.mat
+    load(gstr)
     fprintf('Loaded existing g.mat file \n')
     if input_num('Enter [1] to load from scratch',1)
         g = load_subset_detections(prefix,p,red,time_bounds,fig);
+        save(gstr,'g');
     end
 end
        
