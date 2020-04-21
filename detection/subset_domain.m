@@ -81,6 +81,7 @@ red.jspan=jspan;
 red.fxlat=w.fxlat(ispan,jspan);
 red.fxlong=w.fxlong(ispan,jspan);
 red.tign_g=w.tign_g(ispan,jspan);
+red.fmc_g = w.fmc_g(ispan,jspan);
 if isfield(w,'nfuel_cat')
     red.nfuel_cat=w.nfuel_cat(ispan,jspan);
 

@@ -47,7 +47,7 @@ else
     wrfout{i}=['wrfout_d01_',datestr(wrfout_time,times_format)];
     if ~exist(wrfout{i},'file')
         fprintf('file %s does not exist\n',wrfout{i})
-        wrfout_time = wrfout_time - 23.5/24;  % no wrfout produced on restart => written 30 min later
+        wrfout_time = wrfout_time - 23/24;  % no wrfout produced on restart => written 30 min later
         wrfout{i}=['wrfout_d01_',datestr(wrfout_time,times_format)];
     end
     wrfrst{i}=['wrfrst_d01_',datestr(base+t(i).replay_start,times_format)];
