@@ -6,7 +6,7 @@ function [ plotters ] = plot_full_sim(wrfout )
 %   title_string, string, title of figure
 %plots fire cone
 
-fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1)
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1);
 cycle = input_num('Which cycle? ',0)
 if fire_choice == 1
     fire_name = 'Camp fire';

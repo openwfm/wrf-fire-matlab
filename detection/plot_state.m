@@ -7,9 +7,10 @@
         % c     contour heights
         [m,n] = size(T);
         if m*n > 500^2
-            T = T(1:10:end,1:10:end);
-            red.fxlong = red.fxlong(1:10:end,1:10:end);
-            red.fxlat = red.fxlat(1:10:end,1:10:end);
+            d=7;
+            T = T(1:d:end,1:d:end);
+            red.fxlong = red.fxlong(1:d:end,1:d:end);
+            red.fxlat = red.fxlat(1:d:end,1:d:end);
         end
         base_time=red.min_tign;
         fprintf('Figure %i %s',fig,s) 
