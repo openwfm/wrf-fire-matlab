@@ -84,6 +84,8 @@ red.tign_g=w.tign_g(ispan,jspan);
 %not all w.mat files will have fmc_g, nfuel_cat
 if isfield(w,'nfuel_cat')
     red.nfuel_cat=w.nfuel_cat(ispan,jspan);
+end
+if isfield(w,'fmc_g')
     red.fmc_g = w.fmc_g(ispan,jspan);
 end
     %commenting out next 4 lines
