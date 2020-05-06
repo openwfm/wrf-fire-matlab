@@ -6,7 +6,7 @@ function cycles(varargin)
 base_datestr='2015-08-11 00:00:00';
 
 %multiplier to go to different time frame(s)
-mult = 1;
+mult = 0.5;
 
 base=datenum(base_datestr);
 num_cycles=5;
@@ -90,6 +90,9 @@ else
     cycle=i;
     save(savew,'w','cycle','time_bounds','t')
     p=detect_fit_level2(cycle,time_bounds,[],w,force)
+    fprintf('Saving p\n');
+    pstr = sprintf('p_%i.mat',i);
+    save(pstr,'p')
     print_times(i)
     fprintf('perimeter_time=%10.3f\nrestart=%s\n',t(i).perimeter_time,restart)
     q=sprintf('replace TIGN_G in %s and run\n %s\n [0/1]',rewrite,link_namelist_command);
