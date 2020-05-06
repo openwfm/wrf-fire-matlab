@@ -23,7 +23,7 @@ else
 end
 
 %%% compute score using data likelihood
-like_score = input_num('Use likelihood approach? No = [0] Yes = [1]',1,0)
+like_score = input_num('Use likelihood approach? No = [0] Yes = [1]',0,1)
 close all
 
 red = subset_domain(w,1);
@@ -219,7 +219,7 @@ hold off
 score_mask = logical([0 0 1 0 0]);
 score = perim_scores(score_mask);
 diff_var = perim_vars(score_mask);
-%score = mean(perim_scores(perim_scores ~= 0));
+score = mean(perim_scores(perim_scores ~= 0));
 
 
 

@@ -20,7 +20,7 @@ function [ growth_struct] = growth_score( wrfout )
 %     load(wrfout);
 % end
 
-fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1)
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',0,1)
 cycle = input_num('Which cycle? ',0)
 if fire_choice == 1
     prefix='../campTIFs/';
@@ -137,11 +137,18 @@ for i=1:length(g)
         end
 end
 
+%make areas monotonic increasing
+for i = 2:data_count
+    sat_area(i) = max(sat_area(i),sat_area(i-1));
+    fore_area(i) = max(fore_area(i),fore_area(i-1));
+end
+
 %convert data_time to days since simulation
 data_time = (data_time - red.start_datenum);
-if strcmp(prefix(end-5:end),'/TIFs/')
+%bad data in patch fire
+if fire_choice == 0
     term = 40;
-    term = length(data_time);
+    %term = length(data_time);
 else
     term = length(data_time);
 end
@@ -164,8 +171,13 @@ hold off
 % xlabel('Simulation Time [days]')
 % ylabel('Change in Area [grid nodes]')
 % hold off
-gs = mean(abs(sat_area-fore_area));
-
+%gs = mean(abs(sat_area-fore_area));
+%relative error
+if fire_choice == 0
+    gs = mean(abs(sat_area(1:term)-fore_area(1:term))./sat_area(1:term))
+else
+    gs = mean(abs(sat_area-fore_area)./sat_area)
+end
 %compute rates
 sat_rate = sat_area;
 fore_rate = fore_area;
