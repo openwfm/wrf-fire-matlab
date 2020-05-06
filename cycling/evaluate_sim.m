@@ -3,8 +3,6 @@ function score = evaluate_sim( wrfout_s, wrfout_c, wrf_time_step )
 % inputs:
 %   wrfout_s - wrfout from a simulation w/o cycling or spinup, string with file path
 %   wrfout_c - wrfout from a simulation with cycling or spinup, string with file path
-%   perim - kml with fire perimter data, string wih file path or (to be
-%   programmed ) path to directory with shape files
 %   wrf_time_step - optional string with time step to be read
 % output:
 %   score - number which gives how good the simulation matches the perimter
@@ -39,10 +37,10 @@ if nargin > 2
     clear('w_s');
 else
     w_c =read_wrfout_tign(wrfout_c);
-    red_c = subset_domain(w_c,1);
+    red_c = subset_domain(w_c);
     clear('w_c');
     w_s =read_wrfout_tign(wrfout_s);
-    red_s = subset_domain(w_s,1);
+    red_s = subset_domain(w_s);
     clear('w_s');
 end
 

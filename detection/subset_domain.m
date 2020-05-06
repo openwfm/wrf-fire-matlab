@@ -98,7 +98,8 @@ red.max_lon = max(red.fxlong(:));
 
 
 red.end_datenum=datenum(char(w.times(:))'); % this time step end
-red.end_time=w.dt*w.itimestep; % time from simulation start in seconds
+%red.end_time=w.dt*w.itimestep; % time from simulation start in seconds
+red.end_time = [];
 red.start_time=0;
 % for reading wrfinput file
 if isempty(red.end_time)
