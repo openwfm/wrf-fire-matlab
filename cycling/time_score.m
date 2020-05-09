@@ -219,7 +219,7 @@ hold off
 score_mask = logical([1 1 1 0 0]);
 score = perim_scores(score_mask);
 diff_var = perim_vars(score_mask);
-%score = mean(perim_scores(perim_scores ~= 0));
+score = mean(perim_scores(perim_scores ~= 0));
 
 
 
