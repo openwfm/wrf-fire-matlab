@@ -1,8 +1,8 @@
 function score = evaluate_sim( wrfout_s, wrfout_c, wrf_time_step )
 %score = evaluate_sim( wrfout, perim )
 % inputs:
-%   wrfout_s - wrfout from a simulation w/o cycling or spinup, string with file path
-%   wrfout_c - wrfout from a simulation with cycling or spinup, string with file path
+%   wrfout_s - wrfout from a simulation w/o cycling or spinup or ROS adjustment, string with file path
+%   wrfout_c - wrfout from a simulation with cycling or spinup or ROS adjustment, string with file path
 %   wrf_time_step - optional string with time step to be read
 % output:
 %   score - number which gives how good the simulation matches the perimter
@@ -22,8 +22,8 @@ close all
 
 min_fire_confidence = 7;
 
-spinup_compare = input_num('Compare spin-up vs analysis [1] Cycle vs No cycle? [2] Two diff cycles? [3]?',1,0);
-if spinup_compare == 3
+exp_num = input_num('Compare No ROS adjust vs ROS adjust = [1] Cycle vs No cycle = [2] Two diff cycles = [3]',1,0);
+if exp_num == 3
    cycle_s = input_num('Cycle number for wrfout_s?',0);
    cycle_c = input_num('Cycle number for wrfout_c?',1);
 end
@@ -225,7 +225,7 @@ for i = 1:p_count
         area_sim_c = sum(sim_fires_c(:));
         x_fires_sim_c = x_grid(sim_fires_c);
         y_fires_sim_c = y_grid(sim_fires_c);
-        shrink = 0.75;
+        shrink = 0.95;
         %find boundaries
         sim_boundary_s = boundary(x_fires_sim_s,y_fires_sim_s,shrink);
         sim_x_s = x_fires_sim_s(sim_boundary_s);
@@ -242,7 +242,7 @@ for i = 1:p_count
         area_perim = sum(perim_fires(:));
         x_fires_perim = x_grid(perim_fires);
         y_fires_perim = y_grid(perim_fires);
-        shrink = 0.75;
+        %shrink = 0.75; already declared
         perim_boundary = boundary(x_fires_perim,y_fires_perim,shrink);
         perim_x = x_fires_perim(perim_boundary);
         perim_y = y_fires_perim(perim_boundary);
@@ -299,14 +299,17 @@ for i = 1:p_count
         plot(sim_x_s,sim_y_s,'b');
         plot(perim_x ,perim_y,'r');
         %xticks(-112.72:0.02:-112.58)
-        if spinup_compare == 2
+        if exp_num == 2
             title_str = ('Perimeter Observation and Forecast without cycling');
             legend({'Satellite Fire Detections','Forecast without cycling','Infrared perimeter'});
             save_str = [p_struct(i).file '_s']; %% _s is for single run
-        elseif spinup_compare == 1
-            title_str = ('Perimeter Observation and Forecast without spin-up');
-            legend({'Satellite Fire Detections','Forecast without spin-up','Infrared perimeter'});
-            save_str = [p_struct(i).file '_No_spinup'];
+        elseif exp_num == 1
+%             title_str = ('Perimeter Observation and Forecast without spin-up');
+%             legend({'Satellite Fire Detections','Forecast without spin-up','Infrared perimeter'});
+%             save_str = [p_struct(i).file '_No_spinup'];
+            title_str = ('Perimeter Observation and Forecast without ROS  adjust');
+            legend({'Satellite Fire Detections','Forecast without ROS adjust','Infrared perimeter'});
+            save_str = [p_struct(i).file '_No_ROS_adj'];
         else %spinup_compare == 3
             title_str = sprintf('Perimeter Observation and Forecast for Cycle %d ',cycle_s);
             %title_str = ('Perimeter Observation and Forecast without spin-up');
@@ -342,14 +345,17 @@ for i = 1:p_count
         plot(sim_x_c,sim_y_c,'b');
         plot(perim_x ,perim_y,'r');
         %xticks(-112.72:0.02:-112.58)
-        if spinup_compare == 2
+        if exp_num == 2
             legend({'Satellite Fire Detections','Forecast with cycling','Infrared perimeter'});
             title_str = ('Perimeter Observation and Forecast with cycling');
             save_str = [p_struct(i).file '_c'];
-        elseif spinup_compare == 1
-            legend({'Satellite Fire Detections','Forecast using spin-up','Infrared perimeter'});
-            title_str = ('Perimeter Observation and Forecast using spin-up');
-            save_str = [p_struct(i).file '_with_spinup'];
+        elseif exp_num == 1
+%             legend({'Satellite Fire Detections','Forecast using spin-up','Infrared perimeter'});
+%             title_str = ('Perimeter Observation and Forecast using spin-up');
+%             save_str = [p_struct(i).file '_with_spinup'];
+            legend({'Satellite Fire Detections','Forecast using ROS adjust','Infrared perimeter'});
+            title_str = ('Perimeter Observation and Forecast using ROS adjust');
+            save_str = [p_struct(i).file '_with_ROS_adj'];
         else %spinup_compare == 3
             title_str = sprintf('Perimeter Observation and Forecast for Cycle %d ',cycle_c);
             %title_str = ('Perimeter Observation and Forecast without spin-up');
