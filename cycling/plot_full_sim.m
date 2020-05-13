@@ -22,7 +22,7 @@ else
     prefix = '../cougarTIFs/';
 end
 
-fig_num = input_num('Figure number? ',113,1);
+fig_num = input_num('Figure number? ',113);
 % make reduced structure
 %w = read_wrfout_tign(wrfout);
 % special case
