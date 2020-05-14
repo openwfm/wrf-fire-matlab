@@ -2,9 +2,16 @@ function fmc_change(m)
 
 f = 'wrfinput_d01';
 %w = read_wrfout_tign(f);
-load sm_mask.mat
-s = nc2struct('wrfinput_d01',{'FMC_GC'},{})
-moist = m*s.fmc_gc;
+%load sm_mask.mat
+s = nc2struct(f,{'FMC_GC'},{})
+f_time = input_num('Which fuel levels? All = -1',-1);
+if f_time < 0
+    moist = m*s.fmc_gc;
+else
+    for i = 1:length(f_time)
+        moist = m*s.fmc_gc(:,:,f_time(i));
+    end
+end
 %moist2 = moist;
 rewrite_bak=[f,'.bak_before_fmc'];
 if system(['cp ',f,' ',rewrite_bak])
