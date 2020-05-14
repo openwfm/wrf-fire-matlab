@@ -147,7 +147,7 @@ end
 data_time = (data_time - red.start_datenum);
 %bad data in patch fire
 if fire_choice == 0
-    term = 40;
+    term = 36;
     %term = length(data_time);
 else
     term = length(data_time);
