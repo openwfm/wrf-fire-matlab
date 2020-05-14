@@ -21,7 +21,7 @@ else
         load(wrfout)
     end
 end
-red = subset_domain(w,1);
+red = subset_domain(w);
 
 
 %use the wrfout file to find subset of detections
