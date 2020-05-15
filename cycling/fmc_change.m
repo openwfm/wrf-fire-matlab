@@ -8,8 +8,9 @@ f_time = input_num('Which fuel levels? All = -1',-1);
 if f_time < 0
     moist = m*s.fmc_gc;
 else
+    moist = s.fmc_gc;
     for i = 1:length(f_time)
-        moist = m*s.fmc_gc(:,:,f_time(i));
+        moist(:,:,f_time(i)) = m*s.fmc_gc(:,:,f_time(i));
     end
 end
 %moist2 = moist;
