@@ -3,14 +3,15 @@ function fuel_adjust(restart_file)
 %wrfrst
 
 fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1)
-cycle = input_num('Which cycle? ',0)
-load_str = sprintf('p_%d.mat',cycle)
+cycle = input_num('Which cycle? ',0);
+load_str = sprintf('p_%d.mat',cycle);
 load(load_str);
 
 %nned to beef up what's in red, below
 w  = read_wrfout_tign(restart_file);
 %use analysis to et region for changing fuel moisture
 w.tign_g = p.analysis;
+w.tign_g = p.spinup;
 red = subset_domain(w);
 
 %use the wrfout file to find subset of detections

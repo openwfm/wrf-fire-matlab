@@ -22,11 +22,11 @@ else
     prefix = '../cougarTIFs/';
 end
 
-fig_num = input_num('Figure number? ',113,1);
+fig_num = input_num('Figure number? ',113);
 % make reduced structure
-%w = read_wrfout_tign(wrfout);
+w = read_wrfout_tign(wrfout);
 % special case
-w = read_wrfout_tign(wrfout,'2013-08-17_07:00:00');
+%w = read_wrfout_tign(wrfout,'2013-08-17_07:00:00');
 red = subset_domain(w);
 
 

@@ -21,7 +21,7 @@ else
         load(wrfout)
     end
 end
-red = subset_domain(w,1);
+red = subset_domain(w);
 
 
 %use the wrfout file to find subset of detections
@@ -85,10 +85,6 @@ fire_area = red.tign <= time_bounds(2)-0.001;
 % cells within simulation perimeter
 fire_lon = red.fxlong(fire_area);
 fire_lat = red.fxlat(fire_area);
-decimate = 1;
-fire_lon = fire_lon(1:decimate:end);
-fire_lat = fire_lat(1:decimate:end);
-%scatter(fire_lon,fire_lat,'*','r')
 fire_boundary = boundary(fire_lon,fire_lat);
 x = fire_lon(fire_boundary);
 y = fire_lat(fire_boundary);
