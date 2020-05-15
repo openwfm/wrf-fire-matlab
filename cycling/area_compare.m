@@ -1,8 +1,11 @@
 function ac = area_compare(wrf_a,wrf_b)
 %compares areas of fires over time
-ts = '2013-08-17_07:00:00'
-w_a = read_wrfout_tign(wrf_a,ts);
-w_b = read_wrfout_tign(wrf_b,ts);
+% ts = '2013-08-17_07:00:00'
+% w_a = read_wrfout_tign(wrf_a,ts);
+% w_b = read_wrfout_tign(wrf_b,ts);
+
+w_a = read_wrfout_tign(wrf_a);
+w_b = read_wrfout_tign(wrf_b);
 
 t_1 = max(min(w_a.tign_g(:)),min(w_b.tign_g(:)));
 t_2 = min(max(w_a.tign_g(:)),max(w_b.tign_g(:)));
