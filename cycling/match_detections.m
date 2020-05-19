@@ -50,12 +50,13 @@ end
 fig.fig_map=0;
 fig.fig_3d=0;
 fig.fig_interp=0;
-if exist('g_match.mat','file')
-    load('g_match.mat')
+g_str = sprintf('g_match_%d.mat',cycle);
+if exist(g_str,'file')
+    load(g_str)
 else
     det_list=sort_rsac_files(prefix);
     g = load_subset_detections(prefix,det_list,red,time_bounds,fig);
-    save('g_match.mat', 'g', '-v7.3')
+    save(g_str, 'g', '-v7.3')
 end
 %find list of detections
 min_con = 7;
