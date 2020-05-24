@@ -1,6 +1,6 @@
 function fmc_change(m)
 
-f = 'wrfinput_d01';
+f = 'wrfinput_d04';
 %w = read_wrfout_tign(f);
 %load sm_mask.mat
 s = nc2struct(f,{'FMC_GC'},{})
