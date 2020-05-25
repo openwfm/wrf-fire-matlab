@@ -1,19 +1,20 @@
-function d = detection_list(g)
+function d = detection_list(g,r)
 %d = detection_list(g)
 %inputs :
-%   g       struct, stelite data from subset detections
+%   g       struct, satellite data from subset_detections
+%   r       struct, fire data from subset_domain
 %output ;
 %   d       nx2  array with lon,lat of detections
 
 
 min_con = 7;
-mask = zeros(size(g(1).data));
+mask = zeros(size(g(1).fxdata));
 for i = 1:length(g)
-    mask = mask + g(i).data >= min_con;
+    mask = mask + double(g(i).fxdata >= min_con);
 end
 
 % plot the fires
-%figure,mesh(g(1).xlon,g(1).xlat,mask)
+figure,mesh(r.fxlong,r.fxlat,mask)
 
 d = mask;
 end

@@ -1,9 +1,7 @@
-function [ plotters ] = plot_full_sim(wrfout )
+function [ plotters ] = plot_full_sim(wrfout, ts )
 % inputs:
-%   fig_num - integer, figure number
-%   fire - string, either "Patch" or "Camp"
 %   wrfout - path to a wrfout file
-%   title_string, string, title of figure
+%   ts - time_step in wrfout
 %plots fire cone
 
 fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1);
@@ -24,7 +22,11 @@ end
 
 fig_num = input_num('Figure number? ',113);
 % make reduced structure
-w = read_wrfout_tign(wrfout);
+if exist('ts','var')
+    w = read_wrfout_tign(wrfout,ts);
+else
+    w = read_wrfout_tign(wrfout);
+end
 % special case
 %w = read_wrfout_tign(wrfout,'2013-08-17_07:00:00');
 red = subset_domain(w);
