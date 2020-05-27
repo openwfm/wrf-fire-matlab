@@ -1,5 +1,5 @@
 function var=nclist(filename,q) 
-% get info on all variables
+%  info on all variables
 
 quiet=exist('q','var');
 fprintf('ncdump: file %s\n',filename);
@@ -12,5 +12,10 @@ for varid=1:nvars, % one variable at a time
         dispvarinfo(var(varid));
     end
 end
+for i=1:nvars % save the native netcdf variable order
+    var(i).varid=i-1;
+end
+[~,ix]=sort({var.varname});
+var=var(ix);
 netcdf.close(ncid);
 end
