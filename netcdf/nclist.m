@@ -1,5 +1,8 @@
 function var=nclist(filename,q) 
-%  info on all variables
+% var=nclist(filename)
+% var=nclist(filename,'q')  
+%  return structure array with info on each netcdf variable in the file
+%  'q' = quiet
 
 quiet=exist('q','var');
 fprintf('ncdump: file %s\n',filename);
