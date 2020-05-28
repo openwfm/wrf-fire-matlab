@@ -27,7 +27,13 @@ if ~exist('g_ellipse.mat','file')
     g = load_subset_detections(prefix,p,red,time_bounds,fig);
     save g_ellipse.mat g
 else
-    load g_ellipse.mat
+    load_new = input_num('re-load detections from scratch? ',1);
+    if load_new
+        g = load_subset_detections(prefix,p,red,time_bounds,fig);
+        save g_ellipse.mat g
+    else
+        load g_ellipse.mat
+    end
 end
 
 t = g(end).time;
