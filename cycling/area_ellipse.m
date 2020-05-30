@@ -1,6 +1,3 @@
-%% DOCUMENT TITLE
-% INTRODUCTORY TEXT
-%%
 function a = area_ellipse(wrfout)
 % function a = area_ellipse(wrfout)
 % function for comparing area and orientations
@@ -37,7 +34,6 @@ else
 end
 
 t = g(end).time;
-
 %fite ellipse, plot results
 figure(1)
 e_data = detection_ellipse(g,red);
