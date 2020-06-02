@@ -79,7 +79,7 @@ end
 fprintf('display bounds %g %g %g %g\n',red.disp_bounds);
 
 disp('Loading and subsetting detections')
-fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar [3]',0)
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar [3]',0,1)
 if fire_choice == 1
     prefix='../campTIFs/';
 elseif fire_choice == 0
@@ -155,7 +155,7 @@ maxiter =2;
 maxdepth=3;
 h_stor = zeros(m,n,maxiter);
 
-new_like = input_num('Use new likelihood? No == 0 ',0);
+new_like = input_num('Use new likelihood? No == 0 ',0,1);
 for istep=1:maxiter
     
     fprintf('********** Iteration %g/%g **************\n', istep, maxiter);

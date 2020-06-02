@@ -37,7 +37,7 @@ else
 end
 
 w = read_wrfout_tign(wrfout);
-red = subset_domain(w);
+red = subset_domain(w,1);
 time_bounds = [red.start_datenum red.end_datenum];
 
 % figures
@@ -145,9 +145,9 @@ end
 
 %convert data_time to days since simulation
 data_time = (data_time - red.start_datenum);
-%bad data in patch fire
+%bad data in patch fire towards end...
 if fire_choice == 0
-    term = 36;
+    term = min(36,length(data_time));
     %term = length(data_time);
 else
     term = length(data_time);

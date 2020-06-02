@@ -10,7 +10,7 @@ function a = area_ellipse(wrfout)
 [fire_name,save_name,prefix] = fire_choice()
 
 w = read_wrfout_tign(wrfout);
-red = subset_domain(w);
+red = subset_domain(w,1);
 
 % figures
 fig.fig_map=0;
@@ -24,7 +24,7 @@ if ~exist('g_ellipse.mat','file')
     g = load_subset_detections(prefix,p,red,time_bounds,fig);
     save g_ellipse.mat g
 else
-    load_new = input_num('re-load detections from scratch? ',1);
+    load_new = input_num('re-load detections from scratch? ',0,1);
     if load_new
         g = load_subset_detections(prefix,p,red,time_bounds,fig);
         save g_ellipse.mat g

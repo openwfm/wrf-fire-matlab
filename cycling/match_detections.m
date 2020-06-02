@@ -1,4 +1,4 @@
-function [ score ] = match_detections( wrfout, wrf_time_step )
+function [ score ] = match_detections( wrfout, wrf_time_step, cycle )
 %function score = match_detections( input_args )
 %Function evaluates a simulation by finding how well it was able to predict
 %where satellites detections would indicate a fire was burning
@@ -21,7 +21,7 @@ else
         load(wrfout)
     end
 end
-red = subset_domain(w);
+red = subset_domain(w,1);
 
 
 %use the wrfout file to find subset of detections
@@ -31,8 +31,8 @@ end_date = datestr(time_bounds(2));
 %time_bounds(2) = 7.354637292824074e+05
 time_bounds(1) = red.min_tign;
 %time_bounds(1) = time_bounds(2)-3;
-fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1)
-cycle = input_num('Which cycle? ',0)
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',0,1)
+%cycle = input_num('Which cycle? ',0)
 if fire_choice == 1
     fire_name = 'Camp fire';
     save_name = 'camp';

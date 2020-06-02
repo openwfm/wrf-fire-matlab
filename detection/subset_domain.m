@@ -61,7 +61,7 @@ default_bounds{2}=[sim.min_lon,sim.max_lon,sim.min_lat,sim.max_lat];
 default_bounds{3}=[-112.75414 -112.43779 40.27268 40.50655]
 for i=1:length(default_bounds),fprintf('default bounds %i: %8.5f %8.5f %8.5f %8.5f\n',i,default_bounds{i});end
 
-bounds=input_num('enter bounds [min_lon,max_lon,min_lat,max_lat] or number of bounds above (1)> ',1,force);
+bounds=input_num('enter bounds [min_lon,max_lon,min_lat,max_lat] or number of bounds above (1)> ',3,force);
 if isempty(bounds),bounds=1;end
 if length(bounds)==1,
    bounds=default_bounds{bounds};
