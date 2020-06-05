@@ -14,7 +14,7 @@ for i = 1:length(g)
 end
 
 % plot the fires
-figure,mesh(r.fxlong,r.fxlat,mask)
+%figure,mesh(r.fxlong,r.fxlat,mask)
 
 d = mask;
 end
