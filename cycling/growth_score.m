@@ -1,3 +1,4 @@
+
 function [ growth_struct] = growth_score( wrfout )
 %function [ gs ] = growth_score( wrfout,prefix )
 % inputs:
