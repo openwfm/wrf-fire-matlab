@@ -1,8 +1,8 @@
-function [ growth_struct] = growth_score( wrfout )
+function [ growth_struct] = growth_score( wrfout, ts )
 %function [ gs ] = growth_score( wrfout,prefix )
 % inputs:
 %   wrfout - string, parth to wrfout file for evaluation
-%  
+%   ts - string, time step in wrfout file
 % outputs:
 %   growth_struct- struct with the following:
 %      gs - mean error in area gowth rate of forecast vs. area
@@ -36,7 +36,7 @@ else
     save_str = sprintf('cougar_growth_c%d',cycle);
 end
 
-w = read_wrfout_tign(wrfout);
+w = read_wrfout_tign(wrfout,ts);
 red = subset_domain(w,1);
 time_bounds = [red.start_datenum red.end_datenum];
 
