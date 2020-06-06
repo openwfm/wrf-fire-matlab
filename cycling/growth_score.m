@@ -1,5 +1,4 @@
-
-function [ growth_struct] = growth_score( wrfout, ts )
+function [ growth_struct] = growth_score( wrfout )
 %function [ gs ] = growth_score( wrfout,prefix )
 % inputs:
 %   wrfout - string, parth to wrfout file for evaluation
@@ -37,7 +36,7 @@ else
     save_str = sprintf('cougar_growth_c%d',cycle);
 end
 
-w = read_wrfout_tign(wrfout,ts);
+w = read_wrfout_tign(wrfout);
 red = subset_domain(w,1);
 time_bounds = [red.start_datenum red.end_datenum];
 
