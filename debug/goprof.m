@@ -1,5 +1,5 @@
 % debugging canopy interpolation
- step=5
+ step=2
  file='wrfout_d05_2012-11-11_12:00:00'
  long=-86.73
  lat=30.53
