@@ -31,7 +31,7 @@ else
 end
 
 
-v.file=file;
+v.file=file2;
 [v.time,v.timestr]=rsac2time(file);
 if ~exist('silent','var'),
     fprintf('file name w/prefix    %s\n',pfile);
