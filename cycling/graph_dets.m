@@ -3,11 +3,30 @@ function graph_dets(w)
 
 [fire_name,save_name,prefix] = fire_choice();
 red = subset_domain(w);
+time_bounds(2) = red.max_tign;
+time_bounds(1) = red.min_tign;
+
 % figures
 fig.fig_map=0;
 fig.fig_3d=0;
 fig.fig_interp=0;
 p = sort_rsac_files(prefix);
+
+g_str = 'g_graph.mat';
+if ~exist(g_str,'file')
+    g = subset_l2_detections(prefix,p,red,time_bounds,fig)
+    save(g_str, 'g', '-v7.3')
+else
+    g = [];
+    reload_dets = input_num('Reload detections? 1 = yes',1);
+    if reload_dets == 1
+        g = subset_l2_detections(prefix,p,red,time_bounds,fig)
+        save(g_str, 'g', '-v7.3')
+    else
+        load g_graph.mat
+    end
+end
+
 
 
 
@@ -18,10 +37,10 @@ min_con = 7;
 for i = 1:length(g)
     if sum(g(i).det(3:5)) > 0
         fires = g(i).data >= min_con;
-        lons = g(i).xlon(fires);
-        lats = g(i).xlat(fires);
-        times = g(i).time*ones(length(lons),1);
-        pts = [pts;[lats,lons,times]];
+        lons = g(i).lon(fires);
+        lats = g(i).lat(fires);
+        times = g(i).time*ones(size(lons));
+        pts = [pts;[lats',lons',times']];
     end
 end
 fprintf('Detections collected \n')
@@ -29,7 +48,7 @@ figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
 title('full scatter')
 
 %prune the data
-cull = 5;
+cull = 1;
 n_points = pts(1:cull:end,:,:);
 figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3));
 title('patial scatter')
@@ -37,7 +56,7 @@ title('patial scatter')
 %make edge weights
 n = length(n_points);
 a = zeros(n,n);
-max_t = 1.5;
+max_t = 2.5;
 
 %maybe change later
 pts = n_points;
