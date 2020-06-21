@@ -1,10 +1,22 @@
-function graph_dets(g)
+function graph_dets(w)
+%w = read_wrfout_tign(wrfout)
+
+[fire_name,save_name,prefix] = fire_choice();
+red = subset_domain(w);
+% figures
+fig.fig_map=0;
+fig.fig_3d=0;
+fig.fig_interp=0;
+p = sort_rsac_files(prefix);
+
+
+
 
 close all
 pts = [];
-min_con = 8;
+min_con = 7;
 for i = 1:length(g)
-    if randn > 0 && sum(g(i).det(3:5)) > 0
+    if sum(g(i).det(3:5)) > 0
         fires = g(i).data >= min_con;
         lons = g(i).xlon(fires);
         lats = g(i).xlat(fires);
@@ -17,7 +29,7 @@ figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
 title('full scatter')
 
 %prune the data
-cull = 4;
+cull = 5;
 n_points = pts(1:cull:end,:,:);
 figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3));
 title('patial scatter')
@@ -25,7 +37,7 @@ title('patial scatter')
 %make edge weights
 n = length(n_points);
 a = zeros(n,n);
-max_t = 3;
+max_t = 1.5;
 
 %maybe change later
 pts = n_points;
@@ -60,7 +72,7 @@ hold off
 fg = digraph(a);
 figure(3),plot(fg);
 
-for i = 1:10
+for i = 1:1
     for j = 1:2:n
         distant_point = j;
         [p,d] = shortestpath(fg,1,distant_point);
