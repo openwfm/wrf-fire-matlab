@@ -67,18 +67,21 @@ function [d,v] =perim_distance(w,g)
  fprintf('Forecast distanc: %0.2f     Forecast ROS: %0.2f  \n',d,v)
  fprintf('Detection distance : %0.2f   Detection ROS: %0.2f \n',dd,dv);
  
- figure,contour(r.fxlong,r.fxlat,r.tign_g)
+ n = 10;
+ c_lines = linspace(min_t,max_t,n);
+ 
+ figure,contour(r.fxlong,r.fxlat,r.tign_g,c_lines,'k')
  hold on
- scatter(ignition_point(2),ignition_point(1),'*r');
- scatter(point(2),point(1),'k*');
+ scatter(ignition_point(2),ignition_point(1),500,'*r')
+ scatter(point(2),point(1),500,'r*');
  title('Foecast points')
  hold off
  
- figure,contour(r.fxlong,r.fxlat,r.tign_g)
+ figure,contour(r.fxlong,r.fxlat,r.tign_g,c_lines,'k')
  title('Detection Points');
  hold on
- scatter(det_ignition(2),det_ignition(1),'*r');
- scatter(det_point(2),det_point(1),'k*');
+ scatter(det_ignition(2),det_ignition(1),500,'*r');
+ scatter(det_point(2),det_point(1),500,'*r');
  hold off
  
 end
