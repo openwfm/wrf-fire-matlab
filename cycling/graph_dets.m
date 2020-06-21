@@ -25,7 +25,7 @@ title('patial scatter')
 %make edge weights
 n = length(n_points);
 a = zeros(n,n);
-max_t = 3.5;
+max_t = 3;
 
 %maybe change later
 pts = n_points;
@@ -44,7 +44,7 @@ for i = 1:n
         distant_point = i;
     end
     for j = 1:n
-        if (pts(j,3)-time) > 0 && (pts(j,3) - time) < max_t
+        if (pts(j,3)-time) >= 0 && (pts(j,3) - time) < max_t
             j_point = [pts(j,1),pts(j,2)];
             a(i,j) = distance(i_point,j_point,E);
         end
@@ -60,19 +60,21 @@ hold off
 fg = digraph(a);
 figure(3),plot(fg);
 
-
-[p,d] = shortestpath(fg,1,distant_point);
-
-figure(2),hold on
-plot3(pts(p,2),pts(p,1),pts(p,3),'r');
-for k = 2:length(p)-1
-%     tail = pts(p(k-1),:,:);
-%     head = pts(p(k),:,:);
-%     arr = tail-head;
-    scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3),'*r');
-    %quiver3(tail(2),tail(1),tail(3),arr(2),arr(1),arr(3));
+for i = 1:10
+    for j = 1:2:n
+        distant_point = j;
+        [p,d] = shortestpath(fg,1,distant_point);
+        
+        figure(2),hold on
+        plot3(pts(p,2),pts(p,1),pts(p,3),'r');
+        for k = 2:length(p)-1
+            %     tail = pts(p(k-1),:,:);
+            %     head = pts(p(k),:,:);
+            %     arr = tail-head;
+            scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3),'*r');
+            %quiver3(tail(2),tail(1),tail(3),arr(2),arr(1),arr(3));
+        end
+        hold off
+    end
 end
-hold off
-    
-
 end
