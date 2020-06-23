@@ -90,6 +90,9 @@ scatter3(pts(1,2),pts(1,1),pts(1,3),'*r');
 scatter3(pts(distant_point,2),pts(distant_point,1),pts(distant_point,3),'*r');
 hold off
 
+%calculate max velocity of fire
+%max=_v 
+
 fg = digraph(a);
 figure(3),plot(fg);
 
