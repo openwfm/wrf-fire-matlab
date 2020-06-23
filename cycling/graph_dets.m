@@ -18,7 +18,7 @@ if ~exist(g_str,'file')
     save(g_str, 'g', '-v7.3')
 else
     g = [];
-    reload_dets = input_num('Reload detections? 1 = yes',1);
+    reload_dets = input_num('Reload detections? 1 = yes',0,1);
     if reload_dets == 1
         g = subset_l2_detections(prefix,p,red,time_bounds,fig)
         save(g_str, 'g', '-v7.3')
@@ -48,7 +48,7 @@ figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
 title('full scatter')
 
 %prune the data
-cull = 1;
+cull =1;
 n_points = pts(1:cull:end,:,:);
 figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3));
 title('patial scatter')
@@ -56,7 +56,7 @@ title('patial scatter')
 %make edge weights
 n = length(n_points);
 a = zeros(n,n);
-max_t = 2.5;
+max_t = 1.5;
 
 %maybe change later
 pts = n_points;
@@ -75,9 +75,11 @@ for i = 1:n
         distant_point = i;
     end
     for j = 1:n
-        if (pts(j,3)-time) >= 0 && (pts(j,3) - time) < max_t
+        time_diff = pts(j,3)-time;
+        if (time_diff >= 0 && time_diff < max_t)
+            time_penalty = 1;%exp(0.01*time_diff);
             j_point = [pts(j,1),pts(j,2)];
-            a(i,j) = distance(i_point,j_point,E);
+            a(i,j) = distance(i_point,j_point,E)*time_penalty;
         end
     end
 end

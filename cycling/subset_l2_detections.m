@@ -14,7 +14,7 @@ for i = 1:length(d)
     file = d{i};
     %only read fire product files
     if strcmp(file(4:5),'14')
-        file_str = [prefix,file]
+        file_str = [prefix,file];
 
         %fprintf('reading fire product \n')
         if strcmp(file(1),'M')
@@ -45,7 +45,7 @@ for i = 1:length(d)
             v.lon = v.lon(idx);
             v.lat = v.lat(idx);
             v.power = v.power(idx);
-            v.conf = v.conf(idx)
+            v.conf = v.conf(idx);
             v.time = t(i);
             v.file = file;
             v.axis=[red.min_lon,red.max_lon,red.min_lat,red.max_lat];
