@@ -18,7 +18,7 @@ if ~exist(g_str,'file')
     save(g_str, 'g', '-v7.3')
 else
     g = [];
-    reload_dets = input_num('Reload detections? 1 = yes',1);
+    reload_dets = input_num('Reload detections? 1 = yes',0);
     if reload_dets == 1
         g = subset_l2_detections(prefix,p,red,time_bounds,fig)
         save(g_str, 'g', '-v7.3')
@@ -75,7 +75,7 @@ for i = 1:n
         distant_point = i;
     end
     for j = 1:n
-        if (pts(j,3)-time) >= 0 && (pts(j,3) - time) < max_t
+        if (pts(j,3)-time) > 0 && (pts(j,3) - time) < max_t
             j_point = [pts(j,1),pts(j,2)];
             a(i,j) = distance(i_point,j_point,E);
         end
@@ -87,6 +87,9 @@ figure(2),hold on
 scatter3(pts(1,2),pts(1,1),pts(1,3),'*r');
 scatter3(pts(distant_point,2),pts(distant_point,1),pts(distant_point,3),'*r');
 hold off
+
+%calculate max velocity of fire
+%max=_v 
 
 fg = digraph(a);
 figure(3),plot(fg);
