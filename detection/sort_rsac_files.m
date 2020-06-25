@@ -7,7 +7,7 @@ function p=sort_rsac_files(prefix)
 % d              cell array of file names ordered by time
 
 % insert query to use tifs of Level2 data here
-use_tifs = input_num('Use TIF files? No = 0',0,1);
+use_tifs = 0;%input_num('Use TIF files? No = 0',0,1);
 
 if use_tifs == 1
     d=dir([prefix,'*.tif.mat']);d={d.name};

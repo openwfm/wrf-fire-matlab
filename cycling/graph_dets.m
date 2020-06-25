@@ -1,4 +1,4 @@
-function graph_dets(w)
+function graph_dets(w,cull)
 %w = read_wrfout_tign(wrfout)
 
 [fire_name,save_name,prefix] = fire_choice();
@@ -12,7 +12,7 @@ fig.fig_3d=0;
 fig.fig_interp=0;
 p = sort_rsac_files(prefix);
 
-g_str = 'g_graph.mat';
+g_str = 'g.mat';
 if ~exist(g_str,'file')
     g = subset_l2_detections(prefix,p,red,time_bounds,fig)
     save(g_str, 'g', '-v7.3')
@@ -27,13 +27,27 @@ else
     end
 end
 
-
-
-
-
 close all
 pts = [];
 min_con = 7;
+%make unique ignition point
+for i = 1:length(g)% fprintf('Detections collected \n')
+% figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
+% title('full scatter')
+
+    if sum(g(i).det(3:5)) > 0
+        fires = g(i).data >= min_con;
+        lons = mean(g(i).lon(fires));
+        lats = mean(g(i).lat(fires));
+        times = g(i).time-0.5;
+        pts = [lats,lons,times];
+    end
+    if norm(pts) > 0
+        break
+    end
+end
+    
+
 for i = 1:length(g)
     if sum(g(i).det(3:5)) > 0
         fires = g(i).data >= min_con;
@@ -43,19 +57,22 @@ for i = 1:length(g)
         pts = [pts;[lats',lons',times']];
     end
 end
-fprintf('Detections collected \n')
-figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
-title('full scatter')
+% fprintf('Detections collected \n')
+% figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
+% title('full scatter')
 
 %prune the data
-cull =1;
+%cull = 2;
 n_points = pts(1:cull:end,:,:);
 figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3));
 title('patial scatter')
 
 %make edge weights
 n = length(n_points);
+%adjacency
 a = zeros(n,n);
+%velocity
+v = a;
 max_t = 1.5;
 
 %maybe change later
@@ -64,6 +81,8 @@ E = wgs84Ellipsoid;
 
 %max distance from ignition
 max_d = 0;
+%error in time of fire from time of detection
+time_err = 0.5;
 distant_point = 1;
 ig_point = [pts(1,1),pts(1,2)];
 for i = 1:n
@@ -75,11 +94,12 @@ for i = 1:n
         distant_point = i;
     end
     for j = 1:n
-        time_diff = pts(j,3)-time;
-        if (time_diff >= 0 && time_diff < max_t)
+        time_diff = max(time_err,pts(j,3)-time);
+        if (time_diff >= 0  && time_diff < max_t)
             time_penalty = 1;%exp(0.01*time_diff);
             j_point = [pts(j,1),pts(j,2)];
             a(i,j) = distance(i_point,j_point,E)*time_penalty;
+            v(i,j) = a(i,j)/time_diff;
         end
     end
 end
@@ -91,13 +111,25 @@ scatter3(pts(distant_point,2),pts(distant_point,1),pts(distant_point,3),'*r');
 hold off
 
 %calculate max velocity of fire
-%max=_v 
+max_v = abs(max_d/(pts(distant_point,3)-pts(1,3)));
+v_mask = v < max_v;
+%filter detections too far apart, fix this KLUGE
+speed_penalty = 1.2;
+for i = 1:n
+    for j = 1:n
+        if (a(i,j) > 0) && (v(i,j) > speed_penalty*max_v)
+            a(i,j) = 0;
+        end
+    end
+end
+
+
 
 fg = digraph(a);
 figure(3),plot(fg);
 
 for i = 1:1
-    for j = 1:2:n
+    for j = round(n/5):cull:n
         distant_point = j;
         [p,d] = shortestpath(fg,1,distant_point);
         
