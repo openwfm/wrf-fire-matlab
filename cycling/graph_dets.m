@@ -1,4 +1,4 @@
-function graph_dets(w,cull)
+function path_struct = graph_dets(w,cull)
 %w = read_wrfout_tign(wrfout)
 
 [fire_name,save_name,prefix] = fire_choice();
@@ -14,29 +14,29 @@ p = sort_rsac_files(prefix);
 
 g_str = 'g.mat';
 if ~exist(g_str,'file')
-    g = subset_l2_detections(prefix,p,red,time_bounds,fig)
-    save(g_str, 'g', '-v7.3')
+    g = subset_l2_detections(prefix,p,red,time_bounds,fig);
+    save(g_str, 'g', '-v7.3');
 else
     g = [];
     reload_dets = input_num('Reload detections? 1 = yes',0,1);
     if reload_dets == 1
-        g = subset_l2_detections(prefix,p,red,time_bounds,fig)
-        save(g_str, 'g', '-v7.3')
+        g = subset_l2_detections(prefix,p,red,time_bounds,fig);
+        save(g_str, 'g', '-v7.3');
     else
-        load g_graph.mat
+        load g_graph.mat;
     end
 end
 
 close all
 pts = [];
-min_con = 7;
+min_con = 90;
 %make unique ignition point
 for i = 1:length(g)% fprintf('Detections collected \n')
-% figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
-% title('full scatter')
-
+    % figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
+    % title('full scatter')
+    
     if sum(g(i).det(3:5)) > 0
-        fires = g(i).data >= min_con;
+        fires = g(i).conf >= min_con;
         lons = mean(g(i).lon(fires));
         lats = mean(g(i).lat(fires));
         times = g(i).time-0.5;
@@ -46,11 +46,11 @@ for i = 1:length(g)% fprintf('Detections collected \n')
         break
     end
 end
-    
+
 
 for i = 1:length(g)
     if sum(g(i).det(3:5)) > 0
-        fires = g(i).data >= min_con;
+        fires = g(i).conf >= min_con;
         lons = g(i).lon(fires);
         lats = g(i).lat(fires);
         times = g(i).time*ones(size(lons));
@@ -65,7 +65,7 @@ end
 %cull = 2;
 n_points = pts(1:cull:end,:,:);
 figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3));
-title('patial scatter')
+title('Partial scatter')
 
 %make edge weights
 n = length(n_points);
@@ -73,7 +73,7 @@ n = length(n_points);
 a = zeros(n,n);
 %velocity
 v = a;
-max_t = 1.5;
+max_t = 0.9;
 
 %maybe change later
 pts = n_points;
@@ -82,11 +82,12 @@ E = wgs84Ellipsoid;
 %max distance from ignition
 max_d = 0;
 %error in time of fire from time of detection
-time_err = 0.5;
+time_err = 0.0;
 distant_point = 1;
 ig_point = [pts(1,1),pts(1,2)];
 for i = 1:n
     time = pts(i,3);
+    locs(i) = local_time(time);
     i_point = [pts(i,1),pts(i,2)];
     new_d = distance(ig_point,i_point,E);
     if new_d > max_d
@@ -95,10 +96,14 @@ for i = 1:n
     end
     for j = 1:n
         time_diff = max(time_err,pts(j,3)-time);
-        if (time_diff >= 0  && time_diff < max_t)
-            time_penalty = 1;%exp(0.01*time_diff);
+        %if (time_diff > 0  && time_diff < max_t)
+        if time_diff < max_t
             j_point = [pts(j,1),pts(j,2)];
-            a(i,j) = distance(i_point,j_point,E)*time_penalty;
+            a(i,j) = distance(i_point,j_point,E);
+            %special treatment for detections on same granule
+%             if time_diff == time_err
+%                 a(i,j) = sqrt(a(i,j));
+%             end
             v(i,j) = a(i,j)/time_diff;
         end
     end
@@ -111,12 +116,28 @@ scatter3(pts(distant_point,2),pts(distant_point,1),pts(distant_point,3),'*r');
 hold off
 
 %calculate max velocity of fire
+v_std = std(v(:));
+v_mean = mean(v(:));
 max_v = abs(max_d/(pts(distant_point,3)-pts(1,3)));
+max_v = v_mean;
 v_mask = v < max_v;
 %filter detections too far apart, fix this KLUGE
 speed_penalty = 1.2;
+fast = 0.1;
+slow = 2.6;
 for i = 1:n
+    if (locs(i) > 8) && (locs(i) < 18)
+        sp1 = fast;
+    else
+        sp1 = slow;
+    end
     for j = 1:n
+        if (locs(j) > 8) && (locs(j) < 18)
+            sp2 = fast;
+        else
+            sp2 = slow;
+        end
+        %speed_penalty = (sp1+sp2)/2;
         if (a(i,j) > 0) && (v(i,j) > speed_penalty*max_v)
             a(i,j) = 0;
         end
@@ -127,22 +148,45 @@ end
 
 fg = digraph(a);
 figure(3),plot(fg);
-
+path_count = 0;
+start_pt = 1;
+new_points = pts;
 for i = 1:1
-    for j = round(n/5):cull:n
+    %paths to next 20 detections
+    for j = 1:cull:n
         distant_point = j;
-        [p,d] = shortestpath(fg,1,distant_point);
-        
+        %[p,d] = shortestpath(fg,start_pt,distant_point);
+        [p,d] = shortestpath(fg,i,j);
+        if ~isempty(p)
+            path_count = path_count + 1;
+            paths(path_count).p = p;
+            paths(path_count).d = d;
+            %fprintf('%d points in path \n',length(p))
+        end
         figure(2),hold on
         plot3(pts(p,2),pts(p,1),pts(p,3),'r');
-        for k = 2:length(p)-1
-            %     tail = pts(p(k-1),:,:);
-            %     head = pts(p(k),:,:);
-            %     arr = tail-head;
-            scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3),'*r');
-            %quiver3(tail(2),tail(1),tail(3),arr(2),arr(1),arr(3));
-        end
+        %         for k = 2:length(p)-1
+        %             scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3),'*r');
+        %         end
         hold off
+%         for k = 1:length(p)-1
+%             new_pt = ([pts(p(k),1),pts(p(k),2),pts(p(k),3)]+[pts(p(k+1),1),pts(p(k+1),2),pts(p(k+1),3)])/2;
+%             new_points = [new_points;new_pt];
+%         end
     end
+    path_struct.paths = paths;
+    path_struct.graph = fg;
+    path_struct.distances = a;
+    path_struct.speeds = v;
+    path_struct.points = double(pts);
+    path_struct.red = red;
+    path_struct.new_points = new_points;
 end
 end
+
+function lt = local_time(time)
+    shift = 7;
+    lt = 24*((time-shift)-floor(time-shift));
+end
+
+
