@@ -18,7 +18,7 @@ if ~exist(g_str,'file')
     save(g_str, 'g', '-v7.3');
 else
     g = [];
-    reload_dets = input_num('Reload detections? 1 = yes',0,1);
+    reload_dets = input_num('Reload detections? 1 = yes',0);
     if reload_dets == 1
         g = subset_l2_detections(prefix,p,red,time_bounds,fig);
         save(g_str, 'g', '-v7.3');
@@ -29,8 +29,8 @@ end
 
 close all
 pts = [];
-min_con = 90;
-%make unique ignition point
+min_con = 70;
+%make unique ignition point 
 for i = 1:length(g)% fprintf('Detections collected \n')
     % figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
     % title('full scatter')
@@ -39,8 +39,9 @@ for i = 1:length(g)% fprintf('Detections collected \n')
         fires = g(i).conf >= min_con;
         lons = mean(g(i).lon(fires));
         lats = mean(g(i).lat(fires));
-        times = g(i).time-0.5;
-        pts = [lats,lons,times];
+        confs = mean(double(g(i).conf(fires)));
+        times = g(i).time-0.25;
+        pts = [lats,lons,times,confs];
     end
     if norm(pts) > 0
         break
@@ -54,7 +55,8 @@ for i = 1:length(g)
         lons = g(i).lon(fires);
         lats = g(i).lat(fires);
         times = g(i).time*ones(size(lons));
-        pts = [pts;[lats',lons',times']];
+        confs = double(g(i).conf(fires));
+        pts = [pts;[lats',lons',times',confs']];
     end
 end
 % fprintf('Detections collected \n')
@@ -63,8 +65,8 @@ end
 
 %prune the data
 %cull = 2;
-n_points = pts(1:cull:end,:,:);
-figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3));
+n_points = pts(1:cull:end,:,:,:);
+figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3)-red.start_datenum);
 title('Partial scatter')
 
 %make edge weights
@@ -73,16 +75,22 @@ n = length(n_points);
 a = zeros(n,n);
 %velocity
 v = a;
-max_t = 0.9;
+max_t = 1.2;
 
 %maybe change later
 pts = n_points;
+
+%convert from points in the scattered data of L2 data to nearest 
+%neighbors on the fire grid
+grid_pts = fixpoints2grid(red,n_points);
+
+
 E = wgs84Ellipsoid;
 
 %max distance from ignition
 max_d = 0;
 %error in time of fire from time of detection
-time_err = 0.0;
+time_err = 0.1;
 distant_point = 1;
 ig_point = [pts(1,1),pts(1,2)];
 for i = 1:n
@@ -110,9 +118,9 @@ for i = 1:n
 end
 fprintf('Matrix ready \n');
 %scatter ignition and distant point
-figure(2),hold on
-scatter3(pts(1,2),pts(1,1),pts(1,3),'*r');
-scatter3(pts(distant_point,2),pts(distant_point,1),pts(distant_point,3),'*r');
+figure(2),hold on,zlabel('Days from start'),xlabel('Lon'),ylabel('Lat')
+scatter3(pts(1,2),pts(1,1),pts(1,3)-red.start_datenum,'*r');
+scatter3(pts(distant_point,2),pts(distant_point,1),pts(distant_point,3)-red.start_datenum,'*r');
 hold off
 
 %calculate max velocity of fire
@@ -123,8 +131,9 @@ max_v = v_mean;
 v_mask = v < max_v;
 %filter detections too far apart, fix this KLUGE
 speed_penalty = 1.2;
-fast = 0.1;
-slow = 2.6;
+fast = 2.0;
+slow = 0.4;
+speeders = 0;
 for i = 1:n
     if (locs(i) > 8) && (locs(i) < 18)
         sp1 = fast;
@@ -137,13 +146,15 @@ for i = 1:n
         else
             sp2 = slow;
         end
-        %speed_penalty = (sp1+sp2)/2;
+        speed_penalty = (sp1+sp2)/2;
+        %fprintf('speed penalty = %0.2f \n',speed_penalty)
         if (a(i,j) > 0) && (v(i,j) > speed_penalty*max_v)
             a(i,j) = 0;
+            speeders = speeders + 1;
         end
     end
 end
-
+fprintf('%d speeders removed \n',speeders)
 
 
 fg = digraph(a);
@@ -151,7 +162,7 @@ figure(3),plot(fg);
 path_count = 0;
 start_pt = 1;
 new_points = pts;
-for i = 1:1
+for i = 1:2
     %paths to next 20 detections
     for j = 1:cull:n
         distant_point = j;
@@ -161,10 +172,15 @@ for i = 1:1
             path_count = path_count + 1;
             paths(path_count).p = p;
             paths(path_count).d = d;
+            %path confidenc is geometric mean of detections in path
+            paths(path_count).c = prod(pts(p,4))^(1/length(p));
             %fprintf('%d points in path \n',length(p))
         end
         figure(2),hold on
-        plot3(pts(p,2),pts(p,1),pts(p,3),'r');
+        %l2 points
+        plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
+        %grid points
+        plot3(grid_pts(p,4),grid_pts(p,3),pts(p,3)-red.start_datenum,'g');
         %         for k = 2:length(p)-1
         %             scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3),'*r');
         %         end
@@ -181,6 +197,8 @@ for i = 1:1
     path_struct.points = double(pts);
     path_struct.red = red;
     path_struct.new_points = new_points;
+    path_struct.grid_pts = grid_pts(:,3:4);
+    path_struct.idx = uint8(grid_pts(:,1:2));
 end
 end
 

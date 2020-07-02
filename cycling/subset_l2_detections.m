@@ -18,19 +18,28 @@ for i = 1:length(d)
 
         %fprintf('reading fire product \n')
         if strcmp(file(1),'M')
-            fprintf('Reading MODIS FRP data \n')
-            v.power = hdfread(file_str,'/FP_power');
-            v.lon = hdfread(file_str,'/FP_longitude');
-            v.lat  = hdfread(file_str,'/FP_latitude');
-            v.conf =  hdfread(file_str,'/FP_confidence');
+            try
+                fprintf('Reading MODIS FRP data \n')
+                v.det = [0 0 1 1 1];
+                v.power = hdfread(file_str,'/FP_power');
+                v.lon = hdfread(file_str,'/FP_longitude');
+                v.lat  = hdfread(file_str,'/FP_latitude');
+                v.conf =  hdfread(file_str,'/FP_confidence');
+            catch
+                warning('Read error somewhere')
+            end
         else
             fprintf('Reading VIIRS FRP data \n')
             %%fake for the time being
-            v.det = [0 0 1 1 1];
-            v.power = h5read(file_str,'/FP_power')';
-            v.lon = h5read(file_str,'/FP_longitude')';
-            v.lat  = h5read(file_str,'/FP_latitude')';
-            v.conf =  h5read(file_str,'/FP_confidence')';
+            try
+                v.det = [0 0 1 1 1];
+                v.power = h5read(file_str,'/FP_power')';
+                v.lon = h5read(file_str,'/FP_longitude')';
+                v.lat  = h5read(file_str,'/FP_latitude')';
+                v.conf =  h5read(file_str,'/FP_confidence')';
+            catch
+                warning('read error somewhere')
+            end
         end
         %filter data
         xj=find(v.lon > red.min_lon & v.lon < red.max_lon);
