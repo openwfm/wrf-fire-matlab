@@ -34,7 +34,6 @@ min_con = 70;
 for i = 1:length(g)% fprintf('Detections collected \n')
     % figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
     % title('full scatter')
-    
     if sum(g(i).det(3:5)) > 0
         fires = g(i).conf >= min_con;
         lons = mean(g(i).lon(fires));
@@ -50,7 +49,9 @@ end
 
 
 for i = 1:length(g)
-    if sum(g(i).det(3:5)) > 0
+    
+    % don't use times after model end
+    if (sum(g(i).det(3:5)) > 0) && (g(i).time < red.end_datenum)
         fires = g(i).conf >= min_con;
         lons = g(i).lon(fires);
         lats = g(i).lat(fires);
@@ -64,17 +65,18 @@ end
 % title('full scatter')
 
 %prune the data
-%cull = 2;
+
 n_points = pts(1:cull:end,:,:,:);
-figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3)-red.start_datenum);
-title('Partial scatter')
+% figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3)-red.start_datenum);
+% title('Partial scatter')
 
 %make edge weights
 n = length(n_points);
-%adjacency
+%adjacency / distance
 a = zeros(n,n);
 %velocity
 v = a;
+%%% figure out way to get max_ automatically
 max_t = 1.2;
 
 %maybe change later
@@ -95,13 +97,16 @@ distant_point = 1;
 ig_point = [pts(1,1),pts(1,2)];
 for i = 1:n
     time = pts(i,3);
+    %%% local time for help in figuring out day/night
     locs(i) = local_time(time);
     i_point = [pts(i,1),pts(i,2)];
+    %find furthest detection from ignition
     new_d = distance(ig_point,i_point,E);
     if new_d > max_d
         max_d = new_d;
         distant_point = i;
     end
+    %distance from all points
     for j = 1:n
         time_diff = max(time_err,pts(j,3)-time);
         %if (time_diff > 0  && time_diff < max_t)
@@ -118,15 +123,15 @@ for i = 1:n
 end
 fprintf('Matrix ready \n');
 %scatter ignition and distant point
-figure(2),hold on,zlabel('Days from start'),xlabel('Lon'),ylabel('Lat')
-scatter3(pts(1,2),pts(1,1),pts(1,3)-red.start_datenum,'*r');
-scatter3(pts(distant_point,2),pts(distant_point,1),pts(distant_point,3)-red.start_datenum,'*r');
-hold off
+% figure(2),hold on,zlabel('Days from start'),xlabel('Lon'),ylabel('Lat')
+% scatter3(pts(1,2),pts(1,1),pts(1,3)-red.start_datenum,'*r');
+% scatter3(pts(distant_point,2),pts(distant_point,1),pts(distant_point,3)-red.start_datenum,'*r');
+% hold off
 
 %calculate max velocity of fire
-v_std = std(v(:));
+v_std = std(v(:)); %change to v(v>0)?
 v_mean = mean(v(:));
-max_v = abs(max_d/(pts(distant_point,3)-pts(1,3)));
+%max_v = abs(max_d/(pts(distant_point,3)-pts(1,3)));
 max_v = v_mean;
 v_mask = v < max_v;
 %filter detections too far apart, fix this KLUGE
@@ -162,7 +167,7 @@ figure(3),plot(fg);
 path_count = 0;
 start_pt = 1;
 new_points = pts;
-for i = 1:2
+for i = 1:1
     %paths to next 20 detections
     for j = 1:cull:n
         distant_point = j;
@@ -178,12 +183,12 @@ for i = 1:2
         end
         figure(2),hold on
         %l2 points
-        plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
+        %plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
         %grid points
         plot3(grid_pts(p,4),grid_pts(p,3),pts(p,3)-red.start_datenum,'g');
-        %         for k = 2:length(p)-1
-        %             scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3),'*r');
-        %         end
+                for k = 2:length(p)-1
+                    scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3)-red.start_datenum,'*r');
+                end
         hold off
 %         for k = 1:length(p)-1
 %             new_pt = ([pts(p(k),1),pts(p(k),2),pts(p(k),3)]+[pts(p(k+1),1),pts(p(k+1),2),pts(p(k+1),3)])/2;

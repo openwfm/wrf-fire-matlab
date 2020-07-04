@@ -72,6 +72,6 @@ for i = 1:length(d)
     
     
 end % for i = ...
-
+fprintf('Detections loaded. %d granules had data inside domain \n',gc);
 
 end % function
