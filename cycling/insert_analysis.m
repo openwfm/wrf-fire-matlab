@@ -8,7 +8,7 @@ function outer = insert_analysis(w,paths,a)
 red = paths.red;
 w.analysis = w.tign_g;
 temp_a = datenum2time(a,red);
-diff = max(w.tign_g(:))-max(temp_a);
+diff = max(w.tign_g(:))-max(temp_a);p2,
 temp_a = temp_a + diff;
 w.analysis(red.ispan,red.jspan)=temp_a;
 

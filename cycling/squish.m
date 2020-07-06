@@ -1,4 +1,4 @@
-function tign_new = squish(ps,ai)
+)function tign_new = squish(ps,ai)
 %% ps is struct with paths, red, graph,distances, etc.
 %% ps = graph_dets(w)
 %% fs - analysis or ignitions start, ai = 1 ==> analysis
