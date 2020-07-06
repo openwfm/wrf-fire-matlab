@@ -64,7 +64,7 @@ for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
-    pause(3/k)
+    %pause(3/k)
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
         %plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
