@@ -22,7 +22,8 @@ close all
 
 min_fire_confidence = 7;
 
-exp_num = input_num('Compare No ROS adjust vs ROS adjust = [1] Cycle vs No cycle = [2] Two diff cycles = [3]',1,0);
+%exp_num = input_num('Compare No ROS adjust vs ROS adjust = [1] Cycle vs No cycle = [2] Two diff cycles = [3]',1,0);
+exp_num = input_num('Compare old method vs new method = [1] Cycle vs No cycle = [2] Two diff cycles = [3]',1,0);
 if exp_num == 3
    cycle_s = input_num('Cycle number for wrfout_s?',0);
    cycle_c = input_num('Cycle number for wrfout_c?',1);
@@ -304,9 +305,12 @@ for i = 1:p_count
             legend({'Satellite Fire Detections','Forecast without cycling','Infrared perimeter'});
             save_str = [p_struct(i).file '_s']; %% _s is for single run
         elseif exp_num == 1
-            title_str = ('Perimeter Observation and Forecast without spin-up');
-            legend({'Satellite Fire Detections','Forecast without spin-up','Infrared perimeter'});
-            save_str = [p_struct(i).file '_No_spinup'];
+              title_str = ('Perimeter Observation and Forecast using old method');
+              legend({'Satellite Fire Detections','Forecast from old method','Infrared perimeter'});
+              save_str = [p_struct(i).file '_old'];
+%             title_str = ('Perimeter Observation and Forecast without spin-up');
+%             legend({'Satellite Fire Detections','Forecast without spin-up','Infrared perimeter'});
+%             save_str = [p_struct(i).file '_No_spinup'];
 %             title_str = ('Perimeter Observation and Forecast without ROS  adjust');
 %             legend({'Satellite Fire Detections','Forecast without ROS adjust','Infrared perimeter'});
 %             save_str = [p_struct(i).file '_No_ROS_adj'];
@@ -350,9 +354,12 @@ for i = 1:p_count
             title_str = ('Perimeter Observation and Forecast with cycling');
             save_str = [p_struct(i).file '_c'];
         elseif exp_num == 1
-            legend({'Satellite Fire Detections','Forecast using spin-up','Infrared perimeter'});
-            title_str = ('Perimeter Observation and Forecast using spin-up');
-            save_str = [p_struct(i).file '_with_spinup'];
+              title_str = ('Perimeter Observation and Forecast using new method');
+              legend({'Satellite Fire Detections','Forecast from new method','Infrared perimeter'});
+              save_str = [p_struct(i).file '_new'];
+%             legend({'Satellite Fire Detections','Forecast using spin-up','Infrared perimeter'});
+%             title_str = ('Perimeter Observation and Forecast using spin-up');
+%             save_str = [p_struct(i).file '_with_spinup'];
 %             legend({'Satellite Fire Detections','Forecast using ROS adjust','Infrared perimeter'});
 %             title_str = ('Perimeter Observation and Forecast using ROS adjust');
 %             save_str = [p_struct(i).file '_with_ROS_adj'];
