@@ -172,7 +172,7 @@ fg = digraph(a);
 figure(3),plot(fg);
 path_count = 0;
 
-new_points = pts;
+% new_points = pts;
 start_pt = 1;
 for i = 1:start_pt
     for j = 1:cull:n
@@ -197,6 +197,7 @@ for i = 1:start_pt
                     scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3)-red.start_datenum,'*r');
                 end
         hold off
+%         % add a new point to the list by interpolation
 %         for k = 1:length(p)-1
 %             new_pt = ([pts(p(k),1),pts(p(k),2),pts(p(k),3)]+[pts(p(k+1),1),pts(p(k+1),2),pts(p(k+1),3)])/2;
 %             new_points = [new_points;new_pt];
@@ -208,7 +209,7 @@ for i = 1:start_pt
     path_struct.speeds = v;
     path_struct.points = double(pts);
     path_struct.red = red;
-    path_struct.new_points = new_points;
+%    path_struct.new_points = new_points;
     path_struct.grid_pts = grid_pts(:,3:4);
     path_struct.idx = uint8(grid_pts(:,1:2));
 end
