@@ -1,4 +1,4 @@
-)function tign_new = squish(ps,ai)
+function tign_new = squish(ps,ai)
 %% ps is struct with paths, red, graph,distances, etc.
 %% ps = graph_dets(w)
 %% fs - analysis or ignitions start, ai = 1 ==> analysis
@@ -15,7 +15,7 @@ fig_num = 23;
 pts_length = length(ps.grid_pts);
 max_l2_time = max(max(pts(:,3)));
 if ai == 1
-    fig_num = 23+1;
+    fig_num = fig_num+1;
     tign_new = ps.red.tign;
     tign_flat=max_l2_time*ones(size(tign));
     title_str = 'Analysis';
@@ -45,21 +45,25 @@ for i = 1:pts_length
     t_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 end
 
-
-
 %just squish the ignition point
 %bigger k ==> more smoothing
-smoothings = 10;
+
 norms=[];
 
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
+% try computing this as a fraction of grid size
 rm = 2;
 % random multiplier, keep the same
 % perturbs points downward in time to
 rt = 0.55;
 % weight for tign_new
+
+%alhpa blends  estimate of tign at a point with old estimate
+% new_estimate = alph*current_setimate + (1-alpha)*old_estimate
 alpha = 0.5;
+%number of loops to run
+smoothings = 20;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
@@ -108,15 +112,15 @@ for k = 1:smoothings
             end
         end
     end
-    %size of local averaging to apply
-    patch = 2;
-    %patch=1;
-
+    %size of local averaging to apply aoutomate by grid size?
+    patch = 3;
+   
+    %smooth the sign
     tign_new = rlx_shp(tign_new,1/2,patch);
     if ai == 1
         tign_flat = rlx_shp(tign_flat,1/2,patch);
     end
-
+    %collect information about tign at the detection points
     for i = 1:pts_length
         t_times(i) = tign_new(ps.idx(i,1),ps.idx(i,2));
         if ai ==1

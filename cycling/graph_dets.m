@@ -1,5 +1,7 @@
 function path_struct = graph_dets(w,cull)
 %w = read_wrfout_tign(wrfout)
+%cull - data reduction factor, reduces sizes of matrices 
+%       example new_matrix = old_matrix(1:cull:end,1:cull:end)
 
 [fire_name,save_name,prefix] = fire_choice();
 red = subset_domain(w);
@@ -14,6 +16,7 @@ p = sort_rsac_files(prefix);
 
 g_str = 'g.mat';
 if ~exist(g_str,'file')
+    %loading L2 data
     g = subset_l2_detections(prefix,p,red,time_bounds,fig);
     save(g_str, 'g', '-v7.3');
 else
@@ -29,6 +32,7 @@ end
 
 close all
 pts = [];
+%minimum detection confidence level
 min_con = 70;
 %make unique ignition point 
 for i = 1:length(g)% fprintf('Detections collected \n')
@@ -72,11 +76,13 @@ n_points = pts(1:cull:end,:,:,:);
 
 %make edge weights
 n = length(n_points);
-%adjacency / distance
+%adjacency / distance matrix
 a = zeros(n,n);
-%velocity
+%velocity matrix
 v = a;
-%%% figure out way to get max_ automatically
+%%% figure out way to get max_t automatically
+% maximum allowed time between nodes in the graph to allow them to be
+% connected
 max_t = 1.2;
 
 %maybe change later
@@ -87,8 +93,8 @@ pts = n_points;
 grid_pts = fixpoints2grid(red,n_points);
 
 
+%% computing distance between points using GPS coords
 E = wgs84Ellipsoid;
-
 %max distance from ignition
 max_d = 0;
 %error in time of fire from time of detection
@@ -161,17 +167,18 @@ for i = 1:n
 end
 fprintf('%d speeders removed \n',speeders)
 
-
+%% make directed graph from a
 fg = digraph(a);
 figure(3),plot(fg);
 path_count = 0;
-start_pt = 1;
+
 new_points = pts;
-for i = 1:1
-    %paths to next 20 detections
+start_pt = 1;
+for i = 1:start_pt
     for j = 1:cull:n
         distant_point = j;
-        %[p,d] = shortestpath(fg,start_pt,distant_point);
+        % finds shortest path between points i,j
+        % p is the points in the path, d is the total distance
         [p,d] = shortestpath(fg,i,j);
         if ~isempty(p)
             path_count = path_count + 1;
@@ -186,7 +193,7 @@ for i = 1:1
         %plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
         %grid points
         plot3(grid_pts(p,4),grid_pts(p,3),pts(p,3)-red.start_datenum,'g');
-                for k = 2:length(p)-1
+                for k = 1:length(p)
                     scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3)-red.start_datenum,'*r');
                 end
         hold off
