@@ -67,9 +67,9 @@ fprintf('%d new points were added \n',new_pt_ct)
 % time_mask = ps.points(:,3)>ps.red.end_datenum;
 % figure(1),hold on,scatter3(ps.points(time_mask,2),ps.points(time_mask,1),ps.points(time_mask,3))
 % loop to sort new points where we can change FMC
-figure(2),mesh(ps.red.fxlong,ps.red.fxlat,new_tign)
-figure(2),hold on,scatter3(ps.points(c1,2),ps.points(c1,1),ps.points(c1,3),'b*');
-figure(2),hold on,scatter3(ps.points(c2,2),ps.points(c2,1),ps.points(c2,3),'r*');
+figure,mesh(ps.red.fxlong,ps.red.fxlat,new_tign)
+hold on,scatter3(ps.points(c1,2),ps.points(c1,1),ps.points(c1,3),'b*');
+hold on,scatter3(ps.points(c2,2),ps.points(c2,1),ps.points(c2,3),'r*');
 
 ps.fast_list = fast_list;
 ps.cluster = cluster;
