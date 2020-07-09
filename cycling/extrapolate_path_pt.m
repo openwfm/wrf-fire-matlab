@@ -74,6 +74,6 @@ figure(2),hold on,scatter3(ps.points(c2,2),ps.points(c2,1),ps.points(c2,3),'r*')
 ps.fast_list = fast_list;
 ps.cluster = cluster;
 
-
+new_path_struct = ps;
 
 end
