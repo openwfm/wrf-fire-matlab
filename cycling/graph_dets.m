@@ -84,12 +84,14 @@ n = length(n_points);
 a = zeros(n,n);
 %velocity matrix
 v = a;
+%time matrix
+t = a;
 %cone volume matrix
 cv = a;
 %%% figure out way to get max_t automatically
 % maximum allowed time between nodes in the graph to allow them to be
 % connected
-max_t = 1.2;
+max_t = 2*(24*3600);
 
 %maybe change later
 pts = n_points;
@@ -104,7 +106,7 @@ E = wgs84Ellipsoid;
 %max distance from ignition
 max_d = 0;
 %error in time of fire from time of detection
-time_err = 0.1;
+time_err = 0.10;
 distant_point = 1;
 ig_point = [pts(1,1),pts(1,2)];
 for i = 1:n
@@ -119,20 +121,26 @@ for i = 1:n
         distant_point = i;
     end
     %distance from all points
-    for j = 1:n
-        time_diff = max(time_err,pts(j,3)-time);
+    for j = i:n
+        time_diff = max(time_err,pts(j,3)-time)*(24*3600);
         %if (time_diff > 0  && time_diff < max_t)
+        
+        %% maybe fix this, time_err is weird
+        t(i,j) = time_diff;  %pts(j,3)-time;
         if time_diff < max_t
             j_point = [pts(j,1),pts(j,2)];
             a(i,j) = distance(i_point,j_point,E);
-            %special treatment for detections on same granule
-%             if time_diff == time_err
-%                 a(i,j) = sqrt(a(i,j));
-%             end
             v(i,j) = a(i,j)/time_diff;
         end
     end
 end
+
+%fix up triangular matrices
+t = t-t';
+t_mask = t < -time_err*(24*3600);
+t(~t_mask) = abs(t(~t_mask));
+a = a+a';
+a(t_mask)=0;
 fprintf('Matrix ready \n');
 %scatter ignition and distant point
 % figure(2),hold on,zlabel('Days from start'),xlabel('Lon'),ylabel('Lat')
@@ -147,6 +155,8 @@ v_mean = mean(v(:));
 max_v = v_mean;
 v_mask = v < max_v;
 %filter detections too far apart, fix this KLUGE
+
+t1 = 1.2*(24*3600); %1.2 days for fast growth cone
 speed_penalty = 1.2;
 fast = 2.0;
 slow = 0.4;
@@ -165,7 +175,15 @@ for i = 1:n
         end
         speed_penalty = (sp1+sp2)/2;
         %fprintf('speed penalty = %0.2f \n',speed_penalty)
-        if (a(i,j) > 0) && (v(i,j) > speed_penalty*max_v)
+        % lft haf of speed cone
+        if (a(i,j) > 0) && (v(i,j) > speed_penalty*max_v) && (t(i,j) < t1)
+            a(i,j) = 0;
+            speeders = speeders + 1;
+        end
+        %right half of speed cone
+        max_r = speed_penalty*max_v*t1;
+        cone_slope = -max_r/(max_t-t1);
+        if (a(i,j) > max_r-cone_slope*(t(i,j)-t1)) && (t(i,j) >= t1)
             a(i,j) = 0;
             speeders = speeders + 1;
         end
