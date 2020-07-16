@@ -17,13 +17,14 @@ max_l2_time = max(max(pts(:,3)));
 if ai == 1
     fig_num = fig_num+1;
     tign_new = ps.red.tign;
-    tign_flat=max_l2_time*ones(size(tign));
+    tign_flat=ps.red.end_datenum*ones(size(tign));
     title_str = 'Analysis';
 else
     %max_l2_time = max(tign(:));
     %flat tign_new
-    tign_new=max_l2_time*ones(size(tign));
-    %figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
+    f_days=input_num('Days of forecast to produce? ',0)
+    tign_new=max_l2_time*ones(size(tign))+f_days;
+    figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title_str = 'Generated fire cone';
 end
 
@@ -53,7 +54,7 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
-rm = 2;
+rm = 3;
 % random multiplier, keep the same
 % perturbs points downward in time to
 rt = 0.55;
@@ -63,12 +64,12 @@ rt = 0.55;
 % new_estimate = alph*current_setimate + (1-alpha)*old_estimate
 alpha = 0.5;
 %number of loops to run
-smoothings = 20;
+smoothings = 10;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
-    %pause(3/k)
+    pause(3/k)
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
         %plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
@@ -95,14 +96,21 @@ for k = 1:smoothings
             if ai == 1
                 tign_flat(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
             end
-            %        mask(idx(p(j),1),idx(p(j),2)) = mask(idx(p(j),1),idx(p(j),2))-1/length(ps.paths);
-            %         holes = length(tign(:))-sum(mask(:));
-            %         fprintf('%d holes in mask \n',holes);
+
             % interpolate new point between adjacent path detections
             if j > 1
-                new_i = uint8(round((idx(p(j),1)+idx(p(j-1),1))/2));
-                new_j = uint8(round((idx(p(j),2)+idx(p(j-1),2))/2));
-                new_t =  0.5*(pts(p(j),3)+pts(p(j-1),3));
+                %weighted average will move new point close to that with
+                %higher FRP
+                frp1 = ps.points(p(j-1),5);
+                frp2 = ps.points(p(j),5);
+                w1 = frp1/(frp1+frp2);
+                w2 = frp2/(frp1+frp2);
+                new_i = uint8(w1*idx(p(j-1),1)+w2*idx(p(j),1));
+                new_j = uint8(w1*idx(p(j-1),2)+w2*idx(p(j),2));
+                new_t = w1*pts(p(j),3)+w2*pts(p(j-1),3);
+%                 new_i = uint8(round((idx(p(j),1)+idx(p(j-1),1))/2));
+%                 new_j = uint8(round((idx(p(j),2)+idx(p(j-1),2))/2));
+%                 new_t =  0.5*(pts(p(j),3)+pts(p(j-1),3));
                 %assign tign for all in small, block around midpoint
                 tign_new(new_i-round(rand):new_i+round(rand),new_j-round(rand):new_j+round(rand)) = new_t-rt*rand;
                 if ai == 1
@@ -113,9 +121,9 @@ for k = 1:smoothings
         end
     end
     %size of local averaging to apply aoutomate by grid size?
-    patch = 3;
+    patch = 2;
    
-    %smooth the sign
+    %smooth the tign
     tign_new = rlx_shp(tign_new,1/2,patch);
     if ai == 1
         tign_flat = rlx_shp(tign_flat,1/2,patch);
@@ -141,8 +149,13 @@ for k = 1:smoothings
     %only do norm for times before final detection time
     time_mask = tign_new < pts(end,3);  %max(max(pts(:,3)));
     norms(k,2) = norm(tign_new(time_mask)-tign_old(time_mask));
-    figure(fig_num+3);plot(norms(1:k,1));title('Norm of graph diff')
-    figure(fig_num+4);plot(1:k,norms(1:k,2)),title('Norm of Tign diff')
+    figure(fig_num+3);plot(norms(1:k,1));
+    tstr = sprintf('Norm of difference between successive \n TIGN after each interpolation');
+    title(tstr)
+    figure(fig_num+4);plot(1:k,norms(1:k,2))
+    tstr = sprintf('Norm of difference between times of \n detections and TIGN at detectionon locations');
+    title(tstr);
+    xlabel('Iterations of Interpolation')
     temp_var(k) = min(tign_new(:))-ps.red.start_datenum;
     figure(fig_num+5);plot(1:k,temp_var(1:k)),title('temp variable')
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))

@@ -14,7 +14,7 @@ fig.fig_3d=0;
 fig.fig_interp=0;
 p = sort_rsac_files(prefix);
 
-g_str = 'g.mat';
+g_str = 'g_graph.mat';
 if ~exist(g_str,'file')
     %loading L2 data
     g = subset_l2_detections(prefix,p,red,time_bounds,fig);
@@ -44,7 +44,10 @@ for i = 1:length(g)% fprintf('Detections collected \n')
         lats = mean(g(i).lat(fires));
         confs = mean(double(g(i).conf(fires)));
         times = g(i).time-0.25;
-        pts = [lats,lons,times,confs];
+        frps = mean(g(i).power(fires));
+        gran = i;
+        pts = [lats,lons,times,confs,frps,gran];
+        
     end
     if norm(pts) > 0
         break
@@ -53,7 +56,6 @@ end
 
 
 for i = 1:length(g)
-    
     % don't use times after model end
     if (sum(g(i).det(3:5)) > 0) && (g(i).time < red.end_datenum)
         fires = g(i).conf >= min_con;
@@ -61,7 +63,9 @@ for i = 1:length(g)
         lats = g(i).lat(fires);
         times = g(i).time*ones(size(lons));
         confs = double(g(i).conf(fires));
-        pts = [pts;[lats',lons',times',confs']];
+        frps = g(i).power(fires);
+        gran = i*ones(size(lons));
+        pts = [pts;[lats',lons',times',confs',frps',gran']];
     end
 end
 % fprintf('Detections collected \n')
@@ -70,7 +74,7 @@ end
 
 %prune the data
 
-n_points = pts(1:cull:end,:,:,:);
+n_points = pts(1:cull:end,:,:,:,:,:);
 % figure(2),scatter3(n_points(:,2),n_points(:,1),n_points(:,3)-red.start_datenum);
 % title('Partial scatter')
 
@@ -80,6 +84,8 @@ n = length(n_points);
 a = zeros(n,n);
 %velocity matrix
 v = a;
+%cone volume matrix
+cv = a;
 %%% figure out way to get max_t automatically
 % maximum allowed time between nodes in the graph to allow them to be
 % connected
@@ -211,7 +217,7 @@ for i = 1:start_pt
     path_struct.red = red;
 %    path_struct.new_points = new_points;
     path_struct.grid_pts = grid_pts(:,3:4);
-    path_struct.idx = uint8(grid_pts(:,1:2));
+    path_struct.idx = grid_pts(:,1:2);
 end
 end
 
