@@ -44,31 +44,17 @@ if any(s1 ~= s2)
     s1=size(v1);
     s2=size(v2);
 end
-[relerr,ssq,p]=comp('total',v1,v2);
+[relerr,ssq,p]=ncdiffvars('total',v1,v2);
 if relerr>0,
     for i=1:s1(end)    
         s=['slice ',num2str(i)];
         switch length(s1)
             case 4
-                comp(s,v1(:,:,:,i),v2(:,:,:,i));
+                ncdiffvars(s,v1(:,:,:,i),v2(:,:,:,i));
             case 3
-                comp(s,v1(:,:,i),v2(:,:,i));
+                ncdiffvars(s,v1(:,:,i),v2(:,:,i));
         end
     end
 end
 name=var;
-end
-
-function [relerr,ssq,p]=comp(s,v1,v2)
-scale=max(big(v1),big(v2));
-relerr=big(v2(:)-v1(:))/(scale+realmin); 
-ssq=norm(v2(:)-v1(:))/(max(norm(v1(:)),norm(v2(:)))+realmin); 
-d=(v2(:)-v1(:))/(scale+realmin); % scaled diff
-avgdiff=mean(d);
-stdev=std(d);
-n=length(v1(:));
-t=sqrt(n)*avgdiff/(stdev+realmin);
-p=erf(t);
-fprintf('%s max abs %g relative diff %g max %g stdev %g avg %g t-stats %g p-value %g\n',...
-    s,scale,relerr,max(d),stdev,avgdiff,t,p) 
 end
