@@ -12,5 +12,27 @@ diff = max(w.tign_g(:))-max(temp_a);
 temp_a = temp_a + diff;
 w.analysis(red.ispan,red.jspan)=temp_a;
 
+%% adapt to use new use
+% restart_time=time_bounds(3);
+% perimeter_time=time_bounds(4);
+% wf = max(forecast - restart_time,0); % 0 in forecast fire area at restart time, >0 outside 
+% wa = max(perimeter_time-analysis,0); % 0 outside of analysis fire area at perimeter time, >0 inside
+% 
+% % check if we have inclusion so the strip exist 
+% shrink=nnz(wa + wf==0);  
+% if shrink,
+%     fprintf('Cannot spin up, fire area shrinking in analysis at %g points\n',shrink)
+%     warning('Using analysis in place of spinup');
+%     w.spinup = w.analysis
+% else
+% 
+% % map the weights so that 0 ->1, 0->1, 
+% vf=1-wf./(wf+wa);  % 1  in forecast fire area at restart time, ADDING UP TO 1 
+% va=1-wa./(wf+wa); %  1  outside of analysis fire area at restart time, ADDING UP TO 1
+% 
+% % combine the forecast and analysis
+% spinup = vf.*forecast + va.*analysis; 
+% end
+
 outer = w;
 end

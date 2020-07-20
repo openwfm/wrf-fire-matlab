@@ -63,6 +63,8 @@ rt = 0.25;
 %alhpa blends  estimate of tign at a point with old estimate
 % new_estimate = alph*current_setimate + (1-alpha)*old_estimate
 alpha = 0.5;
+%constant for smooth in rls_shp
+alpha_2 = 0.25; %smaller alph_2 ==> smoother
 %number of loops to run
 smoothings = 20;
 for k = 1:smoothings
@@ -124,9 +126,9 @@ for k = 1:smoothings
     patch = 2;
    
     %smooth the tign
-    tign_new = rlx_shp(tign_new,1/2,patch);
+    tign_new = rlx_shp(tign_new,alpha_2,patch);
     if ai == 1
-        tign_flat = rlx_shp(tign_flat,1/2,patch);
+        tign_flat = rlx_shp(tign_flat,alpha_2,patch);
     end
     %collect information about tign at the detection points
     for i = 1:pts_length
@@ -138,7 +140,7 @@ for k = 1:smoothings
     norms(k,1) = norm(t_times-ps.points(:,3),2);
     % blend flat start with forecast start for analysis
     if ai == 1
-        tign_flat = rlx_shp(tign_flat,1/2,patch);
+        tign_flat = rlx_shp(tign_flat,alpha_2,patch);
         norm_flat = norm(flat_times-ps.points(:,3),2);
         norm_tign_new = norms(k,1);
         if (norm_flat > norm_tign_new)
