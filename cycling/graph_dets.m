@@ -54,10 +54,11 @@ for i = 1:length(g)% fprintf('Detections collected \n')
     end
 end
 
-
+%can change end time for comparisons
+end_time = red.end_datenum;
 for i = 1:length(g)
     % don't use times after model end
-    if (sum(g(i).det(3:5)) > 0) && (g(i).time < red.end_datenum)
+    if (sum(g(i).det(3:5)) > 0) && (g(i).time < end_time)
         fires = g(i).conf >= min_con;
         lons = g(i).lon(fires);
         lats = g(i).lat(fires);
@@ -91,7 +92,7 @@ cv = a;
 %%% figure out way to get max_t automatically
 % maximum allowed time between nodes in the graph to allow them to be
 % connected
-max_t = 2*(24*3600);
+max_t = 1.9*(24*3600);
 
 %maybe change later
 pts = n_points;
@@ -141,6 +142,7 @@ t_mask = t < -time_err*(24*3600);
 t(~t_mask) = abs(t(~t_mask));
 a = a+a';
 a(t_mask)=0;
+% work on the v matrix?
 fprintf('Matrix ready \n');
 %scatter ignition and distant point
 % figure(2),hold on,zlabel('Days from start'),xlabel('Lon'),ylabel('Lat')
@@ -156,9 +158,9 @@ max_v = v_mean;
 v_mask = v < max_v;
 %filter detections too far apart, fix this KLUGE
 
-t1 = 1.2*(24*3600); %1.2 days for fast growth cone
+t1 = 0.9*(24*3600); %1.2 days for fast growth cone
 speed_penalty = 1.2;
-fast = 2.0;
+fast = 1.6;
 slow = 0.4;
 speeders = 0;
 for i = 1:n
@@ -181,11 +183,12 @@ for i = 1:n
             speeders = speeders + 1;
         end
         %right half of speed cone
-        max_r = speed_penalty*max_v*t1;
+        max_r = max_v*t1;
         cone_slope = -max_r/(max_t-t1);
         if (a(i,j) > max_r-cone_slope*(t(i,j)-t1)) && (t(i,j) >= t1)
             a(i,j) = 0;
             speeders = speeders + 1;
+            %fprintf('Second type speeder removed \n')
         end
     end
 end

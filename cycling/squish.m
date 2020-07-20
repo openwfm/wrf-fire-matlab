@@ -54,17 +54,17 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
-rm = 3;
+rm = 2;
 % random multiplier, keep the same
 % perturbs points downward in time to
-rt = 0.55;
+rt = 0.25;
 % weight for tign_new
 
 %alhpa blends  estimate of tign at a point with old estimate
 % new_estimate = alph*current_setimate + (1-alpha)*old_estimate
 alpha = 0.5;
 %number of loops to run
-smoothings = 10;
+smoothings = 20;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
@@ -79,7 +79,7 @@ for k = 1:smoothings
             %mesh indices for path points, perturbed
             p_i = idx(p(j),1)+rm*round(randn);
             p_j = idx(p(j),2)+rm*round(randn);
-            %%% make mean of old and new, in small block around path point
+            %%% make mean of old and new, in small block around path point 
             tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
             %%%% alternate strategy.
 %             if k == 1 && j > 1
@@ -105,8 +105,8 @@ for k = 1:smoothings
                 frp2 = ps.points(p(j),5);
                 w1 = frp1/(frp1+frp2);
                 w2 = frp2/(frp1+frp2);
-                new_i = uint8(w1*idx(p(j-1),1)+w2*idx(p(j),1));
-                new_j = uint8(w1*idx(p(j-1),2)+w2*idx(p(j),2));
+                new_i = uint16(w1*idx(p(j-1),1)+w2*idx(p(j),1));
+                new_j = uint16(w1*idx(p(j-1),2)+w2*idx(p(j),2));
                 new_t = w1*pts(p(j),3)+w2*pts(p(j-1),3);
 %                 new_i = uint8(round((idx(p(j),1)+idx(p(j-1),1))/2));
 %                 new_j = uint8(round((idx(p(j),2)+idx(p(j-1),2))/2));
@@ -142,7 +142,7 @@ for k = 1:smoothings
         norm_flat = norm(flat_times-ps.points(:,3),2);
         norm_tign_new = norms(k,1);
         if (norm_flat > norm_tign_new)
-            fprintf('blending flat start with forecast \n')
+            %fprintf('blending flat start with forecast \n')
             tign_new = 0.5*(tign_new+tign_flat);
         end
     end
@@ -157,7 +157,7 @@ for k = 1:smoothings
     title(tstr);
     xlabel('Iterations of Interpolation')
     temp_var(k) = min(tign_new(:))-ps.red.start_datenum;
-    figure(fig_num+5);plot(1:k,temp_var(1:k)),title('temp variable')
+    figure(fig_num+5);plot(1:k,temp_var(1:k)*24),title('Change in ignition time'),xlabel('iteration'),ylabel('hours')
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')
