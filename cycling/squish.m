@@ -64,14 +64,14 @@ rt = 0.25;
 % new_estimate = alph*current_setimate + (1-alpha)*old_estimate
 alpha = 0.5;
 %constant for smooth in rls_shp
-alpha_2 = 0.25; %smaller alph_2 ==> smoother
+alpha_2 = 0.1; %smaller alph_2 ==> smoother
 %number of loops to run
 smoothings = 20;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
-    pause(3/k)
+    %pause(3/k)
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
         %plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
@@ -79,8 +79,8 @@ for k = 1:smoothings
         for j = 1:length(p)
             tign_old = tign_new;
             %mesh indices for path points, perturbed
-            p_i = idx(p(j),1)+rm*round(randn);
-            p_j = idx(p(j),2)+rm*round(randn);
+            p_i = idx(p(j),1);%+rm*round(randn);
+            p_j = idx(p(j),2);%+rm*round(randn);
             %%% make mean of old and new, in small block around path point 
             tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
             %%%% alternate strategy.
@@ -114,7 +114,7 @@ for k = 1:smoothings
 %                 new_j = uint8(round((idx(p(j),2)+idx(p(j-1),2))/2));
 %                 new_t =  0.5*(pts(p(j),3)+pts(p(j-1),3));
                 %assign tign for all in small, block around midpoint
-                tign_new(new_i-round(rand):new_i+round(rand),new_j-round(rand):new_j+round(rand)) = new_t-rt*rand;
+                tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
                 if ai == 1
                     tign_new(new_i-round(rand):new_i+round(rand),new_j-round(rand):new_j+round(rand)) = new_t-rt*rand;
                 end
@@ -123,7 +123,7 @@ for k = 1:smoothings
         end
     end
     %size of local averaging to apply aoutomate by grid size?
-    patch = 2;
+    patch = 4;
    
     %smooth the tign
     tign_new = rlx_shp(tign_new,alpha_2,patch);
@@ -163,7 +163,7 @@ for k = 1:smoothings
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')
-        break
+        %break
     end
 end
 %tign_new = [];
