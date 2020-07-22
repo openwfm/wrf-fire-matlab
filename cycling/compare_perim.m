@@ -8,8 +8,9 @@ function compare_perim(w,tign_new)
 red = subset_domain(w);
 
 
+
 %% find which fire and data locations to use
-sim = input_num('Patch [1] or Camp [2] or Cougar [3] ? ',1,1);
+sim = input_num('Patch [1] or Camp [2] or Cougar [3] ? ',3);
 if sim == 1
     det_prefix = '../TIFs/';
     perim = '../PERIMs/patch_perims/';
