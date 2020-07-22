@@ -3,6 +3,7 @@ function path_struct = graph_dets(w,cull)
 %cull - data reduction factor, reduces sizes of matrices 
 %       example new_matrix = old_matrix(1:cull:end,1:cull:end)
 
+
 [fire_name,save_name,prefix] = fire_choice();
 red = subset_domain(w);
 time_bounds(2) = red.max_tign;

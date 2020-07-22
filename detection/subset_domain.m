@@ -89,6 +89,9 @@ end
 if isfield(w,'fmc_g')
     red.fmc_g = w.fmc_g(ispan,jspan);
 end
+if isfield(w,'fhgt')
+    red.fhgt = w.fhgt(ispan,jspan);
+end
     %commenting out next 4 lines
 red.min_lat = min(red.fxlat(:));
 red.max_lat = max(red.fxlat(:));
