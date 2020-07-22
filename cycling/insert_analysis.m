@@ -4,6 +4,7 @@ function outer = insert_analysis(w,paths,a)
 %red = subset_domain(w)
 %paths = graph_dets(w,1)
 %a = squish(paths,1) , this is an anylysis fire arrival time
+%                       time format is ??
 
 red = paths.red;
 w.analysis = w.tign_g;
