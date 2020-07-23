@@ -142,7 +142,8 @@ t = t-t';
 t_mask = t < -time_err*(24*3600);
 t(~t_mask) = abs(t(~t_mask));
 a = a+a';
-a(t_mask)=0;
+raw_dist = a;
+%a(t_mask)=0;
 % work on the v matrix?
 fprintf('Matrix ready \n');
 %scatter ignition and distant point
@@ -231,6 +232,7 @@ for i = 1:start_pt
 %             new_points = [new_points;new_pt];
 %         end
     end
+    path_struct.raw_dist = raw_dist;
     path_struct.paths = paths;
     path_struct.graph = fg;
     path_struct.distances = a;
