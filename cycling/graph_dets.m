@@ -108,7 +108,7 @@ E = wgs84Ellipsoid;
 %max distance from ignition
 max_d = 0;
 %error in time of fire from time of detection
-time_err = 0.10;
+time_err = 0.2;
 distant_point = 1;
 ig_point = [pts(1,1),pts(1,2)];
 for i = 1:n
@@ -123,7 +123,7 @@ for i = 1:n
         distant_point = i;
     end
     %distance from all points
-    for j = i:n
+    for j = 1:n
         time_diff = max(time_err,pts(j,3)-time)*(24*3600);
         %if (time_diff > 0  && time_diff < max_t)
         

@@ -10,17 +10,19 @@ red = subset_domain(w);
 
 
 %% find which fire and data locations to use
-sim = input_num('Patch [1] or Camp [2] or Cougar [3] ? ',3);
-if sim == 1
-    det_prefix = '../TIFs/';
-    perim = '../PERIMs/patch_perims/';
-elseif sim == 2
-    det_prefix = '../campTIFs/';
-    perim = '../PERIMs/camp_perims/';
-else
-    det_prefix = '../cougarTIFs/';
-    perim = '../PERIMs/cougar_perims/';
-end
+% sim = input_num('Patch [1] or Camp [2] or Cougar [3] ? ',3);
+% if sim == 1
+%     prefix = '../TIFs/';
+%     perim = '../PERIMs/patch_perims/';
+% elseif sim == 2
+%     prefix = '../campTIFs/';
+%     perim = '../PERIMs/camp_perims/';
+% else
+%     prefix = '../cougarTIFs/';
+%     perim = '../PERIMs/cougar_perims/';
+% end
+
+[fire_name,save_name,prefix,perim] = fire_choice();
 
 %% get perim data, arrange and store
 fprintf('Reading directory of shape files \n')

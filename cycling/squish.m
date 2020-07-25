@@ -54,7 +54,7 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
-rm = 2;
+rm = 1;
 % random multiplier, keep the same
 % perturbs points downward in time to
 rt = 0.25;
@@ -116,7 +116,7 @@ for k = 1:smoothings
                 %assign tign for all in small, block around midpoint
                 tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
                 if ai == 1
-                    tign_new(new_i-round(rand):new_i+round(rand),new_j-round(rand):new_j+round(rand)) = new_t-rt*rand;
+                    tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
                 end
                 %mask(new_i,new_j)=0;
             end
@@ -163,7 +163,7 @@ for k = 1:smoothings
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')
-        %break
+        break
     end
 end
 %tign_new = [];
