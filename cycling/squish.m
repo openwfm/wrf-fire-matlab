@@ -54,10 +54,10 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
-rm = 2;
+rm = 20;
 % random multiplier, keep the same
 % perturbs points downward in time to
-rt = 0.25;
+rt = 0.05;
 % weight for tign_new
 
 %alhpa blends  estimate of tign at a point with old estimate
@@ -66,7 +66,7 @@ alpha = 0.5;
 %constant for smooth in rls_shp
 alpha_2 = 0.1; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 20;
+smoothings = 7;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
@@ -116,14 +116,14 @@ for k = 1:smoothings
                 %assign tign for all in small, block around midpoint
                 tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
                 if ai == 1
-                    tign_new(new_i-round(rand):new_i+round(rand),new_j-round(rand):new_j+round(rand)) = new_t-rt*rand;
+                    tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
                 end
                 %mask(new_i,new_j)=0;
             end
         end
     end
     %size of local averaging to apply aoutomate by grid size?
-    patch = 4;
+    patch = 12;
    
     %smooth the tign
     tign_new = rlx_shp(tign_new,alpha_2,patch);
@@ -163,7 +163,7 @@ for k = 1:smoothings
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')
-        %break
+        break
     end
 end
 %tign_new = [];
