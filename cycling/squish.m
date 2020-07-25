@@ -54,10 +54,12 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
+
 rm = 1;
+
 % random multiplier, keep the same
 % perturbs points downward in time to
-rt = 0.25;
+rt = 0.05;
 % weight for tign_new
 
 %alhpa blends  estimate of tign at a point with old estimate
@@ -66,7 +68,7 @@ alpha = 0.5;
 %constant for smooth in rls_shp
 alpha_2 = 0.1; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 20;
+smoothings = 7;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
@@ -123,7 +125,7 @@ for k = 1:smoothings
         end
     end
     %size of local averaging to apply aoutomate by grid size?
-    patch = 4;
+    patch = 12;
    
     %smooth the tign
     tign_new = rlx_shp(tign_new,alpha_2,patch);
