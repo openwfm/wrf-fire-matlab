@@ -92,7 +92,7 @@ for i = 1:length(a)
 %         %save(a(i).TIF_name,'data','geotransform');
 %         %plot results
         plot_on = 1;
-        if plot_on
+        if plot_on && a(i).p_time < max(tign_new(:));
             figure
             contour(red.fxlong,red.fxlat,tign_new,[a(i).p_time a(i).p_time],'b');
             fire_mask = tign_new <= a(i).p_time;
