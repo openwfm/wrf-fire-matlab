@@ -35,7 +35,7 @@ end
 close all
 pts = [];
 %minimum detection confidence level
-min_con = 60;
+min_con = 70;
 %make unique ignition point 
 for i = 1:length(g)% fprintf('Detections collected \n')
     % figure(1),scatter3(pts(:,2),pts(:,1),pts(:,3));
@@ -75,18 +75,18 @@ end
 n_points = pts(1:cull:end,:,:,:,:,:);
 
 %cluster the data 
-% dt = round(g(end).time - g(1).time);
-% space_clusters = dt; %days
-% [s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
+dt = ceil(g(end).time - g(1).time);
+space_clusters = dt; %days
+[s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
 
 % find optimal cluster k
-max_clusts = 20;
-s_pts = pts(:,1:2);
-klist=2:max_clusts;%the number of clusters you want to try
-myfunc = @(X,K)(kmeans(X, K));
-eva = evalclusters(s_pts,myfunc,'CalinskiHarabasz','klist',klist)
-classes=kmeans(s_pts,eva.OptimalK);
-dt = eva.OptimalK;
+% max_clusts = 20;
+% s_pts = pts(:,1:2);
+% klist=2:max_clusts;%the number of clusters you want to try
+% myfunc = @(X,K)(kmeans(X, K));
+% eva = evalclusters(s_pts,myfunc,'CalinskiHarabasz','klist',klist)
+% classes=kmeans(s_pts,eva.OptimalK);
+% dt = eva.OptimalK;
 
 
 
@@ -107,10 +107,10 @@ space_clusters = dt; %days
 % hold off
 
 %scatter 3d
-figure,scatter3(pts(s_idx==1,1),pts(s_idx==1,2),pts(s_idx==1,3));
+figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3));
 hold on
 for i = 2:dt
-  scatter3(pts(s_idx==i,1),pts(s_idx==i,2),pts(s_idx==i,3));
+  scatter3(pts(s_idx==i,2),pts(s_idx==i,1),pts(s_idx==i,3));
 end
 hold off
 
