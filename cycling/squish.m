@@ -22,8 +22,9 @@ if ai == 1
 else
     %max_l2_time = max(tign(:));
     %flat tign_new
-    f_days=input_num('Days of forecast to produce? ',0)
-    tign_new=max_l2_time*ones(size(tign))+f_days;
+    f_days=input_num('Days of forecast to produce? ',0);
+    %tign_new=max_l2_time*ones(size(tign))+f_days;
+    tign_new = estimate_tign(ps);
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title_str = 'Generated fire cone';
 end
@@ -55,11 +56,11 @@ norms=[];
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
 
-rm = 1;
+rm = 2;
 
 % random multiplier, keep the same
 % perturbs points downward in time to
-rt = 0.05;
+rt = 0.25;
 % weight for tign_new
 
 %alhpa blends  estimate of tign at a point with old estimate
@@ -125,7 +126,7 @@ for k = 1:smoothings
         end
     end
     %size of local averaging to apply aoutomate by grid size?
-    patch = 12;
+    patch = 4;
    
     %smooth the tign
     tign_new = rlx_shp(tign_new,alpha_2,patch);
