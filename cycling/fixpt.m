@@ -2,7 +2,7 @@ function [i,j,new_lat,new_lon]= fixpt(w,pt,varargin)
 % compute the nearest point in the fire mesh to the given coordinates
 % w - w = read_wrfout_tign(f)  , struct with fxlong,fxlat or red =
 %                                                     subset_domain(w)
-%  pt   - point to be fixed to fire mesh pt = [lon,lat]
+%  pt   - point to be fixed to fire mesh pt = [lat,lon]
 % 
 % i,j  - indices in the grids fxlong,fxlat  or  xlong,xlt
 % new_lat,new_lon  -- fxlat(i,j) fxlong(i,j)

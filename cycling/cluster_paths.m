@@ -75,7 +75,7 @@ end
 n_points = pts(1:cull:end,:,:,:,:,:);
 
 %cluster the data 
-dt = ceil(g(end).time - g(1).time);
+dt = 2*ceil(g(end).time - g(1).time);
 space_clusters = dt; %days
 [s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
 

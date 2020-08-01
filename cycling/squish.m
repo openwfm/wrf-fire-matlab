@@ -23,8 +23,11 @@ else
     %max_l2_time = max(tign(:));
     %flat tign_new
     f_days=input_num('Days of forecast to produce? ',0);
-    %tign_new=max_l2_time*ones(size(tign))+f_days;
-    tign_new = estimate_tign(ps);
+    tign_new=max_l2_time*ones(size(tign))+f_days;
+    if f_days > 0
+        ps.red.end_datenum = ps.red.end_datenum + f_days;
+    end
+    %tign_new = estimate_tign(ps);
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title_str = 'Generated fire cone';
 end
@@ -60,24 +63,26 @@ rm = 2;
 
 % random multiplier, keep the same
 % perturbs points downward in time to
-rt = 0.25;
+rt = 0.2;
 % weight for tign_new
 
 %alhpa blends  estimate of tign at a point with old estimate
 % new_estimate = alph*current_setimate + (1-alpha)*old_estimate
 alpha = 0.5;
 %constant for smooth in rls_shp
-alpha_2 = 0.1; %smaller alph_2 ==> smoother
+alpha_2 = 0.5; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 7;
+smoothings = 20;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
-    %pause(3/k)
+    pause(3/k)
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
-        %plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
+%         figure(73),hold on
+%         plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
+%         hold off
         %plot3(pts(p,2),pts(p,1),tign(idx(p,1),idx(p,2))-ps.red.start_datenum,'g')
         for j = 1:length(p)
             tign_old = tign_new;
@@ -106,17 +111,21 @@ for k = 1:smoothings
             if j > 1
                 %weighted average will move new point close to that with
                 %higher FRP
-                frp1 = ps.points(p(j-1),5);
-                frp2 = ps.points(p(j),5);
-                w1 = frp1/(frp1+frp2);
-                w2 = frp2/(frp1+frp2);
-                new_i = uint16(w1*idx(p(j-1),1)+w2*idx(p(j),1));
-                new_j = uint16(w1*idx(p(j-1),2)+w2*idx(p(j),2));
-                new_t = w1*pts(p(j),3)+w2*pts(p(j-1),3);
-%                 new_i = uint8(round((idx(p(j),1)+idx(p(j-1),1))/2));
-%                 new_j = uint8(round((idx(p(j),2)+idx(p(j-1),2))/2));
-%                 new_t =  0.5*(pts(p(j),3)+pts(p(j-1),3));
+                %                 frp1 = ps.points(p(j-1),5);
+                %                 frp2 = ps.points(p(j),5);
+                %                 w1 = frp1/(frp1+frp2);
+                %                 w2 = frp2/(frp1+frp2);
+                w1 = 0.5;
+                w2 = 0.5;
                 %assign tign for all in small, block around midpoint
+                %             frp1 = ps.points(p(j-1),5);
+                %             frp2 = ps.points(p(j),5);
+                %             w1 = frp1/(frp1+frp2);
+                %             w2 = frp2/(frp1+frp2);
+                new_lat = w1*pts(p(j-1),1)+w2*pts(p(j),1);
+                new_lon = w1*pts(p(j-1),2)+w2*pts(p(j),2);
+                new_t = w1*pts(p(j-1),3)+w2*pts(p(j),3);
+                [new_i,new_j,new_lat,new_lon]= fixpt(ps.red,[new_lat,new_lon]);
                 tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
                 if ai == 1
                     tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
@@ -126,7 +135,7 @@ for k = 1:smoothings
         end
     end
     %size of local averaging to apply aoutomate by grid size?
-    patch = 4;
+    patch = 2;
    
     %smooth the tign
     tign_new = rlx_shp(tign_new,alpha_2,patch);

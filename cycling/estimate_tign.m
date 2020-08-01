@@ -10,8 +10,15 @@ times = ps.points(:,3);
 lats = ps.points(:,1);
 lons = ps.points(:,2);
 
+%sort detections by time
+[st_1,st_2]=sort(times);
+lats = lats(st_2);
+lons = lons(st_2);
+times = times(st_2);
+
+
 n = length(times);
-end_time = max(times);
+end_time = max(max(times),ps.red.end_datenum);
 start_time = min(times);
 total_time = ceil(end_time-start_time);
 
@@ -38,9 +45,9 @@ times_set = [];
 %     mesh(ps.red.fxlong,ps.red.fxlat,tign)
 % end
 
-%going by every granule
-for i = 1:max(ps.points(:,6))
-    pt_set = ps.points(:,6) <= i;
+%going by every 30 detections
+for i = 1:30:n
+    pt_set = times <= times(i);
     lons_set = [lons_set;lons(pt_set)];
     lats_set = [lats_set;lats(pt_set)];
 %    times_set = [times_set;times(pt_set)];
@@ -52,7 +59,7 @@ for i = 1:max(ps.points(:,6))
     temp_tign(in) = max(times_set);
     temp_tign(~in) = end_time;
     tign = min(tign,temp_tign);
-    tign = imgaussfilt(tign,1/8);
+    %tign = imgaussfilt(tign,1/8);
     
 end
 
