@@ -5,7 +5,7 @@ function a = analyze_paths(ps,new_tign)
 
 %vector for speeds between points in the paths new_tign
 p_speeds = [];
-%vector for speeds between pts in tign
+%vector for speeds between pts in tigndist = ps.raw_dist(p2,p1);
 t_speeds = [];
 speeds_count = 0;
 %figure(117),contour(ps.red.fxlong,ps.red.fxlat,ps.red.tign);
@@ -46,9 +46,9 @@ for i = 1:length(ps.paths)
             %reall, this is the p_speeds
             t_speeds(speeds_count)= (dist/dt)/(24*3600);
             %elevation data
-%             e_p1 = ps.red.fhgt(ps.idx(p1,1),ps.idx(p1,2));
-%             e_p2 = ps.red.fhgt(ps.idx(p2,1),ps.idx(p2,2));
-%             slopes(speeds_count) = (e_p2-e_p1)/dist;
+            e_p1 = ps.red.fhgt(ps.idx(p1,1),ps.idx(p1,2));
+            e_p2 = ps.red.fhgt(ps.idx(p2,1),ps.idx(p2,2));
+            slopes(speeds_count) = (e_p2-e_p1)/dist;
 
         end
         %scatter(ps.points(p(end),2),ps.points(p(end),1),'*r')
@@ -63,7 +63,7 @@ a.p_fuel_2 = p_fuel_2';
 a.matrix(:,1)=p_speeds';
 a.matrix(:,2)=p_fuel_1';
 a.matrix(:,3)=p_fuel_2';
-%a.slopes = slopes';
+a.slopes = slopes';
 
 %%%%%% wtf happened %%%%
 %% (figure(117),contour(ps.red.fxlong,ps.red.fxlat,ps.red.tign);;

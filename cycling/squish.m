@@ -63,21 +63,21 @@ rm = 2;
 
 % random multiplier, keep the same
 % perturbs points downward in time to
-rt = 0.2;
+rt = 0.5;
 % weight for tign_new
 
 %alhpa blends  estimate of tign at a point with old estimate
 % new_estimate = alph*current_setimate + (1-alpha)*old_estimate
 alpha = 0.5;
 %constant for smooth in rls_shp
-alpha_2 = 0.5; %smaller alph_2 ==> smoother
+alpha_2 = 0.05; %smaller alph_2 ==> smoother
 %number of loops to run
 smoothings = 20;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
-    pause(3/k)
+    %pause(3/k)
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
 %         figure(73),hold on

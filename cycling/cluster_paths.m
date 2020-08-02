@@ -236,7 +236,7 @@ for i = 1:start_pt
         %             new_points = [new_points;new_pt];
         %         end
     end
-    path_struct.raw_dist = raw_dist;
+    path_struct.raw_dist = raw_dist+raw_dist';
     path_struct.paths = paths;
     path_struct.graph = fg;
     path_struct.distances = a;
