@@ -104,7 +104,7 @@ grid_pts = fixpoints2grid(red,n_points);
 
 
 %% computing distance between points using GPS coords
-E = wgs84Ellipsoid;
+E = wgs84Ellipsoid;distance(ig_point,i_point,E);
 %max distance from ignition
 max_d = 0;
 %error in time of fire from time of detection

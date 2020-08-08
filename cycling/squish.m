@@ -72,7 +72,7 @@ alpha = 0.5;
 %constant for smooth in rls_shp
 alpha_2 = 0.05; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 20;
+smoothings = 10;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
