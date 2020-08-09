@@ -12,11 +12,16 @@ lat = ps.red.fxlat(1:cull:end,1:cull:end);
 tign = ps.red.tign(1:cull:end,1:cull:end);
 tign2 = tign2(1:cull:end,1:cull:end);
 
-%compute grid spacing
-
+%compute gradient step sizes
+E = wgs84Ellipsoid;
+[n,m] = size(lon);
+hx = distance(lat(1,round(m/2)),lon(1,1),lat(1,round(m/2)),lon(end,end),E)/m;
+hy = distance(lat(1,1),lon(round(n/2),1),lat(end,end),lon(round(n/2),1),E)/n;
 
 [dx1,dy1] = fire_gradients(lon,lat,tign,1);
+dx1=dx1/hx;dy1=dy1/hy;
 [dx2,dy2] = fire_gradients(lon,lat,tign2,1);
+dx2=dx2/hx;dy2=dy2/hy;
 
 %mask for only the fire cone
 t_msk1 = tign<max(tign(:));
