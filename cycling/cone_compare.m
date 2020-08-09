@@ -10,7 +10,9 @@ tign = ps.red.tign;
 [dx2,dy2] = fire_gradients(lon,lat,tign2,1);
 
 %mask for only the fire cone
-t_msk = tign<max(tign(:));
+t_msk1 = tign<max(tign(:));
+t_msk2 = tign2<max(tign2(:));
+t_msk = logical(t_msk1.*t_msk2);
 
 %measure angles
 theta1 = atan2(dy1(t_msk),dx1(t_msk));
@@ -44,6 +46,32 @@ quiver(lon(t_msk),lat(t_msk),dv2(t_msk),du2(t_msk))
 title('Gradients in fire surfaces')
 legend('Ground Truth','Interpolated')
 
+%get magnitudes of these vectors for comparison
+% m1 = sqrt(du1(t_msk).^2+dv1(t_msk).^2);
+% m2 = sqrt(du2(t_msk).^2+dv2(t_msk).^2);
+m1 = sqrt(du1.^2+dv1.^2);
+m2 = sqrt(du2.^2+dv2.^2);
+mdiff = m1-m2;
+g_msk = abs(mdiff)>0.1;
+figure,histogram(mdiff(g_msk));
+avg_mdiff = mean(mdiff(g_msk));
+std_mdiff = std(mdiff(g_msk));
+tstr = sprintf('Histogram of difference in vector magnitudes \n mean = %f std = %f',avg_mdiff,std_mdiff);
+title(tstr);
+
+%find where the fire is burning too fast
+
+fast = mdiff < avg_mdiff-1/2*std_mdiff;
+slow = mdiff > avg_mdiff+1/2*std_mdiff;
+%figure,scatter(lon(slow),lat(slow)),
+figure,scatter(lon(fast),lat(fast),'*r')
+legend('Forecast is Slow','Forecat is fast')
+
+%cluster the domain by fuel type and gradient difference
+[s_idx,s_c] = kmeans([lon(:),lat(:),mdiff(:)],2);
+figure,scatter(lon(s_idx==1),lat(s_idx==1),'r')
+hold on,scatter(lon(s_idx==2),lat(s_idx==2),'b')
+legend('Forecast too fast','Forecast too slow')
 
 
 
