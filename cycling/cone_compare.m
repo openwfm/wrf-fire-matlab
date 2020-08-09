@@ -6,6 +6,15 @@ lon = ps.red.fxlong;
 lat = ps.red.fxlat;
 tign = ps.red.tign;
 
+cull = input_num('Thin data set? [1]',1);
+lon = ps.red.fxlong(1:cull:end,1:cull:end);
+lat = ps.red.fxlat(1:cull:end,1:cull:end);
+tign = ps.red.tign(1:cull:end,1:cull:end);
+tign2 = tign2(1:cull:end,1:cull:end);
+
+%compute grid spacing
+
+
 [dx1,dy1] = fire_gradients(lon,lat,tign,1);
 [dx2,dy2] = fire_gradients(lon,lat,tign2,1);
 
@@ -65,7 +74,7 @@ fast = mdiff < avg_mdiff-1/2*std_mdiff;
 slow = mdiff > avg_mdiff+1/2*std_mdiff;
 %figure,scatter(lon(slow),lat(slow)),
 figure,scatter(lon(fast),lat(fast),'*r')
-legend('Forecast is Slow','Forecat is fast')
+%legend('Forecast is Slow','Forecat is fast')
 
 %cluster the domain by fuel type and gradient difference
 [s_idx,s_c] = kmeans([lon(:),lat(:),mdiff(:)],2);
