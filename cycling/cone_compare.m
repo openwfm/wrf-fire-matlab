@@ -53,6 +53,10 @@ legend('Ground Truth','Interpolated')
 %get vectors which are not unit vectors
 [du1,dv1] = fire_gradients(lon,lat,tign,0);
 [du2,dv2] = fire_gradients(lon,lat,tign2,0);
+du1=du1/hx;dv1=dv1/hy;
+du2=du2/hx;dv2=dv2/hy;
+
+
 figure
 quiver(lon(t_msk),lat(t_msk),dv1(t_msk),du1(t_msk))
 hold on
@@ -66,12 +70,30 @@ legend('Ground Truth','Interpolated')
 m1 = sqrt(du1.^2+dv1.^2);
 m2 = sqrt(du2.^2+dv2.^2);
 mdiff = m1-m2;
-g_msk = abs(mdiff)>0.1;
+g_msk = abs(mdiff)>=0.0;
 figure,histogram(mdiff(g_msk));
 avg_mdiff = mean(mdiff(g_msk));
 std_mdiff = std(mdiff(g_msk));
 tstr = sprintf('Histogram of difference in vector magnitudes \n mean = %f std = %f',avg_mdiff,std_mdiff);
 title(tstr);
+
+
+%rate of spread
+rx1 = 1./du1/(24*3600);
+ry1 = 1./dv1/(24*3600);
+rx2 = 1./du2/(24*3600);
+ry2 = 1./dv2/(24*3600);
+r1 = sqrt(rx1.^2+ry1.^2);
+r2 = sqrt(rx2.^2+ry2.^2);
+
+r_diff = r1-r2;
+
+% figure
+% quiver(lon(t_msk),lat(t_msk),rx1(t_msk),ry1(t_msk))
+% hold on
+% quiver(lon(t_msk),lat(t_msk),rx2(t_msk),ry2(t_msk))
+% title('ROS vectors')
+% legend('Ground Truth','Interpolated')
 
 %find where the fire is burning too fast
 
