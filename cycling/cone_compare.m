@@ -5,6 +5,9 @@ function cone_compare(ps,tign2)
 lon = ps.red.fxlong;
 lat = ps.red.fxlat;
 tign = ps.red.tign;
+%blur the data for smoother gradients
+% tign = imgaussfilt(tign,2);
+tign2 = imgaussfilt(tign2,2);
 
 cull = input_num('Thin data set? [1]',1);
 lon = ps.red.fxlong(1:cull:end,1:cull:end);
@@ -104,10 +107,10 @@ figure,scatter(lon(fast),lat(fast),'*r')
 %legend('Forecast is Slow','Forecat is fast')
 
 %cluster the domain by fuel type and gradient difference
-[s_idx,s_c] = kmeans([lon(:),lat(:),mdiff(:)],2);
-figure,scatter(lon(s_idx==1),lat(s_idx==1),'r')
-hold on,scatter(lon(s_idx==2),lat(s_idx==2),'b')
-legend('Forecast too fast','Forecast too slow')
+% [s_idx,s_c] = kmeans([lon(:),lat(:),mdiff(:)],2);
+% figure,scatter(lon(s_idx==1),lat(s_idx==1),'r')
+% hold on,scatter(lon(s_idx==2),lat(s_idx==2),'b')
+% legend('Forecast too fast','Forecast too slow')
 
 
 

@@ -1,6 +1,6 @@
 function tign = squish2(ps)
 %function takes path structure and makes new estimated tign
-%inputs  ps = graph_dets(w) or cluster_paths(w), struct with points, paths, etc.
+%inputs  ps = graph_dets(w) or ps = cluster_paths(w), struct with points, paths, etc.
 
 %copy variables to shorter names
 pts = ps.grid_pts;
