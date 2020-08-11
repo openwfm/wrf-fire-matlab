@@ -12,7 +12,11 @@ function [dx,dy] = fire_gradients(fxlong,fxlat,tign,unit)
 
 
 %[dx,dy] = gradient(tign,hx,hy);
-[dx,dy] = gradient(tign);
+%[dx,dy] = gradient(tign);
+%using Sobel edge detector
+[dx,dy] = imgradientxy(tign);
+dx = dx/8;
+dy = dy/8;
 %make unit vectors
 if unit == 1
 dx = dx./sqrt(dx.^2+dy.^2);
