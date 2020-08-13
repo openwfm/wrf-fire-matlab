@@ -19,8 +19,9 @@ E = wgs84Ellipsoid;
 % dy = dy/8;
 %make unit vectors
 if unit == 1
-dx = dx./sqrt(dx.^2+dy.^2);
-dy = dy./sqrt(dx.^2+dy.^2);
+% need to fix this to make up for uneven grid spacing
+% dx = dx./sqrt(dx.^2+dy.^2);
+% dy = dy./sqrt(dx.^2+dy.^2);
 end
 
 % figure,contour(fxlong,fxlat,tign)

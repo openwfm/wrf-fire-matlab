@@ -9,8 +9,8 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-% tign = imgaussfilt(tign,3);
-% tign2 = imgaussfilt(tign2,3);
+tign = imgaussfilt(tign,1);
+tign2 = imgaussfilt(tign2,1);
 
 %compare areas of the two and plot over time
 % area_compare(tign,tign2); 
@@ -19,8 +19,9 @@ tign = ps.red.tign;
 t_end = min(max(tign(:)),max(tign2(:)))-0.1;
 a1 = sum(sum(tign<t_end));
 a2 = sum(sum(tign2<t_end));
-tign(tign>=t_end)=t_end;
-tign2(tign2>=t_end)=t_end;
+%make the top flate for each
+% tign(tign>=t_end)=t_end;
+% tign2(tign2>=t_end)=t_end;
 fprintf('Forecast Area: %d Data area: %d \n',a1,a2);
 figure,contour(lon,lat,tign,[t_end t_end],'k')
 hold on,contour(lon,lat,tign2,[t_end t_end],'b')
@@ -49,8 +50,12 @@ hold on
 quiver(lon,lat,dx1,dy1)
 hold off
 % dx1=dx1/hx;dy1=dy1/hy;
-% [dx2,dy2] = fire_gradients(lon,lat,tign2,1);
-[dx2,dy2] = gradient(tign2);
+[dx2,dy2] = fire_gradients(lon,lat,tign2,1);
+figure,contour(lon,lat,tign2,20,'k');
+hold on
+quiver(lon,lat,dx2,dy2)
+hold off
+%[dx2,dy2] = gradient(tign2);
 % dx2=dx2/hx;dy2=dy2/hy;
 
 %compute the gradient of the terrain
@@ -79,7 +84,7 @@ td(td<-pi) = td(td<-pi)+2*pi;
 b_msk = abs(td)<pi/6;
 figure,histogram(td)
 format short
-tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f',mean(td),std(td));
+tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f',mean(td(:)),std(td(:)));
 title(tstr)
 xlabel('Difference of angles (radians)')
 ylabel('Number')
@@ -100,12 +105,12 @@ legend('Forecast','Interpolated')
 % du2=du2/hx;dv2=dv2/hy;
 
 
-figure
-quiver(lon(t_msk),lat(t_msk),du1(t_msk),du1(t_msk))
-hold on
-quiver(lon(t_msk),lat(t_msk),du2(t_msk),dv2(t_msk))
-title('Gradients in fire surfaces')
-legend('Forecast','Interpolated')
+% figure
+% quiver(lon(t_msk),lat(t_msk),du1(t_msk),du1(t_msk))
+% hold on
+% quiver(lon(t_msk),lat(t_msk),du2(t_msk),dv2(t_msk))
+% title('Gradients in fire surfaces')
+% legend('Forecast','Interpolated')
 
 %get magnitudes of these vectors for comparison
 % m1 = sqrt(du1(t_msk).^2+dv1(t_msk).^2);
@@ -120,7 +125,7 @@ g_msk = abs(mdiff)>=0.0;
 % tstr = sprintf('Histogram of difference in vector magnitudes \n mean = %f std = %f',avg_mdiff,std_mdiff);
 % title(tstr);
 
-
+%use the slope from gradientm function instead
 %rate of spread
 rx1 = 1./du1/(24*3600);
 ry1 = 1./dv1/(24*3600);
