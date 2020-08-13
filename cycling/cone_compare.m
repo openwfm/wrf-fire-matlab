@@ -6,16 +6,23 @@ function cone_compare(ps,tign2)
 
 lon = ps.red.fxlong;
 lat = ps.red.fxlat;
+%forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-tign = imgaussfilt(tign,1);
-tign2 = imgaussfilt(tign2,1);
+% tign = imgaussfilt(tign,3);
+% tign2 = imgaussfilt(tign2,3);
 
 %compute are of fires
-t_end = min(max(tign(:)),max(tign2(:)));
+t_end = min(max(tign(:)),max(tign2(:)))-0.1;
 a1 = sum(sum(tign<t_end));
 a2 = sum(sum(tign2<t_end));
+tign(tign>=t_end)=t_end;
+tign2(tign2>=t_end)=t_end;
 fprintf('Forecast Area: %d Data area: %d \n',a1,a2);
+figure,contour(lon,lat,tign,[t_end t_end],'k')
+hold on,contour(lon,lat,tign2,[t_end t_end],'b')
+legend('forecast','estimate')
+title('Perimeters')
 
 cull = input_num('Thin data set? [1]',1);
 lon = ps.red.fxlong(1:cull:end,1:cull:end);
@@ -40,13 +47,17 @@ t_msk2 = tign2<max(tign2(:));
 t_msk = logical(t_msk1.*t_msk2);
 
 %measure angles
-theta1 = atan2(dy1(t_msk),dx1(t_msk));
-theta2 = atan2(dy2(t_msk),dx2(t_msk));
+% theta1 = atan2(dy1(t_msk),dx1(t_msk));
+% theta2 = atan2(dy2(t_msk),dx2(t_msk));
+%no mask
+theta1 = atan2(dy1,dx1);
+theta2 = atan2(dy2,dx2);
 
 td = theta1-theta2;
 td(td>pi) = td(td>pi)-2*pi;
 td(td<-pi) = td(td<-pi)+2*pi;
-td = td(~isnan(td));
+%td = td(~isnan(td));
+b_msk = abs(td)<pi/6;
 figure,histogram(td)
 format short
 tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f',mean(td),std(td));
@@ -55,11 +66,11 @@ xlabel('Difference of angles (radians)')
 ylabel('Number')
 
 figure
-quiver(lon(t_msk),lat(t_msk),dy1(t_msk),dx1(t_msk))
+quiver(lon(t_msk),lat(t_msk),dx1(t_msk),dy1(t_msk))
 % quiver(lon,lat,dy1,dx1)
 hold on
-quiver(lon(t_msk),lat(t_msk),dy2(t_msk),dx2(t_msk))
-% quiver(lon,lat,dy2,dx2)
+quiver(lon(t_msk),lat(t_msk),dx2(t_msk),dy2(t_msk))
+% quiver(lon,lat,dx2,dy2)
 title('Gradients in fire surfaces, unit vectors')
 legend('Forecast','Interpolated')
 
@@ -71,9 +82,9 @@ du2=du2/hx;dv2=dv2/hy;
 
 
 figure
-quiver(lon(t_msk),lat(t_msk),dv1(t_msk),du1(t_msk))
+quiver(lon(t_msk),lat(t_msk),du1(t_msk),du1(t_msk))
 hold on
-quiver(lon(t_msk),lat(t_msk),dv2(t_msk),du2(t_msk))
+quiver(lon(t_msk),lat(t_msk),du2(t_msk),dv2(t_msk))
 title('Gradients in fire surfaces')
 legend('Forecast','Interpolated')
 
@@ -99,9 +110,14 @@ ry2 = 1./dv2/(24*3600);
 r1 = sqrt(rx1.^2+ry1.^2);
 r2 = sqrt(rx2.^2+ry2.^2);
 
+figure
+quiver(lon(b_msk),lat(b_msk),rx1(b_msk),ry1(b_msk))
+hold on
+quiver(lon(b_msk),lat(b_msk),rx2(b_msk),ry2(b_msk))
+
 r_diff = r1-r2;
+%r_diff = imgaussfilt(r_diff,1/2);
 r_msk = abs(r_diff)<10;
-%r_diff = r_diff(abs(r_diff)<10);
 avg_r_diff = mean(r_diff(r_msk));
 std_r_diff = std(r_diff(r_msk));
 figure,histogram(r_diff(r_msk));
@@ -144,6 +160,19 @@ xlabel('Fuel Type'),ylabel('Number')
 % legend('Forecast too fast','Forecast too slow')
 
 %compute slope of terrain
+
+%compare by fuel type
+for i = 1:13
+    fuel_mask = ps.red.nfuel_cat == i;
+    msk = logical(fuel_mask.*r_msk);
+    fuel_rate_diff =  r1(msk)-r2(msk);
+    mean_frd = mean(fuel_rate_diff);
+    std_frd = std(fuel_rate_diff);
+    format short
+    fprintf('Fuel type: %d ROS difference: %f Std. Deviation: %f \n',i,mean_frd,std_frd);
+    
+end
+
 
 
 
