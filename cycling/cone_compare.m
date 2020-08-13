@@ -12,6 +12,9 @@ tign = ps.red.tign;
 % tign = imgaussfilt(tign,3);
 % tign2 = imgaussfilt(tign2,3);
 
+%compare areas of the two and plot over time
+% area_compare(tign,tign2); 
+
 %compute are of fires
 t_end = min(max(tign(:)),max(tign2(:)))-0.1;
 a1 = sum(sum(tign<t_end));
@@ -36,10 +39,26 @@ E = wgs84Ellipsoid;
 hx = distance(lat(1,round(m/2)),lon(1,1),lat(1,round(m/2)),lon(end,end),E)/m;
 hy = distance(lat(1,1),lon(round(n/2),1),lat(end,end),lon(round(n/2),1),E)/n;
 
+%gradient oin fire arrival time
 [dx1,dy1] = fire_gradients(lon,lat,tign,1);
-dx1=dx1/hx;dy1=dy1/hy;
-[dx2,dy2] = fire_gradients(lon,lat,tign2,1);
-dx2=dx2/hx;dy2=dy2/hy;
+% [dx1,dy1] = gradient(tign);
+% dx1 = dx1./sqrt(dx1.^2+dy1.^2);
+% dy1 = dy1./sqrt(dx1.^2+dy1.^2);
+figure,contour(lon,lat,tign,20,'k');
+hold on
+quiver(lon,lat,dx1,dy1)
+hold off
+% dx1=dx1/hx;dy1=dy1/hy;
+% [dx2,dy2] = fire_gradients(lon,lat,tign2,1);
+[dx2,dy2] = gradient(tign2);
+% dx2=dx2/hx;dy2=dy2/hy;
+
+%compute the gradient of the terrain
+elev = ps.red.fhgt;
+[aspect,slope,ey,ex] = gradientm(lat,lon,elev,E);
+figure,contour(lon,lat,elev,'k')
+hold on
+quiver(lon(1:5:end,1:5:end),lat(1:5:end,1:5:end),ex(1:5:end,1:5:end),ey(1:5:end,1:5:end))
 
 %mask for only the fire cone
 t_msk1 = tign<max(tign(:));
@@ -77,8 +96,8 @@ legend('Forecast','Interpolated')
 %get vectors which are not unit vectors
 [du1,dv1] = fire_gradients(lon,lat,tign,0);
 [du2,dv2] = fire_gradients(lon,lat,tign2,0);
-du1=du1/hx;dv1=dv1/hy;
-du2=du2/hx;dv2=dv2/hy;
+% du1=du1/hx;dv1=dv1/hy;
+% du2=du2/hx;dv2=dv2/hy;
 
 
 figure

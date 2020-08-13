@@ -7,8 +7,9 @@ function ac = area_compare(w_a,w_b)
 % w_a = read_wrfout_tign(wrf_a);
 % w_b = read_wrfout_tign(wrf_b);
 
-t_1 = max(min(w_a(:)),min(w_b(:)));
-t_2 = min(max(w_a(:)),max(w_b(:)));
+%time +- 1/4 day at simulation start and end
+t_1 = max(min(w_a(:)),min(w_b(:)))+0.25;
+t_2 = min(max(w_a(:)),max(w_b(:)))-0.25;
 
 pts = 20;
 t = linspace(t_1,t_2,pts);
