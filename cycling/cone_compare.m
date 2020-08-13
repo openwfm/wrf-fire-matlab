@@ -9,8 +9,8 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-tign = imgaussfilt(tign,1);
-tign2 = imgaussfilt(tign2,1);
+tign = imgaussfilt(tign,3);
+tign2 = imgaussfilt(tign2,3);
 
 %compare areas of the two and plot over time
 % area_compare(tign,tign2); 
@@ -29,10 +29,12 @@ legend('forecast','estimate')
 title('Perimeters')
 
 cull = input_num('Thin data set? [1]',1);
-lon = ps.red.fxlong(1:cull:end,1:cull:end);
-lat = ps.red.fxlat(1:cull:end,1:cull:end);
-tign = ps.red.tign(1:cull:end,1:cull:end);
+if cull ~= 1
+lon = lon(1:cull:end,1:cull:end);
+lat = lat(1:cull:end,1:cull:end);
+tign = tign(1:cull:end,1:cull:end);
 tign2 = tign2(1:cull:end,1:cull:end);
+end
 
 %compute gradient step sizes
 E = wgs84Ellipsoid;
