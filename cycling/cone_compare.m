@@ -9,8 +9,9 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-tign = imgaussfilt(tign,2);
-tign2 = imgaussfilt(tign2,2);
+st = 1;
+tign = imgaussfilt(tign,st);
+tign2 = imgaussfilt(tign2,st);
 
 %compare areas of the two and plot over time
 area_compare(tign,tign2); 
@@ -51,7 +52,7 @@ aspect_ratio = [1 hy/hx 1];
 % dy = dy1./sqrt(dx1.^2+dy1.^2);
 % dx1=dx;
 % dy1=dy;
-clear dx dy
+% clear dx dy
 figure,contour(lon,lat,tign,20,'k');
 daspect(aspect_ratio)
 hold on
@@ -74,6 +75,10 @@ elev = ps.red.fhgt;
 % hold on
 % quiver(lon(1:5:end,1:5:end),lat(1:5:end,1:5:end),ex(1:5:end,1:5:end),ey(1:5:end,1:5:end))
 
+%slopes of fire directions by directional derivatives
+sl1 = ex.*dx1+ey.*dy1;
+sl2 = ex.*dx2+ey.*dy2;
+
 %mask for only the fire cone
 t_msk1 = tign<max(tign(:));
 t_msk2 = tign2<max(tign2(:));
@@ -89,11 +94,11 @@ theta2 = atan2(dy2,dx2);
 td = theta1-theta2;
 td(td>pi) = td(td>pi)-2*pi;
 td(td<-pi) = td(td<-pi)+2*pi;
-%td = td(~isnan(td));
+td_msk = ~isnan(td);
 b_msk = abs(td)<pi/6;
 figure,histogram(td)
 format short
-tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f',mean(td(:)),std(td(:)));
+tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f',mean(td(td_msk)),std(td(td_msk)));
 title(tstr)
 xlabel('Difference of angles (radians)')
 ylabel('Number')
@@ -110,16 +115,13 @@ legend('Forecast','Interpolated')
 %get vectors which are not unit vectors
 [du1,dv1] = fire_gradients(lon,lat,tign,0);
 [du2,dv2] = fire_gradients(lon,lat,tign2,0);
-% du1=du1/hx;dv1=dv1/hy;
-% du2=du2/hx;dv2=dv2/hy;
 
-
-% figure
-% quiver(lon(t_msk),lat(t_msk),du1(t_msk),du1(t_msk))
-% hold on
-% quiver(lon(t_msk),lat(t_msk),du2(t_msk),dv2(t_msk))
-% title('Gradients in fire surfaces')
-% legend('Forecast','Interpolated')
+figure
+quiver(lon(t_msk),lat(t_msk),du1(t_msk),du1(t_msk))
+hold on
+quiver(lon(t_msk),lat(t_msk),du2(t_msk),dv2(t_msk))
+title('Gradients in fire surfaces')
+legend('Forecast','Interpolated')
 
 %get magnitudes of these vectors for comparison
 % m1 = sqrt(du1(t_msk).^2+dv1(t_msk).^2);

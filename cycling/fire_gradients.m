@@ -21,9 +21,10 @@ E = wgs84Ellipsoid;
 if unit == 1
 x = dx./sqrt(dx.^2+dy.^2);
 y = dy./sqrt(dx.^2+dy.^2);
-end
 dx = x;
 dy = y;
+end
+
 % figure,contour(fxlong,fxlat,tign)
 % hold on
 % quiver(fxlong,fxlat,ux,uy)
