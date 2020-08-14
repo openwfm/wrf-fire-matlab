@@ -21,7 +21,8 @@ end
 
 figure
 plot(t/(24*3600),area_a,t/(24*3600),area_b)
-legend('wrf-a','wrf-b')
+%legend('wrf-a','wrf-b')
+legend('Forecast','Estimate')
 %legend('Wet fuel','Normal Fuel')
 xlabel('Time')
 ylabel('Fire Area')

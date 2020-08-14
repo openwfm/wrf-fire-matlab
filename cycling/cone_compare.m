@@ -9,13 +9,13 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-tign = imgaussfilt(tign,3);
-tign2 = imgaussfilt(tign2,3);
+tign = imgaussfilt(tign,2);
+tign2 = imgaussfilt(tign2,2);
 
 %compare areas of the two and plot over time
-% area_compare(tign,tign2); 
+area_compare(tign,tign2); 
 
-%compute are of fires
+%compute area of fires
 t_end = min(max(tign(:)),max(tign2(:)))-0.1;
 a1 = sum(sum(tign<t_end));
 a2 = sum(sum(tign2<t_end));
@@ -41,31 +41,38 @@ E = wgs84Ellipsoid;
 [n,m] = size(lon);
 hx = distance(lat(1,round(m/2)),lon(1,1),lat(1,round(m/2)),lon(end,end),E)/m;
 hy = distance(lat(1,1),lon(round(n/2),1),lat(end,end),lon(round(n/2),1),E)/n;
+aspect_ratio = [1 hy/hx 1];
 
-%gradient oin fire arrival time
+
+%gradient in fire arrival time, unit vector
 [dx1,dy1] = fire_gradients(lon,lat,tign,1);
 % [dx1,dy1] = gradient(tign);
-% dx1 = dx1./sqrt(dx1.^2+dy1.^2);
-% dy1 = dy1./sqrt(dx1.^2+dy1.^2);
+% dx = dx1./sqrt(dx1.^2+dy1.^2);
+% dy = dy1./sqrt(dx1.^2+dy1.^2);
+% dx1=dx;
+% dy1=dy;
+clear dx dy
 figure,contour(lon,lat,tign,20,'k');
+daspect(aspect_ratio)
 hold on
 quiver(lon,lat,dx1,dy1)
 hold off
 % dx1=dx1/hx;dy1=dy1/hy;
+%unit vector
 [dx2,dy2] = fire_gradients(lon,lat,tign2,1);
-figure,contour(lon,lat,tign2,20,'k');
-hold on
-quiver(lon,lat,dx2,dy2)
-hold off
+% figure,contour(lon,lat,tign2,20,'k');
+% hold on
+% quiver(lon,lat,dx2,dy2)
+% hold off
 %[dx2,dy2] = gradient(tign2);
 % dx2=dx2/hx;dy2=dy2/hy;
 
 %compute the gradient of the terrain
 elev = ps.red.fhgt;
 [aspect,slope,ey,ex] = gradientm(lat,lon,elev,E);
-figure,contour(lon,lat,elev,'k')
-hold on
-quiver(lon(1:5:end,1:5:end),lat(1:5:end,1:5:end),ex(1:5:end,1:5:end),ey(1:5:end,1:5:end))
+% figure,contour(lon,lat,elev,'k')
+% hold on
+% quiver(lon(1:5:end,1:5:end),lat(1:5:end,1:5:end),ex(1:5:end,1:5:end),ey(1:5:end,1:5:end))
 
 %mask for only the fire cone
 t_msk1 = tign<max(tign(:));
@@ -158,18 +165,22 @@ hold on,scatter(lon(r_slow),lat(r_slow),'b');
 title('Locations for fuel adjustment')
 legend('Forecast too fast','Forecast too slow')
 
-figure,histogram(ps.red.nfuel_cat(r_fast)),xticks(1:14)
-title('Fuel Types Where Fire is Burning too Fast')
-xlabel('Fuel Type'),ylabel('Number')
-figure,histogram(ps.red.nfuel_cat(r_slow)),xticks(1:14)
-title('Fuel Types Where Fire is Burning too Slow')
-xlabel('Fuel Type'),ylabel('Number')
-% figurelow
+% figure,histogram(ps.red.nfuel_cat(r_fast)),xticks(1:14)
+% title('Fuel Types Where Fire is Burning too Fast')
+% xlabel('Fuel Type'),ylabel('Number')
+% figure,histogram(ps.red.nfuel_cat(r_slow)),xticks(1:14)
+% title('Fuel Types Where Fire is Burning too Slow')
+% xlabel('Fuel Type'),ylabel('Number')
+
+% figure
 % quiver(lon(t_msk),lat(t_msk),rx1(t_msk),ry1(t_msk))
 % hold on
 % quiver(lon(t_msk),lat(t_msk),rx2(t_msk),ry2(t_msk))
 % title('ROS vectors')
 % legend('Ground Truth','Interpolated')
+figure,histogram(ps.red.nfuel_cat(t_msk)),xticks(1:14)
+title('Fuel types')
+
 
 %find where the fire is burning too fast
 
