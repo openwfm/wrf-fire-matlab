@@ -78,10 +78,12 @@ elev = ps.red.fhgt;
 %slopes of fire directions by directional derivatives
 sl1 = ex.*dx1+ey.*dy1;
 sl2 = ex.*dx2+ey.*dy2;
+sl_diff = sl1-sl2;
+figure,histogram(sl_diff)
 
 %mask for only the fire cone
-t_msk1 = tign<max(tign(:));
-t_msk2 = tign2<max(tign2(:));
+t_msk1 = tign<max(tign(:))-0.1;
+t_msk2 = tign2<max(tign2(:))-0.1;
 t_msk = logical(t_msk1.*t_msk2);
 
 %measure angles
