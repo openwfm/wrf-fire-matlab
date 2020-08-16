@@ -88,18 +88,12 @@ space_clusters = dt; %days
 % classes=kmeans(s_pts,eva.OptimalK);
 % dt = eva.OptimalK;
 
-
-
-        
-
 % %spatial clusters scatter plot
 % figure,scatter(pts(s_idx==1,1),pts(s_idx==1,2));
 % hold on% dt = round(g(end).time - g(1).time);% dt = round(g(end).time - g(1).time);
 % space_clusters = dt; %days
 % [s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
 
-space_clusters = dt; %days
-[s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
 
 % for i = 2:dt
 %   scatter(pts(s_idx==i,1),pts(s_idx==i,2));
@@ -194,9 +188,9 @@ for i = 1:n
             a(i,j) = cluster_mult*a(i,j);
         end
         % make points in different clusters further apart
-        if (a(i,j) > 0) && (s_idx(i)~=s_idx(j))
-            a(i,j) = a(i,j) + clust_dist(s_idx(i),s_idx(j));
-        end
+        % if (a(i,j) > 0) && (s_idx(i)~=s_idx(j))
+        %    a(i,j) = a(i,j) + clust_dist(s_idx(i),s_idx(j));
+        % end
     end
 end
 
