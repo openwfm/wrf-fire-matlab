@@ -9,7 +9,7 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-st = 1;
+st = 3;
 tign = imgaussfilt(tign,st);
 tign2 = imgaussfilt(tign2,st);
 
@@ -168,6 +168,12 @@ figure,scatter(lon(r_fast),lat(r_fast),'*r');
 hold on,scatter(lon(r_slow),lat(r_slow),'b');
 title('Locations for fuel adjustment')
 legend('Forecast too fast','Forecast too slow')
+
+%regression on slope and ros differences
+r_diff(abs(r_diff)>2) = NaN;
+sl_diff(abs(r_diff)>2) = NaN;
+figure,scatter(sl_diff(~isnan(r_diff)),r_diff(~isnan(r_diff)));
+mdl = fitlm(sl_diff(:),r_diff(:));
 
 % figure,histogram(ps.red.nfuel_cat(r_fast)),xticks(1:14)
 % title('Fuel Types Where Fire is Burning too Fast')
