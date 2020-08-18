@@ -5,12 +5,12 @@ function track_struct = track_fmc(f)
 %outputs
 %   track_struct  - matlab struct with information about the wrfout
 
-t=nc2struct(wrf,{'Times'},{});
+t=nc2struct(f,{'Times'},{});
 ts = char(t.times');
 [n,m] = size(ts)
 fuel_cat = 2;
 for i = 1:n
-    s = nc2struct(wrf,{'FMC_G','ROS','NFUEL_CAT','UF','VF'},{},i);
+    s = nc2struct(f,{'FMC_G','ROS','NFUEL_CAT','UF','VF'},{},i);
     fuel_mask = s.nfuel_cat ==2;
     avg_fmc(i) = mean(s.fmc_g(:));
     avg_ros(i) = mean(s.ros(:));
