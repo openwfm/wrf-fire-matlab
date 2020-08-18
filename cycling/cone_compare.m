@@ -9,9 +9,9 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-st = 3;
-tign = imgaussfilt(tign,st);
-tign2 = imgaussfilt(tign2,st);
+% st = 3;
+% tign = imgaussfilt(tign,st);
+% tign2 = imgaussfilt(tign2,st);
 
 %compare areas of the two and plot over time
 area_compare(tign,tign2); 
