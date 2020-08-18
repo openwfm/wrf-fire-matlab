@@ -74,10 +74,27 @@ end
 %prune the data
 n_points = pts(1:cull:end,:,:,:,:,:);
 
+%% for computing distance between points using GPS coords
+% also used for finding aspect of the slope, for clustering
+E = wgs84Ellipsoid;
+[aspect,slope,dy,dx] = gradientm(red.fxlat,red.fxlong,red.fhgt,E);
+clst_pts =  fixpoints2grid(red,n_points);
+ig_pt = [mean(clst_pts(:,3)),mean(clst_pts(:,4))];
+for i = 1:length(clst_pts)
+   pt_1 = [ig_pt(1,1),clst_pts(i,4)];
+   pt_2 = [clst_pts(i,3),clst_pts(i,4)];
+   d_lon = sign(clst_pts(1,4)-clst_pts(i,4))*distance(ig_pt,pt_1,E);
+   d_lat = sign(clst_pts(1,3)-clst_pts(i,3))*distance(pt_2,pt_1,E);
+   cp(i,:) = [clst_pts(i,:),d_lat,d_lon];
+    %% work out x-y coordinate with pt 1 as origin
+end
+
+
 %cluster the data 
-dt = 2*ceil(g(end).time - g(1).time);
+dt = 3*ceil(g(end).time - g(1).time);
 space_clusters = dt; %days
 [s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
+[s_idx,s_c] = kmeans(cp(:,5:6),space_clusters);
 
 % find optimal cluster k
 % max_clusts = 20;
@@ -139,7 +156,7 @@ for i = 1:space_clusters
     i_clust = [s_c(i,1),s_c(i,2)];
     for j = 1:space_clusters
         j_clust = [s_c(j,1),s_c(j,2)];
-        clust_dist(i,j) =  distance(i_clust,j_clust,E);
+        clust_dist(i,j) =  sqrt((i_clust(1)-j_clust(1))^2+((i_clust(2)-j_clust(2))^2));
     end
 end
 

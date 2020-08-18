@@ -1,4 +1,9 @@
-function track_struct = track_fmc(wrf)
+function track_struct = track_fmc(f)
+%compute some trens about fuels, winds, ROS, etc for a wrfout
+%inputs
+%   f   -   string, path to a wrfout file
+%outputs
+%   track_struct  - matlab struct with information about the wrfout
 
 t=nc2struct(wrf,{'Times'},{});
 ts = char(t.times');
