@@ -163,15 +163,15 @@ for k = 1:smoothings
     %only do norm for times before final detection time
     time_mask = tign_new < pts(end,3);  %max(max(pts(:,3)));
     norms(k,2) = norm(tign_new(time_mask)-tign_old(time_mask));
-    figure(fig_num+3);plot(norms(1:k,1));
-    tstr = sprintf('Norm of difference between successive \n TIGN after each interpolation');
-    title(tstr)
-    figure(fig_num+4);plot(1:k,norms(1:k,2))
-    tstr = sprintf('Norm of difference between times of \n detections and TIGN at detectionon locations');
-    title(tstr);
-    xlabel('Iterations of Interpolation')
+%     figure(fig_num+3);plot(norms(1:k,1));
+%     tstr = sprintf('Norm of difference between successive \n TIGN after each interpolation');
+%     title(tstr)
+%     figure(fig_num+4);plot(1:k,norms(1:k,2))
+%     tstr = sprintf('Norm of difference between times of \n detections and TIGN at detectionon locations');
+%     title(tstr);
+%     xlabel('Iterations of Interpolation')
     temp_var(k) = min(tign_new(:))-ps.red.start_datenum;
-    figure(fig_num+5);plot(1:k,temp_var(1:k)*24),title('Change in ignition time'),xlabel('iteration'),ylabel('hours')
+    %figure(fig_num+5);plot(1:k,temp_var(1:k)*24),title('Change in ignition time'),xlabel('iteration'),ylabel('hours')
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')

@@ -82,7 +82,7 @@ for i = 1:n;% total_time %half day interval
     end
 end
 tign=min(tign,pts_tign);
-tign = imgaussfilt(tign,2/3,'FilterDomain','frequency');
+tign = imgaussfilt(tign,2,'FilterDomain','frequency');
 fprintf('Blurring ... \n')
 figure(fignum),mesh(ps.red.fxlong,ps.red.fxlat,tign)
 xlabel('Lon'),ylabel('Lat'),zlabel('Time'),title('Interpolated by Polygons')

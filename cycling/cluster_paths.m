@@ -94,7 +94,8 @@ end
 dt = 3*ceil(g(end).time - g(1).time);
 space_clusters = dt; %days
 [s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
-[s_idx,s_c] = kmeans(cp(:,5:6),space_clusters);
+%clustering using aspect, not good
+%[s_idx,s_c] = kmeans(cp(:,5:6),space_clusters);
 
 % find optimal cluster k
 % max_clusts = 20;
