@@ -1,7 +1,7 @@
 function [dx,dy] = fire_gradients(fxlong,fxlat,tign,unit)
 %computes the gradients of the fire arrival time cone
 % inputs : tign - fire arrival time matrix
-% output:  ux,uy   - unit vector components of gradients in the x and y directions
+% output:  ux,uy   - vector components of gradients in the x and y directions
 % unit = 1 ==> return unit vectors
 lon = fxlong;
 lat = fxlat;
