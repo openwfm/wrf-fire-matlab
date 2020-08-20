@@ -23,7 +23,7 @@ else
 end
 
 %%% compute score using data likelihood
-like_score = input_num('Use likelihood approach? No = [0] Yes = [1]',0)
+like_score = input_num('Use likelihood approach? No = [0] Yes = [1]',0,1);
 close all
 
 red = subset_domain(w,1);
@@ -43,12 +43,12 @@ if perim_path(end) == 'l'
     fprintf('Using a kml file for perimeters \n')
     %%%%%% convert kml file to a struct
     temp_struct = kml2struct(perim_path);
-
+    
     
 elseif perim_path(end) == '/'
     
     perim_dat = ['kml';'shp'];
-    p_type = input_num('Type of perimeter file to use? (1) kml (2) shp', 1)
+    p_type = input_num('Type of perimeter file to use? (1) kml (2) shp', 2,1)
     fprintf('Reading %s files in  directory %s \n',perim_dat(p_type,:),perim_path)
     if p_type == 1
         d = dir([perim_path,'*.kml'])
@@ -59,7 +59,7 @@ elseif perim_path(end) == '/'
     
     
 end % if perim_path...
-    
+
 
 
 %%%%%% find the perimeters in the struct, make new struct, find times of
@@ -69,47 +69,47 @@ perim_idx = [];
 perim_count = 0;
 
 for i = 1:length(temp_struct)
-   % find the perimters, which have the tag 'Polygon'
-   if  strcmp(temp_struct(i).Geometry,'Polygon')
-       perim_count = perim_count + 1;
-       
-       perim_idx = [perim_idx,i];
-       
-       if perim_path(end) == 'l'
-          time_str = temp_struct(i).Name(end-13:end);
-          perim_date(perim_count) = datetime(time_str,'InputFormat','MM-dd-yyyy HHmm');
-       else
-          time_str = temp_struct(i).Name(end-12:end);
-          perim_date(perim_count) = datetime(time_str,'InputFormat','yyyyMMdd HHmm');
-       end
-       
-       %create new stuct with only perims
-       perim_struct(perim_count).Lon = temp_struct(i).Lon;
-       perim_struct(perim_count).Lat = temp_struct(i).Lat;
-       perim_struct(perim_count).Name = temp_struct(i).Name;
-       perim_struct(perim_count).time = datenum(perim_date(perim_count));
-       %perim_time = datenum(perim_date);
-       %perim_struct(perim_count) = temp_struct(i);
-           %perim_struct(perim_count).time = 0;
-           % look for nan/inf in data last entry seems to always be a nan....
-               %inf_lat = ~isfinite(temp_struct(i).Lat);
-               %sum(inf_lat)
-       end %if
-    end
+    % find the perimters, which have the tag 'Polygon'
+    if  strcmp(temp_struct(i).Geometry,'Polygon')
+        perim_count = perim_count + 1;
+        
+        perim_idx = [perim_idx,i];
+        
+        if perim_path(end) == 'l'
+            time_str = temp_struct(i).Name(end-13:end);
+            perim_date(perim_count) = datetime(time_str,'InputFormat','MM-dd-yyyy HHmm');
+        else
+            time_str = temp_struct(i).Name(end-12:end);
+            perim_date(perim_count) = datetime(time_str,'InputFormat','yyyyMMdd HHmm');
+        end
+        
+        %create new stuct with only perims
+        perim_struct(perim_count).Lon = temp_struct(i).Lon;
+        perim_struct(perim_count).Lat = temp_struct(i).Lat;
+        perim_struct(perim_count).Name = temp_struct(i).Name;
+        perim_struct(perim_count).time = datenum(perim_date(perim_count));
+        %perim_time = datenum(perim_date);
+        %perim_struct(perim_count) = temp_struct(i);
+        %perim_struct(perim_count).time = 0;
+        % look for nan/inf in data last entry seems to always be a nan....
+        %inf_lat = ~isfinite(temp_struct(i).Lat);
+        %sum(inf_lat)
+    end %if
+end
 
-    %sort the perimeters
+%sort the perimeters
 
-    perim_time = datenum(perim_date);
-    fprintf('There were %d perimetrs in the kml file \n',perim_count)
-    [sorted_times,sort_idx] = sort(perim_date);
+perim_time = datenum(perim_date);
+fprintf('There were %d perimetrs in the kml file \n',perim_count)
+[sorted_times,sort_idx] = sort(perim_date);
 
-    %% compute scores and plot the data
+%% compute scores and plot the data
 
-    perim_scores = zeros(perim_count,1);
-    perim_vars = zeros(perim_count,1);
-    figure(perim_count+1)
-    if size(red.fxlong) < 500
-        mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
+perim_scores = zeros(perim_count,1);
+perim_vars = zeros(perim_count,1);
+figure(perim_count+1)
+if size(red.fxlong) < 500
+    mesh(red.fxlong,red.fxlat,(red.tign-red.start_datenum))
 else
     mesh(red.fxlong(1:10:end,1:10:end),red.fxlat(1:10:end,1:10:end),(red.tign(1:10:end,1:10:end)-red.start_datenum))
 end
@@ -128,9 +128,9 @@ for j = 1:perim_count
     if perim_struct(i).time <= red.end_datenum - 0.2
         %% ??? perim_time(i)-max(red.max_tign)
         z = perim_struct(i).time*ones(size(p_lon));
-        z_interp = Fr(p_lon,p_lat);   
+        z_interp = Fr(p_lon,p_lat);
         %%% time difference is perimter time minus forecast time
-        %%%   thus early forecast time gives a positive number and 
+        %%%   thus early forecast time gives a positive number and
         %%%   data likelihood would be higher
         diff = (z-z_interp)*24;
         diff = diff(~isnan(diff));
@@ -140,7 +140,7 @@ for j = 1:perim_count
             cone = diff < max(diff)-0.1;
             diff = diff(cone);
         end
-
+        
         %like_score = 0;
         if like_score > 0
             %make or load spline for data likelihood
@@ -150,12 +150,12 @@ for j = 1:perim_count
                     load p_spline.mat
                 else
                     fprintf('Making and saving spline \n')
-                    [p_spline,~,~]=make_spline(72,400);
+                    [p_spline,~,~]= make_spline(72,400);
                     save p_spline.mat p_spline
                 end
             else
                 fprintf('Using spline in workspace \n')
-            end %make spline      
+            end %make spline
         end %like_score adjustments
         
         
@@ -198,12 +198,12 @@ for j = 1:perim_count
             fprintf('   mean %f var %f \n',mean(likes),var(likes));
             
         end
-          
+        
     else
         fprintf('%s perimter after simulation end \n',perim_struct(i).Name);
-    end 
+    end
     
-
+    
 end
 hold off
 
@@ -215,11 +215,11 @@ hold off
 %     score_mask(k) = input_num(query_string,1);
 % end
 % score_mask = logical(score_mask);
-    
-score_mask = logical([0 0 1 0 0]);
+
+score_mask = logical([1 1 1 0 0]);
 score = perim_scores(score_mask);
 diff_var = perim_vars(score_mask);
-%score = mean(perim_scores(perim_scores ~= 0));
+score = mean(perim_scores(perim_scores ~= 0));
 
 
 

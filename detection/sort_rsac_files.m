@@ -7,7 +7,7 @@ function p=sort_rsac_files(prefix)
 % d              cell array of file names ordered by time
 
 % insert query to use tifs of Level2 data here
-use_tifs = input_num('Use TIF files? yes = 1',1);
+use_tifs = 0;%input_num('Use TIF files? No = 0',0,1);
 
 if use_tifs == 1
     d=dir([prefix,'*.tif.mat']);d={d.name};
@@ -44,7 +44,18 @@ else
     
     %check to make sure geolocation and data files are both present!
     if mod(nfiles,2) ~= 0
-        fprintf('Mismatch, number of files is not an even number')
+        match_mask = true(1,nfiles);
+        fprintf('Mismatch, number of files is not an even number \n')
+        for j = 1:nfiles-1
+            if p.time(j) == p.time(j+1)
+                fprintf('time match \n')
+                j = j+2
+               
+            else
+                fprintf('time mismatch \n')
+                match_mask(j)  = false;
+            end
+        end    
     end
     
     

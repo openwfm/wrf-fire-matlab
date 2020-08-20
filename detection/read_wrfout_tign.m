@@ -34,8 +34,8 @@ function w=read_wrfout_tign(f,ts)
     end
 
     w=nc2struct(f,{'Times','TIGN_G','FXLONG','FXLAT','UNIT_FXLAT','UNIT_FXLONG','LFN','UF','VF',...
-        'XLONG','XLAT','NFUEL_CAT','ITIMESTEP'},{'DX','DY','DT'},frame);
-
+        'XLONG','XLAT','NFUEL_CAT','ITIMESTEP','FMC_G','ROS','HGT'},{'DX','DY','DT'},frame);
+    w.fhgt = griddata(w.xlong,w.xlat,w.hgt,w.fxlong,w.fxlat);
     w.times=char(w.times');
     w.cwd=pwd;
     w.datestr=datestr(clock);

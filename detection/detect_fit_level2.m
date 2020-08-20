@@ -79,9 +79,14 @@ end
 fprintf('display bounds %g %g %g %g\n',red.disp_bounds);
 
 disp('Loading and subsetting detections')
-    
-%prefix='../campTIFs/';
-prefix='../TIFs/';
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar [3]',0,1)
+if fire_choice == 1
+    prefix='../campTIFs/';
+elseif fire_choice == 0
+    prefix='../TIFs/';
+else
+    prefix = '../cougarTIFs/';
+end
 %prefix='../TIFpoint/';
 %prefix='../perimTIFs/';
 % the level2 file names processed by geotiff2mat.py
@@ -95,8 +100,18 @@ print_time_bounds(red,'Detections',time_bounds(1),time_bounds(2))
 print_time_bounds(red,'Spinup    ',time_bounds(3),time_bounds(4))
 red.time_bounds=time_bounds;
 
-g = load_subset_detections(prefix,p,red,time_bounds,fig);
-save g.mat g;
+gstr = sprintf('g_%d.mat',cycle);
+if ~exist(gstr,'file')
+    g = load_subset_detections(prefix,p,red,time_bounds,fig);
+    save(gstr,'g')
+else
+    load(gstr)
+    fprintf('Loaded existing g.mat file \n')
+    if input_num('Enter [1] to load from scratch',1)
+        g = load_subset_detections(prefix,p,red,time_bounds,fig);
+        save(gstr,'g');
+    end
+end
        
 [m,n]=size(red.fxlong);
     
@@ -140,7 +155,7 @@ maxiter =2;
 maxdepth=3;
 h_stor = zeros(m,n,maxiter);
 
-new_like = input_num('Use new likelihood? No == 0 ',0);
+new_like = input_num('Use new likelihood? No == 0 ',0,1);
 for istep=1:maxiter
     
     fprintf('********** Iteration %g/%g **************\n', istep, maxiter);
@@ -234,7 +249,7 @@ va=1-wa./(wf+wa); %  1  outside of analysis fire area at restart time, ADDING UP
 % combine the forecast and analysis
 spinup = vf.*forecast + va.*analysis; 
 
-figure,mesh(spinup),title('spinup mesh')
+%figure,mesh(spinup),title('spinup mesh')
 
 plot_state(8,red,'Spinup',spinup,g,time_bounds(3:4))
 savefig('spinup',cycle)

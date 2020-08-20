@@ -1,10 +1,8 @@
-function score = evaluate_sim( wrfout_s, wrfout_c, perim, wrf_time_step )
+function score = evaluate_sim( wrfout_s, wrfout_c, wrf_time_step )
 %score = evaluate_sim( wrfout, perim )
 % inputs:
-%   wrfout_s - wrfout from a simulation w/o cycling or spinup, string with file path
-%   wrfout_c - wrfout from a simulation with cycling or spinup, string with file path
-%   perim - kml with fire perimter data, string wih file path or (to be
-%   programmed ) path to directory with shape files
+%   wrfout_s - wrfout from a simulation w/o cycling or spinup or ROS adjustment, string with file path
+%   wrfout_c - wrfout from a simulation with cycling or spinup or ROS adjustment, string with file path
 %   wrf_time_step - optional string with time step to be read
 % output:
 %   score - number which gives how good the simulation matches the perimter
@@ -22,22 +20,29 @@ function score = evaluate_sim( wrfout_s, wrfout_c, perim, wrf_time_step )
 
 close all
 
-spinup_compare = input_num('Compare spin-up vs analysis [1] Cycle vs No cycle? [2] Two diff cycles? [3]?',1,0);
-if spinup_compare == 3
+min_fire_confidence = 7;
+
+%exp_num = input_num('Compare No ROS adjust vs ROS adjust = [1] Cycle vs No cycle = [2] Two diff cycles = [3]',1,0);
+exp_num = input_num('Compare old method vs new method = [1] Cycle vs No cycle = [2] Two diff cycles = [3]',1,0);
+if exp_num == 3
    cycle_s = input_num('Cycle number for wrfout_s?',0);
    cycle_c = input_num('Cycle number for wrfout_c?',1);
 end
 %read wrfout section
-if nargin > 3
+if nargin > 2
     w_c =read_wrfout_tign(wrfout_c,wrf_time_step);
     red_c = subset_domain(w_c,1);
+    clear('w_c')
     w_s =read_wrfout_tign(wrfout_s,wrf_time_step);
     red_s = subset_domain(w_s,1);
+    clear('w_s');
 else
     w_c =read_wrfout_tign(wrfout_c);
-    red_c = subset_domain(w_c,1);
+    red_c = subset_domain(w_c);
+    clear('w_c');
     w_s =read_wrfout_tign(wrfout_s);
-    red_s = subset_domain(w_s,1);
+    red_s = subset_domain(w_s);
+    clear('w_s');
 end
 
 
@@ -47,11 +52,16 @@ max_tign = max(red_s.max_tign,red_c.max_tign);
 min_tign = min(red_s.min_tign,red_c.min_tign);
 
 % need to plot detections too, this will be moved elsewhere
-sim = input_num('Patch [1] or Camp [2] ? ',1);
+sim = input_num('Patch [1] or Camp [2] or Cougar [3] ? ',1,1);
 if sim == 1
     det_prefix = '../TIFs/';
-else
+    perim = '../PERIMs/patch_perims/';
+elseif sim == 2
     det_prefix = '../campTIFs/';
+    perim = '../PERIMs/camp_perims/';
+else
+    det_prefix = '../cougarTIFs/';
+    perim = '../PERIMs/cougar_perims/';
 end
 
 det_list=sort_rsac_files(det_prefix);
@@ -61,12 +71,12 @@ fig.fig_interp=0;
 
 
 if perim(end) == 'l'
-%read kml section, *.kml file
-a = kml2struct(perim);
+    %read kml section, *.kml file
+    a = kml2struct(perim);
 else
-% or
-fprintf('Reading directory of shape files \n')
-a = shape2struct(perim);
+    % or
+    fprintf('Reading directory of shape files \n')
+    a = shape2struct(perim);
 end
 
 %find perimeters from perim file
@@ -79,30 +89,38 @@ for i = 1:length(a)
     %i, a(i)
     if strcmp(a(i).Geometry,'Polygon')
         p_count = p_count + 1;
-        i,a(i);
+        %i,a(i)
         
         % get perimeter time
-        a(i).p_string = a(i).Name(end-14:end)
-        if a(i).p_string(1) ~= '1'
-            a(i).p_string(1) = '0';
-        end
-        formatIn = 'mm-dd-yyyy HHMM';
+        a(i).p_string = a(i).Name(end-12:end);
+        
+%        only for kml file
+%         if a(i).p_string(1) ~= '1'
+%             a(i).p_string(1) = '0';
+%         end
+%         formatIn = 'mm-dd-yyyy HHMM';
+        formatIn = 'yyyymmdd HHMM';
         %perim times are local, need to convert to UTC
         zone_shift = 6;
-        if a(i).Name(1:2) == 'ca'
-            a(i).p_string = a(i).Name(end-12:end);
+        if strcmp(a(i).Name(1:2),'ca') | strcmp(a(i).Name(1:2),'wa')
+            %a(i).p_string = a(i).Name(end-12:end);
             zone_shift = 8;
-            formatIn = 'yyyymmdd HHMM';
-            %a(i).p_string = a(i).p_string(end-13:end);
-            
+            %formatIn = 'yyyymmdd HHMM';
+            %a(i).p_string = a(i).p_string(end-12:end)
         end
         a(i).p_time = datenum(a(i).p_string,formatIn)+zone_shift/24;
         
         %set decimate to an  postive integer to use just a subset of points
         %  in perimeter
-        decimate = 1;
-        lats = a(i).Lat(1:decimate:end);
-        lons = a(i).Lon(1:decimate:end);
+        fprintf('Perimeter %s: %d points in the perimeter \n',a(i).p_string,length(a(i).Lon));
+        if length(a(i).Lat) > 500
+            decimate = 10;
+            lats = a(i).Lat(1:decimate:end);
+            lons = a(i).Lon(1:decimate:end);
+        else
+            lats = a(i).Lat;
+            lons = a(i).Lon;
+        end
         
         %create regularly spaced data
         dx = (a(i).BoundingBox(2,1)-a(i).BoundingBox(1,1))/n;
@@ -134,7 +152,7 @@ for i = 1:length(a)
             scatter(x,y);
             scatter(x(fires),y(fires),'*','r');
             title(a(i).Name);
-            plot(lons,lats)
+            %plot(lons,lats)
             hold off
             %figure,mesh(data)
         end %if plot_on
@@ -208,12 +226,12 @@ for i = 1:p_count
         area_sim_c = sum(sim_fires_c(:));
         x_fires_sim_c = x_grid(sim_fires_c);
         y_fires_sim_c = y_grid(sim_fires_c);
-        %shrink = 1.0;
+        shrink = 0.95;
         %find boundaries
-        sim_boundary_s = boundary(x_fires_sim_s,y_fires_sim_s);
+        sim_boundary_s = boundary(x_fires_sim_s,y_fires_sim_s,shrink);
         sim_x_s = x_fires_sim_s(sim_boundary_s);
         sim_y_s = y_fires_sim_s(sim_boundary_s);
-        sim_boundary_c = boundary(x_fires_sim_c,y_fires_sim_c);
+        sim_boundary_c = boundary(x_fires_sim_c,y_fires_sim_c,shrink);
         sim_x_c = x_fires_sim_c(sim_boundary_c);
         sim_y_c = y_fires_sim_c(sim_boundary_c);
         
@@ -225,8 +243,8 @@ for i = 1:p_count
         area_perim = sum(perim_fires(:));
         x_fires_perim = x_grid(perim_fires);
         y_fires_perim = y_grid(perim_fires);
-        shrink = 1.0;
-        perim_boundary = boundary(x_fires_perim,y_fires_perim);
+        %shrink = 0.75; already declared
+        perim_boundary = boundary(x_fires_perim,y_fires_perim,shrink);
         perim_x = x_fires_perim(perim_boundary);
         perim_y = y_fires_perim(perim_boundary);
         
@@ -255,11 +273,11 @@ for i = 1:p_count
 
         for j = 1:length(g_c)
             if j == 1
-                det_g_c = g_c(j).data >= 7;
+                det_g_c = g_c(j).data >= min_fire_confidence;
                 scatter_lon = g_c(j).xlon(det_g_c);
                 scatter_lat = g_c(j).xlat(det_g_c);
             end
-            det_g_c = g_c(j).data >= 7;
+            det_g_c = g_c(j).data >= min_fire_confidence;
             lon_g_c = g_c(j).xlon(det_g_c);
             lat_g_c = g_c(j).xlat(det_g_c);
             %scatter_det = [scatter_det det_g_c(:)];
@@ -281,18 +299,24 @@ for i = 1:p_count
         scatter(scatter_lon,scatter_lat,'m','*');        alpha(1.0);
         plot(sim_x_s,sim_y_s,'b');
         plot(perim_x ,perim_y,'r');
-        xticks(-112.72:0.02:-112.58)
-        if spinup_compare == 2
-            title_str = ('Perimeter observation and Forecast without cycling');
+        %xticks(-112.72:0.02:-112.58)
+        if exp_num == 2
+            title_str = ('Perimeter Observation and Forecast without cycling');
             legend({'Satellite Fire Detections','Forecast without cycling','Infrared perimeter'});
             save_str = [p_struct(i).file '_s']; %% _s is for single run
-        elseif spinup_compare == 1
-            title_str = ('Perimeter observation and Forecast without spin-up');
-            legend({'Satellite Fire Detections','Forecast without spin-up','Infrared perimeter'});
-            save_str = [p_struct(i).file '_No_spinup'];
+        elseif exp_num == 1
+              title_str = ('Perimeter Observation and Forecast using old method');
+              legend({'Satellite Fire Detections','Forecast from old method','Infrared perimeter'});
+              save_str = [p_struct(i).file '_old'];
+%             title_str = ('Perimeter Observation and Forecast without spin-up');
+%             legend({'Satellite Fire Detections','Forecast without spin-up','Infrared perimeter'});
+%             save_str = [p_struct(i).file '_No_spinup'];
+%             title_str = ('Perimeter Observation and Forecast without ROS  adjust');
+%             legend({'Satellite Fire Detections','Forecast without ROS adjust','Infrared perimeter'});
+%             save_str = [p_struct(i).file '_No_ROS_adj'];
         else %spinup_compare == 3
-            title_str = sprintf('Perimeter observation and Forecast for Cycle %d ',cycle_s);
-            %title_str = ('Perimeter observation and Forecast without spin-up');
+            title_str = sprintf('Perimeter Observation and Forecast for Cycle %d ',cycle_s);
+            %title_str = ('Perimeter Observation and Forecast without spin-up');
             legend({'Satellite Fire Detections','Forecast','Infrared perimeter'});
             save_str = sprintf('%s_cycle_%d',p_struct(i).file,cycle_s);
         end
@@ -324,18 +348,24 @@ for i = 1:p_count
         alpha(1.0);
         plot(sim_x_c,sim_y_c,'b');
         plot(perim_x ,perim_y,'r');
-        xticks(-112.72:0.02:-112.58)
-        if spinup_compare == 2
+        %xticks(-112.72:0.02:-112.58)
+        if exp_num == 2
             legend({'Satellite Fire Detections','Forecast with cycling','Infrared perimeter'});
-            title_str = ('Perimeter observation and Forecast with cycling');
+            title_str = ('Perimeter Observation and Forecast with cycling');
             save_str = [p_struct(i).file '_c'];
-        elseif spinup_compare == 1
-            legend({'Satellite Fire Detections','Forecast using spin-up','Infrared perimeter'});
-            title_str = ('Perimeter observation and Forecast using spin-up');
-            save_str = [p_struct(i).file '_with_spinup'];
+        elseif exp_num == 1
+              title_str = ('Perimeter Observation and Forecast using new method');
+              legend({'Satellite Fire Detections','Forecast from new method','Infrared perimeter'});
+              save_str = [p_struct(i).file '_new'];
+%             legend({'Satellite Fire Detections','Forecast using spin-up','Infrared perimeter'});
+%             title_str = ('Perimeter Observation and Forecast using spin-up');
+%             save_str = [p_struct(i).file '_with_spinup'];
+%             legend({'Satellite Fire Detections','Forecast using ROS adjust','Infrared perimeter'});
+%             title_str = ('Perimeter Observation and Forecast using ROS adjust');
+%             save_str = [p_struct(i).file '_with_ROS_adj'];
         else %spinup_compare == 3
-            title_str = sprintf('Perimeter observation and Forecast for Cycle %d ',cycle_c);
-            %title_str = ('Perimeter observation and Forecast without spin-up');
+            title_str = sprintf('Perimeter Observation and Forecast for Cycle %d ',cycle_c);
+            %title_str = ('Perimeter Observation and Forecast without spin-up');
             legend({'Satellite Fire Detections','Forecast','Infrared perimeter'});
             save_str = sprintf('%s_cycle_%d',p_struct(i).file,cycle_c);
         end
@@ -388,15 +418,18 @@ end
 %     
 % end %for j
 
-
+whos
 %m_s = score_s > 0;
-m_c = score_c > 0.2;
+m_c = score_c > 0.02;
 
 mean_score_s = mean(score_s(m_c));
 mean_score_c = mean(score_c(m_c));
 
 
-score = [mean_score_s mean_score_c];
-
+score.score_s = score_s;
+score.score_c = score_c;
+score.mean_score_s = mean(score_s(m_c));
+score.mean_score_c = mean(score_c(m_c));
+score.file = p_struct.file;
 end
 

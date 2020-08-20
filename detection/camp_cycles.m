@@ -1,20 +1,27 @@
 function cycles(varargin)
 ! date
-base_datestr='2013-08-11 00:00:00';
+
+% base_datestr='2013-08-11 00:00:00';
+% for the Camp fire
+base_datestr='2018-11-08 12:00:00';
+
+%multiplier to go to different time frame(s)
+mult = 1/3;
+
 base=datenum(base_datestr);
 num_cycles=5;
-spinup_time=ones(1,num_cycles);
-cycle_length=ones(1,num_cycles);
-cycle_start =[0,2,3,4,5,6]
-spinup_time =[2,1,1,1,1,1]
+spinup_time=ones(1,num_cycles)*mult;
+cycle_length=ones(1,num_cycles)*mult;
+cycle_start =[0,2,3,4,5,6]*mult
+spinup_time =[2,1,1,1,1,1]*mult
 times_format='yyyy-mm-dd_HH:MM:SS';
 for i=1:num_cycles
-    t(i).forecast_time=cycle_start(i+1)+1;
+    t(i).forecast_time=cycle_start(i+1)+1*mult;
     t(i).obs_start=cycle_start(i);
     t(i).obs_end=cycle_start(i+1)-1e-6;
     t(i).replay_start=cycle_start(i);
     t(i).replay_end=cycle_start(i+1);
-    t(i).run_end=cycle_start(i+1)+2;
+    t(i).run_end=cycle_start(i+1)+2*mult;
     t(i).perimeter_time=t(i).replay_end*24*3600;
     forecast_times{i}=datestr(base+t(i).forecast_time,times_format);
     print_times(i)
@@ -42,18 +49,18 @@ if i==0,
     
 else
     print_times(i)
-    system('ls -l wrfout*')
+    system('ls -lh wrfout*')
     wrfout_time = base+t(i).forecast_time;
-    wrfout{i}=['wrfout_d01_',datestr(wrfout_time,times_format)];
+    wrfout{i}=['wrfout_d03_',datestr(wrfout_time,times_format)];
     if ~exist(wrfout{i},'file')
         fprintf('file %s does not exist\n',wrfout{i})
         wrfout_time = wrfout_time - 23.5/24;  % no wrfout produced on restart => written 30 min later
-        wrfout{i}=['wrfout_d01_',datestr(wrfout_time,times_format)];
+        wrfout{i}=['wrfout_d03_',datestr(wrfout_time,times_format)];
     end
-    wrfrst{i}=['wrfrst_d01_',datestr(base+t(i).replay_start,times_format)];
+    wrfrst{i}=['wrfrst_d03_',datestr(base+t(i).replay_start,times_format)];
     fprintf('%s %s %s %s\n','Reading fire arrival time at',forecast_times{i},' from ',wrfout{i})
     if t(i).replay_start==0;
-       rewrite='wrfinput_d01';
+       rewrite='wrfinput_d03';
        restart='.false.';
     else
        rewrite=wrfrst{i};
@@ -68,6 +75,10 @@ else
        end
     end
     w=read_wrfout_tign(wrfout{i},forecast_times{i});
+    if isempty(w)
+        display('Time step not found. Taking final timestep instead')
+        w=read_wrfout_tign(wrfout{i}) % this will take final timestep
+    end
     wrfout_bak=[wrfout{i},'.bak'];
     q=input_num(['1 to move ',wrfout{i},' to ',wrfout_bak],1,force);
     if q,
@@ -79,26 +90,15 @@ else
     cycle=i;
     save(savew,'w','cycle','time_bounds','t')
     p=detect_fit_level2(cycle,time_bounds,[],w,force)
-    fprintf('Saving p\n');
-    pstr = sprintf('p_%i.mat',i);
-    save(pstr,'p')
     print_times(i)
     fprintf('perimeter_time=%10.3f\nrestart=%s\n',t(i).perimeter_time,restart)
     q=sprintf('replace TIGN_G in %s and run\n %s\n [0/1]',rewrite,link_namelist_command);
     if input_num(q,1,force)
-        use_analysis = input_num('Use analyis for restart? [0]',0,1)
-        if use_analysis
-            p.analysis= max(p.forecast,p.analysis);
-            p.spinup = p.analysis;
-        end
         ncreplace(rewrite,'TIGN_G',p.spinup)
         if system(link_namelist_command),
              error('link failed')
         end
     end
-    %compute ros adjustment factor
-    %ra = ros_adjust(p.forecast,p.analysis,p.observations_end_time,w.nfuel_cat);
-    %fprintf('Recomended ROS adjust factor: %f \n',ra);
     disp('Run WRF-SFIRE and continue when done\n')
 end
 

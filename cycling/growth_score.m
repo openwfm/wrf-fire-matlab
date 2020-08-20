@@ -1,8 +1,8 @@
-function [ growth_struct] = growth_score( wrfout,prefix )
+function [ growth_struct] = growth_score( wrfout )
 %function [ gs ] = growth_score( wrfout,prefix )
 % inputs:
 %   wrfout - string, parth to wrfout file for evaluation
-%   prefix - string, path to directory with stellite dat
+%   ts - string, time step in wrfout file
 % outputs:
 %   growth_struct- struct with the following:
 %      gs - mean error in area gowth rate of forecast vs. area
@@ -20,8 +20,24 @@ function [ growth_struct] = growth_score( wrfout,prefix )
 %     load(wrfout);
 % end
 
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',0,1)
+cycle = input_num('Which cycle? ',0)
+if fire_choice == 1
+    prefix='../campTIFs/';
+    title_str = sprintf('Camp Fire -- Cycle %d',cycle)
+    save_str = sprintf('camp_growth_c%d',cycle);
+elseif fire_choice == 0
+    prefix='../TIFs/';
+    title_str = sprintf('Patch Springs Fire -- Cycle %d',cycle)
+    save_str = sprintf('patch_growth_c%d',cycle);
+else
+    prefix = '../cougarTIFs/';
+    title_str = sprintf('Cougar Creek Fire -- Cycle %d',cycle)
+    save_str = sprintf('cougar_growth_c%d',cycle);
+end
+
 w = read_wrfout_tign(wrfout);
-red = subset_domain(w);
+red = subset_domain(w,1);
 time_bounds = [red.start_datenum red.end_datenum];
 
 % figures
@@ -30,13 +46,21 @@ fig.fig_3d=0;
 fig.fig_interp=0;
 
 %find detections
-p = sort_rsac_files(prefix);
+
 if exist('g_full.mat','file')
     load g_full.mat
 else
+    p = sort_rsac_files(prefix);
     g = load_subset_detections(prefix,p,red,time_bounds,fig);
-    save g_full.mat g;
+    save('g_full.mat', 'g', '-v7.3')
+    %save g_full.mat g;
 end
+
+if exist('growth.mat','file')
+    fprintf('Growth structure file exists \n')
+    load growth.mat
+end
+
 
 
 %granules with active fire detections
@@ -62,13 +86,35 @@ for i=1:length(g)
         sat_lons = double([sat_lons(:);lon_update(:)]);
         sat_lats = double([sat_lats(:);lat_update(:)]);
         
-        fprintf('Computing Satellite area \n')
-        %draw polygon around the fire grid detections
-        sat_boundary = boundary(sat_lons,sat_lats);
-        [sat_in,sat_on] = inpolygon(red.fxlong(:),red.fxlat(:),sat_lons,sat_lats);
-        %figure,scatter(
-        sat_area(data_count) = sum(sat_in) + sum(sat_on);
-        data_time(data_count) = g(i).time;
+        %% posibly add new granules
+        if exist('temp_struct','var')&length(temp_struct.data_time) < i
+            temp_struct.data_time(i) = 0;
+            temp_struct.sat_area(i) = 0;
+            temp_struct.fore_area(i) = 0;
+            temp_struct.sat_rate(i) = 0;
+            temp_struct.fore_rate(i) = 0;
+            temp_struct.data_file{i} = 'temp';
+        end %% adding new granule
+            
+        
+        %% get satellite fire area
+        if exist('temp_struct','var') & strcmp(g(i).file,temp_struct.data_file(data_count))
+            fprintf('Temp struct has area already \n')
+            sat_area(data_count) = temp_struct.sat_area(data_count);
+            %temp_struct has data_time as days since sim start
+            data_time(data_count) = temp_struct.data_time(data_count)+red.start_datenum;
+            data_file{data_count} = temp_struct.data_file{data_count};
+        else
+            fprintf('Computing Satellite area in %s \n',g(i).file)
+            %draw polygon around the fire grid detections
+            sat_boundary = boundary(sat_lons,sat_lats);
+            [sat_in,sat_on] = inpolygon(red.fxlong(:),red.fxlat(:),sat_lons,sat_lats);
+            %figure,scatter(
+            sat_area(data_count) = sum(sat_in) + sum(sat_on);
+            % recor time and file name
+            data_time(data_count) = g(i).time;
+            data_file{data_count} = g(i).file;
+        end
         
         fprintf('Computing forecast area \n')
         fore_mask = red.tign < g(i).time;
@@ -91,10 +137,18 @@ for i=1:length(g)
         end
 end
 
+%make areas monotonic increasing
+for i = 2:data_count
+    sat_area(i) = max(sat_area(i),sat_area(i-1));
+    fore_area(i) = max(fore_area(i),fore_area(i-1));
+end
+
 %convert data_time to days since simulation
 data_time = (data_time - red.start_datenum);
-if strcmp(prefix(end-5:end),'/TIFs/')
-    term = 40;
+%bad data in patch fire towards end...
+if fire_choice == 0
+    term = min(36,length(data_time));
+    %term = length(data_time);
 else
     term = length(data_time);
 end
@@ -105,7 +159,10 @@ hold on, plot(data_time(1:term),fore_area(1:term))
 legend('Area within detection perimeter','Area within forecast perimeter')
 xlabel('Simulation Time [days]')
 ylabel('Simulation Area [grid nodes]')
-title(wrfout);
+
+title(title_str);
+savefig(save_str);
+saveas(gcf,[save_str '.png']);
 hold off
 
 % figure,plot(data_time(1:term),diff_sat_area(1:term))
@@ -114,8 +171,13 @@ hold off
 % xlabel('Simulation Time [days]')
 % ylabel('Change in Area [grid nodes]')
 % hold off
-gs = mean(abs(sat_area-fore_area));
-
+%gs = mean(abs(sat_area-fore_area));
+%relative error
+if fire_choice == 0
+    gs = mean(abs(sat_area(1:term)-fore_area(1:term))./sat_area(1:term))
+else
+    gs = mean(abs(sat_area-fore_area)./sat_area)
+end
 %compute rates
 sat_rate = sat_area;
 fore_rate = fore_area;
@@ -126,10 +188,19 @@ end
 
 
 growth_struct.gs = gs;
+growth_struct.cycle = cycle;
 growth_struct.data_time = data_time;
 growth_struct.sat_area = sat_area;
 growth_struct.fore_area = fore_area;
 growth_struct.sat_rate = sat_rate;
 growth_struct.fore_rate = fore_rate;
+growth_struct.data_file = data_file;
+
+if ~exist('growth.mat','file')
+    temp_struct = growth_struct;
+    save growth.mat temp_struct;
+end
+
+
 end
 

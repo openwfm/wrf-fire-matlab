@@ -58,6 +58,7 @@ max_lat=min(sim.max_lat,act.max_lat+margin*(act.max_lat-act.min_lat));
 
 default_bounds{1}=[min_lon,max_lon,min_lat,max_lat];
 default_bounds{2}=[sim.min_lon,sim.max_lon,sim.min_lat,sim.max_lat];
+default_bounds{3}=[-112.75414 -112.43779 40.27268 40.50655]
 for i=1:length(default_bounds),fprintf('default bounds %i: %8.5f %8.5f %8.5f %8.5f\n',i,default_bounds{i});end
 
 bounds=input_num('enter bounds [min_lon,max_lon,min_lat,max_lat] or number of bounds above (1)> ',1,force);
@@ -81,9 +82,16 @@ red.jspan=jspan;
 red.fxlat=w.fxlat(ispan,jspan);
 red.fxlong=w.fxlong(ispan,jspan);
 red.tign_g=w.tign_g(ispan,jspan);
+%not all w.mat files will have fmc_g, nfuel_cat
 if isfield(w,'nfuel_cat')
     red.nfuel_cat=w.nfuel_cat(ispan,jspan);
-
+end
+if isfield(w,'fmc_g')
+    red.fmc_g = w.fmc_g(ispan,jspan);
+end
+if isfield(w,'fhgt')
+    red.fhgt = w.fhgt(ispan,jspan);
+end
     %commenting out next 4 lines
 red.min_lat = min(red.fxlat(:));
 red.max_lat = max(red.fxlat(:));
@@ -92,11 +100,17 @@ red.max_lon = max(red.fxlong(:));
 
 % convert tign_g to datenum 
 
-%comment out here to the end
+
 red.end_datenum=datenum(char(w.times(:))'); % this time step end
-red.end_time=w.dt*w.itimestep; % time from simulation start in seconds
+%red.end_time=w.dt*w.itimestep; % time from simulation start in seconds
+red.end_time = [];
 red.start_time=0;
+% for reading wrfinput file
+if isempty(red.end_time)
+    red.end_time = max(red.tign_g(:));
+end
 red.start_datenum=red.end_datenum-red.end_time/(24*3600);
+
 fprintf('simulation start seems to be %s\n',datestr(red.start_datenum,'dd-mmm-yyyy HH:MM:SS'));
 
 red.max_tign_g=max(w.tign_g(:));

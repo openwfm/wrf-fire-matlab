@@ -1,5 +1,14 @@
 function v = readl2data(prefix,file,file2,silent)
+%v = readl2data(prefix,file,file2,silent)
 %read L2 data and return v.lon v.lat v.data
+% inputs:
+%    prefix - string, path to directory with data files
+%    file, file2 - strings, file names of geolocation and active fire dat,
+%        respectively
+%    silent - character to print output, optional
+%
+% output:
+%    v      - struct, contains geolocation dat and fire mask.
 fprintf('Reading l2 data\n')
 
 
@@ -14,13 +23,15 @@ if file(1) == 'M'
     %v.frp = hdfread(pfile2, '/FP_power', 'Index', {[1  1],[1  1],[size(v.lon)]});
 else
     fprintf('Reading VIIRS data\n')
+    fprintf('fires : %s \n',pfile2)
+    fprintf('geo   : %s \n',pfile)
     v.lon = h5read(pfile,'/HDFEOS/SWATHS/VNP_750M_GEOLOCATION/Geolocation Fields/Longitude');
     v.lat = h5read(pfile,'/HDFEOS/SWATHS/VNP_750M_GEOLOCATION/Geolocation Fields/Latitude');
     v.data = h5read(pfile2,'/fire mask');
 end
 
 
-v.file=file;
+v.file=file2;
 [v.time,v.timestr]=rsac2time(file);
 if ~exist('silent','var'),
     fprintf('file name w/prefix    %s\n',pfile);
