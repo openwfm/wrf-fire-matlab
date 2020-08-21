@@ -64,7 +64,9 @@ times_set = [];
 %make random patch around detections
 rm = 0;
 for i = 1:n;% total_time %half day interval
-    pts_tign(idx(i,1)-round(rm*rand):idx(i,1)+round(rm*rand),idx(i,2)-round(rm*rand):idx(i,2)+round(rm*rand))=times(i);
+    if rm ~= 0
+        pts_tign(idx(i,1)-round(rm*rand):idx(i,1)+round(rm*rand),idx(i,2)-round(rm*rand):idx(i,2)+round(rm*rand))=times(i);
+    end
     %draw polygon around every 20 detections
     if mod(i,20) == 0 || i == n
     pt_set = times <= times(i);
@@ -72,17 +74,23 @@ for i = 1:n;% total_time %half day interval
     lats_set = [lats_set;lats(pt_set)];
     times_set = [times_set;times(pt_set)];
 %     figure,scatter3(lons_set,lats_set,times_set)
+    %convex hull operations
+%     dt = delaunayTriangulation(lats_set,lons_set);
+%     c = convexHull(dt);
+%     [in,on] = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set(c),lons_set(c));
+%     figure,plot(lons_set(c),lats_set(c));
     [in,on] = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set,lons_set);
+    %in = logical(in+on);
     temp_tign(in) = max(times_set);
     temp_tign(~in) = end_time;
     tign = min(tign,temp_tign);
-    tign = imgaussfilt(tign,1/8);
+    %tign = imgaussfilt(tign,1);
     figure(fignum)
     mesh(ps.red.fxlong,ps.red.fxlat,tign)
     end
 end
-tign=min(tign,pts_tign);
-tign = imgaussfilt(tign,2,'FilterDomain','frequency');
+%tign=min(tign,pts_tign);
+tign = imgaussfilt(tign,2/3,'FilterDomain','frequency');
 fprintf('Blurring ... \n')
 figure(fignum),mesh(ps.red.fxlong,ps.red.fxlat,tign)
 xlabel('Lon'),ylabel('Lat'),zlabel('Time'),title('Interpolated by Polygons')
