@@ -1,4 +1,3 @@
-:q
 function a = analyze_paths(ps,new_tign)
 %looks at the paths in a path struct and figures out some basic statistics
 % input   ps - struct, from ps = graph_dets(w,1);
