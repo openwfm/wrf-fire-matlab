@@ -1,16 +1,22 @@
-function fmc_change(m)
-
+function fmc_change(m,msk)
+%perchentage change to add/subtract
+% msk - locations where to add subtract
 f = 'wrfinput_d01';
+msk = double(msk);
+msk(msk>0) = 1;
+
+%blur mask a little bit
+%msk= imgaussfilt(msk,1/2);
 %w = read_wrfout_tign(f);
 %load sm_mask.mat
 s = nc2struct(f,{'FMC_GC'},{})
-f_time = input_num('Which fuel levels? All = -1',-1,1);
+f_time = input_num('Which fuel levels? All = -1',-1);
 if f_time < 0
-    moist = m*s.fmc_gc;
+    moist = m*msk + s.fmc_gc;
 else
     moist = s.fmc_gc;
     for i = 1:length(f_time)
-        moist(:,:,f_time(i)) = m*s.fmc_gc(:,:,f_time(i));
+        moist(:,:,f_time(i)) = m*msk + s.fmc_gc(:,:,f_time(i));
     end
 end
 %moist2 = moist;

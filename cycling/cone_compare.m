@@ -2,8 +2,6 @@ function cone_compare(ps,tign2)
 %compares feature of fire arrival cones
 %ps = tign_try(w), tign = squish(ps)
 
-
-
 lon = ps.red.fxlong;
 lat = ps.red.fxlat;
 %forecast
@@ -80,6 +78,9 @@ sl1 = ex.*dx1+ey.*dy1;
 sl2 = ex.*dx2+ey.*dy2;
 sl_diff = sl1-sl2;
 figure,histogram(sl_diff)
+title('Difference in slopes')
+xlabel('Slope differences')
+ylabel('Number')
 
 %mask for only the fire cone
 t_msk1 = tign<max(tign(:))-0.1;
