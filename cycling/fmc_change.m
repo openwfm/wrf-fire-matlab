@@ -3,7 +3,7 @@ function fmc_change(m,msk)
 % msk - locations where to add subtract
 f = 'wrfinput_d01';
 msk = double(msk);
-msk(msk>0) = 1;
+%msk(msk>0) = 1;
 
 %blur mask a little bit
 %msk= imgaussfilt(msk,1/2);
@@ -16,7 +16,10 @@ if f_time < 0
 else
     moist = s.fmc_gc;
     for i = 1:length(f_time)
+        %mask area
         moist(:,:,f_time(i)) = m*msk + s.fmc_gc(:,:,f_time(i));
+        %small adjustment globally
+        moist(:,:,f_time(i)) = moist(:,:,f_time(i))+m/4;
     end
 end
 %moist2 = moist;

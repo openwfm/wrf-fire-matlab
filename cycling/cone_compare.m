@@ -12,7 +12,7 @@ tign = ps.red.tign;
 % tign2 = imgaussfilt(tign2,st);
 
 %compare areas of the two and plot over time
-area_compare(tign,tign2); 
+area_compare(ps,tign2); 
 
 %compute area of fires
 t_end = min(max(tign(:)),max(tign2(:)))-0.1;
@@ -25,9 +25,9 @@ fprintf('Forecast Area: %d Data area: %d \n',a1,a2);
 figure,contour(lon,lat,tign,[t_end t_end],'k')
 hold on,contour(lon,lat,tign2,[t_end t_end],'b')
 legend('forecast','estimate')
-title('Perimeters')
-
-cull = input_num('Thin data set? [1]',1);
+t_str = sprintf('Perimeters \n Forecast Area = %d    Data Area = %d',a1,a2);
+title(t_str)
+cull = input_num('Thin data set? [1]',1,1);
 if cull ~= 1
 lon = lon(1:cull:end,1:cull:end);
 lat = lat(1:cull:end,1:cull:end);
@@ -78,9 +78,10 @@ sl1 = ex.*dx1+ey.*dy1;
 sl2 = ex.*dx2+ey.*dy2;
 sl_diff = sl1-sl2;
 figure,histogram(sl_diff)
-title('Difference in slopes')
+t_str=sprintf('Difference in slopes normal to fire front \n Mean = %f', mean(sl_diff(~isnan(sl_diff))));
 xlabel('Slope differences')
 ylabel('Number')
+title(t_str)
 
 %mask for only the fire cone
 t_msk1 = tign<max(tign(:))-0.1;
@@ -147,11 +148,15 @@ rx2 = 1./du2/(24*3600);
 ry2 = 1./dv2/(24*3600);
 r1 = sqrt(rx1.^2+ry1.^2);
 r2 = sqrt(rx2.^2+ry2.^2);
-
+cut_off = est_max(ps,r2)
+%cut_off = 0.1;
+b1 = r1<cut_off;b2 = r2 < cut_off;b_msk = logical(b1.*b2);
 figure
 quiver(lon(b_msk),lat(b_msk),rx1(b_msk),ry1(b_msk))
 hold on
 quiver(lon(b_msk),lat(b_msk),rx2(b_msk),ry2(b_msk))
+t_str =sprintf('ROS vectors for ROS < %f',cut_off);
+title(t_str);
 
 r_diff = r1-r2;
 %r_diff = imgaussfilt(r_diff,1/2);
