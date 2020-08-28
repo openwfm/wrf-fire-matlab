@@ -94,4 +94,17 @@ tign = imgaussfilt(tign,2/3,'FilterDomain','frequency');
 fprintf('Blurring ... \n')
 figure(fignum),mesh(ps.red.fxlong,ps.red.fxlat,tign)
 xlabel('Lon'),ylabel('Lat'),zlabel('Time'),title('Interpolated by Polygons')
+%resize, if small matrices were used
+if isfield(ps.red,'red')
+    if size(ps.red.fxlong) ~= size(ps.red.red.fxlong)
+        fprintf('resizing to original size of grid \n');
+        [n,m] = size(ps.red.red.tign);
+        la = linspace(ps.red.red.min_lat,ps.red.red.max_lat,m);
+        lo = linspace(ps.red.red.min_lon,ps.red.red.max_lon,n);
+        [lat,lon] = meshgrid(la,lo);
+        tign = griddata(ps.red.fxlat(:),ps.red.fxlong(:),tign(:),lat,lon);
+    end
+end
+
+
 end

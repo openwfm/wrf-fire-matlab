@@ -6,6 +6,16 @@ function path_struct = cluster_paths(w,cull)
 
 [fire_name,save_name,prefix] = fire_choice();
 red = subset_domain(w);
+%shrink the size for large matrices
+if length(red.tign) > 350;
+    %shrink_factor
+    sf = 4;
+    [m,n] = size(red.tign);
+    n =round(n/sf);
+    m = round(m/sf);
+    red_copy = red;
+    red = subset_small(red,m,n);
+end
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
 
