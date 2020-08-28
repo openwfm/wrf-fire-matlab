@@ -1,22 +1,26 @@
-function ac = area_compare(w_a,w_b)
+function ac = area_compare(ps,tign_b)
 %compares areas of fires over time
-% ts = '2013-08-17_07:00:00'
-% w_a = read_wrfout_tign(wrf_a,ts);
-% w_b = read_wrfout_tign(wrf_b,ts);
+% outputs graph, areas and a mask
+% ps = cluster_paths(w) --- Forecast
+% tign_b = quish2(ps) --- "Analysis"
 
-% w_a = read_wrfout_tign(wrf_a);
-% w_b = read_wrfout_tign(wrf_b);
+tign_a = ps.red.tign;
+%create a mask 
+msk=tign_b-tign_a;
+msk(abs(msk)<0.2) = 0;
+msk(msk>0)=1; %add fuel moisture ==> slow fire
+msk(msk<0)=-1; %subtract fuel moist ==> speed up fire
 
 %time +- 1/4 day at simulation start and end
-t_1 = max(min(w_a(:)),min(w_b(:)))+0.25;
-t_2 = min(max(w_a(:)),max(w_b(:)))-0.25;
+t_1 = max(min(tign_a(:)),min(tign_b(:)))+0.25;
+t_2 = min(max(tign_a(:)),max(tign_b(:)))-0.25;
 
 pts = 20;
 t = linspace(t_1,t_2,pts);
 
 for i = 1:pts
-    area_a(i) = sum(sum(w_a < t(i)));
-    area_b(i) = sum(sum(w_b < t(i)));
+    area_a(i) = sum(sum(tign_a < t(i)));
+    area_b(i) = sum(sum(tign_b < t(i)));
 end
 
 figure
@@ -27,9 +31,13 @@ legend('Forecast','Estimate')
 xlabel('Time')
 ylabel('Fire Area')
 title('Comparison of Areas')
-%xlim([0 6.1])
+
+figure,mesh(ps.red.fxlong,ps.red.fxlat,msk)
+title('Mask for fuel adjustments')
+xlabel('lon'),ylabel('lat')
 ac.area_a = area_a;
 ac.area_b = area_b;
+ac.msk = msk;
 
 end
 
