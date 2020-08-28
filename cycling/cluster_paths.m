@@ -14,9 +14,9 @@ if length(red.tign) > target_size
     %shrink_factor
     %sf = 4;
     max_dim = max(m,n);
-    sf = round(target_size/max_dim);
-    n =round(n/sf);
-    m = round(m/sf);
+    sf = target_size/max_dim;
+    n =round(n*sf);
+    m = round(m*sf);
     red_copy = red;
     red = subset_small(red,m,n);
 end
