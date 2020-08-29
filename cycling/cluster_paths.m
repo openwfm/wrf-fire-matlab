@@ -7,7 +7,7 @@ function path_struct = cluster_paths(w,cull)
 [fire_name,save_name,prefix] = fire_choice();
 red = subset_domain(w);
 %shrink the size for large matrices
-target_size = 200;
+target_size = 100;
 if length(red.tign) > target_size
 
     [m,n] = size(red.tign);
@@ -87,18 +87,23 @@ end
 
 %prune the data
 n_points = pts(1:cull:end,:,:,:,:,:);
+%
 
 %% for computing distance between points using GPS coords
 % also used for finding aspect of the slope, for clustering
 E = wgs84Ellipsoid;
 [aspect,slope,dy,dx] = gradientm(red.fxlat,red.fxlong,red.fhgt,E);
 clst_pts =  fixpoints2grid(red,n_points);
-ig_pt = [mean(clst_pts(:,3)),mean(clst_pts(:,4))];
+% just use the index numbers, maintain the l2 data coords
+clst_pts(:,3:4) = n_points(:,1:2);
+%ig_pt = [mean(clst_pts(:,3)),mean(clst_pts(:,4))];
+ig_pt = [clst_pts(1,3),clst_pts(1,4)];
 for i = 1:length(clst_pts)
    pt_1 = [ig_pt(1,1),clst_pts(i,4)];
    pt_2 = [clst_pts(i,3),clst_pts(i,4)];
-   d_lon = sign(clst_pts(1,4)-clst_pts(i,4))*distance(ig_pt,pt_1,E);
-   d_lat = sign(clst_pts(1,3)-clst_pts(i,3))*distance(pt_2,pt_1,E);
+   %distances in lon and lat directions, with sign
+   d_lon = -sign(clst_pts(1,4)-clst_pts(i,4))*distance(ig_pt,pt_1,E);
+   d_lat = -sign(clst_pts(1,3)-clst_pts(i,3))*distance(pt_2,pt_1,E);
    cp(i,:) = [clst_pts(i,:),d_lat,d_lon];
     %% work out x-y coordinate with pt 1 as origin
 end
@@ -107,9 +112,9 @@ end
 %cluster the data 
 dt = 3*ceil(g(end).time - g(1).time);
 space_clusters = dt; %days
-[s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
+%[s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
 %clustering using aspect, not good
-%[s_idx,s_c] = kmeans(cp(:,5:6),space_clusters);
+[s_idx,s_c] = kmeans(cp(:,5:6),space_clusters);
 
 % find optimal cluster k
 % max_clusts = 20;
@@ -132,11 +137,19 @@ space_clusters = dt; %days
 % end
 % hold off
 
-%scatter 3d
+%scatter 3d  lat/lon
 figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3));
 hold on
 for i = 2:dt
   scatter3(pts(s_idx==i,2),pts(s_idx==i,1),pts(s_idx==i,3));
+end
+hold off
+
+%scatter 3d  ldistances in lat/lon directions
+figure(7),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3));
+hold on
+for i = 2:dt
+  scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3));
 end
 hold off
 
