@@ -19,6 +19,10 @@ fmc_adjust = 1/2*(fitter(r2)-fitter(r1));
 %adjiust fuel gloabally for starters
 msk = ones(size(w.xlong));
 fmc_change(fmc_adjust,msk);
+new_w = insert_analysis(w,ps,tn);
+%maybe do this in the fmc_change function?
+ncreplace('wrfinput_d01','TIGN_G',new_w.analysis);
+fprintf('All done. Copy files to directories and restart WRF-SFIRE\n');
 
 
 end % function
