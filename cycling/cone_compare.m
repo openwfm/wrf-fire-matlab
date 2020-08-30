@@ -1,4 +1,4 @@
-function cone_compare(ps,tign2)
+function [r1,r2] = cone_compare(ps,tign2)
 %compares feature of fire arrival cones
 %ps = tign_try(w), tign = squish(ps)
 
@@ -149,7 +149,7 @@ ry2 = 1./dv2/(24*3600);
 r1 = sqrt(rx1.^2+ry1.^2);
 r2 = sqrt(rx2.^2+ry2.^2);
 cut_off = est_max(ps,r2)
-%cut_off = 0.1;
+cut_off = min(0.1,cut_off);
 b1 = r1<cut_off;b2 = r2 < cut_off;b_msk = logical(b1.*b2);
 figure
 quiver(lon(b_msk),lat(b_msk),rx1(b_msk),ry1(b_msk))
@@ -226,7 +226,8 @@ for i = 1:13
     
 end
 
-
+r1 = mean(r1(b_msk));
+r2 = mean(r2(b_msk));
 
 
 end

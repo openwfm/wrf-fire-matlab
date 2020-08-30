@@ -1,8 +1,8 @@
 function outer = insert_analysis(w,paths,a)
-
+% puts analysis into the w file
 %w = wrfout_tign(f)
 %red = subset_domain(w)
-%paths = graph_dets(w,1)
+%paths = graph_dets(w,1) or paths = cluster(paths,w1)
 %a = squish(paths,1) , this is an anylysis fire arrival time
 %                       time format is ??
 
