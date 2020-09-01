@@ -10,13 +10,15 @@ msk1 = r<r_cut(i);
 msk2 = r > 0.0001;
 msk = logical(msk1.*msk2);
 s(i) = sum(msk(:));
-mdl = fitlm(ps.red.fmc_g(msk),r(msk));
-p(i)=table2array(mdl.Coefficients(2,4));
-if p(i) <= 0.01 && stopping == 0
-    fprintf('cutoff at ros = %f \n',r_cut(i))
-    stopping = 1;
-    perc = r_cut(i);
-    break
+if s(i) > 20
+    mdl = fitlm(ps.red.fmc_g(msk),r(msk));
+    p(i)=table2array(mdl.Coefficients(2,4));
+    if p(i) <= 0.01 && stopping == 0
+        fprintf('cutoff at ros = %f \n',r_cut(i))
+        stopping = 1;
+        perc = r_cut(i);
+        break
+    end
 end
 
 end%for i
@@ -27,6 +29,8 @@ end%for i
 % 
 % figure,plot(r_cut,s)
 % title('samples')
-
+if perc == []
+    perc = 0.1
+end
 
 end%function

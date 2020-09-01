@@ -3,6 +3,8 @@ function new_cycles(f)
 %input:
 %    f - string with path to wrfout file
 
+cycle = input_num('Which cycle? ',1);
+
 w = read_wrfout_tign(f);
 ps = cluster_paths(w,1);
 tn = squish2(ps);
@@ -21,8 +23,14 @@ msk = ones(size(w.xlong));
 fmc_change(fmc_adjust,msk);
 new_w = insert_analysis(w,ps,tn);
 %maybe do this in the fmc_change function?
-ncreplace('wrfinput_d01','TIGN_G',new_w.analysis);
+if cycle == 1
+    ncreplace('wrfinput_d01','TIGN_G',new_w.analysis);
+else
+    fprintf('need to put in selection method for restart file here \n');
+    rst='wrfrst_d01_2013-08-13_00:00:00.bak';
+    ncreplace(rst,'TIGN_G',new_w.analysis);
+end
 fprintf('All done. Copy files to directories and restart WRF-SFIRE\n');
-
+fprintf('Do not forget the namelist file needs to be re-linked \n');
 
 end % function

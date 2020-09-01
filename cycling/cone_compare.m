@@ -148,8 +148,9 @@ rx2 = 1./du2/(24*3600);
 ry2 = 1./dv2/(24*3600);
 r1 = sqrt(rx1.^2+ry1.^2);
 r2 = sqrt(rx2.^2+ry2.^2);
-cut_off = est_max(ps,r2)
-cut_off = min(0.1,cut_off);
+% cut_off = est_max(ps,r2)
+% cut_off = min(0.1,cut_off);
+cut_off = 0.1;
 b1 = r1<cut_off;b2 = r2 < cut_off;b_msk = logical(b1.*b2);
 figure
 quiver(lon(b_msk),lat(b_msk),rx1(b_msk),ry1(b_msk))
