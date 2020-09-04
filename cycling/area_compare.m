@@ -32,9 +32,9 @@ xlabel('Time')
 ylabel('Fire Area')
 title('Comparison of Areas')
 
-figure,mesh(ps.red.fxlong,ps.red.fxlat,msk)
-title('Mask for fuel adjustments')
-xlabel('lon'),ylabel('lat')
+% figure,mesh(ps.red.fxlong,ps.red.fxlat,msk)
+% title('Mask for fuel adjustments')
+% xlabel('lon'),ylabel('lat')
 ac.area_a = area_a;
 ac.area_b = area_b;
 ac.msk = msk;
