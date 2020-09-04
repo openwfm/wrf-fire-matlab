@@ -138,20 +138,20 @@ space_clusters = dt; %days
 % hold off
 
 %scatter 3d  lat/lon
-figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3));
-hold on
-for i = 2:dt
-  scatter3(pts(s_idx==i,2),pts(s_idx==i,1),pts(s_idx==i,3));
-end
-hold off
+% figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3));
+% hold on
+% for i = 2:dt
+%   scatter3(pts(s_idx==i,2),pts(s_idx==i,1),pts(s_idx==i,3));
+% end
+% hold off
 
 %scatter 3d  ldistances in lat/lon directions
-figure(7),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3));
-hold on
-for i = 2:dt
-  scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3));
-end
-hold off
+% figure(7),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3));
+% hold on
+% for i = 2:dt
+%   scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3));
+% end
+% hold off
 
 %make edge weights
 n = length(n_points);
@@ -242,7 +242,7 @@ end
 
 %make paths
 fg = digraph(a);
-figure(3),plot(fg);
+% figure(3),plot(fg);
 path_count = 0;
 
 % new_points = pts;

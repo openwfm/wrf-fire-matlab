@@ -10,7 +10,9 @@ msk = double(msk);
 %w = read_wrfout_tign(f);
 %load sm_mask.mat
 s = nc2struct(f,{'FMC_GC'},{})
-f_time = input_num('Which fuel levels? All = -1',-1);
+fprintf('Fuel levels 1--> 1hr, 2-->10hr 3-->100hr 4-->1000hr 5-->live \n')
+fprintf('Standard for now is [3,5]: 100hr, live fuels.\n')
+f_time = input_num('Which fuel levels? All = -1',[3,5]);
 if f_time < 0
     moist = m*msk + s.fmc_gc;
 else

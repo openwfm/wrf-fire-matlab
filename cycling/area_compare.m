@@ -12,7 +12,7 @@ msk(msk>0)=1; %add fuel moisture ==> slow fire
 msk(msk<0)=-1; %subtract fuel moist ==> speed up fire
 
 %time +- 1/4 day at simulation start and end
-t_1 = max(min(tign_a(:)),min(tign_b(:)))+0.25;
+t_1 = max(min(tign_a(:)),min(tign_b(:)));%+0.25;
 t_2 = min(max(tign_a(:)),max(tign_b(:)))-0.25;
 
 pts = 20;
@@ -23,13 +23,15 @@ for i = 1:pts
     area_b(i) = sum(sum(tign_b < t(i)));
 end
 
+t_days = (t-ps.red.start_datenum)
 figure
-plot(t/(24*3600),area_a,t/(24*3600),area_b)
+plot(t_days,area_a,t_days,area_b)
+%plot(t/(24*3600),area_a,t/(24*3600),area_b)
 %legend('wrf-a','wrf-b')
 legend('Forecast','Estimate')
 %legend('Wet fuel','Normal Fuel')
-xlabel('Time')
-ylabel('Fire Area')
+xlabel('Time since start [days]')
+ylabel('Fire Area [gride nodes]')
 title('Comparison of Areas')
 
 % figure,mesh(ps.red.fxlong,ps.red.fxlat,msk)
@@ -38,6 +40,7 @@ title('Comparison of Areas')
 ac.area_a = area_a;
 ac.area_b = area_b;
 ac.msk = msk;
+
 
 end
 
