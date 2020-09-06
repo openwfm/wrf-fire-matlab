@@ -23,16 +23,17 @@ for i = 1:pts
     area_b(i) = sum(sum(tign_b < t(i)));
 end
 
-t_days = (t-ps.red.start_datenum)
+t_days = (t-ps.red.start_datenum-1)
 figure
 plot(t_days,area_a,t_days,area_b)
 %plot(t/(24*3600),area_a,t/(24*3600),area_b)
 %legend('wrf-a','wrf-b')
 legend('Forecast','Estimate')
 %legend('Wet fuel','Normal Fuel')
-xlabel('Time since start [days]')
-ylabel('Fire Area [gride nodes]')
+xlabel('Simulation Time [days]')
+ylabel('Simulation Area [gride nodes]')
 title('Comparison of Areas')
+%xlim([0 6])
 
 % figure,mesh(ps.red.fxlong,ps.red.fxlat,msk)
 % title('Mask for fuel adjustments')
