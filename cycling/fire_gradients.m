@@ -1,10 +1,8 @@
-function [dx,dy] = fire_gradients(fxlong,fxlat,tign,unit)
+function [dx,dy,nan_msk] = fire_gradients(lon,lat,tign,unit)
 %computes the gradients of the fire arrival time cone
-% inputs : tign - fire arrival time matrix
+% inputs : tign - fire arrival time matrix, lon = fxlon, lat = fxlat
 % output:  ux,uy   - vector components of gradients in the x and y directions
 % unit = 1 ==> return unit vectors
-lon = fxlong;
-lat = fxlat;
 E = wgs84Ellipsoid;
 % [n,m] = size(lon);
 % hx = distance(lat(1,round(m/2)),lon(1,1),lat(1,round(m/2)),lon(end,end),E)/m;
@@ -31,6 +29,10 @@ end
 % hold off
 
 %[gy,gx] = imgradientxy(tign);
-
+mx = isnan(dx);
+my = isnan(dy);
+nan_msk = logical(mx.*my);
+%plot the vectors
+figure,quiver(lon(~nan_msk),lat(~nan_msk),dx(~nan_msk),dy(~nan_msk))
 
 end % function

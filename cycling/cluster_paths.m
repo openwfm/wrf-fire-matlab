@@ -4,7 +4,7 @@ function path_struct = cluster_paths(w,cull)
 %          cull - number fo using smaller data sets
 % output - cp , struct with path info
 
-[fire_name,save_name,prefix] = fire_choice();
+[fire_name,save_name,prefix,perim] = fire_choice();
 red = subset_domain(w);
 %shrink the size for large matrices
 target_size = 400;
@@ -45,6 +45,22 @@ else
         load g_cluster.mat;
     end
 end
+
+%add functionality to pull in perimeter data here
+use_perims = input_num('Use perimeter data ? 1 = yes',0)
+if use_perims == 1
+    %use just 40 points per peimeter
+    p_points = 20;
+    p_gran = perim2gran(p_points);
+    for i = 1:length(p_gran)
+        g(length(g)+1)=p_gran(i);
+    end
+    %sort the data by time
+    T = struct2table(g);
+    sortedT = sortrows(T,'time');
+    g = table2struct(sortedT);
+end
+
 
 close all
 pts = [];
@@ -89,11 +105,13 @@ end
 n_points = pts(1:cull:end,:,:,:,:,:);
 %
 
+
+
 %% for computing distance between points using GPS coords
 % also used for finding aspect of the slope, for clustering
 E = wgs84Ellipsoid;
 [aspect,slope,dy,dx] = gradientm(red.fxlat,red.fxlong,red.fhgt,E);
-clst_pts =  fixpoints2grid(red,n_points);
+load aclst_pts =  fixpoints2grid(red,n_points);
 % just use the index numbers, maintain the l2 data coords
 clst_pts(:,3:4) = n_points(:,1:2);
 %ig_pt = [mean(clst_pts(:,3)),mean(clst_pts(:,4))];
