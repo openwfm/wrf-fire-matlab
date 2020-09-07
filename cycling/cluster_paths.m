@@ -110,8 +110,8 @@ n_points = pts(1:cull:end,:,:,:,:,:);
 %% for computing distance between points using GPS coords
 % also used for finding aspect of the slope, for clustering
 E = wgs84Ellipsoid;
-[aspect,slope,dy,dx] = gradientm(red.fxlat,red.fxlong,red.fhgt,E);
-load aclst_pts =  fixpoints2grid(red,n_points);
+%[aspect,slope,dy,dx] = gradientm(red.fxlat,red.fxlong,red.fhgt,E);
+clst_pts =  fixpoints2grid(red,n_points);
 % just use the index numbers, maintain the l2 data coords
 clst_pts(:,3:4) = n_points(:,1:2);
 %ig_pt = [mean(clst_pts(:,3)),mean(clst_pts(:,4))];

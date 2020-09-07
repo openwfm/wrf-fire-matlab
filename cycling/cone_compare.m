@@ -74,14 +74,14 @@ elev = ps.red.fhgt;
 % quiver(lon(1:5:end,1:5:end),lat(1:5:end,1:5:end),ex(1:5:end,1:5:end),ey(1:5:end,1:5:end))
 
 %slopes of fire directions by directional derivatives
-sl1 = ex.*dx1+ey.*dy1;
-sl2 = ex.*dx2+ey.*dy2;
-sl_diff = sl1-sl2;
-figure,histogram(sl_diff)
-t_str=sprintf('Difference in slopes normal to fire front \n Mean = %f', mean(sl_diff(~isnan(sl_diff))));
-xlabel('Slope differences')
-ylabel('Number')
-title(t_str)
+% sl1 = ex.*dx1+ey.*dy1;
+% sl2 = ex.*dx2+ey.*dy2;
+% sl_diff = sl1-sl2;
+% figure,histogram(sl_diff)
+% t_str=sprintf('Difference in slopes normal to fire front \n Mean = %f', mean(sl_diff(~isnan(sl_diff))));
+% xlabel('Slope differences')
+% ylabel('Number')
+% title(t_str)
 
 %mask for only the fire cone
 t_msk1 = tign<max(tign(:))-0.1;
