@@ -50,19 +50,69 @@ end
 use_perims = input_num('Use perimeter data ? 1 = yes',0)
 if use_perims == 1
     %use just 40 points per peimeter
-    p_points = 20;
-    p_gran = perim2gran(p_points);
-    for i = 1:length(p_gran)
-        g(length(g)+1)=p_gran(i);
+    p_points = input_num('How many perimeter points to use?',20);
+    %p_points = 20;
+    p_gran = perim2gran(p_points,perim);
+    interp_perim = input_num('Interpolate perimeters to grid? yes = 1',1)
+    if interp_perim == 1
+       for i =1 length(p_gran)
+          pts = [p_gran(i).lat',p_gran(i).lon'];
+          n_pts = fixpoints2grid(w,pts);
+          n_pts = unique(n_pts,'rows');
+          l = length(n_pts);
+          p_gran(i).power = 50*ones(1,l);
+          p_gran(i).data  =  9*ones(1,l);
+          p_gran(i).conf  = 95*ones(1,l);
+          p_gran(i).lat = n_pts(:,3)';
+          p_gran(i).lon = n_pts(:,4)';
+       end
     end
+    gl = length(g);
+    rm_idx = zeros(1,length(p_gran));
+    for i = 1:length(p_gran)
+        %only add perimeters up to final granules time
+        if p_gran(i).time < g(gl).time
+            g(length(g)+1)=p_gran(i);
+        else
+            fprintf('Perimeter time after last granule, removing from set of perimeters \n')
+           rm_idx(i) = 1;
+        end
+    end
+    rm_idx = logical(rm_idx);
+    p_gran(rm_idx) = [];
     %sort the data by time
     T = struct2table(g);
     sortedT = sortrows(T,'time');
     g = table2struct(sortedT);
+    %select only a specified perimeter, delete data after - use for
+    %    initializing a fire from a specified perimeter
+    spec_perim = input_num('Specify a perimeter? 1 = yes',0)
+    if spec_perim == 1
+       for i = 1:length(p_gran)
+           fprintf('%d  %s  \n',i,p_gran(i).file)
+       end
+       perim_num = input_num('Which perimeter to use? ',1);
+       %delete granules past perimeter
+       for i = length(g):-1:1
+           %fprintf('%d Time diff: %f \n',i, g(i).time - p_gran(perim_num).time)
+           if g(i).time > p_gran(perim_num).time
+               g(i) = [];
+           end
+       end   
+       %filter points outside of perimeter make low confidence so they are
+       %ignore in the  graph
+       gl = length(g);
+       for i = 1:gl-1
+          in = inpolygon(g(i).lon,g(i).lat,g(gl).lon,g(gl).lat);
+          scatter(g(i).lon,g(i).lat)
+          hold on, scatter(g(gl).lon,g(gl).lat)
+          g(i).conf(~in) = 20;
+       end
+    end
 end
 
 
-close all
+%close all
 pts = [];
 %minimum detection confidence level
 min_con = 70;
@@ -75,7 +125,7 @@ for i = 1:length(g)% fprintf('Detections collected \n')
         lons = mean(g(i).lon(fires));
         lats = mean(g(i).lat(fires));
         confs = mean(double(g(i).conf(fires)));
-        times = g(i).time-0.25;
+        times = g(i).time;
         frps = mean(g(i).power(fires));
         gran = i;
         pts = [lats,lons,times,confs,frps,gran];
@@ -104,7 +154,13 @@ end
 %prune the data
 n_points = pts(1:cull:end,:,:,:,:,:);
 %
-
+%filter Nan fom data
+%should be handled in the perim2gran.m function
+% for i = length(n_points):-1:1
+%     if sum(isnan(n_points(i,:)))~= 0
+%         n_points(i,:) = [];
+%     end
+% end
 
 
 %% for computing distance between points using GPS coords
@@ -130,6 +186,11 @@ end
 %cluster the data 
 dt = 3*ceil(g(end).time - g(1).time);
 space_clusters = dt; %days
+%more clusters for using perimeter data
+if use_perims == 1
+    space_clusters = dt*2;
+end
+
 %[s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
 %clustering using aspect, not good
 [s_idx,s_c] = kmeans(cp(:,5:6),space_clusters);
@@ -164,12 +225,12 @@ space_clusters = dt; %days
 % hold off
 
 %scatter 3d  ldistances in lat/lon directions
-% figure(7),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3));
-% hold on
-% for i = 2:dt
-%   scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3));
-% end
-% hold off
+figure(7),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3));
+hold on
+for i = 2:space_clusters
+  scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3));
+end
+hold off
 
 %make edge weights
 n = length(n_points);
@@ -243,7 +304,7 @@ raw_dist = a;
 fprintf('matrices done\n')
 
 %start filtering distance
-cluster_mult = 0.5;
+cluster_mult = 0.25;
 for i = 1:n
     for j = 1:n
 %         % make points in same cluster close

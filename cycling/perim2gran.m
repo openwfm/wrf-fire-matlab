@@ -1,7 +1,8 @@
-function p_struct = perim2gran(n)
+function p_struct = perim2gran(n,perim)
 %reads in a directory of perimieters and makes them into "satellite granules"
+%n - number of points from each perimeter to use
+%perim - path to the perimeter data
 
-[fire_name,save_name,prefix,perim] = fire_choice()
 
 %%% reading the perimeters
 if perim(end) == 'l'
@@ -53,6 +54,16 @@ for i = 1:length(a)
         %set decimate to an  postive integer to use just a subset of points
         %  in perimeter
         fprintf('Perimeter %s: %d points in the perimeter \n',a(i).p_string,length(a(i).Lon));
+        %filter out the NaN
+        latnan = find(isnan(a(i).Lat));
+        a(i).Lat(latnan) = [];
+        a(i).Lon(latnan) = [];
+        lonnan = find(isnan(a(i).Lon));
+        a(i).Lat(lonnan) = [];
+        a(i).Lon(lonnan) = [];
+        if length(a(i).Lon) ~= length(a(i).Lat)
+            fprintf('Size mismatch between Lon and Lat\n')
+        end
         if length(a(i).Lat) > n
             decimate = round(length(a(i).Lat)/n);
             lats = a(i).Lat(1:decimate:end);
