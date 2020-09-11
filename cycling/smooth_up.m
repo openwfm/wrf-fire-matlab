@@ -7,8 +7,8 @@ steps = 20;
 t = linspace(t0,t1,steps);
 
 %compute different std. for imgausfilt
-mx = 1;
-mn = 2/3;
+mx = 3/2;
+mn = 1/4;
 m = (mn-mx)/(steps-2);
 y = @(t) mx + m*(t-2);
 
