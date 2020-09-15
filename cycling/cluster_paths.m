@@ -23,11 +23,14 @@ end
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
 
+
 % figures
 fig.fig_map=0;
 fig.fig_3d=0;
 fig.fig_interp=0;
 p = sort_rsac_files(prefix);
+time_bounds(2) = p.time(end);
+time_bounds(1) = p.time(1);
 
 %load satellite data
 g_str = 'g_cluster.mat';

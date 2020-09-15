@@ -72,12 +72,12 @@ alpha = 0.5;
 %constant for smooth in rls_shp
 alpha_2 = 0.05; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 10;
+smoothings = 40;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
-    %pause(3/k)
+    pause(3/k)
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
 %         figure(73),hold on
@@ -135,12 +135,14 @@ for k = 1:smoothings
         end
     end
     %size of local averaging to apply aoutomate by grid size?
-    patch = 2;
+    patch = 6;
    
     %smooth the tign
+    %tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
     tign_new = rlx_shp(tign_new,alpha_2,patch);
     if ai == 1
         tign_flat = rlx_shp(tign_flat,alpha_2,patch);
+        %tign_flat = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_flat);
     end
     %collect information about tign at the detection points
     for i = 1:pts_length
@@ -152,6 +154,7 @@ for k = 1:smoothings
     norms(k,1) = norm(t_times-ps.points(:,3),2);
     % blend flat start with forecast start for analysis
     if ai == 1
+        %tign_flat = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_flat);
         tign_flat = rlx_shp(tign_flat,alpha_2,patch);
         norm_flat = norm(flat_times-ps.points(:,3),2);
         norm_tign_new = norms(k,1);
@@ -178,9 +181,13 @@ for k = 1:smoothings
         break
     end
 end
+tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
+figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
+    title(title_str)
+    hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
 %tign_new = [];
 if ai == 1
-    figure,mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign)
+    figure(fig_num+2),mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign)
     title('Forecast')
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r')
 end

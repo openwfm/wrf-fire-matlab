@@ -4,21 +4,23 @@ function [ plotters ] = plot_full_sim(wrfout, ts )
 %   ts - time_step in wrfout
 %plots fire cone
 
-fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1);
+[fire_name,save_name,prefix,perim] = fire_choice()
+
+% fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',1);
 cycle = input_num('Which cycle? ',0)
-if fire_choice == 1
-    fire_name = 'Camp fire';
-    save_name = 'camp';
-    prefix='../campTIFs/';
-elseif fire_choice == 0
-    fire_name = 'Patch Springs fire';
-    save_name = 'patch';
-    prefix='../TIFs/';
-else
-    fire_name = 'Cougar Creek fire';
-    save_name = 'cougar';
-    prefix = '../cougarTIFs/';
-end
+% if fire_choice == 1
+%     fire_name = 'Camp fire';
+%     save_name = 'camp';
+%     prefix='../campTIFs/';
+% elseif fire_choice == 0
+%     fire_name = 'Patch Springs fire';
+%     save_name = 'patch';
+%     prefix='../TIFs/';
+% else
+%     fire_name = 'Cougar Creek fire';
+%     save_name = 'cougar';
+%     prefix = '../cougarTIFs/';
+% end
 
 fig_num = input_num('Figure number? ',113);
 % make reduced structure
