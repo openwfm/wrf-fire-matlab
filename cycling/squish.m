@@ -10,6 +10,7 @@ function tign_new = squish(ps,ai)
 pts = ps.grid_pts;
 pts(:,3) = ps.points(:,3);
 tign = ps.red.tign;
+[m,n] = size(tign);
 idx = ps.idx;
 fig_num = 23;
 pts_length = length(ps.grid_pts);
@@ -72,12 +73,12 @@ alpha = 0.5;
 %constant for smooth in rls_shp
 alpha_2 = 0.05; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 10;
+smoothings = 40;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
-    %pause(3/k)
+    pause(1/k)
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
 %         figure(73),hold on
@@ -86,12 +87,17 @@ for k = 1:smoothings
         %plot3(pts(p,2),pts(p,1),tign(idx(p,1),idx(p,2))-ps.red.start_datenum,'g')
         for j = 1:length(p)
             tign_old = tign_new;
+            near_bound = p_i-rm > 0 && p_i + rm < m & p_j + rm > 0 && p_j < n;
             %mesh indices for path points, perturbed
             p_i = idx(p(j),1);%+rm*round(randn);
             p_j = idx(p(j),2);%+rm*round(randn);
-            %%% make mean of old and new, in small block around path point 
-            tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
-            %%%% alternate strategy.
+            %%% make mean of old and new, in small ransdom size block around path point 
+            if ~near_bound
+                tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
+            else %block of a signle pointmake small 
+                tign_new(p_i,p_j) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
+            end
+            %%%% alternate strategy., not working
 %             if k == 1 && j > 1
 %             t1 = min(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
 %             t2 = max(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
@@ -103,9 +109,13 @@ for k = 1:smoothings
 %             tign_new(p_i,p_j) = max(t1,t2);
 %             tign_new(p_i-1,p_j-1) = min(t1,t2);
 %             end
-            if ai == 1
-                tign_flat(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
-            end
+if ai == 1
+    if ~near_bound
+        tign_flat(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
+    else
+        tign_flat(p_i,p_j) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
+    end
+end
 
             % interpolate new point between adjacent path detections
             if j > 1
@@ -126,7 +136,9 @@ for k = 1:smoothings
                 new_lon = w1*pts(p(j-1),2)+w2*pts(p(j),2);
                 new_t = w1*pts(p(j-1),3)+w2*pts(p(j),3);
                 [new_i,new_j,new_lat,new_lon]= fixpt(ps.red,[new_lat,new_lon]);
+                %flatten area areound new pt
                 tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
+                % why do it again?
                 if ai == 1
                     tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
                 end
@@ -135,12 +147,14 @@ for k = 1:smoothings
         end
     end
     %size of local averaging to apply aoutomate by grid size?
-    patch = 2;
+    patch = 6;
    
     %smooth the tign
+    %tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
     tign_new = rlx_shp(tign_new,alpha_2,patch);
     if ai == 1
         tign_flat = rlx_shp(tign_flat,alpha_2,patch);
+        %tign_flat = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_flat);
     end
     %collect information about tign at the detection points
     for i = 1:pts_length
@@ -152,6 +166,7 @@ for k = 1:smoothings
     norms(k,1) = norm(t_times-ps.points(:,3),2);
     % blend flat start with forecast start for analysis
     if ai == 1
+        %tign_flat = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_flat);
         tign_flat = rlx_shp(tign_flat,alpha_2,patch);
         norm_flat = norm(flat_times-ps.points(:,3),2);
         norm_tign_new = norms(k,1);
@@ -178,9 +193,13 @@ for k = 1:smoothings
         break
     end
 end
+tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
+figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
+    title(title_str)
+    hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
 %tign_new = [];
 if ai == 1
-    figure,mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign)
+    figure(fig_num+2),mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign)
     title('Forecast')
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r')
 end

@@ -48,7 +48,8 @@ else
         fprintf('Mismatch, number of files is not an even number \n')
         for j = 1:nfiles-1
             if p.time(j) == p.time(j+1)
-                fprintf('time match \n')
+                fprintf('time match %s\n',p.file{j})
+                fprintf('time match %s\n',p.file{j+1})
                 j = j+2
                
             else

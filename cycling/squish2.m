@@ -7,6 +7,8 @@ pts = ps.grid_pts;
 pts(:,3) = ps.points(:,3);
 new_pts = pts;
 tign = ps.red.tign;
+t_max = max(ps.points(:,3));
+tign(tign>=t_max)=t_max;
 idx = ps.idx;
 new_idx = idx;
 fignum = 111;

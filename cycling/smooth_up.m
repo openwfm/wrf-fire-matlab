@@ -7,8 +7,8 @@ steps = 20;
 t = linspace(t0,t1,steps);
 
 %compute different std. for imgausfilt
-mx = 1;
-mn = 2/3;
+mx = 4;
+mn = 2;
 m = (mn-mx)/(steps-2);
 y = @(t) mx + m*(t-2);
 
@@ -16,8 +16,8 @@ y = @(t) mx + m*(t-2);
 t_diff(1) = 0;
 
 t_temp = tign;
-figure(136),mesh(lon,lat,tign),title('Original')
-figure(137),mesh(lon,lat,tign),title('Smoothing')
+% figure(136),mesh(lon,lat,tign),title('Original')
+% figure(137),mesh(lon,lat,tign),title('Smoothing')
 for i = 2:steps
     m1 = tign < t(i-1);
     m2 = tign < t(i);
