@@ -177,10 +177,10 @@ title('Locations for fuel adjustment')
 legend('Forecast too fast','Forecast too slow')
 
 %regression on slope and ros differences
-r_diff(abs(r_diff)>2) = NaN;
-sl_diff(abs(r_diff)>2) = NaN;
-figure,scatter(sl_diff(~isnan(r_diff)),r_diff(~isnan(r_diff)));
-mdl = fitlm(sl_diff(:),r_diff(:));
+% r_diff(abs(r_diff)>2) = NaN;
+% sl_diff(abs(r_diff)>2) = NaN;
+% figure,scatter(sl_diff(~isnan(r_diff)),r_diff(~isnan(r_diff)));
+% mdl = fitlm(sl_diff(:),r_diff(:));
 
 % figure,histogram(ps.red.nfuel_cat(r_fast)),xticks(1:14)
 % title('Fuel Types Where Fire is Burning too Fast')

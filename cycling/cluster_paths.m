@@ -47,7 +47,7 @@ else
 end
 
 %add functionality to pull in perimeter data here
-use_perims = input_num('Use perimeter data ? 1 = yes',0)
+use_perims = input_num('Use perimeter data ? 1 = yes',0);
 if use_perims == 1
     %use just 40 points per peimeter
     p_points = 20;
