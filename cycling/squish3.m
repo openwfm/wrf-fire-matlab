@@ -10,9 +10,9 @@ pts(:,3) = ps.points(:,3);
 tign = ps.red.tign;
 t0 = min(tign(:));
 
-tign2 = squish2(ps);
-tign2 = smooth_up(ps.red.fxlong,ps.red.fxlat,tign2);
-tign = max(tign,tign2);
+%[tign2,tign2_large] = squish2(ps);
+%tign2 = smooth_up(ps.red.fxlong,ps.red.fxlat,tign2);
+%tign = max(tign,tign2);
 idx = ps.idx;
 fig_num = 23;
 pts_length = length(ps.grid_pts);
@@ -77,7 +77,7 @@ alpha = 0.5;
 %constant for smooth in rlx_shp
 alpha_2 = 0.5; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 10;
+smoothings = 20;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
@@ -147,7 +147,7 @@ for k = 1:smoothings
     
     %smooth the tign
     tign_new(tign_new < t0) = t0;
-    tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
+    %tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
     tign_new = rlx_shp(tign_new,alpha_2,patch);
 %     tign_flat = rlx_shp(tign_flat,alpha_2,patch);
     
@@ -186,7 +186,13 @@ for k = 1:smoothings
     end
 end
 %tign_new = [];
+%smooth the result
+tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
+figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
+title(title_str)
+hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
 
+%plot the forecast for comparison
 figure,mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign)
 title('Forecast')
 hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r')

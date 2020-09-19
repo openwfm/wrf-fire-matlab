@@ -1,6 +1,9 @@
 function sp = hot_spots(p_gran,red)
 %function lookts at satellie data between perimeter observations and
 %clusters data into back fire , fire froint
+%inputs:
+%p_gran - struct with perimeters in the format of l2 active fire granules
+%red = red = subset_domain(w)
 
 
 %display and chose which perimeters to work with
