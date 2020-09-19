@@ -18,6 +18,7 @@ area_compare(ps,tign2);
 t_end = min(max(tign(:)),max(tign2(:)))-0.1;
 a1 = sum(sum(tign<t_end));
 a2 = sum(sum(tign2<t_end));
+adjr0 = 1/10*sqrt(abs(a1-a2)/a2);
 %make the top flate for each
 % tign(tign>=t_end)=t_end;
 % tign2(tign2>=t_end)=t_end;

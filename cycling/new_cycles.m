@@ -18,6 +18,7 @@ fitter = fit(fuel(2).ros_fmc_g',fuel(2).fmc_g','cubicspline')
 %need to adjust for slope of terrain, right now just use 1/2 of the
 %difference
 fmc_adjust = 1/2*(fitter(r2)-fitter(r1));
+close all
 fprintf('Adjusting fuels by %f \n',fmc_adjust);
 %adjiust fuel gloabally for starters
 msk = ones(size(w.xlong));
