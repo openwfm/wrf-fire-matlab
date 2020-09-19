@@ -75,48 +75,49 @@ alpha_2 = 0.05; %smaller alph_2 ==> smoother
 %number of loops to run
 smoothings = 40;
 for k = 1:smoothings
+    rm = max(round(smoothings/k),2);
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
     hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
     pause(1/k)
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
-%         figure(73),hold on
-%         plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
-%         hold off
+        %         figure(73),hold on
+        %         plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
+        %         hold off
         %plot3(pts(p,2),pts(p,1),tign(idx(p,1),idx(p,2))-ps.red.start_datenum,'g')
         for j = 1:length(p)
             tign_old = tign_new;
-            near_bound = p_i-rm > 0 && p_i + rm < m & p_j + rm > 0 && p_j < n;
             %mesh indices for path points, perturbed
             p_i = idx(p(j),1);%+rm*round(randn);
             p_j = idx(p(j),2);%+rm*round(randn);
-            %%% make mean of old and new, in small ransdom size block around path point 
+            near_bound = p_i-rm > 0 && p_i + rm < m & p_j + rm > 0 && p_j < n;
+            %%% make mean of old and new, in small ransdom size block around path point
             if ~near_bound
                 tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
-            else %block of a signle pointmake small 
+            else %block of a signle pointmake small
                 tign_new(p_i,p_j) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
             end
             %%%% alternate strategy., not working
-%             if k == 1 && j > 1
-%             t1 = min(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
-%             t2 = max(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
-%             dt12 = t2-t1;
-%             dg = pts(p(j),3)-pts(p(j-1),3);
-%             time_shift = 0.5*(dg-dt12);
-%             t1 = t1-time_shift;
-%             t2 = t2+time_shift;
-%             tign_new(p_i,p_j) = max(t1,t2);
-%             tign_new(p_i-1,p_j-1) = min(t1,t2);
-%             end
-if ai == 1
-    if ~near_bound
-        tign_flat(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
-    else
-        tign_flat(p_i,p_j) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
-    end
-end
-
+            %             if k == 1 && j > 1
+            %             t1 = min(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
+            %             t2 = max(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
+            %             dt12 = t2-t1;
+            %             dg = pts(p(j),3)-pts(p(j-1),3);
+            %             time_shift = 0.5*(dg-dt12);
+            %             t1 = t1-time_shift;
+            %             t2 = t2+time_shift;
+            %             tign_new(p_i,p_j) = max(t1,t2);
+            %             tign_new(p_i-1,p_j-1) = min(t1,t2);
+            %             end
+            if ai == 1
+                if ~near_bound
+                    tign_flat(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
+                else
+                    tign_flat(p_i,p_j) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
+                end
+            end
+            
             % interpolate new point between adjacent path detections
             if j > 1
                 %weighted average will move new point close to that with
@@ -136,11 +137,13 @@ end
                 new_lon = w1*pts(p(j-1),2)+w2*pts(p(j),2);
                 new_t = w1*pts(p(j-1),3)+w2*pts(p(j),3);
                 [new_i,new_j,new_lat,new_lon]= fixpt(ps.red,[new_lat,new_lon]);
-                %flatten area areound new pt
-                tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
+                %flatten area around new pt
+                %tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
                 % why do it again?
                 if ai == 1
-                    tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
+                    if ~near_bound
+                        tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
+                    end
                 end
                 %mask(new_i,new_j)=0;
             end
@@ -193,6 +196,7 @@ end
         break
     end
 end
+%final smoothin after iterations
 tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
 figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)

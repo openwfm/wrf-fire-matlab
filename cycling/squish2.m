@@ -1,4 +1,4 @@
-function tign = squish2(ps)
+function [tign,tign_large] = squish2(ps)
 %function takes path structure and makes new estimated tign
 %inputs  ps = graph_dets(w) or ps = cluster_paths(w), struct with points, paths, etc.
 
@@ -104,7 +104,11 @@ if isfield(ps.red,'red')
         la = linspace(ps.red.red.min_lat,ps.red.red.max_lat,m);
         lo = linspace(ps.red.red.min_lon,ps.red.red.max_lon,n);
         [lat,lon] = meshgrid(la,lo);
-        tign = griddata(ps.red.fxlat(:),ps.red.fxlong(:),tign(:),lat,lon);
+        F = scatteredInterpolant(ps.red.fxlat(:),ps.red.fxlong(:),tign(:));
+        tign_large = F(lat,lon);
+        %griddata seems to work the same as the scattererd interpolant
+        %here...
+        %tign = griddata(ps.red.fxlat(:),ps.red.fxlong(:),tign(:),lat,lon);
     end
 end
 
