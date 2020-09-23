@@ -7,9 +7,12 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-% st = 3;
-% tign = imgaussfilt(tign,st);
-% tign2 = imgaussfilt(tign2,st);
+st = 1;
+tign = imgaussfilt(tign,st);
+tign2 = imgaussfilt(tign2,st);
+% use snmooth_up function to do smoothing
+% tign = smooth_up(lon,lat,tign);
+% tign2 = smooth_up(lon,lat,tign2);
 
 %compare areas of the two and plot over time
 area_compare(ps,tign2); 
@@ -22,7 +25,7 @@ adjr0 = 1/10*sqrt(abs(a1-a2)/a2);
 %make the top flate for each
 % tign(tign>=t_end)=t_end;
 % tign2(tign2>=t_end)=t_end;
-fprintf('Forecast Area: %d Data area: %d \n',a1,a2);
+fprintf('Forecast Area: %d Data area: %d adjr0: %f\n',a1,a2,adjr0);
 figure,contour(lon,lat,tign,[t_end t_end],'k')
 hold on,contour(lon,lat,tign2,[t_end t_end],'b')
 legend('forecast','estimate')

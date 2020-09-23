@@ -1,4 +1,4 @@
-function p_struct = perim2gran(n,perim)
+function p_struct = perim2gran(perim,n)
 %reads in a directory of perimieters and makes them into "satellite granules"
 %n - number of points from each perimeter to use
 %perim - path to the perimeter data
