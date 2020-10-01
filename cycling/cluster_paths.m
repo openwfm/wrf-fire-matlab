@@ -7,7 +7,7 @@ function path_struct = cluster_paths(w,cull)
 [fire_name,save_name,prefix,perim] = fire_choice();
 red = subset_domain(w);
 %shrink the size for large matrices
-target_size = 400;
+target_size = 600;
 if max(size(red.tign)) > target_size
 
     [m,n] = size(red.tign);
