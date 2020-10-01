@@ -1,4 +1,4 @@
-function [r1,r2] = cone_compare(ps,tign2)
+function [r1,r2,adjr0] = cone_compare(ps,tign2)
 %compares feature of fire arrival cones
 %ps = tign_try(w), tign = squish(ps)
 
@@ -21,7 +21,8 @@ area_compare(ps,tign2);
 t_end = min(max(tign(:)),max(tign2(:)))-0.1;
 a1 = sum(sum(tign<t_end));
 a2 = sum(sum(tign2<t_end));
-adjr0 = 1/10*sqrt(abs(a1-a2)/a2);
+adjr0 = sign(a2-a1)*1/10*sqrt(abs(a1-a2)/a2);
+%adjr0 = 1/10*sqrt(abs(a1-a2)/a2);
 %make the top flate for each
 % tign(tign>=t_end)=t_end;
 % tign2(tign2>=t_end)=t_end;
@@ -230,6 +231,8 @@ for i = 1:13
     fprintf('Fuel type: %d ROS difference: %f Std. Deviation: %f \n',i,mean_frd,std_frd);
     
 end
+
+close all
 
 r1 = mean(r1(b_msk));
 r2 = mean(r2(b_msk));

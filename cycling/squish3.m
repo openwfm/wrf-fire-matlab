@@ -182,7 +182,7 @@ for k = 1:smoothings
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')
-        %break
+        break
     end
 end
 %tign_new = [];

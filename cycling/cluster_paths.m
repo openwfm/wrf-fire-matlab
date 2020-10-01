@@ -143,10 +143,10 @@ for i = 1:length(g)% fprintf('Detections collected \n')
 end
 
 %can change end time for comparisons
-if new_end_time ~= red.end_datenum;
+if new_end_time ~= 0
     end_time = new_end_time;
 else 
-    end_time = red.end_datenum;
+    end_time = red.max_tign;
 end
 for i = 1:length(g)
     % don't use times after model end
@@ -192,6 +192,26 @@ for i = 1:length(clst_pts)
    cp(i,:) = [clst_pts(i,:),d_lat,d_lon];
     %% work out x-y coordinate with pt 1 as origin
 end
+
+%remove data points too far from the main set,
+%cluster pts into 2 clusters
+[s_idx2,s_c2] = kmeans(cp(:,5:6),2);
+%find cluster with smallest number of pts
+c1 = sum(s_idx2 == 1);
+c2 = sum(s_idx2 == 2);
+small_clust = 1;
+if c2 < c1
+    small_clust = 2;
+end
+if sum(s_idx2==small_clust)/(c1+c2) < 0.05
+    cp(s_idx2==small_clust,:) = [];
+    pts(s_idx2==small_clust,:) = [];
+    n_points(s_idx2==small_clust,:) = [];
+    clst_pts(s_idx2==small_clust,:) = [];
+    
+end
+
+
 
 
 %cluster the data 
