@@ -17,10 +17,9 @@ elseif perim(end) == '/'
     p_type = input_num('Type of perimeter file to use? (1) kml (2) shp', 2,1);
     fprintf('Reading %s files in  directory %s \n',perim_dat(p_type,:),perim);
     if p_type == 1
-        d = dir([perim,'*.kml'])
+        d = dir([perim,'*.kml']);
     else
-        a = shape2struct(perim)
-        temp_struct = a;
+        a = shape2struct(perim);
     end
 end % if perim_path...
 

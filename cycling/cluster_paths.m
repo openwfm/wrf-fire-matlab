@@ -7,7 +7,8 @@ function path_struct = cluster_paths(w,cull)
 [fire_name,save_name,prefix,perim] = fire_choice();
 red = subset_domain(w);
 %shrink the size for large matrices
-target_size = 600;
+target_size = 900;
+
 if max(size(red.tign)) > target_size
 
     [m,n] = size(red.tign);
@@ -22,15 +23,19 @@ if max(size(red.tign)) > target_size
 end
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
-
+new_end_time = input_num('Use alternate end time? Enter datenum of new time, 0 if no.',0)
+if new_end_time ~=0
+  time_bounds(2) = new_end_time;  
+end
+% time_bounds(2) = 7.354591409722222e+05;
 
 % figures
 fig.fig_map=0;
 fig.fig_3d=0;
 fig.fig_interp=0;
 p = sort_rsac_files(prefix);
-time_bounds(2) = p.time(end);
-time_bounds(1) = p.time(1);
+%time_bounds(2) = p.time(end);
+%time_bounds(1) = p.time(1);
 
 %load satellite data
 g_str = 'g_cluster.mat';
@@ -139,7 +144,11 @@ for i = 1:length(g)% fprintf('Detections collected \n')
 end
 
 %can change end time for comparisons
-end_time = red.end_datenum;
+if new_end_time ~= red.end_datenum;
+    end_time = new_end_time;
+else 
+    end_time = red.end_datenum;
+end
 for i = 1:length(g)
     % don't use times after model end
     if (sum(g(i).det(3:5)) > 0) && (g(i).time < end_time)
