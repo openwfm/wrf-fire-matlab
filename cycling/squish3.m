@@ -79,10 +79,11 @@ alpha_2 = 0.5; %smaller alph_2 ==> smoother
 %number of loops to run
 smoothings = 20;
 for k = 1:smoothings
-    figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
-    title(title_str)
-    hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
-    %pause(3/k)
+    %figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
+    %title(title_str)
+    %hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
+    pause(3/k)
+    figure(fig_num+17),plot(tign_new(:,202));
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
         %         figure(73),hold on
@@ -182,7 +183,7 @@ for k = 1:smoothings
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')
-        break
+        %break
     end
 end
 %tign_new = [];
