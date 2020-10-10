@@ -15,6 +15,7 @@ news = [];
 new_idx = ps.idx;
 new_grid_pts = ps.grid_pts;
 new_points = ps.points;
+new_points2 = ps.points;
 new_grids = [];
 
 for i = 1:n
@@ -23,12 +24,16 @@ for i = 1:n
     pl = length(p);
     if pl > 1
         fprintf('Making new points, path %d\n',i)
+%         if i == 280
+%             pause
+%         end
+        
         for j = 2:pl
             %two points in space, p and q
-            p_i = idx(p(j-1),1);%+rm*round(randn);
-            p_j = idx(p(j-1),2);%+rm*round(randn);
-            q_i = idx(p(j),1);%+rm*round(randn);
-            q_j = idx(p(j),2);%+rm*round(randn);
+%             p_i = idx(p(j-1),1);%+rm*round(randn);
+%             p_j = idx(p(j-1),2);%+rm*round(randn);
+%             q_i = idx(p(j),1);%+rm*round(randn);
+%             q_j = idx(p(j),2);%+rm*round(randn);
             %linear interpolation of new points along the line
             new_lats = linspace(pts(p(j-1),1),pts(p(j),1),np)' ...
                 + 1/1000*randn(np,1);
@@ -51,12 +56,20 @@ for i = 1:n
             %later
             idx_end = length(new_points);
             idx_start = idx_end-np+3;
-            new_p = [new_p(1:j-1) idx_start:idx_end new_p(j:end)];
+            %new_p = [new_p(1:j-1) idx_start:idx_end new_p(j:end)];
+            new_p = [new_p(1:find(new_p==p(j-1))) idx_start:idx_end new_p(find(new_p==p(j)):end)];
             
         end
 
     end 
+    %interpolate the whole path with spline
     new_paths.paths(i).p = new_p;
+    if pl > 1
+        pplat = csaps(ps.points(p,3),ps.points(p,1),0.95,new_points(new_p,3));
+        pplon = csaps(ps.points(p,3),ps.points(p,2),0.97,new_points(new_p,3));
+        new_points(new_p,1)=pplat;
+        new_points(new_p,2)=pplon;
+    end
 end % for i
 new_grids = fixpoints2grid(ps.red,[new_points(:,1),new_points(:,2)]);
 new_paths.grid_pts = [new_grids(:,3),new_grids(:,4)];
