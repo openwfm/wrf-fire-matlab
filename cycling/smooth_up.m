@@ -8,7 +8,7 @@ t = linspace(t0,t1,steps);
 
 %compute different std. for imgausfilt
 mx = 2;
-mn = 1/2;
+mn = 1/6;
 m = (mn-mx)/(steps-2);
 y = @(t) mx + m*(t-2);
 

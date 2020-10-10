@@ -63,7 +63,7 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
-rm = 0;
+rm = 1;
 
 % random multiplier, keep the same
 % perturbs points downward in time to
@@ -77,13 +77,14 @@ alpha = 0.5;
 %constant for smooth in rlx_shp
 alpha_2 = 0.5; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 20;
+smoothings = 5;
 for k = 1:smoothings
-    %figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
-    %title(title_str)
-    %hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
+    figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
+    title(title_str)
+    hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
     pause(3/k)
-    figure(fig_num+17),plot(tign_new(:,202));
+    %plotting a slice
+    %figure(fig_num+17),plot(tign_new(:,202));
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
         %         figure(73),hold on
@@ -97,7 +98,7 @@ for k = 1:smoothings
             p_j = idx(p(j),2);%+rm*round(randn);
             %%% make mean of old and new, in small block around path point
             %alpha is now the data likelikehood
-            alpha = alpha_vect(p(j));
+            %alpha = alpha_vect(p(j));
             tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
             %%%% alternate strategy.
             %             if k == 1 && j > 1
@@ -144,7 +145,7 @@ for k = 1:smoothings
     end
     %size of local averaging to apply aoutomate by grid size?
     %patch = max(1,round(sqrt(smoothings-k)));
-    patch = 4;
+    patch = 2;
     
     %smooth the tign
     tign_new(tign_new < t0) = t0;
@@ -160,30 +161,30 @@ for k = 1:smoothings
     norms(k,1) = norm(t_times-ps.points(:,3),2);
     % blend flat start with forecast start for analysis
     
-    %tign_flat = rlx_shp(tign_flat,alpha_2,patch);
+    tign_flat = rlx_shp(tign_flat,alpha_2,patch);
     norm_flat = norm(flat_times-ps.points(:,3),2);
     norm_tign_new = norms(k,1);
-    if (norm_flat > norm_tign_new)
-        %fprintf('blending flat start with forecast \n')
-        %tign_new = 0.5*(tign_new+tign_flat);
-    end
+%     if (norm_flat > norm_tign_new)
+%         %fprintf('blending flat start with forecast \n')
+%         tign_new = 0.5*(tign_new+tign_flat);
+%     end
     
     %only do norm for times before final detection time
     time_mask = tign_new < pts(end,3);  %max(max(pts(:,3)));
     norms(k,2) = norm(tign_new(time_mask)-tign_old(time_mask));
-    %     figure(fig_num+3);plot(norms(1:k,1));
-    %     tstr = sprintf('Norm of difference between successive \n TIGN after each interpolation');
-    %     title(tstr)
-    %     figure(fig_num+4);plot(1:k,norms(1:k,2))
-    %     tstr = sprintf('Norm of difference between times of \n detections and TIGN at detectionon locations');
-    %     title(tstr);
-    %     xlabel('Iterations of Interpolation')
+    figure(fig_num+3);plot(norms(1:k,1));
+    tstr = sprintf('Norm of difference between successive \n TIGN after each interpolation');
+    title(tstr)
+    figure(fig_num+4);plot(1:k,norms(1:k,2))
+    tstr = sprintf('Norm of difference between times of \n detections and TIGN at detectionon locations');
+    title(tstr);
+    xlabel('Iterations of Interpolation')
     temp_var(k) = min(tign_new(:))-ps.red.start_datenum;
     figure(fig_num+5);plot(1:k,temp_var(1:k)*24),title('Change in ignition time'),xlabel('iteration'),ylabel('hours')
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')
-        %break
+        break
     end
 end
 %tign_new = [];

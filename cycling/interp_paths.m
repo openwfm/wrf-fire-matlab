@@ -9,7 +9,7 @@ idx = ps.idx;
 
 n = length(ps.paths)
 %number of new points on segment
-np = 7;
+np = 3;
 new_points = [];
 news = [];
 new_idx = ps.idx;
@@ -30,8 +30,10 @@ for i = 1:n
             q_i = idx(p(j),1);%+rm*round(randn);
             q_j = idx(p(j),2);%+rm*round(randn);
             %linear interpolation of new points along the line
-            new_lats = linspace(pts(p(j-1),1),pts(p(j),1),np)';
-            new_lons = linspace(pts(p(j-1),2),pts(p(j),2),np)';
+            new_lats = linspace(pts(p(j-1),1),pts(p(j),1),np)' ...
+                + 1/1000*randn(np,1);
+            new_lons = linspace(pts(p(j-1),2),pts(p(j),2),np)' ...
+                + 1/1000*randn(np,1);
             new_time = linspace(pts(p(j-1),3),pts(p(j),3),np)';
             %average confidence of each endpoint on segment
             new_conf = mean(ps.points(j-1,4),ps.points(j,4))*ones(np,1);
