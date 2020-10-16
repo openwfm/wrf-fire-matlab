@@ -25,6 +25,7 @@ for i = 1:length(d)
                 v.lon = hdfread(file_str,'/FP_longitude');
                 v.lat  = hdfread(file_str,'/FP_latitude');
                 v.conf =  hdfread(file_str,'/FP_confidence');
+                v.mask = hdfread(file_str,'/fire mask');
             catch
                 warning('Read error somewhere')
             end
@@ -37,6 +38,7 @@ for i = 1:length(d)
                 v.lon = h5read(file_str,'/FP_longitude')';
                 v.lat  = h5read(file_str,'/FP_latitude')';
                 v.conf =  h5read(file_str,'/FP_confidence')';
+                v.mask = h5read(file_str,'/fire mask');
             catch
                 warning('read error somewhere')
             end

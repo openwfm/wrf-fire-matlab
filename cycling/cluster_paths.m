@@ -37,7 +37,7 @@ p = sort_rsac_files(prefix);
 %time_bounds(2) = p.time(end);
 %time_bounds(1) = p.time(1);
 
-%load satellite data
+%load satellite detection data
 g_str = 'g_cluster.mat';
 if ~exist(g_str,'file')
     %loading L2 data
@@ -53,6 +53,10 @@ else
         load g_cluster.mat;
     end
 end
+
+%load satellite ground detection data
+% get fire mask, fxlong, fxlat for each granule
+pos_detects = collect_pos(prefix,p,red,time_bounds,fig)
 
 %add functionality to pull in perimeter data here
 use_perims = input_num('Use perimeter data ? 1 = yes',0);

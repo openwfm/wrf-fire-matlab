@@ -17,17 +17,25 @@ pfile2=[prefix,file2];
 %v=load(pfile);
 if file(1) == 'M'
     fprintf('Reading Modis data\n')
-    v.lon = hdfread(pfile, 'MODIS_Swath_Type_GEO', 'Fields', 'Longitude');
-    v.lat = hdfread(pfile, 'MODIS_Swath_Type_GEO', 'Fields', 'Latitude');
-    v.data = hdfread(pfile2, '/fire mask', 'Index', {[1  1],[1  1],[size(v.lon)]});
-    %v.frp = hdfread(pfile2, '/FP_power', 'Index', {[1  1],[1  1],[size(v.lon)]});
+    try
+        v.lon = hdfread(pfile, 'MODIS_Swath_Type_GEO', 'Fields', 'Longitude');
+        v.lat = hdfread(pfile, 'MODIS_Swath_Type_GEO', 'Fields', 'Latitude');
+        v.data = hdfread(pfile2, '/fire mask', 'Index', {[1  1],[1  1],[size(v.lon)]});
+        %v.frp = hdfread(pfile2, '/FP_power', 'Index', {[1  1],[1  1],[size(v.lon)]});
+    catch
+        warning('read error somewhere')
+    end
 else
     fprintf('Reading VIIRS data\n')
     fprintf('fires : %s \n',pfile2)
     fprintf('geo   : %s \n',pfile)
-    v.lon = h5read(pfile,'/HDFEOS/SWATHS/VNP_750M_GEOLOCATION/Geolocation Fields/Longitude');
-    v.lat = h5read(pfile,'/HDFEOS/SWATHS/VNP_750M_GEOLOCATION/Geolocation Fields/Latitude');
-    v.data = h5read(pfile2,'/fire mask');
+    try
+        v.lon = h5read(pfile,'/HDFEOS/SWATHS/VNP_750M_GEOLOCATION/Geolocation Fields/Longitude');
+        v.lat = h5read(pfile,'/HDFEOS/SWATHS/VNP_750M_GEOLOCATION/Geolocation Fields/Latitude');
+        v.data = h5read(pfile2,'/fire mask');
+    catch
+        warning('read error somewhere')
+    end
 end
 
 

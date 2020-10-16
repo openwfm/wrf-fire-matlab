@@ -27,25 +27,29 @@ p.file={d{i}};
 p.time=t;
 
 fires = [0 0]
+gran_count = 1;
 for k = 1:nfiles
     if mod(k,2) == 1
         file = p.file{k};
         file2 = p.file{k+1};
         v = readl2data(prefix,file,file2);
-        
+        g(i) = v;
         dets = v.data >= 7;
         v;
         if sum(v.pixels.fire) > 0
             fires = [fires; v.lon(dets) v.lat(dets)];
             %fires = [fires; v.lons(dets) v.lats(dets)];
         end
-        
+        gran_count = gran_count + 1;
     end
 end
 
 fires = fires(2:end,:);
 fprintf('%d fires in %d granules \n',length(fires), length(d))
 figure,scatter(fires(:,1),fires(:,2))
+
+outs.fires = fires;
+outs.g = g;
 
 end
 
