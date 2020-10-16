@@ -81,7 +81,7 @@ smoothings = 5;
 for k = 1:smoothings
     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
     title(title_str)
-    hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
+    %hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
     pause(3/k)
     %plotting a slice
     %figure(fig_num+17),plot(tign_new(:,202));

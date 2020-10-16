@@ -23,17 +23,22 @@ for i = 1:n
     new_p = p;
     pl = length(p);
     if pl > 1
-        fprintf('Making new points, path %d\n',i)
+        fprintf('\n Making new points, path %d\n',i)
 %         if i == 280
 %             pause
 %         end
         
         for j = 2:pl
+            
             %two points in space, p and q
-%             p_i = idx(p(j-1),1);%+rm*round(randn);
-%             p_j = idx(p(j-1),2);%+rm*round(randn);
-%             q_i = idx(p(j),1);%+rm*round(randn);
-%             q_j = idx(p(j),2);%+rm*round(randn);
+            p_i = idx(p(j-1),1);%+rm*round(randn);
+            p_j = idx(p(j-1),2);%+rm*round(randn);
+            q_i = idx(p(j),1);%+rm*round(randn);
+            q_j = idx(p(j),2);%+rm*round(randn);
+            %distance between points in path
+            dist = ps.raw_dist(p(j-1),p(j));
+            np = round(dist/600)+1;
+            fprintf('Segment %d distance: %f new points: %d \n',j-1,dist,np);
             %linear interpolation of new points along the line
             new_lats = linspace(pts(p(j-1),1),pts(p(j),1),np)' ...
                 + 1/1000*randn(np,1);
