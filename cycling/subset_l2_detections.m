@@ -62,7 +62,7 @@ for i = 1:length(d)
             v.axis=[red.min_lon,red.max_lon,red.min_lat,red.max_lat];
             v.xlon = [];
             v.xlat = [];
-            v.fxdata = [];
+            v.fxdata = v.mask(xi,xj);
             %also fake for time being
             v.data = 9*ones(size(v.conf));
             %% put variables into granule struct

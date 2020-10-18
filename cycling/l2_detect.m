@@ -1,4 +1,4 @@
-function outs = l2_detect()
+function outs = l2_detect(red)
 
 
 [fire_name,save_name,prefix] = fire_choice()
@@ -33,14 +33,34 @@ for k = 1:nfiles
         file = p.file{k};
         file2 = p.file{k+1};
         v = readl2data(prefix,file,file2);
-        g(i) = v;
+        % select fire detection within the domain
+        lon_bot = v.lon<red.max_lon;
+        lon_top = v.lon>red.min_lon;
+        lat_bot = v.lat<red.max_lat;
+        lat_top = v.lat>red.min_lat;
+        lon_msk = logical(lon_top.*lon_bot);
+        lat_msk = logical(lat_top.*lat_bot);
+        msk = logical(lat_msk.*lon_msk);
+        xj=find(v.lon > red.min_lon & v.lon < red.max_lon);
+        xi=find(v.lat > red.min_lat & v.lat < red.max_lat);
+        idx = (intersect(xi,xj));
+        ax=[red.min_lon red.max_lon red.min_lat red.max_lat];
+        if isempty(xi) | isempty(xj)
+            fprintf('outside of the domain\n');
+        end
+        if sum(msk(:)) > 0
+        v.data = v.data(idx);
+        v.lon = v.lon(msk);
+        v.lat = v.lat(msk);
         dets = v.data >= 7;
+        g(gran_count) = v;
         v;
-        if sum(v.pixels.fire) > 0
+        if sum(msk(:)) > 0
             fires = [fires; v.lon(dets) v.lat(dets)];
             %fires = [fires; v.lons(dets) v.lats(dets)];
         end
         gran_count = gran_count + 1;
+        end
     end
 end
 
