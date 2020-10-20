@@ -17,14 +17,15 @@ t0 = min(tign(:));
 % t = 4*(-10:20)*3600;
 % ts = p_like_spline(t);
 % figure,plot(t,exp(ts))
+% hold on,plot(t,1-exp(ts))
 %make vector of data likelihoods
 
 fprintf('Collecting ground detection data\n')
 grounds = ground_detects(ps.red);
 [jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
 %make polygon around detections
-%infire = inpolygon(grounds.land(:,4),grounds.land(:,3),pts(:,2),pts(:,1));
-%infire = inpolygon(grounds.land(:,4),grounds.land(:,3),grounds.land(infire,4),grounds.land(infire,3));
+infire = inpolygon(grounds.land(:,4),grounds.land(:,3),pts(:,2),pts(:,1));
+infire = inpolygon(grounds.land(:,4),grounds.land(:,3),grounds.land(infire,4),grounds.land(infire,3));
 infire = inpolygon(igrid(:),jgrid(:),ps.idx(:,1),ps.idx(:,2));
 %remove holes in mask
 infire = inpolygon(igrid(:),jgrid(:),igrid(infire),jgrid(infire));
@@ -33,20 +34,25 @@ tign2 = tign;
 tmax=max(tign2(:));
 tign_ground = tign2;
 tign_flat = ps.red.end_datenum*ones(size(ps.red.tign));
-beta = 7/8;
-figure(159),hold on,scatter(pts(:,2),pts(:,1),'*r')
+beta = 1/2;
+%figure(159),hold on,scatter(pts(:,2),pts(:,1),'*r')
+time_err = 0.25;
+g_diff = (tign_flat-tign+time_err)*24*3600;
+g_likes = p_like_spline(g_diff);
+beta_vect = exp(g_likes);
 %%% ground detection likelihood
-% t_times = zeros(pts_length,1);
+% g_times = zeros(pts_length,1);
 % for i = 1:pts_length
-%     t_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
+%     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
 for i = 1:10
 tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
+%tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
 t_mask = tign_ground > tmax;
 tign_ground(t_mask) = tmax;
-tign_ground = imgaussfilt(tign_ground,i/30-1/31);
+tign_ground = imgaussfilt(tign_ground,1/2);
 figure(159),scatter(pts(:,2),pts(:,1),'*r')
-figure(159),hold on,contour(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold off
+figure(159),hold on,contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold off
 %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
 pause(.5)
 t_min(i) = min(tign_ground(:));
@@ -62,7 +68,7 @@ end
 %tign2 = smooth_up(ps.red.fxlong,ps.red.fxlat,tign2);
 %tign = max(tign,tign2);
 idx = ps.idx;
-fig_num = 23;
+fig_num = 33;
 pts_length = length(ps.grid_pts);
 %max time to look at detection data
 max_l2_time = max(max(pts(:,3)));
