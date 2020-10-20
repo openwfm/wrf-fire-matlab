@@ -1,6 +1,7 @@
-function [ros,ros_mean] = ros_variance(n)
+function [ros,ros_mean] = ros_variance(n,ps)
 %estimates variance in ros between two detections
 %n - number of random points to use in simulation
+%ps - struct with path information, ps = cluster_paths(w,1)
 
 real_data = input_num('Use real data? 0 = no 1 = yes',1,1);
 
@@ -22,9 +23,9 @@ if real_data == 0
     
 else
     %real data
-    load p_struct.mat
-    ps = p;
-    clear p
+    %load p_struct.mat
+    %ps = p;
+    %clear p
     num_paths = length(ps.paths);
     path_num = max(2,round(num_paths*rand));
     path = ps.paths(path_num);
