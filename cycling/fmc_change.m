@@ -1,7 +1,8 @@
-function fmc_change(m,msk)
+function fmc_change(m,msk,f)
 %perchentage change to add/subtract
 % msk - locations where to add subtract
-f = 'wrfinput_d01';
+% f - string, path to a wrfinput or wrfrst file
+%f = 'wrfinput_d01';
 msk = double(msk);
 %msk(msk>0) = 1;
 

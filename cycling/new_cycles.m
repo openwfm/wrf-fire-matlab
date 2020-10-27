@@ -6,13 +6,16 @@ function new_cycles(f)
 cycle = input_num('Which cycle? ',1);
 
 w = read_wrfout_tign(f);
-ps = cluster_paths(w,1);
-tn = squish2(ps);
+ps1 = cluster_paths(w,1);
+%new points
+ps = interp_paths(ps1);
+
+tn = squish4(ps);
 %avg ROS in the forecast and data estimate
 [r1,r2] = cone_compare(ps,tn);
 %load fuel information from the wrfout
 fuels;
-figure,plot(fuel(2).fmc_g,fuel(2).ros_fmc_g);
+%figure,plot(fuel(2).fmc_g,fuel(2).ros_fmc_g);
 fitter = fit(fuel(2).ros_fmc_g',fuel(2).fmc_g','cubicspline')
 %how much to adjust the fmc by
 %need to adjust for slope of terrain, right now just use 1/2 of the
@@ -22,18 +25,19 @@ fmc_adjust = 1/2*(fitter(r2)-fitter(r1));
 fprintf('Adjusting fuels by %f \n',fmc_adjust);
 %adjiust fuel gloabally for starters
 msk = ones(size(w.xlong));
-cd fmc_change(fmc_adjust,msk);
+
 new_w = insert_analysis(w,ps,tn);
 %maybe do this in the fmc_change function?
 if cycle == 1
     %back up
     %make more general for more than a single domain simulation
     wi = 'wrfinput_d0';
-    domain = input_num('Which wrfinput file to write FMC into? ',1)
+    domain = input_num('Which wrfinput_d0x file to write FMC into? x = 1 ',1)
     wi = [wi,num2str(domain)];
     wi_bak = [wi,'.bak'];
     cpy_str = sprintf('cp %s %s',wi,wi_bak);
     system(cpy_str)
+    %fmc_change(fmc_adjust,msk,rst);
     ncreplace('wrfinput_d01','TIGN_G',new_w.analysis);
 else
     d = dir('wrfrst*');
@@ -46,6 +50,7 @@ else
     cpy_str = sprintf('cp %s %s',rst,rst_bak);
     system(cpy_str);
     %rst='wrfrst_d01_2013-08-13_00:00:00.bak';
+    %fmc_change(fmc_adjust,msk,rst);
     ncreplace(rst,'TIGN_G',new_w.analysis);
 end
 fprintf('All done. Copy files to directories and restart WRF-SFIRE\n');
