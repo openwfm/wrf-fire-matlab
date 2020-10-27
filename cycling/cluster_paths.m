@@ -137,7 +137,7 @@ for i = 1:length(g)% fprintf('Detections collected \n')
         lons = mean(g(i).lon(fires));
         lats = mean(g(i).lat(fires));
         confs = mean(double(g(i).conf(fires)));
-        times = g(i).time;
+        times = g(i).time-0.25;
         frps = mean(g(i).power(fires));
         gran = i;
         pts = [lats,lons,times,confs,frps,gran];
@@ -277,11 +277,11 @@ v = a;
 %time matrix
 t = a;
 %cone volume matrix
-cv = a;
+%cv = a;
 %%% figure out way to get max_t automatically
 % maximum allowed time between nodes in the graph to allow them to be
 % connected
-max_t = 1.9*(24*3600);
+%max_t = 1.9*(24*3600);
 
 %maybe change later
 pts = n_points;
@@ -306,8 +306,8 @@ end
 %max distance from ignition
 max_d = 0;
 %error in time of fire from time of detection
-time_err = 0.2;
-distant_point = 1;
+%time_err = 0.2;
+%distant_point = 1;
 ig_point = [pts(1,1),pts(1,2)];
 for i = 1:n
     time = pts(i,3);
@@ -334,7 +334,7 @@ for i = 1:n
 end
 
 %fix up triangular matrices
-t_mask = t >= 0;
+%t_mask = t >= 0;
 % a = a+a';
 raw_dist = a;
 fprintf('matrices done\n')
