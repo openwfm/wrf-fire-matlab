@@ -56,7 +56,7 @@ end
 
 %load satellite ground detection data
 % get fire mask, fxlong, fxlat for each granule
-pos_detects = collect_pos(prefix,p,red,time_bounds,fig)
+%pos_detects = collect_pos(prefix,p,red,time_bounds,fig)
 
 %add functionality to pull in perimeter data here
 use_perims = input_num('Use perimeter data ? 1 = yes',0);
