@@ -8,7 +8,8 @@ cycle = input_num('Which cycle? ',1);
 w = read_wrfout_tign(f);
 ps1 = cluster_paths(w,1);
 %new points
-ps = interp_paths(ps1);
+%ps = interp_paths(ps1);
+ps = ps1;
 
 tn = squish4(ps);
 %avg ROS in the forecast and data estimate

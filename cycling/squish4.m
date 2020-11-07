@@ -21,11 +21,11 @@ t0 = min(tign(:));
 %make vector of data likelihoods
 
 fprintf('Collecting ground detection data\n')
-grounds = ground_detects(ps.red);
+%grounds = ground_detects(ps.red);
 [jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
 %make polygon around detections
-infire = inpolygon(grounds.land(:,4),grounds.land(:,3),pts(:,2),pts(:,1));
-infire = inpolygon(grounds.land(:,4),grounds.land(:,3),grounds.land(infire,4),grounds.land(infire,3));
+%infire = inpolygon(grounds.land(:,4),grounds.land(:,3),pts(:,2),pts(:,1));
+%infire = inpolygon(grounds.land(:,4),grounds.land(:,3),grounds.land(infire,4),grounds.land(infire,3));
 infire = inpolygon(igrid(:),jgrid(:),ps.idx(:,1),ps.idx(:,2));
 %remove holes in mask
 infire = inpolygon(igrid(:),jgrid(:),igrid(infire),jgrid(infire));
@@ -45,7 +45,7 @@ beta_vect = exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-for i = 1:10
+for i = 1:2
 tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
 %tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
 t_mask = tign_ground > tmax;
