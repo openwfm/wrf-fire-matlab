@@ -45,7 +45,7 @@ beta_vect = exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-for i = 1:2
+for i = 1:10
 tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
 %tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
 t_mask = tign_ground > tmax;
@@ -197,6 +197,9 @@ for k = 1:smoothings
     %patch = max(1,round(sqrt(smoothings-k)));
     patch = 2;
     
+    %%%%% make use of ground detections %%%%
+    %tign_new(~infire) = beta*tign_new(~infire)+(1-beta)*tign_flat(~infire);
+    
     %smooth the tign
     tign_new(tign_new < t0) = t0;
     %tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
@@ -239,6 +242,24 @@ for k = 1:smoothings
 end
 %tign_new = [];
 %smooth the result
+
+
+% %%% try using ground detections after paths....
+% tign_ground = tign_new;
+% for i = 1:10
+% tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
+% %tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
+% t_mask = tign_ground > tmax;
+% tign_ground(t_mask) = tmax;
+% tign_ground = imgaussfilt(tign_ground,1/2);
+% figure(159),scatter(pts(:,2),pts(:,1),'*r')
+% figure(159),hold on,contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold off
+% %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
+% %pause(.5)
+% %t_min(i) = min(tign_ground(:));
+% end
+% tign_new = tign_ground;
+
 tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
 figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
 title(title_str)

@@ -25,7 +25,7 @@ for k = 1 : 1
     for i = 1:m
         for j = 1:n
             if red.tign(i,j) < red.end_datenum
-                if rand < 0.02
+                if rand < 0.1
                     %pts = [pts;[lats',lons',times',confs',frps',gran']];
                     pts = [pts;[red.fxlat(i,j),red.fxlong(i,j),red.tign(i,j),100,100,2*round(red.tign(i,j)-red.start_datenum)]];
                     idx = [idx;[i,j]];
@@ -34,6 +34,13 @@ for k = 1 : 1
         end
     end
 end
+if exist('pts.mat','file')
+    clear pts idx~
+    load pts.mat
+else
+    save pts.mat pts idx
+end
+
 figure,mesh(red.fxlong,red.fxlat,red.tign-red.start_datenum),hold on
 scatter3(pts(:,2),pts(:,1),pts(:,3)-red.start_datenum,'r*')
 [st1,st2]=sort(pts(:,3));
