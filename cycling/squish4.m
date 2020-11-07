@@ -45,7 +45,7 @@ beta_vect = exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-for i = 1:10
+for i = 1:2
 tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
 %tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
 t_mask = tign_ground > tmax;
