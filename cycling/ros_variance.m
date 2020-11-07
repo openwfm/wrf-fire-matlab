@@ -83,6 +83,9 @@ if n < 1000
         plot3([r1(i,1) r2(i,1)],[r1(i,2) r2(i,2)],[r1(i,3) r2(i,3)],':')
     end
     hold off
+    %make joint pdf
+    figure,scatter3(dist_rand,1./time_rand,ros_rand);
+    xlabel('Distance'),ylabel('1/Time'),zlabel('ROS')
 end
 
 figure,histogram(ros_rand)
@@ -91,6 +94,7 @@ if real_data == 0
 else
     t_str = sprintf('Histogram of ROS \n Path: %d Points: %d and %d',path_num,path_end-1,path_end);
     title(t_str)
+end
 xlabel('ROS'),ylabel('Number')
 ros_mean = mean(ros_rand);
 fprintf('Mean random ROS: %f\n',mean(ros_rand))

@@ -14,5 +14,8 @@ for j = 1:length(paths)%length(pts)
     %plot3(pts(paths(j).p,2),pts(paths(j).p,1),pts(paths(j).p,3),'Color',[c c c]);
     plot3(pts(paths(j).p,2),pts(paths(j).p,1),pts(paths(j).p,3));
 end
+scatter3(pts(:,2),pts(:,1),pts(:,3),'*r')
 hold off
+grid on,xlabel('Lon'),ylabel('Lat'),zlabel('Time [days since simulation start]')
+title('Shortest Paths and Active Fire Detections')
 end

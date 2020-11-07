@@ -71,7 +71,7 @@ for i = 1:n
     new_paths.paths(i).p = new_p;
     if pl > 1
         pplat = csaps(ps.points(p,3),ps.points(p,1),0.95,new_points(new_p,3));
-        pplon = csaps(ps.points(p,3),ps.points(p,2),0.97,new_points(new_p,3));
+        pplon = csaps(ps.points(p,3),ps.points(p,2),0.95,new_points(new_p,3));
         new_points(new_p,1)=pplat;
         new_points(new_p,2)=pplon;
     end
