@@ -14,10 +14,10 @@ for i = patch_size+1:n-patch_size
         %stencil of pts around a(i,j)
         %a(i,j) = alpha*a(i,j)+beta/4*(a(i-1,j)+a(i+1,j)+a(i,j-1)+a(i,j+1));
         %3x3 ring of pts aound a(i,J)
-        a(i,j) = alpha*a(i,j)+beta*(mean(mean(a(i-1:i+1,j-1:j+1))));   
+        %a(i,j) = alpha*a(i,j)+beta*(mean(mean(a(i-1:i+1,j-1:j+1))));   
         %new_shp(i,j) = alpha*a(i,j)+beta/4*(a(i-1,j)+a(i+1,j)+a(i,j-1)+a(i,j+1));
-        %patch = a(i-patch_size:i+patch_size,j-patch_size:j+patch_size);
-        %new_shp(i,j) = alpha*a(i,j)+beta*mean(patch(:));
+        patch = a(i-patch_size:i+patch_size,j-patch_size:j+patch_size);
+        new_shp(i,j) = alpha*a(i,j)+beta*mean(patch(:));
     end
 end
 a(a<min_t) = min_t;

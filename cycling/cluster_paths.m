@@ -1,4 +1,4 @@
-function path_struct = cluster_paths(w,cull)
+function path_struct = cluster_paths(w,cull,grid_dist)
 % assign shortest paths, using clustering
 % inputs - w = read_wrfout_tign(f)
 %          cull - number fo using smaller data sets
@@ -6,8 +6,28 @@ function path_struct = cluster_paths(w,cull)
 
 [fire_name,save_name,prefix,perim] = fire_choice();
 red = subset_domain(w);
+multi = input_num('Use multigrid? 1 = yes',1,0);
+if multi
+    if exist('ps_multi.mat','file')
+        load ps_multi.mat
+        load an_multi.mat
+        red2=ps_multi.red;
+        new_an = interp2(red2.fxlat,red2.fxlong,an_multi,red.fxlat,red.fxlong);
+        red.tign = new_an;
+    end
+end
+%compute grid sizes
+E = wgs84Ellipsoid;
+dlon= distance(red.min_lat,red.min_lon,red.min_lat,red.max_lon,E);
+dlat= distance(red.min_lat,red.min_lon,red.max_lat,red.min_lon,E);
+if ~exist('grid_dist','var')
+    grid_dist = 200;
+end
+new_m = round(dlon/grid_dist);
+new_n = round(dlat/grid_dist);
+
 %shrink the size for large matrices
-target_size = 900;
+target_size = max(new_m,new_n);
 
 if max(size(red.tign)) > target_size
 
@@ -23,7 +43,7 @@ if max(size(red.tign)) > target_size
 end
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
-new_end_time = input_num('Use alternate end time? Enter datenum of new time, 0 if no.',0)
+new_end_time = input_num('Use alternate end time? Enter datenum of new time, 0 if no.',0,1)
 if new_end_time ~=0
   time_bounds(2) = new_end_time;  
 end
@@ -45,7 +65,7 @@ if ~exist(g_str,'file')
     save(g_str, 'g', '-v7.3');
 else
     g = [];
-    reload_dets = input_num('Reload detections? 1 = yes',0);
+    reload_dets = input_num('Reload detections? 1 = yes',0,1);
     if reload_dets == 1
         g = subset_l2_detections(prefix,p,red,time_bounds,fig);
         save(g_str, 'g', '-v7.3');
@@ -59,7 +79,7 @@ end
 %pos_detects = collect_pos(prefix,p,red,time_bounds,fig)
 
 %add functionality to pull in perimeter data here
-use_perims = input_num('Use perimeter data ? 1 = yes',0);
+use_perims = input_num('Use perimeter data ? 1 = yes',0,1);
 if use_perims == 1
     %use just 40 points per peimeter
     p_points = input_num('How many perimeter points to use?',20);
@@ -221,7 +241,7 @@ end
 
 %cluster the data 
 dt = 3*ceil(g(end).time - g(1).time);
-space_clusters = dt; %days
+space_clusters = 20; %days
 %more clusters for using perimeter data
 if use_perims == 1
     space_clusters = dt*2;
@@ -291,7 +311,6 @@ pts = n_points;
 grid_pts = fixpoints2grid(red,n_points);
 
 %% computing distance between points using GPS coords
-E = wgs84Ellipsoid;
 
 %make cluster center distance matrix
 clust_dist=zeros(space_clusters);

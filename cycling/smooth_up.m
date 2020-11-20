@@ -5,10 +5,14 @@ t1 = max(tign(:));
 
 steps = 20;
 t = linspace(t0,t1,steps);
+[m,n]= size(tign);
 
 %compute different std. for imgausfilt
-mx = 2;
-mn = 1;
+%mx = 2;%
+mx = max(1,max(m,n)/100);
+%mn = 1/2;
+mn = 1/3*mx;
+fprintf('Smooth paramaters : %f   %f   \n',mn,mx);
 m = (mn-mx)/(steps-2);
 y = @(t) mx + m*(t-2);
 
@@ -24,8 +28,8 @@ for i = 2:steps
     msk = logical(m2-m1);
     t_blur = imgaussfilt(tign,y(i));
     t_temp(msk) = t_blur(msk);
-    figure(137),mesh(lon,lat,t_temp)
-    pause(5/steps)
+    %figure(137),mesh(lon,lat,t_temp)
+    %pause(5/steps)
     t_diff(i) = min(t_temp(:))-t0;    
     t_temp(m2) = t_temp(m2)-i/steps*t_diff(i);
     %t_temp = t_temp-i/steps*t_diff(i);
@@ -35,5 +39,5 @@ end
 %     time_slope = pixel_time_diff./t_diff(i);
 %     t_temp3 = t_temp - time_slope.*pixel_time_diff;
 %     t_shift = max(t_temp3,t_temp);
-% figure,plot(t_diff),title('Change in tign')
+%figure,plot(t_diff),title('Change in tign')
 sm_up = t_temp;

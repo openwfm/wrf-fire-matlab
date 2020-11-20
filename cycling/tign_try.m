@@ -8,6 +8,7 @@ if ~exist('red.mat','file')
 else
     load red.mat
 end
+
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
 
@@ -47,14 +48,16 @@ scatter3(pts(:,2),pts(:,1),pts(:,3)-red.start_datenum,'r*')
 pts(:,1) = pts(st2,1);
 pts(:,2) = pts(st2,2);
 pts(:,3) = pts(st2,3);
+idx(:,1) = idx(st2,1);
+idx(:,2) = idx(st2,2);
 
 cull = 1;
 %cluster the data
 t1 = red.min_tign;
 t2 = red.max_tign;
-clusters = round((t2-t1)*cpd);
+%clusters = round((t2-t1)*cpd);
 %clusters = round(length(pts)/20);
-%clusters = 20;
+clusters = cpd;
 [s_idx,s_c] = kmeans(pts(:,1:2),clusters);
 %scatter the clusters with coloring
 figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3)-red.start_datenum);
