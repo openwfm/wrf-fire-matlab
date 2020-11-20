@@ -40,7 +40,7 @@ hold off
 %plot paths with gradient of surface
 %smooth surface first
 r.tign = imgaussfilt(r.tign,1/2)
-[dx,dy]= fire_gradients(r.fxlong,r.fxlat,r.tign);
+[dx,dy]= fire_gradients(r.fxlong,r.fxlat,r.tign,1);
 
 figure,contour(r.fxlong,r.fxlat,r.tign)
 hold on

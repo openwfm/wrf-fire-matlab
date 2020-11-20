@@ -9,6 +9,7 @@ pts(:,3) = ps.points(:,3);
 %forecast
 tign = ps.red.tign;
 t0 = min(tign(:));
+[m,n]=size(ps.red.tign);
 
 %%% data likelihood spline %%%
 %set up data likelihood spline
@@ -20,15 +21,20 @@ t0 = min(tign(:));
 % hold on,plot(t,1-exp(ts))
 %make vector of data likelihoods
 
-fprintf('Collecting ground detection data\n')
-%grounds = ground_detects(ps.red);
-[jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
-%make polygon around detections
-%infire = inpolygon(grounds.land(:,4),grounds.land(:,3),pts(:,2),pts(:,1));
-%infire = inpolygon(grounds.land(:,4),grounds.land(:,3),grounds.land(infire,4),grounds.land(infire,3));
-infire = inpolygon(igrid(:),jgrid(:),ps.idx(:,1),ps.idx(:,2));
-%remove holes in mask
-infire = inpolygon(igrid(:),jgrid(:),igrid(infire),jgrid(infire));
+gq = input_num('use ground detections? yes = [1]',1,1);
+if gq
+    smooth_ground = max(m,n)/100;
+    fprintf('Collecting ground detection data\n')
+    %grounds = ground_detects(ps.red);
+    %[jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
+    [jgrid,igrid]=meshgrid([1:n]',[1:m]');
+    %make polygon around detections
+    %infire = inpolygon(grounds.land(:,4),grounds.land(:,3),pts(:,2),pts(:,1));
+    %infire = inpolygon(grounds.land(:,4),grounds.land(:,3),grounds.land(infire,4),grounds.land(infire,3));
+    infire = inpolygon(igrid(:),jgrid(:),ps.idx(:,1),ps.idx(:,2));
+    %remove holes in mask
+    infire = inpolygon(igrid(:),jgrid(:),igrid(infire),jgrid(infire));
+end
 %try
 tign2 = tign;
 tmax=max(tign2(:));
@@ -36,7 +42,7 @@ tign_ground = tign2;
 tign_flat = ps.red.end_datenum*ones(size(ps.red.tign));
 beta = 1/2;
 %figure(159),hold on,scatter(pts(:,2),pts(:,1),'*r')
-time_err = 0.25;
+time_err = 0.0;
 g_diff = (tign_flat-tign+time_err)*24*3600;
 g_likes = p_like_spline(g_diff);
 beta_vect = exp(g_likes);
@@ -45,17 +51,21 @@ beta_vect = exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-for i = 1:2
-tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
-%tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
-t_mask = tign_ground > tmax;
-tign_ground(t_mask) = tmax;
-tign_ground = imgaussfilt(tign_ground,1/2);
-figure(159),scatter(pts(:,2),pts(:,1),'*r')
-figure(159),hold on,contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold off
-%figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
-pause(.5)
-t_min(i) = min(tign_ground(:));
+if gq
+    for i = 1:10
+        %tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
+        tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
+        t_mask = tign_ground > tmax;
+        tign_ground(t_mask) = tmax;
+        %tign_ground = imgaussfilt(tign_ground,smooth_ground );
+        tign_ground = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground);
+        figure(159),hold on
+        scatter(pts(:,2),pts(:,1),'*r')
+        contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold off
+        %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
+        pause(.5)
+        t_min(i) = min(tign_ground(:));
+    end
 end
 %plot(t_min)
 % figure,scatter(igrid(infire),jgrid(infire))
@@ -84,7 +94,7 @@ title_str = 'Analysis';
 %make matrix of forecast tign time for the points in the graph
 t_times = zeros(pts_length,1);
 for i = 1:pts_length
-    t_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
+    t_times(i) = tign(idx(i,1),idx(i,2));
 end
 
 
@@ -113,11 +123,11 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
-rm = 1;
+rm = 1/2;
 
 % random multiplier, keep the same
 % perturbs points downward in time to
-rt = 0.2;
+rt = 0.0;
 % weight for tign_new
 
 %alhpa blends  estimate of tign at a point with old estimate
@@ -125,9 +135,9 @@ rt = 0.2;
 % for data assimilation, alpha will be computed from exp(likelihood)
 alpha = 0.5;
 %constant for smooth in rlx_shp
-alpha_2 = 0.5; %smaller alph_2 ==> smoother
+alpha_2 = 0.7; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 5;
+smoothings = 20;
 for k = 1:smoothings
 %     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
 %     title(title_str)
@@ -195,16 +205,18 @@ for k = 1:smoothings
     end
     %size of local averaging to apply aoutomate by grid size?
     %patch = max(1,round(sqrt(smoothings-k)));
-    patch = 2;
+    patch = 4*ceil(max(m,n)/100);
+    fprintf('Using patch size %d in rlx_shp function \n',patch);
+    %patch = 2;
     
     %%%%% make use of ground detections %%%%
     %tign_new(~infire) = beta*tign_new(~infire)+(1-beta)*tign_flat(~infire);
     
     %smooth the tign
-    tign_new(tign_new < t0) = t0;
-    %tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
-    tign_new = rlx_shp(tign_new,alpha_2,patch);
-%     tign_flat = rlx_shp(tign_flat,alpha_2,patch);
+    %tign_new(tign_new < t0) = t0;
+    tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
+    %tign_new = rlx_shp(tign_new,alpha_2,patch);
+%   tign_flat = rlx_shp(tign_flat,alpha_2,patch);
     
     %collect information about tign at the detection points
     for i = 1:pts_length
@@ -233,7 +245,7 @@ for k = 1:smoothings
     title(tstr);
     xlabel('Iterations of Interpolation')
     temp_var(k) = min(tign_new(:))-ps.red.start_datenum;
-    figure(fig_num+5);plot(1:k,temp_var(1:k)*24),title('Change in ignition time'),xlabel('iteration'),ylabel('hours')
+    %figure(fig_num+5);plot(1:k,temp_var(1:k)*24),title('Change in ignition time'),xlabel('iteration'),ylabel('hours')
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
     if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
         fprintf('graph norm increase \n')
@@ -246,31 +258,32 @@ end
 
 % %%% try using ground detections after paths....
 % tign_ground = tign_new;
-% for i = 1:10
-% tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
-% %tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
-% t_mask = tign_ground > tmax;
-% tign_ground(t_mask) = tmax;
-% tign_ground = imgaussfilt(tign_ground,1/2);
-% figure(159),scatter(pts(:,2),pts(:,1),'*r')
-% figure(159),hold on,contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold off
-% %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
-% %pause(.5)
-% %t_min(i) = min(tign_ground(:));
+% if gq
+%     for i = 1:2
+%         %tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
+%         tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
+%         t_mask = tign_ground > tmax;
+%         tign_ground(t_mask) = tmax;
+%         tign_ground = imgaussfilt(tign_ground,smooth_ground);
+%         figure(159),scatter(pts(:,2),pts(:,1),'*r')
+%         figure(159),hold on,contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold off
+%         %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
+%         %pause(.5)
+%         %t_min(i) = min(tign_ground(:));
+%     end
+%     tign_new = tign_ground;
 % end
-% tign_new = tign_ground;
 
 tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
-figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
+figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new-t0)
 title(title_str)
-hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r'),hold off
+hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3)-t0,'*r'),hold off
 
 %plot the forecast for comparison
-figure,mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign)
+figure,mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign-t0)
 title('Forecast')
-hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3),'*r')
+hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3)-t0,'*r')
 
 end
-
 
 

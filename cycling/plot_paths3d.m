@@ -4,7 +4,7 @@ function plot_paths3d(path_struct,fig_num)
 %fg = path_struct.graph;
 pts = path_struct.points(:,1:3);
 pts(:,1:2) = path_struct.grid_pts;
-pts(:,3) = (pts(:,3)-floor(min(pts(:,3))));
+%pts(:,3) = (pts(:,3)-floor(min(pts(:,3))));
 paths = path_struct.paths;
 figure(fig_num)
 hold on
@@ -16,6 +16,6 @@ for j = 1:length(paths)%length(pts)
 end
 scatter3(pts(:,2),pts(:,1),pts(:,3),'*r')
 hold off
-grid on,xlabel('Lon'),ylabel('Lat'),zlabel('Time [days since simulation start]')
+grid on,xlabel('Lon'),ylabel('Lat'),zlabel('Time [datenum]')
 title('Shortest Paths and Active Fire Detections')
 end
