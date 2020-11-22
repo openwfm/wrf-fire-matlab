@@ -13,7 +13,7 @@ ps = interp_paths(ps1,0.3);
 
 tn = squish4(ps);
 %avg ROS in the forecast and data estimate
-[r1,r2] = cone_compare(ps,tn);
+load ps5.mat[r1,r2] = cone_compare(ps,tn);
 %load fuel information from the wrfout
 fuels;
 %figure,plot(fuel(2).fmc_g,fuel(2).ros_fmc_g);
