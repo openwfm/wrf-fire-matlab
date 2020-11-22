@@ -17,12 +17,13 @@ new_grid_pts = ps.grid_pts;
 new_points = ps.points;
 new_points2 = ps.points;
 new_grids = [];
+min_path_points = 5
 
 for i = 1:n
     p = ps.paths(i).p;
     new_p = p;
     pl = length(p);
-    if pl > 1
+    if pl >= min_path_points
         fprintf('\n Making new points, path %d\n',i)
 %         if i == 280
 %             pause

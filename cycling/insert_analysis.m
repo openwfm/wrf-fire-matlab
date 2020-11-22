@@ -7,10 +7,18 @@ function outer = insert_analysis(w,paths,a)
 %                       time format is tign_g, seconds from start
 
 red = paths.red;
+if isfield(red,'red')
+    red_orig = red.red;
+    %interpolate back to original size grid
+    F = scatteredInterpolant(red.fxlat(:),red.fxlong(:),a(:));
+    a = F(red_orig.fxlat,red_orig.fxlong);
+end
 w.analysis = w.tign_g;
 temp_a = datenum2time(a,red);
+%shift possible time differneces
 diff = max(w.tign_g(:))-max(temp_a);
 temp_a = temp_a + diff;
+
 w.analysis(red.ispan,red.jspan)=temp_a;
 
 %% adapt to use new use

@@ -1,7 +1,12 @@
-function path_struct = tign_try(w,cpd)
+function path_struct = tign_try(w,cpd,grid_dist)
 %scatter fake data on TIGN cone, try to recover the shape
 %cpd clusters per day of data
 %[fire_name,save_name,prefix] = fire_choice();
+clear_q = input_num('Delete mat files? 1 = yes',1)
+if clear_q
+    !rm red.mat pts.mat
+end
+
 if ~exist('red.mat','file')
     red = subset_domain(w);
     save red.mat red
@@ -9,8 +14,34 @@ else
     load red.mat
 end
 
+%compute grid sizes
+E = wgs84Ellipsoid;
+dlon= distance(red.min_lat,red.min_lon,red.min_lat,red.max_lon,E);
+dlat= distance(red.min_lat,red.min_lon,red.max_lat,red.min_lon,E);
+if ~exist('grid_dist','var')
+    grid_dist = 250;
+end
+new_m = round(dlon/grid_dist);
+new_n = round(dlat/grid_dist);
+
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
+
+%shrink the size for large matrices
+target_size = max(new_m,new_n);
+
+if max(size(red.tign)) > target_size
+
+    [m,n] = size(red.tign);
+    %shrink_factor
+    %sf = 4;
+    max_dim = max(m,n);
+    sf = target_size/max_dim;
+    n =round(n*sf);
+    m = round(m*sf);
+    red_copy = red;
+    red = subset_small(red,m,n);
+end
 
 % figures
 fig.fig_map=0;
@@ -25,8 +56,8 @@ idx = [ig_x,ig_y];
 for k = 1 : 1
     for i = 1:m
         for j = 1:n
-            if red.tign(i,j) < red.end_datenum
-                if rand < 0.1
+            if red.tign(i,j) < red.end_datenum - rm
+                if rand < 0.05
                     %pts = [pts;[lats',lons',times',confs',frps',gran']];
                     pts = [pts;[red.fxlat(i,j),red.fxlong(i,j),red.tign(i,j),100,100,2*round(red.tign(i,j)-red.start_datenum)]];
                     idx = [idx;[i,j]];
@@ -36,7 +67,7 @@ for k = 1 : 1
     end
 end
 if exist('pts.mat','file')
-    clear pts idx~
+    clear pts idx
     load pts.mat
 else
     save pts.mat pts idx
@@ -55,9 +86,9 @@ cull = 1;
 %cluster the data
 t1 = red.min_tign;
 t2 = red.max_tign;
-%clusters = round((t2-t1)*cpd);
+clusters = round((t2-t1)*cpd);
 %clusters = round(length(pts)/20);
-clusters = cpd;
+%clusters = cpd;
 [s_idx,s_c] = kmeans(pts(:,1:2),clusters);
 %scatter the clusters with coloring
 figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3)-red.start_datenum);
@@ -126,7 +157,7 @@ end
 raw_dist = a;
 
 %start filtering distance
-cluster_mult = 0.5;
+cluster_mult = 0.25;
 for i = 1:n
     for j = 1:n
         %         % make points in same cluster close
