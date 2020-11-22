@@ -91,14 +91,14 @@ end
 % ground_mask = logical(time_mask.*~infire);
 tign_new = tign_ground;
 %%%plot and save original perimeter
-figure(159),hold on
-scatter(pts(:,2),pts(:,1),'*r')
-contourf(ps.red.fxlong,ps.red.fxlat,ps.red.tign,20,'k'),hold off
-t_str = sprintf('Perimeter Shrinking \n Iteration %d',0);
-save_str = sprintf('perim_shrink_%d',0);
-xlabel('Lon'),ylabel('Lat'),title(t_str)
-xlim(xl);
-ylim(yl);
+% figure(159),hold on
+% scatter(pts(:,2),pts(:,1),'*r')
+% contourf(ps.red.fxlong,ps.red.fxlat,ps.red.tign,20,'k'),hold off
+% t_str = sprintf('Perimeter Shrinking \n Iteration %d',0);
+% save_str = sprintf('perim_shrink_%d',0);
+% xlabel('Lon'),ylabel('Lat'),title(t_str)
+% xlim(xl);
+% ylim(yl);
 % savefig(save_str);
 % saveas(gcf,[save_str '.png']);
 
