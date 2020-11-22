@@ -8,9 +8,8 @@ cycle = input_num('Which cycle? ',1);
 w = read_wrfout_tign(f);
 ps1 = cluster_paths(w,1);
 %new points
-ps = interp_paths(ps1);
+ps = interp_paths(ps1,0.3);
 %ps = ps1;
-
 tn = squish4(ps);
 %avg ROS in the forecast and data estimate
 load ps5.mat[r1,r2] = cone_compare(ps,tn);
@@ -39,7 +38,7 @@ if cycle == 1
     cpy_str = sprintf('cp %s %s',wi,wi_bak);
     system(cpy_str)
     %fmc_change(fmc_adjust,msk,rst);
-    ncreplace('wrfinput_d01','TIGN_G',new_w.analysis);
+    ncreplace(wi','TIGN_G',new_w.analysis);
 else
     d = dir('wrfrst*');
     for i = 1:length(d)

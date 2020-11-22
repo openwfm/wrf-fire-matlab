@@ -11,7 +11,7 @@ t = linspace(t0,t1,steps);
 %mx = 2;%
 mx = max(1,max(m,n)/100);
 %mn = 1/2;
-mn = 1/3*mx;
+mn = 1/4*mx;
 fprintf('Smooth paramaters : %f   %f   \n',mn,mx);
 m = (mn-mx)/(steps-2);
 y = @(t) mx + m*(t-2);
