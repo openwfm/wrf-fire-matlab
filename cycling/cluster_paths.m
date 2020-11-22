@@ -21,7 +21,7 @@ E = wgs84Ellipsoid;
 dlon= distance(red.min_lat,red.min_lon,red.min_lat,red.max_lon,E);
 dlat= distance(red.min_lat,red.min_lon,red.max_lat,red.min_lon,E);
 if ~exist('grid_dist','var')
-    grid_dist = 200;
+    grid_dist = 250;
 end
 new_m = round(dlon/grid_dist);
 new_n = round(dlat/grid_dist);

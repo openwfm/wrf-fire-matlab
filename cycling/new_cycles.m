@@ -38,7 +38,7 @@ if cycle == 1
     cpy_str = sprintf('cp %s %s',wi,wi_bak);
     system(cpy_str)
     %fmc_change(fmc_adjust,msk,rst);
-    ncreplace(wi','TIGN_G',new_w.analysis);
+    ncreplace(wi,'TIGN_G',new_w.analysis);
 else
     d = dir('wrfrst*');
     for i = 1:length(d)
