@@ -5,15 +5,17 @@ function new_cycles(f)
 
 cycle = input_num('Which cycle? ',1);
 
-w = read_wrfout_tign(f);
-ps1 = cluster_paths(w,1);
+ts = choose_time_step(f);
+w = read_wrfout_tign(f,ts);
+gs = input_num('What grid spacing?',250)
+ps1 = cluster_paths(w,1,gs);
 %new points
 ps = interp_paths(ps1,0.3);
 %ps = ps1;
 
 tn = squish4(ps);
 %avg ROS in the forecast and data estimate
-load ps5.mat[r1,r2] = cone_compare(ps,tn);
+[r1,r2] = cone_compare(ps,tn);
 %load fuel information from the wrfout
 fuels;
 %figure,plot(fuel(2).fmc_g,fuel(2).ros_fmc_g);

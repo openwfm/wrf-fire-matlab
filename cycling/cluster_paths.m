@@ -65,7 +65,7 @@ if ~exist(g_str,'file')
     save(g_str, 'g', '-v7.3');
 else
     g = [];
-    reload_dets = input_num('Reload detections? 1 = yes',0,1);
+    reload_dets = input_num('Reload detections? 1 = yes',1,1);
     if reload_dets == 1
         g = subset_l2_detections(prefix,p,red,time_bounds,fig);
         save(g_str, 'g', '-v7.3');

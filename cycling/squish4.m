@@ -28,7 +28,7 @@ t0 = min(tign(:));
 
 gq = input_num('use ground detections? yes = [1]',1,1);
 if gq
-    smooth_ground = max(m,n)/120;
+    smooth_ground = max(m,n)/50;
     fprintf('Collecting ground detection data\n')
     %grounds = ground_detects(ps.red);
     %[jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
@@ -56,18 +56,33 @@ beta_vect = exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 10;
+ground_steps = 20;
 if gq
+    data_area = sum(infire);
     for i = 1:ground_steps
+        fire_mask = tign_ground < tmax-0.1;
+        fire_area = sum(fire_mask(:));
+        out_side = fire_mask(:)-infire;
+        out_side(out_side<0)=0;
+        out_sum(i) = sum(out_side(:));
+        out_fraction = out_sum(i)/data_area;
+        if i > 2 && out_sum(i) == out_sum(i-1)
+            smooth_ground = 0.9*smooth_ground;
+            fprintf('decreasing ground smoothing \n')
+        end
+        if out_fraction < 0.1
+            break
+        end
+        fprintf('Fire area: %f pixel_out/data area: %f  pixels_out %f\n',fire_area,out_sum(i)/data_area,out_sum(i));
         %tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
         tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
         t_mask = tign_ground > tmax;
         tign_ground(t_mask) = tmax;
-        tign_temp = imgaussfilt(tign_ground,smooth_ground );
-        %tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground);
+        %tign_temp = imgaussfilt(tign_ground,smooth_ground );
+        tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground);
         tign_ground(~infire) = tign_temp(~infire);
-        a = 1/2-1/(2*i);
-        tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
+%         a = 1/10;%1/2-1/(2*i);
+%         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
 %         figure(73),scatter3(ps.red.fxlong(~infire),ps.red.fxlat(~infire),tign_ground(~infire))
 %         pause(1/2)
         figure(159)
@@ -81,7 +96,7 @@ if gq
 %         savefig(save_str);
 %         saveas(gcf,[save_str '.png']);
         %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
-        pause(.5)
+        %pause(.5)
         %t_min(i) = min(tign_ground(:));
     end
 end
@@ -185,8 +200,8 @@ for k = 1:smoothings
             p_j = idx(p(j),2);%+rm*round(randn);
             %%% make mean of old and new, in small block around path point
             %alpha is now the data likelikehood
-            %alpha = alpha_vect(p(j));
-            alpha = 0.1;
+            alpha = alpha_vect(p(j));
+            %alpha = 0.1;
             tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
             %%%% alternate strategy.
             %             if k == 1 && j > 1
@@ -275,7 +290,8 @@ for k = 1:smoothings
     %temp_var(k) = min(tign_new(:))-ps.red.start_datenum;
     %figure(fig_num+5);plot(1:k,temp_var(1:k)*24),title('Change in ignition time'),xlabel('iteration'),ylabel('hours')
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
-    if k > 2 && norms(k,1) > norm(k-1,1) && norms(k,1) > norms(k-2,1)
+    norm_break = 1;
+    if k > 2 && norms(k,norm_break) >= norm(k-1,norm_break) && norms(k,norm_break) >= norms(k-2,norm_break)
         fprintf('graph norm increase \n')
         break
     end
@@ -285,22 +301,54 @@ end
 
 
 % %%% try using ground detections after paths....
-% tign_ground = tign_new;
-% if gq
-%     for i = 1:2
-%         %tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
-%         tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
-%         t_mask = tign_ground > tmax;
-%         tign_ground(t_mask) = tmax;
-%         tign_ground = imgaussfilt(tign_ground,smooth_ground);
-%         figure(159),scatter(pts(:,2),pts(:,1),'*r')
-%         figure(159),hold on,contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold off
-%         %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
-%         %pause(.5)
-%         %t_min(i) = min(tign_ground(:));
-%     end
-%     tign_new = tign_ground;
-% end
+ground_steps = 5;
+tign_ground = tign_new;
+if gq
+    data_area = sum(infire);
+    for i = 1:ground_steps
+        fire_mask = tign_ground < tmax-0.1;
+        fire_area = sum(fire_mask(:));
+        out_side = fire_mask(:)-infire;
+        out_side(out_side<0)=0;
+        out_sum(i) = sum(out_side(:));
+        out_fraction = out_sum(i)/data_area;
+        if i > 2 && out_sum(i) == out_sum(i-1)
+            smooth_ground = 0.9*smooth_ground;
+            fprintf('decreasing ground smoothing \n')
+        end
+        if out_fraction < 0.1
+            break
+        end
+        fprintf('Fire area: %f pixel_out/data area: %f  pixels_out %f\n',fire_area,out_sum(i)/data_area,out_sum(i));
+        %tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
+        tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
+        t_mask = tign_ground > tmax;
+        tign_ground(t_mask) = tmax;
+        tign_temp = imgaussfilt(tign_ground,smooth_ground );
+        %tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground);
+        tign_ground(~infire) = tign_temp(~infire);
+%         a = 1/10;%1/2-1/(2*i);
+%         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
+%         figure(73),scatter3(ps.red.fxlong(~infire),ps.red.fxlat(~infire),tign_ground(~infire))
+%         pause(1/2)
+        figure(159)
+        contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold on
+        scatter(pts(1:5:end,2),pts(1:5:end,1),'*r'),hold off
+        t_str = sprintf('Perimeter Shrinking \n Iteration %d',i);
+        save_str = sprintf('perim_shrink_%d',i);
+        xlabel('Lon'),ylabel('Lat'),title(t_str)
+%         xl=[-121.5094 -121.2496];xlim(xl)
+%         yl = [46.0367   46.2035];ylim(yl)
+%         savefig(save_str);
+%         saveas(gcf,[save_str '.png']);
+        %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
+        %pause(.5)
+        %t_min(i) = min(tign_ground(:));
+    end
+end
+tign_new = tign_ground;
+
+%% end of post smoothing
 
 tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
 figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new-t0)
@@ -311,6 +359,8 @@ hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3)-t0,'*r'),hold 
 figure,mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign-t0)
 title('Forecast')
 hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3)-t0,'*r')
+
+filled_countours(ps,tign_new)
 
 end
 

@@ -9,7 +9,7 @@ idx = ps.idx;
 
 n = length(ps.paths)
 %number of new points on segment
-np = 3;
+np = 7;
 new_points = [];
 news = [];
 new_idx = ps.idx;
@@ -17,7 +17,7 @@ new_grid_pts = ps.grid_pts;
 new_points = ps.points;
 new_points2 = ps.points;
 new_grids = [];
-min_path_points = 5
+min_path_points = 2
 
 for i = 1:n
     p = ps.paths(i).p;
