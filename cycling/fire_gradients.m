@@ -10,6 +10,11 @@ E = wgs84Ellipsoid;
 
 
 [aspect,slope,dy,dx] = gradientm(lat,lon,tign,E);
+%set all gradients at top of cone to NaN
+t_top = tign > max(tign(:))-0.1;
+dx(t_top) = NaN;
+dy(t_top) = NaN;
+
 %[dx,dy] = gradient(tign);
 %using Sobel edge detector
 % [dx,dy] = imgradientxy(tign);
@@ -33,6 +38,9 @@ mx = isnan(dx);
 my = isnan(dy);
 nan_msk = logical(mx.*my);
 %plot the vectors
-figure,quiver(lon(~nan_msk),lat(~nan_msk),dx(~nan_msk),dy(~nan_msk))
-
+fprintf('there were %d NaN in the gradient \n',sum(nan_msk(:)));
+% figure,quiver(lon(~nan_msk),lat(~nan_msk),dx(~nan_msk),dy(~nan_msk))
+% title('Gradient')
+% figure,scatter(lon(nan_msk),lat(nan_msk));
+% title(['Location of ',num2str(sum(nan_msk(:))),' NaN in gradient'])
 end % function

@@ -2,7 +2,7 @@ function path_struct = tign_try(w,cpd,grid_dist)
 %scatter fake data on TIGN cone, try to recover the shape
 %cpd clusters per day of data
 %[fire_name,save_name,prefix] = fire_choice();
-clear_q = input_num('Delete mat files? 1 = yes',1)
+clear_q = input_num('Delete mat files? 1 = yes',0,1);
 if clear_q
     !rm red.mat pts.mat
 end
@@ -88,7 +88,7 @@ t1 = red.min_tign;
 t2 = red.max_tign;
 clusters = round((t2-t1)*cpd);
 %clusters = round(length(pts)/20);
-%clusters = cpd;
+clusters = 20;
 [s_idx,s_c] = kmeans(pts(:,1:2),clusters);
 %scatter the clusters with coloring
 figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3)-red.start_datenum);
