@@ -86,6 +86,11 @@ else
     fprintf('perimeter_time=%10.3f\nrestart=%s\n',t(i).perimeter_time,restart)
     q=sprintf('replace TIGN_G in %s and run\n %s\n [0/1]',rewrite,link_namelist_command);
     if input_num(q,1,force)
+        use_analysis = input_num('Use analyis for restart? [0]',0,1)
+        if use_analysis
+            p.analysis= max(p.forecast,p.analysis);
+            p.spinup = p.analysis;
+        end
         ncreplace(rewrite,'TIGN_G',p.spinup)
         if system(link_namelist_command),
              error('link failed')
@@ -93,8 +98,7 @@ else
     end
     %compute ros adjustment factor
     %ra = ros_adjust(p.forecast,p.analysis,p.observations_end_time,w.nfuel_cat);
-    %fprintf('Recomended ROS adjust factor: %f \n',ra);
-    disp('Run WRF-SFIRE and continue when done\n')
+    %fprintf('Recomended ROS adjust factor: %f \n',r    disp('Run WRF-SFIRE and continue when done\n')
 end
 
 function print_times(ii)

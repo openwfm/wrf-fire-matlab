@@ -6,6 +6,12 @@ function w=read_wrfout_tign(f,ts)
     %    f file name
     %    ts time step (string, optional). Read last time step if not given.
     % 
+    
+    if f(end) == 't'
+        fprintf('Matlab file as input, loading \n')
+        load(f)
+        return
+    end
     t=nc2struct(f,{'Times'},{});  nframes=size(t.times,2);
     alltimes=char(t.times')
     fprintf('Last time step in %s is %i at %s\n',f,nframes,alltimes(nframes,:))
@@ -28,8 +34,10 @@ function w=read_wrfout_tign(f,ts)
     end
 
     w=nc2struct(f,{'Times','TIGN_G','FXLONG','FXLAT','UNIT_FXLAT','UNIT_FXLONG','LFN','UF','VF',...
-        'XLONG','XLAT','NFUEL_CAT','ITIMESTEP'},{'DX','DY','DT'},frame);
-
+        'XLONG','XLAT','NFUEL_CAT','ITIMESTEP','FMC_G','ROS','HGT'},{'DX','DY','DT'},frame);
+    F = scatteredInterpolant(w.xlong(:),w.xlat(:),w.hgt(:));
+    w.fhgt = F(w.fxlong,w.fxlat);
+    %w.fhgt = griddata(w.xlong,w.xlat,w.hgt,w.fxlong,w.fxlat);
     w.times=char(w.times');
     w.cwd=pwd;
     w.datestr=datestr(clock);

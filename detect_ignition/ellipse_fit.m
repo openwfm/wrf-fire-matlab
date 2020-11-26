@@ -1,4 +1,4 @@
-function [ ] = ellipse_fit( data,ci )
+function [e ] = ellipse_fit( data,ci )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 % Calculate the eigenvectors and eigenvalues
@@ -14,10 +14,10 @@ largest_eigenval = max(max(eigenval));
 
 % Get the smallest eigenvector and eigenvalue
 if(largest_eigenvec_ind_c == 1)
-    smallest_eigenval = max(eigenval(:,2))
+    smallest_eigenval = max(eigenval(:,2));
     smallest_eigenvec = eigenvec(:,2);
 else
-    smallest_eigenval = max(eigenval(:,1))
+    smallest_eigenval = max(eigenval(:,1));
     smallest_eigenvec = eigenvec(1,:);
 end
 
@@ -56,6 +56,7 @@ r_ellipse = [ellipse_x_r;ellipse_y_r]' * R;
 
 % Draw the error ellipse
 % axis square
+figure(1)
 plot(r_ellipse(:,1) + X0,r_ellipse(:,2) + Y0,'-')
 hold on;
 
@@ -63,8 +64,8 @@ hold on;
 plot(data(:,1), data(:,2), '.');
 mindata = min(min(data));
 maxdata = max(max(data));
-xlim([mindata-3, maxdata+3]);
-ylim([mindata-3, maxdata+3]);
+%xlim([mindata-3, maxdata+3]);
+%ylim([mindata-3, maxdata+3]);
 hold on;
 
 % Plot the eigenvectors
@@ -75,6 +76,11 @@ hold on;
 % Set the axis labels
 hXLabel = xlabel('x');
 hYLabel = ylabel('y');
+
+e.v = eigenvec;
+e.d = eigenval;
+e.center = [X0,Y0];
+e.ellipse = r_ellipse;
 
 end
 
