@@ -1,4 +1,4 @@
-function tign = squish2(ps)
+function [tign,tign_large] = squish2(ps)
 %function takes path structure and makes new estimated tign
 %inputs  ps = graph_dets(w) or ps = cluster_paths(w), struct with points, paths, etc.
 
@@ -7,6 +7,8 @@ pts = ps.grid_pts;
 pts(:,3) = ps.points(:,3);
 new_pts = pts;
 tign = ps.red.tign;
+t_max = max(ps.points(:,3));
+tign(tign>=t_max)=t_max;
 idx = ps.idx;
 new_idx = idx;
 fignum = 111;
@@ -64,7 +66,9 @@ times_set = [];
 %make random patch around detections
 rm = 0;
 for i = 1:n;% total_time %half day interval
-    pts_tign(idx(i,1)-round(rm*rand):idx(i,1)+round(rm*rand),idx(i,2)-round(rm*rand):idx(i,2)+round(rm*rand))=times(i);
+    if rm ~= 0
+        pts_tign(idx(i,1)-round(rm*rand):idx(i,1)+round(rm*rand),idx(i,2)-round(rm*rand):idx(i,2)+round(rm*rand))=times(i);
+    end
     %draw polygon around every 20 detections
     if mod(i,20) == 0 || i == n
     pt_set = times <= times(i);
@@ -72,18 +76,41 @@ for i = 1:n;% total_time %half day interval
     lats_set = [lats_set;lats(pt_set)];
     times_set = [times_set;times(pt_set)];
 %     figure,scatter3(lons_set,lats_set,times_set)
+    %convex hull operations
+%     dt = delaunayTriangulation(lats_set,lons_set);
+%     c = convexHull(dt);
+%     [in,on] = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set(c),lons_set(c));
+%     figure,plot(lons_set(c),lats_set(c));
     [in,on] = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set,lons_set);
+    %in = logical(in+on);
     temp_tign(in) = max(times_set);
     temp_tign(~in) = end_time;
     tign = min(tign,temp_tign);
-    tign = imgaussfilt(tign,1/8);
+    %tign = imgaussfilt(tign,1);
     figure(fignum)
     mesh(ps.red.fxlong,ps.red.fxlat,tign)
     end
 end
-tign=min(tign,pts_tign);
-tign = imgaussfilt(tign,2/3,'FilterDomain','frequency');
+%tign=min(tign,pts_tign);
+tign = imgaussfilt(tign,1/13,'FilterDomain','frequency');
 fprintf('Blurring ... \n')
 figure(fignum),mesh(ps.red.fxlong,ps.red.fxlat,tign)
 xlabel('Lon'),ylabel('Lat'),zlabel('Time'),title('Interpolated by Polygons')
+%resize, if small matrices were used
+if isfield(ps.red,'red')
+    if size(ps.red.fxlong) ~= size(ps.red.red.fxlong)
+        fprintf('resizing to original size of grid \n');
+        [n,m] = size(ps.red.red.tign);
+        la = linspace(ps.red.red.min_lat,ps.red.red.max_lat,m);
+        lo = linspace(ps.red.red.min_lon,ps.red.red.max_lon,n);
+        [lat,lon] = meshgrid(la,lo);
+        F = scatteredInterpolant(ps.red.fxlat(:),ps.red.fxlong(:),tign(:));
+        tign_large = F(lat,lon);
+        %griddata seems to work the same as the scattererd interpolant
+        %here...
+        %tign = griddata(ps.red.fxlat(:),ps.red.fxlong(:),tign(:),lat,lon);
+    end
+end
+
+
 end

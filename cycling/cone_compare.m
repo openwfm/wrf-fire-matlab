@@ -1,35 +1,52 @@
-function cone_compare(ps,tign2)
+function [r1,r2,adjr0] = cone_compare(ps,tign2)
 %compares feature of fire arrival cones
 %ps = tign_try(w), tign = squish(ps)
 
 
+if isfield(ps.red,'red')
+    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1);
+    if upsize
+        red_orig = ps.red.red;
+        %interpolate back to original size grid
+        F = scatteredInterpolant(double(ps.red.fxlat(:)),double(ps.red.fxlong(:)),tign2(:));
+        tign2 = F(red_orig.fxlat,red_orig.fxlong);
+        %figure,contour(red_orig.fxlong,red_orig.fxlat,tign2,20,'k')
+        %title('resized to original grid spacing')
+        ps.red = red_orig;
+    end
+end
 
 lon = ps.red.fxlong;
 lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-% st = 3;
+% st = 1;
 % tign = imgaussfilt(tign,st);
 % tign2 = imgaussfilt(tign2,st);
+% use snmooth_up function to do smoothing
+% tign = smooth_up(lon,lat,tign);
+% tign2 = smooth_up(lon,lat,tign2);
 
 %compare areas of the two and plot over time
-area_compare(tign,tign2); 
+area_compare(ps,tign2); 
 
 %compute area of fires
 t_end = min(max(tign(:)),max(tign2(:)))-0.1;
 a1 = sum(sum(tign<t_end));
 a2 = sum(sum(tign2<t_end));
+adjr0 = sign(a2-a1)*1/10*sqrt(abs(a1-a2)/a2);
+%adjr0 = 1/10*sqrt(abs(a1-a2)/a2);
 %make the top flate for each
 % tign(tign>=t_end)=t_end;
 % tign2(tign2>=t_end)=t_end;
-fprintf('Forecast Area: %d Data area: %d \n',a1,a2);
+fprintf('Forecast Area: %d Data area: %d adjr0: %f\n',a1,a2,adjr0);
 figure,contour(lon,lat,tign,[t_end t_end],'k')
 hold on,contour(lon,lat,tign2,[t_end t_end],'b')
 legend('forecast','estimate')
-title('Perimeters')
-
-cull = input_num('Thin data set? [1]',1);
+t_str = sprintf('Perimeters \n Forecast Area = %d    Data Area = %d',a1,a2);
+title(t_str)
+cull = input_num('Thin data set? [1]',1,1);
 if cull ~= 1
 lon = lon(1:cull:end,1:cull:end);
 lat = lat(1:cull:end,1:cull:end);
@@ -58,6 +75,7 @@ daspect(aspect_ratio)
 hold on
 quiver(lon,lat,dx1,dy1)
 hold off
+title('Contour and gradient of estimate')
 % dx1=dx1/hx;dy1=dy1/hy;
 %unit vector
 [dx2,dy2] = fire_gradients(lon,lat,tign2,1);
@@ -67,19 +85,22 @@ hold off
 % hold off
 %[dx2,dy2] = gradient(tign2);
 % dx2=dx2/hx;dy2=dy2/hy;
-
 %compute the gradient of the terrain
-elev = ps.red.fhgt;
-[aspect,slope,ey,ex] = gradientm(lat,lon,elev,E);
+%elev = ps.red.fhgt;
+%[aspect,slope,ey,ex] = gradientm(lat,lon,elev,E);
 % figure,contour(lon,lat,elev,'k')
 % hold on
 % quiver(lon(1:5:end,1:5:end),lat(1:5:end,1:5:end),ex(1:5:end,1:5:end),ey(1:5:end,1:5:end))
 
 %slopes of fire directions by directional derivatives
-sl1 = ex.*dx1+ey.*dy1;
-sl2 = ex.*dx2+ey.*dy2;
-sl_diff = sl1-sl2;
-figure,histogram(sl_diff)
+% sl1 = ex.*dx1+ey.*dy1;
+% sl2 = ex.*dx2+ey.*dy2;
+% sl_diff = sl1-sl2;
+% figure,histogram(sl_diff)
+% t_str=sprintf('Difference in slopes normal to fire front \n Mean = %f', mean(sl_diff(~isnan(sl_diff))));
+% xlabel('Slope differences')
+% ylabel('Number')
+% title(t_str)
 
 %mask for only the fire cone
 t_msk1 = tign<max(tign(:))-0.1;
@@ -146,15 +167,20 @@ rx2 = 1./du2/(24*3600);
 ry2 = 1./dv2/(24*3600);
 r1 = sqrt(rx1.^2+ry1.^2);
 r2 = sqrt(rx2.^2+ry2.^2);
-
-figure
-quiver(lon(b_msk),lat(b_msk),rx1(b_msk),ry1(b_msk))
-hold on
-quiver(lon(b_msk),lat(b_msk),rx2(b_msk),ry2(b_msk))
+% cut_off = est_max(ps,r2)
+% cut_off = min(0.1,cut_off);
+cut_off = 2;
+b1 = r1<cut_off;b2 = r2 < cut_off;b_msk = logical(b1.*b2);
+% figure
+% quiver(lon(b_msk),lat(b_msk),rx1(b_msk),ry1(b_msk))
+% hold on
+% quiver(lon(b_msk),lat(b_msk),rx2(b_msk),ry2(b_msk))
+% t_str =sprintf('ROS vectors for ROS < %f',cut_off);
+% title(t_str);
 
 r_diff = r1-r2;
 %r_diff = imgaussfilt(r_diff,1/2);
-r_msk = abs(r_diff)<10;
+r_msk = abs(r_diff)<5;
 avg_r_diff = mean(r_diff(r_msk));
 std_r_diff = std(r_diff(r_msk));
 figure,histogram(r_diff(r_msk));
@@ -170,10 +196,10 @@ title('Locations for fuel adjustment')
 legend('Forecast too fast','Forecast too slow')
 
 %regression on slope and ros differences
-r_diff(abs(r_diff)>2) = NaN;
-sl_diff(abs(r_diff)>2) = NaN;
-figure,scatter(sl_diff(~isnan(r_diff)),r_diff(~isnan(r_diff)));
-mdl = fitlm(sl_diff(:),r_diff(:));
+% r_diff(abs(r_diff)>2) = NaN;
+% sl_diff(abs(r_diff)>2) = NaN;
+% figure,scatter(sl_diff(~isnan(r_diff)),r_diff(~isnan(r_diff)));
+% mdl = fitlm(sl_diff(:),r_diff(:));
 
 % figure,histogram(ps.red.nfuel_cat(r_fast)),xticks(1:14)
 % title('Fuel Types Where Fire is Burning too Fast')
@@ -220,7 +246,10 @@ for i = 1:13
     
 end
 
+%close all
 
+r1 = mean(r1(b_msk));
+r2 = mean(r2(b_msk));
 
 
 end

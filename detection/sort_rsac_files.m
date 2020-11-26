@@ -8,7 +8,7 @@ function p=sort_rsac_files(prefix)
 
 % insert query to use tifs of Level2 data here
 use_tifs = 0;%input_num('Use TIF files? No = 0',0,1);
-
+%obsolete, using only l2 data now
 if use_tifs == 1
     d=dir([prefix,'*.tif.mat']);d={d.name};
     if(isempty(d)), error(['No files found for ',prefix]),end
@@ -44,21 +44,32 @@ else
     
     %check to make sure geolocation and data files are both present!
     if mod(nfiles,2) ~= 0
-        match_mask = true(1,nfiles);
         fprintf('Mismatch, number of files is not an even number \n')
-        for j = 1:nfiles-1
-            if p.time(j) == p.time(j+1)
-                fprintf('time match \n')
-                j = j+2
-               
-            else
-                fprintf('time mismatch \n')
-                match_mask(j)  = false;
-            end
-        end    
     end
-    
+    %check that pairs are there delete unpaired granule form list
+    match_mask = true(1,nfiles);
+    j = 1;
+    while j < nfiles-1
+        if p.time(j) == p.time(j+1)
+            fprintf('time match %s\n',p.file{j})
+            fprintf('time match %s\n',p.file{j+1})
+            fprintf('Pair %d, %d \n\n',j,j+1)
+            j = j+2;
+        else
+            fprintf('***\n time mismatch %s\n***\n',p.file{j})
+            match_mask(j)  = false;
+            j = j+1;
+        end
+    end
+    %check for match in last file
+    if p.time(nfiles) ~= p.time(nfiles-1)
+        fprintf('***\n time mismatch %s\n***\n',p.file{nfiles})
+        match_mask(nfiles)  = false;
+    end
+    %remove unpaired granules
+    p.file = p.file(match_mask);
+    p.time = p.time(match_mask);
     
     
 end % if use_tifs
-end
+end %function

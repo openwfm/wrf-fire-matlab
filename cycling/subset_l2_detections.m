@@ -25,6 +25,7 @@ for i = 1:length(d)
                 v.lon = hdfread(file_str,'/FP_longitude');
                 v.lat  = hdfread(file_str,'/FP_latitude');
                 v.conf =  hdfread(file_str,'/FP_confidence');
+                v.mask = hdfread(file_str,'/fire mask');
             catch
                 warning('Read error somewhere')
             end
@@ -37,6 +38,7 @@ for i = 1:length(d)
                 v.lon = h5read(file_str,'/FP_longitude')';
                 v.lat  = h5read(file_str,'/FP_latitude')';
                 v.conf =  h5read(file_str,'/FP_confidence')';
+                v.mask = h5read(file_str,'/fire mask');
             catch
                 warning('read error somewhere')
             end
@@ -60,7 +62,7 @@ for i = 1:length(d)
             v.axis=[red.min_lon,red.max_lon,red.min_lat,red.max_lat];
             v.xlon = [];
             v.xlat = [];
-            v.fxdata = [];
+            v.fxdata = v.mask(xi,xj);
             %also fake for time being
             v.data = 9*ones(size(v.conf));
             %% put variables into granule struct

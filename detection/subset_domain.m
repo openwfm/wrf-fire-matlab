@@ -92,7 +92,12 @@ end
 if isfield(w,'fhgt')
     red.fhgt = w.fhgt(ispan,jspan);
 end
-    %commenting out next 4 lines
+if isfield(w,'ros')
+      if isempty(w.ros)
+          w.ros = ones(size(w.tign_g));
+      end
+    red.ros = w.ros(ispan,jspan);
+end
 red.min_lat = min(red.fxlat(:));
 red.max_lat = max(red.fxlat(:));
 red.min_lon = min(red.fxlong(:));

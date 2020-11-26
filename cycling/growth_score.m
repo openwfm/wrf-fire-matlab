@@ -21,6 +21,7 @@ function [ growth_struct] = growth_score( wrfout )
 % end
 
 fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3]',0,1)
+%[fire_name,save_name,prefix,perim] = fire_choice();
 cycle = input_num('Which cycle? ',0)
 if fire_choice == 1
     prefix='../campTIFs/';

@@ -98,8 +98,7 @@ else
     end
     %compute ros adjustment factor
     %ra = ros_adjust(p.forecast,p.analysis,p.observations_end_time,w.nfuel_cat);
-    %fprintf('Recomended ROS adjust factor: %f \n',ra);
-    disp('Run WRF-SFIRE and continue when done\n')
+    %fprintf('Recomended ROS adjust factor: %f \n',r    disp('Run WRF-SFIRE and continue when done\n')
 end
 
 function print_times(ii)

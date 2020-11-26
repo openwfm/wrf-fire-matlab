@@ -1,8 +1,7 @@
-:q
 function a = analyze_paths(ps,new_tign)
 %looks at the paths in a path struct and figures out some basic statistics
-% input   ps - struct, from ps = graph_dets(w,1);
-%         new_tign - analysis from squish(ps,1)
+% input   ps - struct, from ps = cluster_paths(w,1);
+%         new_tign - analysis from squish4(ps)
 
 %vector for speeds between points in the paths new_tign
 p_speeds = [];

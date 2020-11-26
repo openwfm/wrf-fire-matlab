@@ -1,16 +1,26 @@
 function outer = insert_analysis(w,paths,a)
-
+% puts analysis into the w file
 %w = wrfout_tign(f)
 %red = subset_domain(w)
-%paths = graph_dets(w,1)
+%paths = graph_dets(w,1) or paths = cluster(paths,w1)
 %a = squish(paths,1) , this is an anylysis fire arrival time
-%                       time format is ??
+%                       time format is tign_g, seconds from start
 
 red = paths.red;
+if isfield(red,'red')
+    red_orig = red.red;
+    %interpolate back to original size grid
+    F = scatteredInterpolant(red.fxlat(:),red.fxlong(:),a(:));
+    a = F(red_orig.fxlat,red_orig.fxlong);
+    figure,contour(red_orig.fxlong,red_orig.fxlat,a,20,'k')
+    title('resized to original grid spacing')
+end
 w.analysis = w.tign_g;
 temp_a = datenum2time(a,red);
+%shift possible time differneces
 diff = max(w.tign_g(:))-max(temp_a);
 temp_a = temp_a + diff;
+
 w.analysis(red.ispan,red.jspan)=temp_a;
 
 %% adapt to use new use
