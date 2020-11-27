@@ -22,15 +22,22 @@ end,end,end
 % gaussian quadrature nodes
 g=0.5773502691896257;
 s = g*ib;
-Ng=Nb;  %  number of Gauss points
+Ng=Nb;  %  number of Gauss points 
 
-K = zeros(Nb);
+% gradient on Gauss points - precompute
 for j=1:Ng
     for k=1:Nb
-        gradf(k,:)=[bd{1}(k,s(j,:)),bd{2}(k,s(j,:)),bd{3}(k,s(j,:))];
+        gradfs(k,:,j)=[bd{1}(k,s(j,:)),bd{2}(k,s(j,:)),bd{3}(k,s(j,:))];
     end
+end
+
+% changes with X
+K = zeros(Nb);
+for j=1:Ng
+    gradf = gradfs(:,:,j);
     Jx = X*gradf; % Jacobian at s
-    K_at_s = gradf * inv(Jx) * A * inv(Jx)' * gradf' * abs(det(Jx));
+    Jg   = gradf/Jx;
+    K_at_s = Jg * A * Jg' * abs(det(Jx));
     K = K + K_at_s;
 end
     

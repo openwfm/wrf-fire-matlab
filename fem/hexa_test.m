@@ -9,5 +9,5 @@ X = [0 0 0
      1 0 1
      0 1 1
      1 1 1]';
-% K = hexa(A,X)
-hexa(A,X)
+K = hexa(A,10*X)
+eig(K)
