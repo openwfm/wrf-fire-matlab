@@ -18,7 +18,7 @@ times = times(st_2);
 
 
 n = length(times);
-end_time = max(max(times),ps.red.end_datenum);
+end_time = max(max(times),ps.red.end_datenum)+0.01;
 start_time = min(times);
 total_time = ceil(end_time-start_time);
 
@@ -46,7 +46,7 @@ times_set = [];
 % end
 
 %going by every 30 detections
-for i = 1:30:n
+for i = 1:20:n
     pt_set = times <= times(i);
     lons_set = [lons_set;lons(pt_set)];
     lats_set = [lats_set;lats(pt_set)];
@@ -55,7 +55,7 @@ for i = 1:30:n
 %     lats_set = lats(pt_set);
     times_set = times(pt_set);
     %figure,scatter3(lons_set,lats_set,times_set)
-    [in,on] = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set,lons_set);
+    in = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set,lons_set);
     temp_tign(in) = max(times_set);
     temp_tign(~in) = end_time;
     tign = min(tign,temp_tign);
@@ -63,7 +63,8 @@ for i = 1:30:n
     
 end
 
-tign = imgaussfilt(tign,1)-0.25;
+%tign = imgaussfilt(tign,1)-0.25;
+%tign = smooth_up(ps.red.fxlong,ps.red.fxlat,tign);
 figure,mesh(ps.red.fxlong,ps.red.fxlat,tign);
 hold on
 scatter3(lons,lats,times,'*r')

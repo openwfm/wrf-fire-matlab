@@ -21,9 +21,9 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-% st = 1;
-% tign = imgaussfilt(tign,st);
-% tign2 = imgaussfilt(tign2,st);
+st = 1;
+tign = imgaussfilt(tign,st);
+tign2 = imgaussfilt(tign2,st);
 % use snmooth_up function to do smoothing
 % tign = smooth_up(lon,lat,tign);
 % tign2 = smooth_up(lon,lat,tign2);

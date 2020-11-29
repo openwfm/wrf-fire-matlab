@@ -24,7 +24,7 @@ for i = 1:n
     new_p = p;
     pl = length(p);
     if pl >= min_path_points
-        fprintf('\n Making new points, path %d\n',i)
+        %fprintf('\n Making new points, path %d\n',i)
 %         if i == 280
 %             pause
 %         end
@@ -39,7 +39,7 @@ for i = 1:n
             %distance between points in path
             dist = ps.raw_dist(p(j-1),p(j));
             np = round(dist/600)+1;
-            fprintf('Segment %d distance: %f new points: %d \n',j-1,dist,np);
+            %fprintf('Segment %d distance: %f new points: %d \n',j-1,dist,np);
             %linear interpolation of new points along the line
             new_lats = linspace(pts(p(j-1),1),pts(p(j),1),np)' ...
                 + 1/1000*randn(np,1);
