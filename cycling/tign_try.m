@@ -57,7 +57,7 @@ for k = 1 : 1
     for i = 1:m
         for j = 1:n
             if red.tign(i,j) < red.end_datenum - rm
-                if rand < 0.05
+                if rand < 0.10
                     %pts = [pts;[lats',lons',times',confs',frps',gran']];
                     pts = [pts;[red.fxlat(i,j),red.fxlong(i,j),red.tign(i,j),100,100,2*round(red.tign(i,j)-red.start_datenum)]];
                     idx = [idx;[i,j]];

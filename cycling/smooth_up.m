@@ -9,7 +9,7 @@ t = linspace(t0,t1,steps);
 
 %compute different std. for imgausfilt
 %mx = 2;%
-mx = max(1.0,max(m,n)/100);
+mx = max(1.0,max(m,n)/120);
 %mn = 1/2;
 mn = 1/3*mx;
 fprintf('Smooth paramaters : %f   %f   \n',mn,mx);

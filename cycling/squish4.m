@@ -293,7 +293,7 @@ for k = 1:smoothings
     norm_break = 1;
     if k > 2 && norms(k,norm_break) >= norm(k-1,norm_break) && norms(k,norm_break) >= norms(k-2,norm_break)
         fprintf('graph norm increase \n')
-        break
+        %break
     end
 end
 %tign_new = [];
