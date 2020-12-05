@@ -36,8 +36,10 @@ K = zeros(Nb);
 for j=1:Ng
     gradf = gradfs(:,:,j);
     Jx = X*gradf; % Jacobian at s
-    Jg   = gradf/Jx;
-    K_at_s = Jg * A * Jg' * abs(det(Jx));
+    [q,r]=qr(Jx);
+    Jg   = (gradf/r)*q'; % gradf/Jx
+    detJx = prod(diag(r)); % det(Jx)
+    K_at_s = Jg * A * Jg' * abs(detJx);
     K = K + K_at_s;
 end
     
