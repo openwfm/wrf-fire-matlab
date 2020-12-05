@@ -16,11 +16,7 @@ for i1=-1:2:1,for i2=-1:2:1,for i3=-1:2:1
 end,end,end
 % the value of basis function k at x
 bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
-% bd{i}(k,x) is the derivative wrt x(i) of basis function k at x
-gradbf = @(k,x) ...  % gradient of basis function k at x
-     [ib(k,1)*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3)),... % d/d(x(1))
-      (1+ib(k,1)*x(1))*ib(k,2)*(1+ib(k,3)*x(3)),... % d/d(x(2))
-      (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*ib(k,3)]/8; % d/d(x(3))
+
 
 % gaussian quadrature nodes
 g=0.5773502691896257;
@@ -29,17 +25,21 @@ Ng=Nb;  %  number of Gauss points
 s(Ng+1,:)=0; % extra point at center
 
 % gradient on Gauss points - precompute
-for j=1:Ng+1
-    for k=1:Nb
-        gradfs(k,:,j)= gradbf(k,s(j,:));
+
+    function g=gradbfs(x)  % gradient of basis functions at point x
+        g=zeros(Nb,3);
+        for k=1:Nb
+            g(k,:)= [ib(k,1)*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3)),... % d/d(x(1))
+                    (1+ib(k,1)*x(1))*ib(k,2)*(1+ib(k,3)*x(3)),... % d/d(x(2))
+                    (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*ib(k,3)]/8; % d/d(x(3))
+        end
     end
-end
 
 % changes with X
 K = zeros(Nb);
 F = zeros(Nb,1);
 for j=1:Ng+1
-    gradf = gradfs(:,:,j);
+    gradf = gradbfs(s(j,:));
     Jx = X*gradf; % Jacobian at s
     [q,r]=qr(Jx);
     Jg   = (gradf/r)*q'; % gradf/Jx
@@ -50,5 +50,6 @@ for j=1:Ng+1
     else   % contribiution to divergence load
         F = F + Jg * u0 * adetJx * 8;
     end
+end
 end
     
