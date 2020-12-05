@@ -28,7 +28,7 @@ Ng=Nb;  %  number of Gauss points
 s(Ng+1,:)=0; % extra point at center
 
 % gradient on Gauss points - precompute
-for j=1:Ng
+for j=1:Ng+1
     for k=1:Nb
         gradfs(k,:,j)= gradbf(k,s(j,:));
     end
@@ -36,13 +36,15 @@ end
 
 % changes with X
 K = zeros(Nb);
-for j=1:Ng
+for j=1:Ng+1
     gradf = gradfs(:,:,j);
     Jx = X*gradf; % Jacobian at s
     [q,r]=qr(Jx);
     Jg   = (gradf/r)*q'; % gradf/Jx
     detJx = prod(diag(r)); % det(Jx)
-    K_at_s = Jg * A * Jg' * abs(detJx);
-    K = K + K_at_s;
+    if j<=Ng % contribution to stiffness
+        K_at_s = Jg * A * Jg' * abs(detJx);
+        K = K + K_at_s;
+    end
 end
     
