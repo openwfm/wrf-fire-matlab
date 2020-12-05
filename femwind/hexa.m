@@ -9,14 +9,17 @@ function [K,F]=hexa(A,X,u0)
 
 % basis functions on reference element [-1,1]^3
 Nb = 8;  % number of basis functions
-k=0; ib=zeros(Nb,3);
-for i1=-1:2:1,for i2=-1:2:1,for i3=-1:2:1
-    k=k+1; 
-    ib(k,:)=[i1,i2,i3];  %  coordinates of node k in the reference element 
-end,end,end
-% the value of basis function k at x
-bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
-
+ib =[  % coordinates of basis functions
+    -1    -1    -1
+    -1    -1     1
+    -1     1    -1
+    -1     1     1
+     1    -1    -1
+     1    -1     1
+     1     1    -1
+     1     1     1];
+% the value of basis function k at x is
+% bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
 
 % gaussian quadrature nodes
 g=0.5773502691896257;
@@ -24,18 +27,6 @@ s = g*ib;
 Ng=Nb;  %  number of Gauss points
 s(Ng+1,:)=0; % extra point at center
 
-% gradient on Gauss points - precompute
-
-    function g=gradbfs(x)  % gradient of basis functions at point x
-        g=zeros(Nb,3);
-        for k=1:Nb
-            g(k,:)= [ib(k,1)*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3)),... % d/d(x(1))
-                    (1+ib(k,1)*x(1))*ib(k,2)*(1+ib(k,3)*x(3)),... % d/d(x(2))
-                    (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*ib(k,3)]/8; % d/d(x(3))
-        end
-    end
-
-% changes with X
 K = zeros(Nb);
 F = zeros(Nb,1);
 for j=1:Ng+1
@@ -47,7 +38,7 @@ for j=1:Ng+1
     if j<=Ng % contribution to stiffness
         K_at_s = Jg * A * Jg' * adetJx;
         K = K + K_at_s;
-    else   % contribiution to divergence load
+    else   % contribution to divergence load
         F = F + Jg * u0 * adetJx * 8;
     end
 end
