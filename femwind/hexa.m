@@ -10,24 +10,27 @@ function K=hexa(A,X)
 Nb = 8;  % number of basis functions
 k=0; ib=zeros(Nb,3);
 for i1=-1:2:1,for i2=-1:2:1,for i3=-1:2:1
-    k=k+1; ib(k,:)=-[i1,i2,i3];
-    % the value of basis function k at x is
-    bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
-    % bd{i}(k,x) is the derivative wrt x(i) of basis function k at x
-    bd{1}= @(k,x) ib(k,1)*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8; % d/d(x(1))
-    bd{2}= @(k,x) (1+ib(k,1)*x(1))*ib(k,2)*(1+ib(k,3)*x(3))/8; % d/d(x(2))
-    bd{3}= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*ib(k,3)/8; % d/d(x(3))
+    k=k+1; 
+    ib(k,:)=[i1,i2,i3];  %  coordinates of node k in the reference element 
 end,end,end
+% the value of basis function k at x
+bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
+% bd{i}(k,x) is the derivative wrt x(i) of basis function k at x
+gradbf = @(k,x) ...  % gradient of basis function k at x
+     [ib(k,1)*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3)),... % d/d(x(1))
+      (1+ib(k,1)*x(1))*ib(k,2)*(1+ib(k,3)*x(3)),... % d/d(x(2))
+      (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*ib(k,3)]/8; % d/d(x(3))
 
 % gaussian quadrature nodes
 g=0.5773502691896257;
 s = g*ib;
-Ng=Nb;  %  number of Gauss points 
+Ng=Nb;  %  number of Gauss points
+s(Ng+1,:)=0; % extra point at center
 
 % gradient on Gauss points - precompute
 for j=1:Ng
     for k=1:Nb
-        gradfs(k,:,j)=[bd{1}(k,s(j,:)),bd{2}(k,s(j,:)),bd{3}(k,s(j,:))];
+        gradfs(k,:,j)= gradbf(k,s(j,:));
     end
 end
 
