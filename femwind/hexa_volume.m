@@ -1,12 +1,15 @@
 function v=hexa_volume(X)
+% in:
 %   X  columns are corners of hexa in this ordering
+% out:
+%   v  volume
 %
 %   7-----8
-%  /     /|
+%  /|    /|
 % 5-----6 |
-% |       |
-% | 3-----4
-% |/     /
+% | |   | |
+% | 3---|-4
+% |/    |/
 % 1-----2 
 
 % row = corners of a tetra
@@ -27,6 +30,7 @@ if vis
     end
     drawnow
 end
+
 for i=1:size(tet,1)
     XX = X(:,tet(i,:));
     vv = abs(det([XX;ones(1,4)]))/6;

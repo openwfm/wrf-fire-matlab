@@ -29,10 +29,10 @@ u = [1, 2, 3]';
 [K, F] = hexa(A,X,u)
 eig(K)  % one eigenvalue zero
 
-vol=hexa_volume(X)
+% test F
 % for linear field mu with values V at nodes V*F should be -integral (grad mu) * u
 gradmu=[4,5,6]; c=1;
-mu = @(x) gradmu*x + c;
-V = mu(X);
-ex = - gradmu*u*vol
-err_F = V*F - ex
+V = gradmu*X + c;
+vol=hexa_volume(X)
+exact = - gradmu*u*vol; 
+err_F = V*F - exact

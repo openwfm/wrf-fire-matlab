@@ -39,7 +39,9 @@ for j=1:Ng+1
         K_at_s = Jg * A * Jg' * adetJx;
         K = K + K_at_s;
     else   % contribution to divergence load
-        F = F - Jg * u0 * adetJx * 8;
+        % vol = adetJx * 8;
+        vol = hexa_volume(X);
+        F = F - Jg * u0 * vol;
     end
 end
 end
