@@ -1,8 +1,9 @@
-function K=hexa(A,X)
+function [K,F]=hexa(A,X,u0)
 % create local stiffness matrix for hexa 3d element
 % in:
 %   A   coefficient matrix size 3x3, symmetric positive definite
 %   X   nodes coordinates size 3x8, one each column is one node
+%   u0   column vector of input wind at the center of the element
 % out:
 %   K   local stiffness matrix
 
@@ -36,15 +37,18 @@ end
 
 % changes with X
 K = zeros(Nb);
+F = zeros(Nb,1);
 for j=1:Ng+1
     gradf = gradfs(:,:,j);
     Jx = X*gradf; % Jacobian at s
     [q,r]=qr(Jx);
     Jg   = (gradf/r)*q'; % gradf/Jx
-    detJx = prod(diag(r)); % det(Jx)
+    adetJx = abs(prod(diag(r))); % det(Jx)
     if j<=Ng % contribution to stiffness
-        K_at_s = Jg * A * Jg' * abs(detJx);
+        K_at_s = Jg * A * Jg' * adetJx;
         K = K + K_at_s;
+    else   % contribiution to divergence load
+        F = F + Jg * u0 * adetJx * 8;
     end
 end
     
