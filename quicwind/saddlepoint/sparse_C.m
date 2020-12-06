@@ -1,4 +1,11 @@
 function C = sparse_C(n)
+% C = sparse_C(n)
+% Create the wind face continuity constraint matrix for a mesh of a given size
+% in:
+%     n   vector size 3, mesh sizes in x y z directions
+% out
+%     C   sparse matrix, one row for each cell face including on the ground
+
 % dimension and factor
 d = size(n,2);
 factor = 2*d;
