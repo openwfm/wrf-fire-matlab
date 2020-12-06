@@ -1,13 +1,14 @@
 function X=regular_mesh(n,h,v)
 % X=regular_mesh(n,h)
 % Creates a regular mesh that is stretched in the vertical direction but
-% uniform horizationally
+% uniform horizationally.
+% Use plot_mesh_3d(X) to see the result.
 % in:
-%     n           number of cells in each direction
-%     h           step size in each direction
-%     v           vertical stretch factor
+%     n           size 3 number of cells in each direction
+%     h           size 3 step size in each direction
+%     v           size 1 vertical stretch factor
 % out:
-%     Mmat        matrix computing fluxes in normal directions on mesh
+%     X           cell array with x y z grid coordinates
 % 
 if ~exist('v','var')
     v=1;
