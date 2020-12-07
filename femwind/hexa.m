@@ -1,4 +1,4 @@
-function [Kloc,Floc]=hexa(A,X,u0)
+function [Kloc,Floc,Jg]=hexa(A,X,u0)
 % create local stiffness matrix for hexa 3d element
 % in:
 %   A   coefficient matrix size 3x3, symmetric positive definite
@@ -7,6 +7,7 @@ function [Kloc,Floc]=hexa(A,X,u0)
 % out:
 %   Kloc   local stiffness matrix
 %   Floc   local divergence load vector
+%   Jg     gradient at center of function with values V is V'*Jg          
 
 % basis functions on reference element [-1,1]^3
 Nb = 8;  % number of basis functions

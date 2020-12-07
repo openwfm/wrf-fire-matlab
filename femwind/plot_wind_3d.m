@@ -1,4 +1,4 @@
-function plot_wind_3d(X,v,text,level,scale)
+function plot_wind_3d(X,W,text,level,scale)
 
 all_levels = false;
 if ~exist('level','var')
@@ -7,10 +7,12 @@ end
 if ~exist('scale','var')
     scale = 1;
 end
+if ~exist('text','var')
+    text="wind"
+end
 
-vx = v(1:3:end); vy = v(2:3:end); vz = v(3:3:end);
 if all_levels
-    quiver3(X{1}(:),X{2}(:),X{3}(:),vx,vy,vz,scale,'LineWidth',2)
+    quiver3(X{1}(:),X{2}(:),X{3}(:),W{1}(:),W{2}(:),vz,scale,'LineWidth',2)
     xlabel('x'), ylabel('y'), zlabel('z')
     title(title)
     hold off

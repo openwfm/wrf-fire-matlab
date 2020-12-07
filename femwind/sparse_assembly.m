@@ -1,8 +1,16 @@
-function [K,F]=sparse_assembly_fem(A,X,u0)
+function [K,F,W]=sparse_assembly(A,X,u0,lambda)
 % in: 
 %  A  penalty coefficients matrix, size 3x3, s.p.d.
 %  X  cell array with 3d arrays x y z coordinates of mesh vertices
 %  u0 cell array with 3d arrays initial wind vector at centers in x y z directions
+%  lambda scalar field on node
+% out:
+%  K  stiffness matrix, sparse
+%  F  load vector
+%  W  gradient of lambda
+
+% do to: now computing all three K,F,W, add a switch to compute only one
+% and save time
 
 d = size(X,2);    % dimensions
 n = size(X{1});   % mesh size
@@ -12,6 +20,7 @@ nz = nn*8;        % estimated nonzeros
 % initialize matrices
 K = sparse([],[],[],nn,nn,nz);
 F = zeros(nn,1);
+W = {zeros(n-1),zeros(n-1),zeros(n-1)};
 
 % create matrices
 tstart=tic;
@@ -34,9 +43,13 @@ for i1=1:n(1)-1  % loop over elements
                 end
             end
             u0loc=[u0{1}(i1,i2,i3),u0{2}(i1,i2,i3),u0{3}(i1,i2,i3)]';
-            [Kloc,Floc]=hexa(A,Xloc,u0loc); % create local matrix and rhs
+            [Kloc,Floc,Jg]=hexa(A,Xloc,u0loc); % create local matrix and rhs
             K(kglo,kglo)=K(kglo,kglo)+Kloc; % assemble to global matrix
             F(kglo)=F(kglo)+Floc; % assemble to global rhs
+            grad = lambda(kglo)'*Jg;  % grad lambda
+            for i=1:3
+                W{i}(i1,i2,i3)=grad(i);
+            end                         
         end
     end
 end
