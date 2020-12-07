@@ -42,6 +42,10 @@ for j=1:Ng+1
         Kloc = Kloc + K_at_s;
     else   % contribution to divergence load
         % vol = adetJx * 8;
+        % TO DO: this is exact for a linearly deformed mesh but squashed is not.
+        % the decomposition in tetras used in hexa_volume will break
+        % non-planar faces. Compare the derminant and the average height method
+        % instead.
         vol = hexa_volume(X);
         Floc = Floc - Jg * u0 * vol;
     end
