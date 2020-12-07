@@ -1,11 +1,11 @@
 disp('femwind_test')
 
 % dimensions in elements
-sc=2; % mesh scale
+sc=1; % mesh scale
 n = sc*[10,5,5];
 h = [1,1,1]/sc;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
-A = diag([1,1,0.1]);
+A = diag([1,1,1]);
 lambda = zeros(prod(n+1),1); % placeholder solution
 
 % creating the grid
