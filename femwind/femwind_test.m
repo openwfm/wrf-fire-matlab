@@ -1,39 +1,24 @@
-% ordering
-% rows: u, v, w.
-% columns: low x, high x, low y, high y, low z, high z.
+disp('femwind_test')
 
-% settings
-if ~exist('plot_all','var')
-    plot_all = false;
-end
-
-% dimension
+% dimensions in elements
 n = [10,5,5];
 h = [1,1,1];
-factor = 6;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
+A = diag([1,1,2]);
 
 % creating grid
-X = regular_mesh(n,h,1);
-%thx = h(1)*[0:n(1)]'*ones(1,n(2)+1);
-%X = add_terrain_to_mesh(X,thx,'shift');
+X = regular_mesh(n,h,1.5);
 X = add_terrain_to_mesh(X,'xhill','squash',0.3);
 CX = center_mesh(X);
-xx = CX{1}; yy = CX{2}; zz = CX{3};
 
-% assembly sparse matrices
-[A,D,E,B,C,v0] = sparse_assembly(X,h);
-
-% plot initial wind at the middle of the cells
-u0=E*v0;
+% initial wind at the centers of the elements
+u0={ones(n),zeros(n),zeros(n)};
 figure, 
 plot_mesh_3d(X), hold on, 
-quiver3(xx(:),yy(:),zz(:),u0(1:3:end),u0(2:3:end),u0(3:3:end),'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Initial wind')
+quiver3(CX{1},CX{2},CX{3},u0{1},u0{2},u0{3},'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Initial wind')
 
-if plot_all
-    % plot initial wind from each cell
-    figure, plot_fluxes_3d(X,B'*v0,h), title('Initial wind fluxes')
-end
+% assembly sparse matrices
+[K,F] = sparse_assembly(A,X,u0);
 
 % solve mass-consistent using saddle problem
 saddle_sparse

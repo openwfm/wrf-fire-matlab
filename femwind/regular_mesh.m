@@ -13,10 +13,9 @@ function X=regular_mesh(n,h,v)
 if ~exist('v','var')
     v=1;
 end
-zz = zeros(1,n(3));
-zz(1) = 0;
-for i=2:n(3)+1
-    zz(i) = zz(i-1) + h(3) * v^(i-2);
+zz = zeros(1,n(3)+1);
+for i=1:n(3)
+    zz(i+1) = zz(i) + h(3) * v^i;
 end
 [x,y,z] = ndgrid(h(1)*[0:n(1)],h(2)*[0:n(2)],zz);
 X = {x,y,z};
