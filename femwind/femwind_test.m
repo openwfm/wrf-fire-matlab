@@ -20,8 +20,11 @@ quiver3(CX{1},CX{2},CX{3},u0{1},u0{2},u0{3},'LineWidth',2), xlabel('x'), ylabel(
 % assembly sparse matrices
 [K,F] = sparse_assembly(A,X,u0);
 
-% solve mass-consistent using saddle problem
-saddle_sparse
+% dirichlet boundary conditions
+[K,F]=apply_boundary_conditions(K,F,X);
+
+% solve the equations
+lambda = K\F;
 
 % transform resulting fluxes into cartesian winds at the centers
 u=E*B*v;

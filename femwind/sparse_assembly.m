@@ -24,9 +24,9 @@ for i1=1:n(1)-1  % loop over elements
             for j3=0:1 % loop over corners of the element
                 for j2=0:1
                     for j1=0:1   
-                        kloc=sub2ind([2,2,2],j1+1,j2+1,j3+1); % local subscript
+                        kloc=sub2ind([2,2,2],j1+1,j2+1,j3+1); % local index
                         % kloc=1+j1+2*(j2+2*j3);   
-                        kglo(kloc)=sub2ind(n,i1+j1,i2+j2,i3+j3); % global subscript
+                        kglo(kloc)=sub2ind(n,i1+j1,i2+j2,i3+j3); % global index
                         for i=1:3
                             Xloc(i,kloc)=X{i}(i1+j1,i2+j2,i3+j3); % node coordinate i
                         end
