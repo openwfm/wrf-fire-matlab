@@ -27,7 +27,7 @@ hold off
 [K,F]=apply_boundary_conditions(K,F,X);
 
 % solve the equations
-lambda = K\F;
+lambda = sparse_solve(K,F,X,'direct');
 
 % gradient of lambda
 [~,~,W] = sparse_assembly(A,X,u0,lambda);
