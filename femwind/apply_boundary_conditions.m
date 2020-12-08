@@ -11,7 +11,7 @@ function [Kb,Fb]=apply_boundary_conditions(K,F,X)
 n = size(X{1});
 nn=size(K,1);
 if nn~=prod(n)
-    error('apply_boundary_conditions: inconsitent sizes')
+    error('apply_boundary_conditions: inconsistent sizes')
 end
 [i1,i2,i3]=ind2sub(n,1:nn);
 bc = i1==1 | i1 ==n(1) | i2 ==1 | i2 == n(2) | i3 == n(3);
