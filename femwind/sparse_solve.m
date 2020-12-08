@@ -6,6 +6,8 @@ switch method
     case {'d','direct'}
         disp('sparse direct solver')
         lambda = K\F;
+    case {'r','red-black'}
+        lambda=rb_line_gs_solve(K,F,X);
     otherwise
         error('unknown method')
 end
