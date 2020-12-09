@@ -8,7 +8,7 @@ if nn~=prod(n)
 end
 
 x = zeros(nn,1);
-maxit=100;
+maxit=1000;
 colx=1:n(3);
 onex=ones(1,n(3));
 tol = 1e-5*big(F)/big(K);
@@ -25,7 +25,7 @@ for it=1:maxit
         end
     end
     res= norm(K*x-F);
-    fprintf('iteration %g residual %g\n',it,res)
+    fprintf('iteration %g residual %g tolerance %g\n',it,res,tol)
     if res<tol,
         break
     end

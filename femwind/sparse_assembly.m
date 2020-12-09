@@ -12,6 +12,8 @@ function [K,F,W]=sparse_assembly(A,X,u0,lambda)
 % do to: now computing all three K,F,W, add a switch to compute only one
 % and save time
 
+fprintf('sparse_assembly:')
+
 d = size(X,2);    % dimensions
 n = size(X{1});   % mesh size
 nn = prod(n);     % total nodes
@@ -26,9 +28,10 @@ W = {zeros(n-1),zeros(n-1),zeros(n-1)};
 tstart=tic;
 Xloc = zeros(3,8);
 kglo=zeros(1,8);
-for i1=1:n(1)-1  % loop over elements
-    for i2=1:n(2)-1
-        for i3=1:n(3)-1
+for i2=1:n(2)-1
+    fprintf(' %g%%',100*i2/(n(2)-1))
+    for i3=1:n(3)-1
+            for i1=1:n(1)-1  % loop over elements
             % now in element (i1,i2,i3)
             for j3=0:1 % loop over corners of the element
                 for j2=0:1
@@ -53,6 +56,7 @@ for i1=1:n(1)-1  % loop over elements
         end
     end
 end
+fprintf('\n')
 % checks
 if length(F)>nn, size(F),error('size has grown by an index out of bounds'),end
 check_symmetry(K,'K',eps)
