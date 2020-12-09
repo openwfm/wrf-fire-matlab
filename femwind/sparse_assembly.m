@@ -50,6 +50,7 @@ for i3=1:n(3)-1
             K(kglo,kglo)=K(kglo,kglo)+Kloc; % assemble to global matrix
             F(kglo)=F(kglo)+Floc; % assemble to global rhs
             grad = lambda(kglo)'*Jg;  % grad lambda
+            grad = grad/A;
             for i=1:3
                 W{i}(i1,i2,i3)=grad(i);
             end                         
