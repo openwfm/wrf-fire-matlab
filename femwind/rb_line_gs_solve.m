@@ -19,7 +19,7 @@ for it=1:maxit
                 for i2=rb2:2:n(2)
                     % solving horizontal location i1 i2 and vertical line
                     ix = sub2ind(n,i1*onex,i2*onex,colx); 
-                    x(ix) = x(ix) - K(ix,ix)\(K(ix,:)*x - F(ix));
+                    x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
                 end
             end
         end

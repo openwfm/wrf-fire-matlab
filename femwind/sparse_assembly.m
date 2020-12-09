@@ -17,7 +17,7 @@ fprintf('sparse_assembly:')
 d = size(X,2);    % dimensions
 n = size(X{1});   % mesh size
 nn = prod(n);     % total nodes
-nz = nn*8;        % estimated nonzeros
+nz = nn*27;        % estimated nonzeros
 
 % initialize matrices
 K = sparse([],[],[],nn,nn,nz);
@@ -28,10 +28,10 @@ W = {zeros(n-1),zeros(n-1),zeros(n-1)};
 tstart=tic;
 Xloc = zeros(3,8);
 kglo=zeros(1,8);
-for i2=1:n(2)-1
-    fprintf(' %g%%',100*i2/(n(2)-1))
-    for i3=1:n(3)-1
-            for i1=1:n(1)-1  % loop over elements
+for i3=1:n(3)-1
+    fprintf(' %g%%',100*i3/(n(3)-1))
+    for i2=1:n(2)-1
+        for i1=1:n(1)-1  % loop over elements
             % now in element (i1,i2,i3)
             for j3=0:1 % loop over corners of the element
                 for j2=0:1
@@ -57,6 +57,9 @@ for i2=1:n(2)-1
     end
 end
 fprintf('\n')
+nn=prod(n);
+nz=nnz(K);
+fprintf('stiffness matrix size %g nonzeros %g density %g%%\n',nn,nz,100*nz/nn^2)
 % checks
 if length(F)>nn, size(F),error('size has grown by an index out of bounds'),end
 check_symmetry(K,'K',eps)
