@@ -2,7 +2,7 @@ disp('femwind_test')
 
 % dimensions in elements
 sc=1; % mesh scale
-n = sc*[10,5,5];
+n = sc*[10,10,5];
 h = [1,1,1]/sc;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
 A = diag([1,1,1]);
@@ -16,7 +16,7 @@ CX = center_mesh(X);
 % initial wind at the centers of the elements
 u0={ones(n),zeros(n),zeros(n)};
 figure(1),clf,hold off 
-% plot_mesh_3d(X), hold on, 
+% plot_mesh_3d(X), hold o5n, 
 quiver3(CX{1},CX{2},CX{3},u0{1},u0{2},u0{3},'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Initial wind')
 hold off
 

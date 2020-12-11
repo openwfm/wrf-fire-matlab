@@ -64,4 +64,5 @@ fprintf('stiffness matrix size %g nonzeros %g density %g%%\n',nn,nz,100*nz/nn^2)
 % checks
 if length(F)>nn, size(F),error('size has grown by an index out of bounds'),end
 check_symmetry(K,'K',eps)
+K = (K+K')/2; % symmetrize
 end
