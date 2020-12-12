@@ -3,11 +3,13 @@ disp('femwind_test')
 % dimensions in elements
 sc=1; % mesh scale
 n = sc*[20,10,5];
-sc2=1;
+sc2=2;
 n(1:2)=n(1:2)*sc2
 h = [1,1,1]/sc;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
-A = diag([1,1,1]);
+da=[1 1 5]
+string_diag_A=sprintf('%g %g %g',da);
+A = diag(da);
 lambda = zeros(prod(n+1),1); % placeholder solution
 
 % creating the grid
@@ -29,6 +31,7 @@ figure
 plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
 plot_wind_3d(CX,U0)
 hold off
+axis equal
 title('Initial wind')
 
 % show initial wind
@@ -36,6 +39,7 @@ figure
 plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
 plot_wind_3d(CX,U0,1)
 hold off
+axis equal
 title('Initial wind lowest layer')
 
 % assemble sparse system matrix
@@ -55,13 +59,21 @@ figure
 plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
 plot_wind_3d(CX,W)
 hold off
-title('Final wind')
+axis equal
+title(['Final wind a=',string_diag_A])
 
 figure
 plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
 plot_wind_3d(CX,W,1)
 hold off
-title('Final wind lowest layer')
+axis equal
+title(['Final wind lowest layer a=',string_diag_A])
 
+figure
+plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+plot_wind_3d(CX,W,1:2)
+hold off
+axis equal
+title(['Final wind lowest layers a=',string_diag_A])
 condition_number=scond(K)
 n

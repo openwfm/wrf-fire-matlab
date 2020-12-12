@@ -24,5 +24,4 @@ end
 hold off
 view(3)
 xlabel('x'), ylabel('y'), zlabel('z'),
-axis equal
 end
