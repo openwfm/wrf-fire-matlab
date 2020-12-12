@@ -28,10 +28,11 @@ W = {zeros(n-1),zeros(n-1),zeros(n-1)};
 tstart=tic;
 Xloc = zeros(3,8);
 kglo=zeros(1,8);
-for i3=1:n(3)-1
-    fprintf(' %g %g %g',100*i3/(n(3)-1))
-    for i2=1:n(2)-1
-        for i1=1:n(1)-1  % loop over elements
+m = n-1;
+done_last=0;
+for i3=1:m(3)
+    for i2=1:m(2)
+        for i1=1:m(1)  % loop over elements
             % now in element (i1,i2,i3)
             for j3=0:1 % loop over corners of the element
                 for j2=0:1
@@ -54,6 +55,12 @@ for i3=1:n(3)-1
             for i=1:3
                 W{i}(i1,i2,i3)=grad(i);
             end                         
+        end
+        done = 100*((i3-1)*m(2)+i2)/(m(3)*m(2));
+        done = round(done);
+        if done>done_last+5
+            fprintf(' %g%% ',done)
+            done_last=done;
         end
     end
 end
