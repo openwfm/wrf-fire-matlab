@@ -3,7 +3,7 @@ disp('femwind_test')
 % dimensions in elements
 sc=1; % mesh scale
 n = sc*[20,10,5];
-sc2=8;
+sc2=1;
 n(1:2)=n(1:2)*sc2
 h = [1,1,1]/sc;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
@@ -37,7 +37,7 @@ lambda = sparse_solve(K,F,X,'r');
 % plot resulting wind
 figure(2),clf,hold off
 % plot_mesh_3d(X), hold on, 
-quiver3(CX{1},CX{2},CX{3},u0{1}+W{1},u0{2}+W{2},u0{3}+W{3},...
+quiver3(CX{1},CX{2},CX{3},W{1},W{2},W{3},...
     'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Final wind')
 hold off
 

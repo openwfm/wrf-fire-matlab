@@ -57,6 +57,9 @@ for i3=1:n(3)-1
         end
     end
 end
+for i=1:3
+    W{i}=u0{i}+W{i};
+end
 fprintf('\n')
 nn=prod(n);
 nz=nnz(K);
