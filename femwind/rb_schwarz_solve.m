@@ -75,7 +75,7 @@ for i1=1:nsub(1)
 end
         
 x = zeros(nn,1);
-xx = zeros(nn,1);
+% xx = zeros(nn,1);
 for it=1:maxit
     for rb1=1:2
         for rb2=1:2
@@ -83,14 +83,14 @@ for it=1:maxit
                 for i2=rb2:2:nsub(2)
                     % solving horizontal location i1 i2 and vertical line
                     ix = IX{i1,i2};
-                    x(ix) = x(ix) + K(ix,ix)\(F(ix) - K(:,ix)'*x);
+                    % x(ix) = x(ix) + K(ix,ix)\(F(ix) - K(:,ix)'*x);
                     p = P{i1,i2}; % Ksub(p,p)= R'*R
-                    res = F(ix) - K(:,ix)'*xx;
+                    res = F(ix) - K(:,ix)'*x;
                     sol = R{i1,i2}\(R{i1,i2}'\res(p));
                     sol(p) = sol;
-                    err = big(res - K(ix,ix)*sol)
-                    xx(ix) = xx(ix) + sol;
-                    err = big(xx(ix)-x(ix))
+                    % err = big(res - K(ix,ix)*sol)
+                    x(ix) = x(ix) + sol;
+                    % err = big(xx(ix)-x(ix))
                 end
             end
         end
