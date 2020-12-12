@@ -29,7 +29,7 @@ tstart=tic;
 Xloc = zeros(3,8);
 kglo=zeros(1,8);
 for i3=1:n(3)-1
-    fprintf(' %g%%',100*i3/(n(3)-1))
+    fprintf(' %g %g %g',100*i3/(n(3)-1))
     for i2=1:n(2)-1
         for i1=1:n(1)-1  % loop over elements
             % now in element (i1,i2,i3)
