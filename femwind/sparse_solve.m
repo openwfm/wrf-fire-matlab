@@ -7,7 +7,9 @@ switch method
         disp('sparse direct solver')
         lambda = K\F;
     case {'r','red-black'}
-        lambda=rb_line_gs_solve(K,F,X);
+        lambda = rb_line_gs_solve(K,F,X);
+    case {'s','schwarz'}
+        lambda = rb_schwarz_solve(K,F,X);
     otherwise
         error('unknown method')
 end

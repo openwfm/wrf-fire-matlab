@@ -49,7 +49,7 @@ title('Initial wind lowest layer')
 [K,F]=apply_boundary_conditions(K,F,X);
 
 % solve the equations
-lambda = sparse_solve(K,F,X,'d');
+lambda = sparse_solve(K,F,X,'s');
 
 % assemble final wind
 [~,~,W] = sparse_assembly(A,X,U0,lambda);
@@ -75,5 +75,5 @@ plot_wind_3d(CX,W,1:2)
 hold off
 axis equal
 title(['Final wind lowest layers a=',string_diag_A])
-condition_number=scond(K)
+% condition_number=scond(K)
 n
