@@ -20,9 +20,14 @@ nn = prod(n);     % total nodes
 nz = nn*27;        % estimated nonzeros
 
 % initialize matrices
-K = sparse([],[],[],nn,nn,nz);
+% KK = sparse([],[],[],nn,nn,nz);
 F = zeros(nn,1);
 W = {zeros(n-1),zeros(n-1),zeros(n-1)};
+nzelem=prod(n-1)*64;     % total nonzeros before assembly
+ii=zeros(nzelem,1);
+jj=zeros(nzelem,1);
+aa=zeros(nzelem,1);
+kk=0;
 
 % create matrices
 tstart=tic;
@@ -48,26 +53,32 @@ for i3=1:m(3)
             end
             u0loc=[u0{1}(i1,i2,i3),u0{2}(i1,i2,i3),u0{3}(i1,i2,i3)]';
             [Kloc,Floc,Jg]=hexa(A,Xloc,u0loc); % create local matrix and rhs
-            K(kglo,kglo)=K(kglo,kglo)+Kloc; % assemble to global matrix
             F(kglo)=F(kglo)+Floc; % assemble to global rhs
+            % KK(kglo,kglo)=KK(kglo,kglo)+Kloc; % assemble to global matrix
+            % instead, accumulate contributions to the global matrix
+            [ix,jx]=ndgrid(kglo,kglo);
+            nzloc=prod(size(Kloc));
+            ii(kk+1:kk+nzloc)=ix(:);
+            jj(kk+1:kk+nzloc)=jx(:);
+            aa(kk+1:kk+nzloc)=Kloc(:);
+            kk=kk+nzloc;
             grad = lambda(kglo)'*Jg;  % grad lambda
             grad = grad/A;
             for i=1:3
                 W{i}(i1,i2,i3)=grad(i);
             end                         
         end
-        done = 100*((i3-1)*m(2)+i2)/(m(3)*m(2));
-        done = round(done);
-        if done>done_last+5
-            fprintf(' %g%% ',done)
-            done_last=done;
-        end
+        % done = 100*((i3-1)*m(2)+i2)/(m(3)*m(2));
+        % done = round(done);
+        % if done>done_last+5, fprintf(' %g%% ',done), done_last=done; end
     end
 end
 for i=1:3
     W{i}=u0{i}+W{i};
 end
 fprintf('\n')
+if kk~=nzelem, error('wrong element nonzeros'),end
+K = sparse(ii,jj,aa,nn,nn); % err_K=big(K-KK)
 nn=prod(n);
 nz=nnz(K);
 fprintf('stiffness matrix size %g nonzeros %g density %g%%\n',nn,nz,100*nz/nn^2)

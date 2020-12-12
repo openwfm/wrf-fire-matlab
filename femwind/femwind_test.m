@@ -1,15 +1,15 @@
 disp('femwind_test')
 
-do_plot=0
+do_plot=1
 
 % dimensions in elements
 sc=1; % mesh scale
 n = sc*[20,10,5];
-sc2=10;
+sc2=1;
 n(1:2)=n(1:2)*sc2
 h = [1,1,1]/sc;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
-da=[1 1 5]
+da=[1 1 1]
 string_diag_A=sprintf('%g %g %g',da);
 A = diag(da);
 lambda = zeros(prod(n+1),1); % placeholder solution
