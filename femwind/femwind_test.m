@@ -36,7 +36,7 @@ lambda = sparse_solve(K,F,X,'r');
 
 % plot resulting wind
 figure(2),clf,hold off
-% plot_mesh_3d(X), hold on, 
+plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
 quiver3(CX{1},CX{2},CX{3},W{1},W{2},W{3},...
     'LineWidth',2), xlabel('x'), ylabel('y'), zlabel('z'), title('Final wind')
 hold off

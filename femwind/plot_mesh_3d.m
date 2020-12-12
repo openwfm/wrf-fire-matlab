@@ -1,5 +1,10 @@
-function plot_mesh_3d(X)
-n = size(X{1});
+function plot_mesh_3d(X,bbox)
+if exist('bbox','var')
+    for i=1:3
+        X{i}=X{i}(bbox(1):bbox(2),bbox(3):bbox(4),bbox(5):bbox(6));
+    end
+end
+[n(1),n(2),n(3)] = size(X{1});
 hold on
 for j=1:n(2)
     for k=1:n(3)
