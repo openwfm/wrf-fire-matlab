@@ -1,8 +1,15 @@
 function plot_wind_3d(CX,W,level,scale)
+% plot_wind_3d(CX,W,level,scale)
+% in:
+%     CX     {x,y,z} 3D coordinates where the wind vectors are located
+%     W      {u,v,w} 3D wind vectors
+%     level  vector of number of vertical levels to display
+%            default if none or empty: all levels
+%     scale  scaling of wind vector arrow, see doc quiver
 
 all_levels = false;
 [n(1),n(2),n(3)]=size(CX{1});
-if ~exist('level','var')
+if ~exist('level','var') || isempty(level)
     level=1:n(3);
 end
 if ~exist('scale','var')
