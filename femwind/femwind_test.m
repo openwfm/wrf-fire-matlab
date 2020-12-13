@@ -3,6 +3,7 @@ disp('femwind_test')
 do_plot=0
 
 scale=[1,2,4,8,16]
+scale=[1]
 for icase = 1:length(scale)
 sc = scale(icase)    
 
@@ -58,7 +59,7 @@ end
 [K,F]=apply_boundary_conditions(K,F,X);
 
 % solve the equations
-lambda = sparse_solve(K,F,X,'s');
+[lambda,it] = sparse_solve(K,F,X,'s');
 
 % assemble final wind
 [~,~,W] = sparse_assembly(A,X,U0,lambda);
@@ -110,6 +111,7 @@ end
     s(icase).W=W;
     s(icase).A=A;
     s(icase).U0=U0;
+    s(icase).it=it;
     save s.mat s
     
 end

@@ -1,4 +1,4 @@
-function lambda=sparse_solve(K,F,X,method)
+function [lambda,it]=sparse_solve(K,F,X,method)
 n = size(X{1});
 nn = size(K,1);
 fprintf('sparse_solve: problem size %g mesh %g %g %g\n',nn,n)
@@ -6,10 +6,11 @@ switch method
     case {'d','direct'}
         disp('sparse direct solver')
         lambda = K\F;
+        it=0;
     case {'r','red-black'}
-        lambda = rb_line_gs_solve(K,F,X);
+        [lambda,it] = rb_line_gs_solve(K,F,X);
     case {'s','schwarz'}
-        lambda = rb_schwarz_solve(K,F,X);
+        [lambda,it] = rb_schwarz_solve(K,F,X);
     otherwise
         error('unknown method')
 end

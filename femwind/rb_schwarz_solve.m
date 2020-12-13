@@ -1,4 +1,4 @@
-function x=rb_schwarz_solve(K,F,X)
+function [x,it]=rb_schwarz_solve(K,F,X)
 % x=rb_line_gs_solve(K,F,X)
 disp('solver red-black horizonal schwarz')
 n = size(X{1})

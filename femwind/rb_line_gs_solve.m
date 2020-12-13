@@ -1,4 +1,4 @@
-function x=rb_line_gs_solve(K,F,X)
+function [x,it]=rb_line_gs_solve(K,F,X)
 % x=rb_line_gs_solve(K,F,X)
 disp('solver red-black relaxation horizontal, lines vertical')
 n = size(X{1});
