@@ -81,6 +81,16 @@ if do_plot
     hold off
     axis equal
     title(['Final wind lowest layers a=',string_diag_A])
+    
+    figure
+    height=1;
+    wind_at_h(X,CX,W,[20,20,1],[2,18,1,9,height,height]); hold on
+    plot_mesh_3d(X,[1,n(1),1,n(2),1,1])
+    hold off
+    axis equal
+    title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
+
 end
+
 % condition_number=scond(K)
 n
