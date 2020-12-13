@@ -1,9 +1,13 @@
 disp('femwind_test')
 
-do_plot=1
+do_plot=0
+
+scale=[1,2,4,8,16]
+for icase = 1:length(scale)
+sc = scale(icase)    
 
 % dimensions in elements
-sc=1; % mesh scale
+% sc=1; % mesh refinement scale
 n = sc*[20,10,5];
 sc2=1;
 n(1:2)=n(1:2)*sc2
@@ -82,15 +86,32 @@ if do_plot
     axis equal
     title(['Final wind lowest layers a=',string_diag_A])
     
+end
+
+
     figure
     height=1;
-    wind_at_h(X,CX,W,[20,20,1],[2,18,1,9,height,height]); hold on
+    [XH,WH]=wind_at_h(X,CX,W,[20,20,1],[2,18,1,9,height,height]); 
+    plot_wind_3d(XH,WH)
+    hold on
     plot_mesh_3d(X,[1,n(1),1,n(2),1,1])
     hold off
     axis equal
     title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
 
+    
+    s(icase).sc=sc;
+    s(icase).n=n;
+    s(icase).X=X;
+    s(icase).CX=CX;
+    s(icase).XH=XH;
+    s(icase).h=h;
+    s(icase).WH=WH;
+    s(icase).W=W;
+    s(icase).A=A;
+    s(icase).U0=U0;
+    save s.mat s
+    
 end
-
 % condition_number=scond(K)
 n

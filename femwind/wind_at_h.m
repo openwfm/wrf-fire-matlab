@@ -1,6 +1,6 @@
 function [XH,WH]=wind_at_h(X,CX,W,m,bbox)
 % [XH,WH]=wind_at_h(X,CX,W,m,bbox)
-% interpolate and plot wind at model independent mesh size m(1) m(2) m(3)
+% interpolate wind at model independent mesh size m(1) m(2) m(3)
 % in a bbox above terrain
 
 % create query mesh
@@ -16,5 +16,4 @@ end
 for i=1:3
     WH{i}=griddata(CX{1},CX{2},CX{3},W{i},XH{1},XH{2},XH{3});
 end
-plot_wind_3d(XH,WH)
 end
