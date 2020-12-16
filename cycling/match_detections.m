@@ -1,4 +1,4 @@
-function [ score ] = match_detections( wrfout, wrf_time_step, cycle )
+function [ score ] = match_detections( wrfout, cycle,wrf_time_step)
 %function score = match_detections( input_args )
 %Function evaluates a simulation by finding how well it was able to predict
 %where satellites detections would indicate a fire was burning
