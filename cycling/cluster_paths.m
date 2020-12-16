@@ -224,11 +224,12 @@ end
 %find cluster with smallest number of pts
 c1 = sum(s_idx2 == 1);
 c2 = sum(s_idx2 == 2);
+fprintf('Two clusters computed %d and %d points in them \n',c1,c2)
 small_clust = 1;
 if c2 < c1
     small_clust = 2;
 end
-if sum(s_idx2==small_clust)/(c1+c2) < 0.05
+if norm(s_c2(2,:)) > 1e4; %sum(s_idx2==small_clust)/(c1+c2) < 0.05
     cp(s_idx2==small_clust,:) = [];
     pts(s_idx2==small_clust,:) = [];
     n_points(s_idx2==small_clust,:) = [];
