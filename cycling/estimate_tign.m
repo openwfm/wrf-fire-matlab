@@ -45,8 +45,9 @@ times_set = [];
 %     mesh(ps.red.fxlong,ps.red.fxlat,tign)
 % end
 
-%going by every 30 detections
-for i = 1:20:n
+%going by every 5 detections
+det_steps = max(5,round(length(ps.points)/30));
+for i = 1:det_steps:n
     pt_set = times <= times(i);
     lons_set = [lons_set;lons(pt_set)];
     lats_set = [lats_set;lats(pt_set)];
