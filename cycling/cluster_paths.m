@@ -79,7 +79,7 @@ end
 %pos_detects = collect_pos(prefix,p,red,time_bounds,fig)
 
 %add functionality to pull in perimeter data here
-use_perims = input_num('Use perimeter data ? 1 = yes',0,1);
+use_perims = input_num('Use perimeter data ? 1 = yes',0);
 if use_perims == 1
     %use just 40 points per peimeter
     p_points = input_num('How many perimeter points to use?',20);
@@ -97,16 +97,17 @@ if use_perims == 1
           p_gran(i).conf  = 95*ones(1,l);
           p_gran(i).lat = n_pts(:,3)';
           p_gran(i).lon = n_pts(:,4)';
+          p_gran(i).mask = [];
        end
     end
     gl = length(g);
     rm_idx = zeros(1,length(p_gran));
     for i = 1:length(p_gran)
         %only add perimeters up to final granules time
-        if p_gran(i).time < g(gl).time
+        if p_gran(i).time < time_bounds(2);% g(gl).time
             g(length(g)+1)=p_gran(i);
         else
-            fprintf('Perimeter time after last granule, removing from set of perimeters \n')
+            fprintf('Perimeter time after simulation end, removing from set of perimeters \n')
            rm_idx(i) = 1;
         end
     end
@@ -242,7 +243,7 @@ end
 
 %cluster the data 
 dt = 3*ceil(g(end).time - g(1).time);
-space_clusters = 20; %days
+space_clusters = 100; %days
 %more clusters for using perimeter data
 if use_perims == 1
     space_clusters = dt*2;
