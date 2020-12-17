@@ -12,7 +12,7 @@ sc = scale(icase)
 n = sc*[20,10,5];
 sc2=1;
 n(1:2)=n(1:2)*sc2
-h = [1,1,1]/sc;
+h = [10,10,10]/sc;
 fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
 da=[1 1 1]
 string_diag_A=sprintf('%g %g %g',da);
@@ -27,7 +27,7 @@ CX = center_mesh(X);
 % initial wind at the centers of the elements
 U0={ones(n),zeros(n),zeros(n)};
 
-if do_plot
+if 1
 
     % show mesh
     hold off
@@ -92,8 +92,11 @@ end
 
 
     figure
-    height=1;
-    [XH,WH]=wind_at_h(X,CX,W,[20,20,1],[2,18,1,9,height,height]); 
+    height=10;
+    [XH,WH]=wind_at_h(X,CX,W,[20,20,1],...
+        [min(X{1}(:)),max(X{1}(:)),...
+        min(X{3}(:)),max(X{3}(:)),...
+        height,height]); 
     plot_wind_3d(XH,WH)
     hold on
     plot_mesh_3d(X,[1,n(1),1,n(2),1,1])

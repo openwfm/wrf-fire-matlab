@@ -33,18 +33,20 @@ for it=1:maxit
         lambda(s1,s2,s3)=x(i);
         exact(s1,s2,s3)=ex(i);
     end
-    res,err(it)=big(lambda-exact)/big(exact);
+    res,err(it)=big(lambda-exact);
     s=7;
     l=squeeze(lambda(:,s,:)-exact(:,s,:));
     xx=squeeze(X{1}(:,s,:));
     yy=squeeze(X{2}(:,s,:));
     zz=squeeze(X{3}(:,s,:));
-    figure(3);
+    figure(13);
     mesh(xx,zz,l)
     t=sprintf('error slice %g y=%g it=%g rel res=%g rel err=%g',...
         s,yy(1),it,res(it)/big(F),err(it)/big(exact));
+    xlabel('horizontal')
+    ylabel('vertical')
     title(t)
-    figure(4)
+    figure(14)
     semilogy(1:it,res,'*',1:it,err,'x'), grid on
     legend('residual','error')
     title(sprintf('mesh=%g %g %g',n))
