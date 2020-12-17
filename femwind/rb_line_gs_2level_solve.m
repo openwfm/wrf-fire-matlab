@@ -8,7 +8,7 @@ if nn~=prod(n)
 end
 
 x = zeros(nn,1);
-maxit=250;
+maxit=100;
 colx=1:n(3);
 onex=ones(1,n(3));
 tol = 1e-5*big(F)/big(K);
@@ -33,7 +33,7 @@ for it=1:maxit
         lambda(s1,s2,s3)=x(i);
         exact(s1,s2,s3)=ex(i);
     end
-    res,err(it)=big(lambda-exact);
+    res,err(it)=norm(x-ex);
     s=7;
     l=squeeze(lambda(:,s,:)-exact(:,s,:));
     xx=squeeze(X{1}(:,s,:));
@@ -42,13 +42,13 @@ for it=1:maxit
     figure(13);
     mesh(xx,zz,l)
     t=sprintf('error slice %g y=%g it=%g rel res=%g rel err=%g',...
-        s,yy(1),it,res(it)/big(F),err(it)/big(exact));
+        s,yy(1),it,res(it)/norm(F),err(it)/norm(ex));
     xlabel('horizontal')
     ylabel('vertical')
     title(t)
     figure(14)
     semilogy(1:it,res,'*',1:it,err,'x'), grid on
-    legend('residual','error')
+    legend('relative L^2 residual','relative L^2 error')
     title(sprintf('mesh=%g %g %g',n))
     xlabel('iteration')
     drawnow,pause(0.1)
