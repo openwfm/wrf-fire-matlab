@@ -31,12 +31,12 @@ if 1
 
     % show mesh
     hold off
-    figure
+    figure(1)
     plot_mesh_3d(X), hold on, 
     title('The wind mesh, wind vector in centers, lambda in corners')
 
     % show initial wind
-    figure 
+    figure(2)
     plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
     plot_wind_3d(CX,U0)
     hold off
@@ -44,7 +44,7 @@ if 1
     title('Initial wind')
 
     % show initial wind
-    figure 
+    figure(3)
     plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
     plot_wind_3d(CX,U0,1)
     hold off
@@ -67,21 +67,21 @@ end
 
 if do_plot
     % plot resulting wind
-    figure
+    figure(4)
     plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
     plot_wind_3d(CX,W)
     hold off
     axis equal
     title(['Final wind a=',string_diag_A])
 
-    figure
+    figure(5)
     plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
     plot_wind_3d(CX,W,1)
     hold off
     axis equal
     title(['Final wind lowest layer a=',string_diag_A])
 
-    figure
+    figure(6)
     plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
     plot_wind_3d(CX,W,1:2)
     hold off
@@ -91,7 +91,7 @@ if do_plot
 end
 
 
-    figure
+    figure(7)
     height=10;
     [XH,WH]=wind_at_h(X,CX,W,[20,20,1],...
         [min(X{1}(:)),max(X{1}(:)),...

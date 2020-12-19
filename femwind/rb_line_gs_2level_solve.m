@@ -31,9 +31,8 @@ end
 Kc = P'*K*P;
 ex = K\F;  % exact solution, for comparison only
 for it=1:maxit
-    coarse = mod(it,nsm+1),            
+    coarse = mod(it,nsm+1)==0;            
     if coarse
-        
         x = x - P*(Kc\(P'*(K*x-F))); % coarse solve
     else  % smoothing
         for rb1=1:2
@@ -71,7 +70,7 @@ for it=1:maxit
     ylabel('vertical')
     title(t)
     figure(14)
-    semilogy(1:it,res,'*',1:it,err,'x',1:it,eer,'+'), grid on
+    semilogy(1:it,res/res(1),'*',1:it,err/err(1),'x',1:it,eer/eer(1),'+'), grid on
     legend('relative 2-norm residual','relative 2-norm error','relative energy norm error')
     title(sprintf('mesh=%g %g %g',n))
     xlabel('iteration')
