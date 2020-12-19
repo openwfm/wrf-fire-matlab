@@ -20,7 +20,8 @@ A = diag(da);
 lambda = zeros(prod(n+1),1); % placeholder solution
 
 % creating the grid
-X = regular_mesh(n,h,1.5^(1/sc));
+expand=1.0
+X = regular_mesh(n,h,expand^(1/sc));
 X = add_terrain_to_mesh(X,'hill','squash',0.3);
 CX = center_mesh(X);
 
