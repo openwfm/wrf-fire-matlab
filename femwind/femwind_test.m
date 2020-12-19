@@ -22,14 +22,16 @@ lambda = zeros(prod(n+1),1); % placeholder solution
 % creating the grid
 expand=1.0
 X = regular_mesh(n,h,expand^(1/sc));
-X = add_terrain_to_mesh(X,'hill','squash',0.3);
+% X = add_terrain_to_mesh(X,'hill','squash',0.3);
 CX = center_mesh(X);
 
 % initial wind at the centers of the elements
 U0={ones(n),zeros(n),zeros(n)};
+rng(1); U0={ones(n),zeros(n),randn(n)};
 
 if 1
-
+    disp('graphics: problem setup')
+    
     % show mesh
     hold off
     figure(1)
@@ -67,6 +69,8 @@ end
 [~,~,W] = sparse_assembly(A,X,U0,lambda);
 
 if do_plot
+    disp('graphics: solution')
+
     % plot resulting wind
     figure(4)
     plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
