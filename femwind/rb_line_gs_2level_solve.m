@@ -1,7 +1,9 @@
 function [x,it]=rb_line_gs_2level_solve(K,F,X)
 % x=rb_line_gs_solve(K,F,X)
 coarsening='vertical lines';
-coarsening='2';
+coarsening='2'
+maxit=50
+nsm = 5
 disp('solver red-black relaxation horizontal, lines vertical')
 disp(['coarsening ',coarsening])
 n = size(X{1});
@@ -21,8 +23,6 @@ onex=ones(1,n(3));
 % prolongation
 switch coarsening
     case 'vertical lines'
-        maxit=500
-        nsm = 5
         nnc = n(1)*n(2);  % number of coarse
         P = spalloc(nn,nnc,nn);
         for i1=1:n(1)
@@ -34,14 +34,16 @@ switch coarsening
             end
         end
     case '2'
-        maxit=500
-        nsm = 5
         if any(mod(n,2)==0)
             error('number of nodes in each dimension must be odd')
         end
         nc = (n+1)/2-1;
         nnc = prod(nc);  % number of coarse
-        P = spalloc(nn,nnc,nnc*27);
+        nncz=nnc*27;
+        ia=zeros(nncz,1);
+        ja=ia;aa=ia;
+        % P = spalloc(nn,nnc,nnc*27);
+        k=0;
         for ic1=1:nc(1)
             for ic2=1:nc(2)
                 for ic3=1:nc(3)
@@ -53,23 +55,36 @@ switch coarsening
                         for in2=-1:1
                             for in3=-1:1
                                 ix=sub2ind(n,if1+in1,if2+in2,if3+in3);
-                                P(ix,ixc)=(2-abs(in1))*(2-abs(in2))*(2-abs(in3))/8;
+                                val=(2-abs(in1))*(2-abs(in2))*(2-abs(in3))/8;
+                                % P(ix,ixc)=val;
+                                k=k+1;
+                                if k>nncz
+                                    error('too many nonzeros')
+                                end
+                                ia(k)=ix;
+                                ja(k)=ixc;
+                                aa(k)=val;
                             end
                         end
                     end
                 end
             end
         end
+        P = sparse(ia,ja,aa,nn,nnc);
     otherwise
         error(['unknown coarsening ',coarsening])
 end
+disp('coarse matrix')
 Kc = P'*K*P;
-ex = K\F;  % exact solution, for comparison only
+disp('exact solution, for comparison only')
+ex = K\F;  
 for it=1:maxit
     coarse = mod(it,nsm+1)==0;            
     if coarse
-        x = x - P*(Kc\(P'*(K*x-F))); % coarse solve
-    else  % smoothing
+        fprintf('iteration %g coarse solve\n')
+        x = x - P*(Kc\(P'*(K*x-F))); 
+    else
+        fprintf('iteration %g smoothing\n',it)
         for rb1=1:2
             for rb2=1:2
                 for i1=rb1:2:n(1)
