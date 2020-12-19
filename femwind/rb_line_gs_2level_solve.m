@@ -1,6 +1,9 @@
 function [x,it]=rb_line_gs_2level_solve(K,F,X)
 % x=rb_line_gs_solve(K,F,X)
+coarsening='vertical lines';
+coarsening='2';
 disp('solver red-black relaxation horizontal, lines vertical')
+disp(['coarsening ',coarsening])
 n = size(X{1});
 nn = size(F,1);
 if nn~=prod(n)
@@ -8,8 +11,6 @@ if nn~=prod(n)
 end
 
 % settings
-maxit=100
-nsm = 10
 tol = 1e-5*big(F)/big(K)
 
 % constant arrays
@@ -18,15 +19,49 @@ colx=1:n(3);
 onex=ones(1,n(3));
 
 % prolongation
-nnc = n(1)*n(2);  % number of coarse
-P = spalloc(nn,nnc,nn);
-for i1=1:n(1)
-    for i2=1:n(2)
-        colw=X{3}(i1,i2,end)-X{3}(i1,i2,:);
-        ix = sub2ind(n,i1*onex,i2*onex,colx);
-        ixc = sub2ind(n(1:2),i1,i2);
-        P(ix,ixc)=squeeze(colw);
-    end
+switch coarsening
+    case 'vertical lines'
+        maxit=500
+        nsm = 5
+        nnc = n(1)*n(2);  % number of coarse
+        P = spalloc(nn,nnc,nn);
+        for i1=1:n(1)
+            for i2=1:n(2)
+                colw=X{3}(i1,i2,end)-X{3}(i1,i2,:);
+                ix = sub2ind(n,i1*onex,i2*onex,colx);
+                ixc = sub2ind(n(1:2),i1,i2);
+                P(ix,ixc)=squeeze(colw);
+            end
+        end
+    case '2'
+        maxit=500
+        nsm = 5
+        if any(mod(n,2)==0)
+            error('number of nodes in each dimension must be odd')
+        end
+        nc = (n+1)/2-1;
+        nnc = prod(nc);  % number of coarse
+        P = spalloc(nn,nnc,nnc*27);
+        for ic1=1:nc(1)
+            for ic2=1:nc(2)
+                for ic3=1:nc(3)
+                    if1=2*ic1;
+                    if2=2*ic2;
+                    if3=2*ic3;
+                    ixc = sub2ind(nc,ic1,ic2,ic3);
+                    for in1=-1:1 
+                        for in2=-1:1
+                            for in3=-1:1
+                                ix=sub2ind(n,if1+in1,if2+in2,if3+in3);
+                                P(ix,ixc)=(2-abs(in1))*(2-abs(in2))*(2-abs(in3))/8;
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    otherwise
+        error(['unknown coarsening ',coarsening])
 end
 Kc = P'*K*P;
 ex = K\F;  % exact solution, for comparison only
@@ -75,7 +110,7 @@ for it=1:maxit
     title(sprintf('mesh=%g %g %g',n))
     xlabel('iteration')
     drawnow,pause(0.1)
-    fprintf('iteration %g residual %g tolerance %g\n',it,res,tol)
+    fprintf('iteration %i residual %g tolerance %g\n',it,res(it),tol)
     if res(it)<tol,
         break
     end

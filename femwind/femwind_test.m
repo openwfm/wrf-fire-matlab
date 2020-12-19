@@ -9,7 +9,7 @@ sc = scale(icase)
 
 % dimensions in elements
 % sc=1; % mesh refinement scale
-n = sc*[20,10,5];
+n = sc*[20,20,8];
 sc2=1;
 n(1:2)=n(1:2)*sc2
 h = [10,10,10]/sc;
