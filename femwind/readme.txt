@@ -7,3 +7,6 @@ section Finite elements.
 The code in this directory is meant to be self-contained. We are copying files
 from the previous generations quicwind and quicwind/saddlepoint as needed.
 
+To run: in Matlab
+
+close all; clean all; femwind_test
