@@ -135,6 +135,9 @@ for sc = params.sc
             hold off
             axis equal
             title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
+            
+            figure(8)
+            wind_streamlines(X,W,params)
         end    
     end
 end
