@@ -1,128 +1,140 @@
 disp('femwind_test')
+% test components of the femwind system
 
-do_plot=0
-
-scale=[1,2,4,8,16]
-% scale=[1]
-for icase = 1:length(scale)
-sc = scale(icase)    
-
-% dimensions in elements
-% sc=1; % mesh refinement scale
-n = sc*[20,20,8];
-sc2=1;
-n(1:2)=n(1:2)*sc2
-h = [10,10,10]/sc;
-fprintf('linear array of %ix%ix%i cells\n',n(1),n(2),n(3))
-da=[1 1 1]
-string_diag_A=sprintf('%g %g %g',da);
-A = diag(da);
-lambda = zeros(prod(n+1),1); % placeholder solution
-
-% creating the grid
-expand=1.0
-X = regular_mesh(n,h,expand^(1/sc));
-% X = add_terrain_to_mesh(X,'hill','squash',0.3);
-CX = center_mesh(X);
-
-% initial wind at the centers of the elements
-U0={ones(n),zeros(n),zeros(n)};
-rng(1); U0={ones(n),zeros(n),randn(n)};
-
-if 1
-    disp('graphics: problem setup')
-    
-    % show mesh
-    hold off
-    figure(1)
-    plot_mesh_3d(X), hold on, 
-    title('The wind mesh, wind vector in centers, lambda in corners')
-
-    % show initial wind
-    figure(2)
-    plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
-    plot_wind_3d(CX,U0)
-    hold off
-    axis equal
-    title('Initial wind')
-
-    % show initial wind
-    figure(3)
-    plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
-    plot_wind_3d(CX,U0,1)
-    hold off
-    axis equal
-    title('Initial wind lowest layer')
+if ~exist('params','var')
+    disp('params do not exist yet, setting')
+    params.graphics=2;  % 1=basic, 2=all
+    params.expand=1.2;  % exponential grid expansion in the vertical
+    params.sc=[1,2]; % mesh refinement for tests at multiple scales 
+    params.sc2=[1];  % additional factor for horizonal mesh extent 
+    params.nelem3=[20,20,8]; % base size in elements in the 3 directions 
+    params.h=[10,10,10]; % base mesh spacing before scaling
+    params.da=[1 1 1]; % penalty factors in x y z directions
+    params.initial_wind=1;
+    params.terrain_shape='hill'; % terrain for add_terrain_to_mesh
+    params.terrain_top='squash'; % mesh top treatment for add_terrain_to_mesh
+    params.terrain_height=0.3; % terrain height as part of domain height
+    params.solver='2-level' ; % see sparse_solve.m
+    params.maxit=50; % max iterations
+    params.coarsening='2 linear';
+    params.smoothing='vertical lines';
+    params.nsmooth=5; % smoothing iterations before correcton
+    params.restol=1e-6;
+    params.exact=1; % compare with exact solution to compute error
+    params.slice=10; % vertical slice of error to display
 end
+params
 
-% assemble sparse system matrix
-[K,F,~] = sparse_assembly(A,X,U0,lambda);
+for sc = params.sc
+    for sc2 = params.sc2
+        n = sc*params.nelem3;  % elements in the 3 directions
+        n(1:2)=n(1:2)*sc2
+        h = params.h/sc;
+        fprintf('mesh of %ix%ix%i cells\n',n(1),n(2),n(3))
+        string_diag_A=sprintf('%g %g %g',params.da); % for figure titles
+        A = diag(params.da);
+        lambda = zeros(prod(n+1),1); % placeholder solution
 
-% dirichlet boundary conditions
-[K,F]=apply_boundary_conditions(K,F,X);
+        % creating the grid
+        expand=params.expand;
+        X = regular_mesh(n,h,params.expand^(1/sc));
+        X = add_terrain_to_mesh(X,...
+            params.terrain_shape,params.terrain_top,params.terrain_height);
+        CX = center_mesh(X); % get midpoints of elements
 
-% solve the equations
-% [lambda,it] = sparse_solve(K,F,X,'s');
-[lambda,it] = sparse_solve(K,F,X,'2');
+        % initial wind at the centers of the elements
+        rng(1);
+        switch params.initial_wind
+            case 1
+                disp('initial wind uniform in x direction')
+                U0={ones(n),zeros(n),zeros(n)};
+            case 2
+                % to test iterative methods with non-smooth initial error
+                disp('initial wind uniform in x direction random in z direction')
+                U0={ones(n),zeros(n),randn(n)};
+        end
+        if params.graphics>0
+            disp('graphics: problem setup')
+            % show mesh
+            figure(1),
+            plot_mesh_3d(X)
+            axis equal
+            title('The wind mesh, wind vector in centers, lambda in corners')
+        end
 
-% assemble final wind
-[~,~,W] = sparse_assembly(A,X,U0,lambda);
+        if params.graphics>1
+            % show initial wind
+            figure(2)
+            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_wind_3d(CX,U0)
+            hold off
+            axis equal
+            title('Initial wind')
 
-if do_plot
-    disp('graphics: solution')
+            % show initial wind
+            figure(3)
+            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_wind_3d(CX,U0,1)
+            hold off
+            axis equal
+            title('Initial wind lowest layer')
+        end
 
-    % plot resulting wind
-    figure(4)
-    plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
-    plot_wind_3d(CX,W)
-    hold off
-    axis equal
-    title(['Final wind a=',string_diag_A])
+        % assemble sparse system matrix
+        [K,F,~] = sparse_assembly(A,X,U0,lambda);
 
-    figure(5)
-    plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
-    plot_wind_3d(CX,W,1)
-    hold off
-    axis equal
-    title(['Final wind lowest layer a=',string_diag_A])
+        % dirichlet boundary conditions
+        [K,F]=apply_boundary_conditions(K,F,X);
 
-    figure(6)
-    plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
-    plot_wind_3d(CX,W,1:2)
-    hold off
-    axis equal
-    title(['Final wind lowest layers a=',string_diag_A])
-    
+        % solve the equations
+        % [lambda,it] = sparse_solve(K,F,X,'s');
+        [lambda,it] = sparse_solve(K,F,X,params);
+
+        % assemble final wind
+        [~,~,W] = sparse_assembly(A,X,U0,lambda);
+
+        if params.graphics>1
+            disp('graphics: solution')
+
+            % plot resulting wind
+            figure(4)
+            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_wind_3d(CX,W)
+            hold off
+            axis equal
+            title(['Final wind a=',string_diag_A])
+
+            figure(5)
+            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_wind_3d(CX,W,1)
+            hold off
+            axis equal
+            title(['Final wind lowest layer a=',string_diag_A])
+
+            figure(6)
+            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_wind_3d(CX,W,1:2)
+            hold off
+            axis equal
+            title(['Final wind lowest layers a=',string_diag_A])
+
+        end
+
+        if params.graphics>0
+            disp('graphics: wind_at_h')
+
+            figure(7)
+            height=10;
+            [XH,WH]=wind_at_h(X,CX,W,[20,20,1],...
+                [min(X{1}(:)),max(X{1}(:)),...
+                min(X{3}(:)),max(X{3}(:)),...
+                height,height]); 
+            plot_wind_3d(XH,WH)
+            hold on
+            plot_mesh_3d(X,[1,n(1),1,n(2),1,1])
+            hold off
+            axis equal
+            title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
+        end    
+    end
 end
-
-
-    figure(7)
-    height=10;
-    [XH,WH]=wind_at_h(X,CX,W,[20,20,1],...
-        [min(X{1}(:)),max(X{1}(:)),...
-        min(X{3}(:)),max(X{3}(:)),...
-        height,height]); 
-    plot_wind_3d(XH,WH)
-    hold on
-    plot_mesh_3d(X,[1,n(1),1,n(2),1,1])
-    hold off
-    axis equal
-    title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
-
-    
-    s(icase).sc=sc;
-    s(icase).n=n;
-    s(icase).X=X;
-    s(icase).CX=CX;
-    s(icase).XH=XH;
-    s(icase).h=h;
-    s(icase).WH=WH;
-    s(icase).W=W;
-    s(icase).A=A;
-    s(icase).U0=U0;
-    s(icase).it=it;
-    save s.mat s
-    
-end
-% condition_number=scond(K)
-n
