@@ -52,11 +52,16 @@ for sc = params.sc
                 % to test iterative methods with non-smooth initial error
                 disp('initial wind uniform in x direction random in z direction')
                 U0={ones(n),zeros(n),randn(n)};
+            case 3
+                % to test iterative methods with non-smooth initial error
+                disp('initial wind uniform in x direction and z direction')
+                U0={ones(n),zeros(n),ones(n)};
+                
         end
         if params.graphics>0
             disp('graphics: problem setup')
             % show mesh
-            figure(1),
+            figure(1),clf
             plot_mesh_3d(X)
             axis equal
             title('The wind mesh, wind vector in centers, lambda in corners')
@@ -64,7 +69,7 @@ for sc = params.sc
 
         if params.graphics>1
             % show initial wind
-            figure(2)
+            figure(2),clf
             plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
             plot_wind_3d(CX,U0)
             hold off
@@ -72,7 +77,7 @@ for sc = params.sc
             title('Initial wind')
 
             % show initial wind
-            figure(3)
+            figure(3),clf
             plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
             plot_wind_3d(CX,U0,1)
             hold off
@@ -97,21 +102,21 @@ for sc = params.sc
             disp('graphics: solution')
 
             % plot resulting wind
-            figure(4)
+            figure(4),clf
             plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
             plot_wind_3d(CX,W)
             hold off
             axis equal
             title(['Final wind a=',string_diag_A])
 
-            figure(5)
+            figure(5),clf
             plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
             plot_wind_3d(CX,W,1)
             hold off
             axis equal
             title(['Final wind lowest layer a=',string_diag_A])
 
-            figure(6)
+            figure(6),clf
             plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
             plot_wind_3d(CX,W,1:2)
             hold off
@@ -123,7 +128,7 @@ for sc = params.sc
         if params.graphics>0
             disp('graphics: wind_at_h')
 
-            figure(7)
+            figure(7),clf
             height=10;
             [XH,WH]=wind_at_h(X,CX,W,[20,20,1],...
                 [min(X{1}(:)),max(X{1}(:)),...
@@ -136,7 +141,7 @@ for sc = params.sc
             axis equal
             title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
             
-            figure(8)
+            figure(8),clf
             wind_streamlines(X,W,params)
         end    
     end

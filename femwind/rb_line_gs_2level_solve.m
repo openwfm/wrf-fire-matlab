@@ -77,8 +77,10 @@ if params.exact
     disp('exact solution, for comparison only')
     ex = K\F;  
 end
+cycles=0;
+t_cycle='first cycle not complete yet';
 for it=1:params.maxit
-    coarse = mod(it,params.nsmooth+1)==0;            
+    coarse = mod(it,params.nsmooth+1)==0;
     if coarse
         fprintf('iteration %g coarse solve\n',it)
         x = x - P*(Kc\(P'*(K*x-F))); 
@@ -119,6 +121,12 @@ for it=1:params.maxit
         end
     end
     res(it)= norm(K*x-F);
+    if mod(it,params.nsmooth+1)==params.nsmooth
+        cycles=cycles+1;
+        rate = (res(it)/norm(F))^(1/cycles);
+        t_cycle=sprintf('cycle %g avg rate %g',cycles,rate);
+        disp(t_cycle)
+    end
     lambda=zeros(n);
     exact=zeros(n);
     for i=1:nn
@@ -138,7 +146,7 @@ for it=1:params.maxit
     ylabel('vertical')
     title(t)
     figure(14)
-    semilogy(1:it,res/res(1),'*')
+    semilogy(1:it,res/norm(F),'*')
     legend('relative 2-norm residual')
     if params.exact
         err(it)=norm(x-ex); % l2 error
@@ -147,7 +155,7 @@ for it=1:params.maxit
         legend('relative 2-norm residual','relative 2-norm error','relative energy norm error')
     end
     grid on
-    title(sprintf('mesh=%g %g %g',n))
+    title([sprintf('mesh=%g %g %g ',n),t_cycle])
     xlabel('iteration')
     drawnow,pause(0.1)
     fprintf('iteration %i residual %g tolerance %g\n',it,res(it),tol)
