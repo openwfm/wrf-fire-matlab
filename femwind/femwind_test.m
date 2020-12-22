@@ -21,7 +21,7 @@ if ~exist('params','var')
     params.nsmooth=5; % smoothing iterations before correcton
     params.restol=1e-6;
     params.exact=1; % compare with exact solution to compute error
-    params.slice=10; % vertical slice of error to display
+    params.slice=0.5; % vertical y slice of error to display, 0 to 1
 end
 params
 

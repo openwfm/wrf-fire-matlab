@@ -134,7 +134,7 @@ for it=1:params.maxit
         lambda(s1,s2,s3)=x(i);
         exact(s1,s2,s3)=ex(i);
     end
-    s=params.slice;
+    s=round(0.5+params.slice*n(2)*(1-eps));
     l=squeeze(lambda(:,s,:)-exact(:,s,:));
     xx=squeeze(X{1}(:,s,:));
     yy=squeeze(X{2}(:,s,:));
