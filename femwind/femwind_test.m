@@ -22,6 +22,8 @@ if ~exist('params','var')
     params.restol=1e-6;
     params.exact=1; % compare with exact solution to compute error
     params.slice=0.5; % vertical y slice of error to display, 0 to 1
+    params.err_slice_fig=12; % figure number for residual slice
+    params.res_slice_fig=13; % figure number for error slice
 end
 params
 

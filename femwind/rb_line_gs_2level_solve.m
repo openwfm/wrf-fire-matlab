@@ -132,7 +132,8 @@ for it=1:params.maxit
                 error(['smoothing ',params.smoothing,' unknown'])
         end
     end
-    r=F-K*x;
+    r=F-K*x;  % residual
+    e=x-ex;   % error
     res(it)= norm(r);
     if mod(it,params.nsmooth+1)==params.nsmooth
         cycles=cycles+1;
@@ -140,37 +141,14 @@ for it=1:params.maxit
         t_cycle=sprintf('cycle %g avg rate %g',cycles,rate);
         disp(t_cycle)
     end
-    lambda=zeros(n);
-    exact=zeros(n);
-    residual=zeros(n);
-    for i=1:nn
-        [s1,s2,s3]=ind2sub(n,i);
-        lambda(s1,s2,s3)=x(i);
-        exact(s1,s2,s3)=ex(i);
-        residual(s1,s2,s3)=r(i);
-    end
-    s=round(0.5+params.slice*n(2)*(1-eps));
-    xx=squeeze(X{1}(:,s,:));
-    yy=squeeze(X{2}(:,s,:));
-    zz=squeeze(X{3}(:,s,:));
-    t=sprintf('slice %g y=%g it=%g %s',s,yy(1),it,it_type);
-    figure(12);
-    mesh(xx,zz,squeeze(residual(:,s,:)));
-    xlabel('horizontal')
-    ylabel('vertical')
-    title(['residual ',t])
-    figure(13);
-    l=squeeze(lambda(:,s,:)-exact(:,s,:));
-    mesh(xx,zz,l)
-    xlabel('horizontal')
-    ylabel('vertical')
-    title(['error ',t])
+    tstring=sprintf('it=%g %s %s %s',it,it_type,t_cycle);
+    plot_error_slice(e,r,X,tstring,params)
     figure(14)
     semilogy(1:it,res/norm(F),'*')
     legend('relative 2-norm residual')
     if params.exact
-        err(it)=norm(x-ex); % l2 error
-        eer(it)=sqrt((x-ex)'*K*(x-ex)); % energy norm error
+        err(it)=norm(e); % l2 error
+        eer(it)=sqrt(e'*K*e); % energy norm error
         hold on, semilogy(1:it,err/err(1),'x',1:it,eer/eer(1),'+'), hold off
         legend('relative 2-norm residual','relative 2-norm error','relative energy norm error')
     end
@@ -179,6 +157,7 @@ for it=1:params.maxit
     xlabel('iteration')
     drawnow,pause(0.1)
     fprintf('iteration %i residual %g tolerance %g\n',it,res(it),tol)
+
     if res(it)<tol,
         break
     end
