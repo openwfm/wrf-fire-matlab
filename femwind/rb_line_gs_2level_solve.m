@@ -84,8 +84,10 @@ for it=1:params.maxit
     if coarse
         fprintf('iteration %g coarse solve\n',it)
         x = x - P*(Kc\(P'*(K*x-F))); 
+        it_type='coarse correction';
     else
         fprintf('iteration %g smoothing by %s\n',it,params.smoothing)
+        it_type='smoothing';
         switch params.smoothing
             case 'vertical lines'
                 % disp('red-black relaxation horizontal, lines vertical')
@@ -120,7 +122,8 @@ for it=1:params.maxit
                 error(['smoothing ',smoothing,' unknown'])
         end
     end
-    res(it)= norm(K*x-F);
+    r=F-K*x;
+    res(it)= norm(r);
     if mod(it,params.nsmooth+1)==params.nsmooth
         cycles=cycles+1;
         rate = (res(it)/norm(F))^(1/cycles);
@@ -129,22 +132,29 @@ for it=1:params.maxit
     end
     lambda=zeros(n);
     exact=zeros(n);
+    residual=zeros(n);
     for i=1:nn
         [s1,s2,s3]=ind2sub(n,i);
         lambda(s1,s2,s3)=x(i);
         exact(s1,s2,s3)=ex(i);
+        residual(s1,s2,s3)=r(i);
     end
     s=round(0.5+params.slice*n(2)*(1-eps));
-    l=squeeze(lambda(:,s,:)-exact(:,s,:));
     xx=squeeze(X{1}(:,s,:));
     yy=squeeze(X{2}(:,s,:));
     zz=squeeze(X{3}(:,s,:));
-    figure(13);
-    mesh(xx,zz,l)
-    t=sprintf('error slice %g y=%g it=%g',s,yy(1),it);
+    t=sprintf('slice %g y=%g it=%g %s',s,yy(1),it,it_type);
+    figure(12);
+    mesh(xx,zz,squeeze(residual(:,s,:)));
     xlabel('horizontal')
     ylabel('vertical')
-    title(t)
+    title(['residual ',t])
+    figure(13);
+    l=squeeze(lambda(:,s,:)-exact(:,s,:));
+    mesh(xx,zz,l)
+    xlabel('horizontal')
+    ylabel('vertical')
+    title(['error ',t])
     figure(14)
     semilogy(1:it,res/norm(F),'*')
     legend('relative 2-norm residual')
