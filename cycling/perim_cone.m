@@ -1,9 +1,9 @@
 function [wz] = perim_cone(n,w)
 
-[x,y,z] = perim();
+[x,y,z] = perim(); %in-line function below
 for i = 2:n
     [x1,y1,z1] = perim();
-    z = min(z+rand,z1);
+    z = min(z,z1);
 end
 close all
 figure,contour(x,y,z,20,'k');
@@ -80,7 +80,7 @@ end
 dim1 = 75;
 dim2 = 70;
 F = scatteredInterpolant(pts(:,1),pts(:,2),pts(:,3),'linear','nearest');
-d = round(max(max(pts(:,1:2))))+2;
+d = round(max(max(pts(:,1:2))))+6;
 [x,y] = meshgrid(linspace(-d,d,dim1),linspace(-d,d,dim2));
 z = F(x,y);
 
