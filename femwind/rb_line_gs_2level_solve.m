@@ -14,8 +14,8 @@ tol = params.restol*norm(F);
 
 % constant arrays
 x = zeros(nn,1);
-colx=1:n(3);
-onex=ones(1,n(3));
+colz=1:n(3);
+onez=ones(1,n(3));
 
 % prolongation
 switch params.coarsening
@@ -25,7 +25,7 @@ switch params.coarsening
         for i1=1:n(1)
             for i2=1:n(2)
                 colw=X{3}(i1,i2,end)-X{3}(i1,i2,:);
-                ix = sub2ind(n,i1*onex,i2*onex,colx);
+                ix = sub2ind(n,i1*onez,i2*onez,colz);
                 ixc = sub2ind(n(1:2),i1,i2);
                 P(ix,ixc)=squeeze(colw);
             end
@@ -89,21 +89,31 @@ for it=1:params.maxit
         fprintf('iteration %g smoothing by %s\n',it,params.smoothing)
         it_type='smoothing';
         switch params.smoothing
-            case 'vertical lines'
+            case {'horizontal planes'}
+                % disp('red-black vertical, planes horizontal')
+                for rb3=1:2
+                    for i3=rb3:2:n(3)
+                            [planex,planey]=ndgrid(1:n(1),1:n(2));
+                            planez = i3*ones(n(1),n(2));
+                            % solving horizontal payer
+                            ix = sub2ind(n,planex,planey,planez); 
+                            x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
+                    end
+                end
+            case {'vertical lines'}
                 % disp('red-black relaxation horizontal, lines vertical')
                 for rb1=1:2
                     for rb2=1:2
                         for i1=rb1:2:n(1)
                             for i2=rb2:2:n(2)
                                 % solving horizontal location i1 i2 and vertical line
-                                ix = sub2ind(n,i1*onex,i2*onex,colx); 
+                                ix = sub2ind(n,i1*onez,i2*onez,colz); 
                                 x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
                             end
                         end
                     end
                 end
-            case '3D'
-                % disp('3D red-black ')
+            case '3D red-black'
                 for rb1=1:2
                     for rb2=1:2
                         for rb3=1:2    
@@ -119,7 +129,7 @@ for it=1:params.maxit
                     end
                 end
             otherwise
-                error(['smoothing ',smoothing,' unknown'])
+                error(['smoothing ',params.smoothing,' unknown'])
         end
     end
     r=F-K*x;
