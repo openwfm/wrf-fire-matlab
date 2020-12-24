@@ -69,7 +69,7 @@ switch params.coarsening
         end
         P = sparse(ia,ja,aa,nn,nnc);
     otherwise
-        error(['unknown coarsening ',coarsening])
+        error(['unknown coarsening ',params.coarsening])
 end
 disp('coarse matrix')
 Kc = P'*K*P;
@@ -95,7 +95,7 @@ for it=1:params.maxit
                     for i3=rb3:2:n(3)
                             [planex,planey]=ndgrid(1:n(1),1:n(2));
                             planez = i3*ones(n(1),n(2));
-                            % solving horizontal payer
+                            % solving horizontal layer
                             ix = sub2ind(n,planex,planey,planez); 
                             x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
                     end
