@@ -24,6 +24,7 @@ X0 = [0 0 0  %1
 T = rand(3);
 % T = magic(3);
 X = T*X0+rand(3,1)*ones(1,8);
+X=X0;
 
 u = [1, 2, 3]';
 [K, F, Jg] = hexa(A,X,u);
@@ -45,4 +46,4 @@ err_iso=norm(K0-K1,'fro')
 
 % test stretch
 X3 = diag([1 1 2])*X0; 
-[K3, ~, ~] = hexa(A,X3,u); p=hexasub({zeros(2,2,2)},K3,[1 1 1]);
+[K3, ~, ~] = hexa(A,X3,u);
