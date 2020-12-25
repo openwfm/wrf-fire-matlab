@@ -5,7 +5,7 @@ function hexa_plot(X,K)
 %   K  size (n,n), symmetric matrix
 h = ishold;
 [m,n]=size(X);
-ml=8/max(abs(K(:)));
+ml=10/max(abs(K(:)));
 tol=1e-6;
 for i=1:n
     plot3(X(1,i),X(2,i),X(3,i),'o','Linewidth',K(i,i)*ml);hold on

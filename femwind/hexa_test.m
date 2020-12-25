@@ -24,7 +24,6 @@ X0 = [0 0 0  %1
 T = rand(3);
 % T = magic(3);
 X = T*X0+rand(3,1)*ones(1,8);
-X=X0;
 
 u = [1, 2, 3]';
 [K, F, Jg] = hexa(A,X,u);
