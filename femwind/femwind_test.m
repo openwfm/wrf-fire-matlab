@@ -5,15 +5,15 @@ if ~exist('params','var')
     disp('params do not exist yet, setting')
     params.graphics=2;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
-    params.sc=[1,2]; % mesh refinement for tests at multiple scales 
-    params.sc2=[1];  % additional factor for horizonal mesh extent 
+    params.sc=[1]; % mesh refinements for tests at multiple scales 
+    params.sc2=[1];  % additional factors for horizonal mesh extent 
     params.nelem3=[20,20,8]; % base size in elements in the 3 directions 
     params.h=[10,10,10]; % base mesh spacing before scaling
     params.da=[1 1 1]; % penalty factors in x y z directions
     params.initial_wind=1;
     params.terrain_shape='hill'; % terrain for add_terrain_to_mesh
     params.terrain_top='squash'; % mesh top treatment for add_terrain_to_mesh
-    params.terrain_height=0.3; % terrain height as part of domain height
+    params.terrain_height=0.2; % terrain height as part of domain height
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
     params.coarsening='2 linear';

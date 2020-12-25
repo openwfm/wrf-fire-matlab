@@ -1,5 +1,6 @@
 function hexa_plot(X,K)
 % hexa_plot(X,K)
+% plot matrix K on nodes X
 % in
 %   X  size (3,n), node coordinates
 %   K  size (n,n), symmetric matrix
