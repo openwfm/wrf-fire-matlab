@@ -16,6 +16,7 @@ function g=gradbfs(x)
      1     1     1];
     g=zeros(Nb,3);
     for k=1:Nb
+        % b(k) = (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3)); % basis functions
         g(k,:)= [ib(k,1)*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3)),... % d/d(x(1))
                 (1+ib(k,1)*x(1))*ib(k,2)*(1+ib(k,3)*x(3)),... % d/d(x(2))
                 (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*ib(k,3)]/8; % d/d(x(3))

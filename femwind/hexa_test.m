@@ -2,7 +2,7 @@ format compact
 A=eye(3);
 % lexicographic unit cube
 %    x y z
-X = [0 0 0  %1
+X0 = [0 0 0  %1
      1 0 0  %2
      0 1 0  %3
      1 1 0  %4
@@ -11,7 +11,7 @@ X = [0 0 0  %1
      0 1 1  %7
      1 1 1  %8
      ]';
-
+ 
 %   7-----8
 %  /|    /|
 % 5-----6 |
@@ -23,10 +23,10 @@ X = [0 0 0  %1
 % linear transformation
 T = rand(3);
 % T = magic(3);
-X = T*X;
+X = T*X0+rand(3,1)*ones(1,8);
 
 u = [1, 2, 3]';
-[K, F] = hexa(A,X,u)
+[K, F, Jg] = hexa(A,X,u);
 eig(K)  % one eigenvalue zero
 
 % test F
@@ -36,3 +36,13 @@ V = gradmu*X + c;
 vol=hexa_volume(X)
 exact = - gradmu*u*vol; 
 err_F = V*F - exact
+
+% invariariant to random isometry
+S=vrrotvec2mat(vrrotvec(randn(3,1),randn(3,1)))*diag(sign(randn(3,1))); 
+[K0, ~, ~] = hexa(A,X,u);
+[K1, ~, ~] = hexa(A,S*X,u);
+err_iso=norm(K0-K1,'fro')
+
+% test stretch
+X3 = diag([1 1 2])*X0; 
+[K3, ~, ~] = hexa(A,X3,u); p=hexasub({zeros(2,2,2)},K3,[1 1 1]);
