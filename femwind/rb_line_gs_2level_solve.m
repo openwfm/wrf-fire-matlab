@@ -1,4 +1,4 @@
-function [x,it]=rb_line_gs_2level_solve(K,F,X,params)
+function [x,it,rate]=rb_line_gs_2level_solve(K,F,X,params)
 % x=rb_line_gs_solve(K,F,X)
 disp(['coarsening method ',params.coarsening])
 disp(['smoothing method ',params.smoothing])

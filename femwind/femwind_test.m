@@ -6,7 +6,7 @@ if ~exist('params','var')
     params.graphics=2;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.sc=[1]; % mesh refinements for tests at multiple scales 
-    params.sc2=[1];  % additional factors for horizonal mesh extent 
+    params.sc2=[1,2,4,8,16];  % additional factors for horizonal mesh extent 
     params.nelem3=[20,20,8]; % base size in elements in the 3 directions 
     params.h=[10,10,10]; % base mesh spacing before scaling
     params.da=[1 1 1]; % penalty factors in x y z directions
@@ -95,7 +95,7 @@ for sc = params.sc
 
         % solve the equations
         % [lambda,it] = sparse_solve(K,F,X,'s');
-        [lambda,it] = sparse_solve(K,F,X,params);
+        [lambda,it,rate(sc,sc2)] = sparse_solve(K,F,X,params);
 
         % assemble final wind
         [~,~,W] = sparse_assembly(A,X,U0,lambda);
