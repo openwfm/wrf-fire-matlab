@@ -1,5 +1,5 @@
-function p=hexasub(X,K,i) 
-% p=hexasub(X,K,i)
+function p=hexa_sub(X,K,i) 
+% p=hexa_sub(X,K,i)
 % extract one submatrix from global matrix from i to i+1
 % in:
 %    X mesh coordinates, cell vector 3
