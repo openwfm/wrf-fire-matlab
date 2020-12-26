@@ -1,4 +1,4 @@
-function [x,it,rate]=rb_line_gs_2level_solve(K,F,X,params)
+function [x,it,rate,XC]=rb_line_gs_2level_solve(K,F,X,params)
 % x=rb_line_gs_solve(K,F,X)
 disp(['coarsening method ',params.coarsening])
 disp(['smoothing method ',params.smoothing])
@@ -41,6 +41,7 @@ switch params.coarsening
         ja=ia;aa=ia;
         % P = spalloc(nn,nnc,nnc*27);
         k=0;
+        for l=1:3,XC{l}=zeros(nc);end
         for ic1=1:nc(1)
             for ic2=1:nc(2)
                 for ic3=1:nc(3)
@@ -48,6 +49,7 @@ switch params.coarsening
                     if2=2*ic2;
                     if3=2*ic3;
                     ixc = sub2ind(nc,ic1,ic2,ic3);
+                    for l=1:3,XC{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);end
                     for in1=-1:1 
                         for in2=-1:1
                             for in3=-1:1
