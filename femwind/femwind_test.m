@@ -95,7 +95,7 @@ for sc = params.sc
 
         % solve the equations
         % [lambda,it] = sparse_solve(K,F,X,'s');
-        [lambda,it,rate(sc,sc2),XC] = sparse_solve(K,F,X,params);
+        [lambda,it,rate(sc,sc2),XC,P] = sparse_solve(K,F,X,params);
 
         % assemble final wind
         [~,~,W] = sparse_assembly(A,X,U0,lambda);
