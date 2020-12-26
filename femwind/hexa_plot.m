@@ -11,14 +11,14 @@ h = ishold;
 if any([m,n]~=size(K))
     error('wrong sizes')
 end
-ml=20;
+ml=8;
 tol=1e-6;
 symm = false;
 if m==n,
     symm = norm(K-K','fro')<tol;
 end
 for j=1:n
-    % plot3(X(1,i),X(2,i),X(3,i),'o','Linewidth',ml); hold on
+    % plot3(X(1,j),X(2,j),X(3,j),'o','Linewidth',ml); hold on
     for i=1:m
         for k=1:3,xij{k}=[X1(k,i),X2(k,j)];end
         if symm,
