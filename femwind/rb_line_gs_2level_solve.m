@@ -35,39 +35,83 @@ switch params.coarsening
             error('number of nodes in each dimension must be odd')
         end
         nc = (n+1)/2-1;
-        nnc = prod(nc);  % number of coarse
-        nncz=nnc*27;
-        ia=zeros(nncz,1);
+        % decide on vertical coarse levels
+        icv=zeros(nc(3),1);
+        dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
+        dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
+        dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
+        dxy=min(dx,dy);  % horizontal step
+        lcl=1; % last coarse level
+        icl(1)=lcl;
+        nc(3)=0;
+        for i=1:n(3)
+            if lcl+2 <= n(3) & dz(lcl)+dz(lcl+1) < params.maxaspect * 2 *dxy 
+                lcl=lcl+2; % next coarse level by 2
+            else
+                lcl=lcl+1; % next coarse level by 1
+            end
+            if lcl < n(3)
+                icl(i+1)=lcl;
+            else % at the top already
+                nc(3)=i;
+                icl=icl(1:i);
+                break
+            end
+        end     
+        if nc(3)==0
+            error('bad number of coarse layers')
+        end
+        disp(['coarse levels ',num2str(icl)])
+        hg=num2str(X{3}(1,1,icl));
+        disp(['corner height ',hg])
+        hg=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl));
+        disp(['center height ',hg])
+        % build the prolongation matrix
+        nnc = prod(nc);  % number of coarse points
+        nncz=nnc*27; % estimate number of nonzeros in coarse matrix
+        ia=zeros(nncz,1); % preallocate arrays for P matrix entries
         ja=ia;aa=ia;
         % P = spalloc(nn,nnc,nnc*27);
         k=0;
-        for l=1:3,XC{l}=zeros(nc);end
-        for ic1=1:nc(1)
-            for ic2=1:nc(2)
-                for ic3=1:nc(3)
-                    if1=2*ic1-1;
+        for l=1:3,XC{l}=zeros(nc);end % preallocate coarse points coordinates
+        for ic3=1:nc(3)           % loop over coarse layers    
+            if3=icl(ic3);         % the fine level of the coarse layer
+            if ic3>1
+                ifs3=icl(ic3-1)+1; % from above previous layer     
+            else
+                ifs3=icl(ic3);     % there is no previous fine layer
+            end
+            if ic3<nc(3)
+                ife3=icl(ic3+1)-1; % up to under next layer
+            else
+                ife3=icl(ic3);     % there is no next layer
+            end
+            fprintf('coarse layer %g at %g contributes to %g : %g\n',ic3,if3,ifs3,ife3)
+            for ic1=1:nc(1)               % loop over coarse points
+                for ic2=1:nc(2)          
+                    if1=2*ic1-1;      % fine mesh indices of the coarse point
                     if2=2*ic2-1;
-                    if3=2*ic3-1;
-                    ixc = sub2ind(nc,ic1,ic2,ic3);
-                    for l=1:3,XC{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);end
-                    for in1=-1:1 
-                        for in2=-1:1
-                            for in3=-1:1
-                                i1=if1+in1;
-                                i2=if2+in2;
-                                i3=if3+in3;
-                                if i1>0 & i2>0 & i3>0,
-                                    ix=sub2ind(n,if1+in1,if2+in2,if3+in3);
-                                    val=(2-abs(in1))*(2-abs(in2))*(2-abs(in3))/8;
-                                    % P(ix,ixc)=val;
-                                    k=k+1;
-                                    if k>nncz
-                                        error('too many nonzeros')
-                                    end
-                                    ia(k)=ix;
-                                    ja(k)=ixc;
-                                    aa(k)=val;
-                                end
+                    for l=1:3         % copy coordinates 
+                        XC{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);
+                    end
+                    ixc = sub2ind(nc,ic1,ic2,ic3); % index into coarse matrix
+                    % loop over fine points coarse point ic1 ic2 ic3 contributes to
+                    ifs1=max(1,if1-1);
+                    ife1=min(n(1),if1+1);
+                    ifs2=max(1,if2-1);
+                    ife2=min(n(2),if2+1);
+                    for i1=ifs1:ife1
+                        for i2=ifs2:ife2
+                            for i3=ifs3:ife3
+                                % should adapt from X 
+                                ix=sub2ind(n,i1,i2,i3);
+                                val=(1-0.5*abs(i1-if1))...
+                                    *(1-0.5*abs(i2-if2))...
+                                    *(1-0.5*abs(i3-if3)); % horizontal
+                                k=k+1;
+                                ia(k)=ix;
+                                ja(k)=ixc;
+                                aa(k)=val;
                             end
                         end
                     end
