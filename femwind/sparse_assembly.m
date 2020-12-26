@@ -3,7 +3,7 @@ function [K,F,W]=sparse_assembly(A,X,u0,lambda)
 %  A  penalty coefficients matrix, size 3x3, s.p.d.
 %  X  cell array with 3d arrays x y z coordinates of mesh vertices
 %  u0 cell array with 3d arrays initial wind vector at centers in x y z directions
-%  lambda scalar field on node
+%  lambda scalar field on node; if present, do not compute K and F
 % out:
 %  K  stiffness matrix, sparse
 %  F  load vector
@@ -35,6 +35,7 @@ Xloc = zeros(3,8);
 kglo=zeros(1,8);
 m = n-1;
 done_last=0;
+disp('accumulating entries')
 for i3=1:m(3)
     for i2=1:m(2)
         for i1=1:m(1)  % loop over elements
@@ -78,6 +79,7 @@ for i=1:3
 end
 fprintf('\n')
 if kk~=nzelem, error('wrong element nonzeros'),end
+disp('building global sparse matrix')
 K = sparse(ii,jj,aa,nn,nn); % err_K=big(K-KK)
 nn=prod(n);
 nz=nnz(K);

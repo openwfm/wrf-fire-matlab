@@ -133,7 +133,11 @@ for it=1:params.maxit
         end
     end
     r=F-K*x;  % residual
-    e=x-ex;   % error
+    if params.exact
+        e=x-ex;   % error
+    else
+        e=[];
+    end
     res(it)= norm(r);
     if mod(it,params.nsmooth+1)==params.nsmooth
         cycles=cycles+1;
