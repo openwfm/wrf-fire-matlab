@@ -1,21 +1,35 @@
-function hexa_plot(X,K)
+function hexa_plot(X1,X2,K)
 % hexa_plot(X,K)
 % plot matrix K on nodes X
 % in
-%   X  size (3,n), node coordinates
-%   K  size (n,n), symmetric matrix
+%   X1  size (3,m), node coordinates
+%   X2  size (3,n), node coordinates
+%   K  size (m,n), matrix
 h = ishold;
-[m,n]=size(X);
-ml=10/max(abs(K(:)));
+[~,m]=size(X1);
+[~,n]=size(X2);
+if any([m,n]~=size(K))
+    error('wrong sizes')
+end
+ml=20;
 tol=1e-6;
-for i=1:n
-    plot3(X(1,i),X(2,i),X(3,i),'o','Linewidth',K(i,i)*ml);hold on
-    for j=i+1:n
-        for k=1:3,xij{k}=[X(k,i),X(k,j)];end
-        if K(i,j)>tol,
-            plot3(xij{:},'--k','Linewidth',K(i,j)*ml);
-        elseif K(i,j)<-tol
-            plot3(xij{:},'--r','Linewidth',-K(i,j)*ml);
+symm = false;
+if m==n,
+    symm = norm(K-K','fro')<tol;
+end
+for j=1:n
+    % plot3(X(1,i),X(2,i),X(3,i),'o','Linewidth',ml); hold on
+    for i=1:m
+        for k=1:3,xij{k}=[X1(k,i),X2(k,j)];end
+        if symm,
+            s = K(i,j)/sqrt(K(i,i)*K(j,j));
+        else
+            s = K(i,j)/norm([K(:,j);K(i,:)'],inf);
+        end
+        if s>tol,
+            plot3(xij{:},'--k','Linewidth',s*ml); hold on
+        elseif s<-tol
+            plot3(xij{:},'--r','Linewidth',-s*ml); hold on
         end
     end
 end
