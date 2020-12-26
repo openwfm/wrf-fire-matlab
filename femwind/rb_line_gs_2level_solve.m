@@ -45,31 +45,36 @@ switch params.coarsening
         for ic1=1:nc(1)
             for ic2=1:nc(2)
                 for ic3=1:nc(3)
-                    if1=2*ic1;
-                    if2=2*ic2;
-                    if3=2*ic3;
+                    if1=2*ic1-1;
+                    if2=2*ic2-1;
+                    if3=2*ic3-1;
                     ixc = sub2ind(nc,ic1,ic2,ic3);
                     for l=1:3,XC{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);end
                     for in1=-1:1 
                         for in2=-1:1
                             for in3=-1:1
-                                ix=sub2ind(n,if1+in1,if2+in2,if3+in3);
-                                val=(2-abs(in1))*(2-abs(in2))*(2-abs(in3))/8;
-                                % P(ix,ixc)=val;
-                                k=k+1;
-                                if k>nncz
-                                    error('too many nonzeros')
+                                i1=if1+in1;
+                                i2=if2+in2;
+                                i3=if3+in3;
+                                if i1>0 & i2>0 & i3>0,
+                                    ix=sub2ind(n,if1+in1,if2+in2,if3+in3);
+                                    val=(2-abs(in1))*(2-abs(in2))*(2-abs(in3))/8;
+                                    % P(ix,ixc)=val;
+                                    k=k+1;
+                                    if k>nncz
+                                        error('too many nonzeros')
+                                    end
+                                    ia(k)=ix;
+                                    ja(k)=ixc;
+                                    aa(k)=val;
                                 end
-                                ia(k)=ix;
-                                ja(k)=ixc;
-                                aa(k)=val;
                             end
                         end
                     end
                 end
             end
         end
-        P = sparse(ia,ja,aa,nn,nnc);
+        P = sparse(ia(1:k),ja(1:k),aa(1:k),nn,nnc);
     otherwise
         error(['unknown coarsening ',params.coarsening])
 end
