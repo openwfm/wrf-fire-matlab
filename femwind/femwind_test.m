@@ -3,10 +3,10 @@ disp('femwind_test')
 
 if ~exist('params','var')
     disp('params do not exist yet, setting')
-    params.graphics=2;  % 1=basic, 2=all
+    params.graphics=1;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.sc=[1]; % mesh refinements for tests at multiple scales 
-    params.sc2=[1,2,4,8,16];  % additional factors for horizonal mesh extent 
+    params.sc2=[1,2];  % additional factors for horizonal mesh extent 
     params.nelem3=[20,20,8]; % base size in elements in the 3 directions 
     params.h=[10,10,10]; % base mesh spacing before scaling
     params.da=[1 1 1]; % penalty factors in x y z directions
@@ -18,12 +18,14 @@ if ~exist('params','var')
     params.maxit=50; % max iterations
     params.coarsening='2 linear';
     params.smoothing='vertical lines';
+    % params.smoothing='3D red-black';
     params.nsmooth=5; % smoothing iterations before correcton
     params.restol=1e-6;
-    params.exact=1; % compare with exact solution to compute error
+    params.exact=0; % compare with exact solution to compute error
     params.slice=0.5; % vertical y slice of error to display, 0 to 1
     params.err_slice_fig=12; % figure number for residual slice
     params.res_slice_fig=13; % figure number for error slice
+    params.maxaspect=3;  % semicoarsening: do not coarsen if fine layer too thick
 end
 params
 
