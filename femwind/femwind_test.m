@@ -17,9 +17,9 @@ if ~exist('params','var')
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
     params.coarsening='2 linear';
-    params.smoothing='vertical lines';
+    params.smoothing='vertical sweeps';
     % params.smoothing='3D red-black';
-    params.nsmooth=5; % smoothing iterations before correcton
+    params.nsmooth=3; % smoothing iterations before correcton
     params.restol=1e-6;
     params.exact=0; % compare with exact solution to compute error
     params.slice=0.5; % vertical y slice of error to display, 0 to 1
@@ -148,5 +148,6 @@ for sc = params.sc
             figure(8),clf
             wind_streamlines(X,W,params)
         end    
+    save -v7.3
     end
 end
