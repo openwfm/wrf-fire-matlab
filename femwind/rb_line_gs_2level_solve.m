@@ -31,12 +31,8 @@ switch params.coarsening
             end
         end
     case '2 linear'
-        if any(mod(n(1:2),2)==0)
-            error('number of nodes in horizontal dimensions must be odd')
-        end
-        nc = (n+1)/2-1;
+        nc = ceil((n+1)/2-1);
         % decide on vertical coarse levels
-        icv=zeros(nc(3),1);
         dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
         dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
         dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
@@ -73,7 +69,9 @@ switch params.coarsening
         ja=ia;aa=ia;
         % P = spalloc(nn,nnc,nnc*27);
         k=0;
-        for l=1:3,X_coarse{l}=zeros(nc);end % preallocate coarse points coordinates
+        for l=1:3
+            X_coarse{l}=zeros(nc); % preallocate coarse points coordinates
+        end
         for ic3=1:nc(3)           % loop over coarse layers    
             if3=icl(ic3);         % the fine level of the coarse layer
             if ic3>1
@@ -87,11 +85,11 @@ switch params.coarsening
                 ife3=icl(ic3);     % there is no next layer
             end
             fprintf('coarse layer %g at %g contributes to %g : %g\n',ic3,if3,ifs3,ife3)
-            for ic1=1:nc(1)               % loop over coarse points
+            for ic1=1:nc(1)        % horizontal loops over coarse points
                 for ic2=1:nc(2)          
-                    if1=2*ic1-1;      % fine mesh indices of the coarse point
+                    if1=2*ic1-1;   % fine mesh indices of the coarse point
                     if2=2*ic2-1;
-                    for l=1:3         % copy coordinates 
+                    for l=1:3      % copy coordinates 
                         X_coarse{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);
                     end
                     ixc = sub2ind(nc,ic1,ic2,ic3); % index into coarse matrix
