@@ -38,6 +38,7 @@ switch params.coarsening
         dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
         dxy=min(dx,dy);  % horizontal step
         lcl=1; % last coarse level
+        icl=zeros(1,nc(3));
         icl(1)=lcl;
         nc(3)=0;
         for i=1:n(3)
