@@ -1,4 +1,4 @@
-function [x,it,rate,XC,P]=rb_line_gs_2level_solve(K,F,X,params)
+function [x,it,rate,X_coarse,P]=rb_line_gs_2level_solve(K,F,X,params)
 % x=rb_line_gs_solve(K,F,X)
 disp(['coarsening method ',params.coarsening])
 disp(['smoothing method ',params.smoothing])
@@ -31,8 +31,8 @@ switch params.coarsening
             end
         end
     case '2 linear'
-        if any(mod(n,2)==0)
-            error('number of nodes in each dimension must be odd')
+        if any(mod(n(1:2),2)==0)
+            error('number of nodes in horizontal dimensions must be odd')
         end
         nc = (n+1)/2-1;
         % decide on vertical coarse levels
@@ -73,7 +73,7 @@ switch params.coarsening
         ja=ia;aa=ia;
         % P = spalloc(nn,nnc,nnc*27);
         k=0;
-        for l=1:3,XC{l}=zeros(nc);end % preallocate coarse points coordinates
+        for l=1:3,X_coarse{l}=zeros(nc);end % preallocate coarse points coordinates
         for ic3=1:nc(3)           % loop over coarse layers    
             if3=icl(ic3);         % the fine level of the coarse layer
             if ic3>1
@@ -92,7 +92,7 @@ switch params.coarsening
                     if1=2*ic1-1;      % fine mesh indices of the coarse point
                     if2=2*ic2-1;
                     for l=1:3         % copy coordinates 
-                        XC{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);
+                        X_coarse{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);
                     end
                     ixc = sub2ind(nc,ic1,ic2,ic3); % index into coarse matrix
                     % loop over fine points coarse point ic1 ic2 ic3 contributes to
@@ -123,7 +123,7 @@ switch params.coarsening
         error(['unknown coarsening ',params.coarsening])
 end
 disp('coarse matrix')
-Kc = P'*K*P;
+K_coarse = P'*K*P;
 if params.exact
     disp('exact solution, for comparison only')
     ex = K\F;  
@@ -135,7 +135,19 @@ for it=1:params.maxit
     if coarse
         fprintf('iteration %g coarse solve\n',it)
         F_coarse = P'*(K*x-F);
-        x_coarse = Kc\F_coarse;
+        if params.levels<=2 % next is 1, the coarsest
+            x_coarse = K_coarse\F_coarse;
+        else  % solve coarse problem recursively
+            params_coarse=params;  % copy all params 
+            params_coarse.levels=params.levels-1;
+            params_coarse.nsmooth=params.nsmooth_coarse;
+            params_coarse.maxit=params.maxit_coarse;
+            params_coarse.iterations_fig=params.iterations_fig+10;
+            params_coarse.res_slice_fig=params.res_slice_fig+10;
+            params_coarse.err_slice_fig=params.err_slice_fig+10;
+            [x_coarse,~,~,~,~]=rb_line_gs_2level_solve(K_coarse,F_coarse,X_coarse,params_coarse);
+            disp('coarse solve done, continuting')
+        end
         x = x - P*x_coarse; 
         it_type='coarse correction';
     else

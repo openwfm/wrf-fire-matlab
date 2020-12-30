@@ -6,8 +6,8 @@ if ~exist('params','var')
     params.graphics=1;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.sc=[1]; % mesh refinements for tests at multiple scales 
-    params.sc2=[1,2];  % additional factors for horizonal mesh extent 
-    params.nelem3=[20,20,8]; % base size in elements in the 3 directions 
+    params.sc2=[1];  % additional factors for horizonal mesh extent 
+    params.nelem3=[22,22,8]; % base size in elements, horizontal=2*odd 
     params.h=[10,10,10]; % base mesh spacing before scaling
     params.da=[1 1 1]; % penalty factors in x y z directions
     params.initial_wind=1;
@@ -27,6 +27,10 @@ if ~exist('params','var')
     params.res_slice_fig=13; % figure number for error slice
     params.iterations_fig=14; % figure number for iterations progress
     params.maxaspect=3;  % semicoarsening: do not coarsen if fine layer too thick
+    params.levels=3;
+    params.nsmooth_coarse=2;
+    params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
+    
 end
 params
 
