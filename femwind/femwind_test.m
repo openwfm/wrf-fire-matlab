@@ -25,6 +25,7 @@ if ~exist('params','var')
     params.slice=0.5; % vertical y slice of error to display, 0 to 1
     params.err_slice_fig=12; % figure number for residual slice
     params.res_slice_fig=13; % figure number for error slice
+    params.iterations_fig=14; % figure number for iterations progress
     params.maxaspect=3;  % semicoarsening: do not coarsen if fine layer too thick
 end
 params

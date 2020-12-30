@@ -61,7 +61,7 @@ switch params.coarsening
         if nc(3)==0
             error('bad number of coarse layers')
         end
-        disp(['coarse levels ',num2str(icl)])
+        disp(['coarse layers ',num2str(icl)])
         hg=num2str(X{3}(1,1,icl));
         disp(['corner height ',hg])
         hg=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl));
@@ -134,7 +134,9 @@ for it=1:params.maxit
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
         fprintf('iteration %g coarse solve\n',it)
-        x = x - P*(Kc\(P'*(K*x-F))); 
+        F_coarse = P'*(K*x-F);
+        x_coarse = Kc\F_coarse;
+        x = x - P*x_coarse; 
         it_type='coarse correction';
     else
         fprintf('iteration %g smoothing by %s\n',it,params.smoothing)
@@ -198,7 +200,7 @@ for it=1:params.maxit
                 error(['smoothing ',params.smoothing,' unknown'])
         end
     end
-    r=F-K*x;  % residual
+    r=F-K*x;  % residualm diagnostics only
     if params.exact
         e=x-ex;   % error
     else
@@ -213,7 +215,7 @@ for it=1:params.maxit
     end
     tstring=sprintf('it=%g %s %s %s',it,it_type,t_cycle);
     plot_error_slice(e,r,X,tstring,params)
-    figure(14)
+    figure(params.iterations_fig)
     semilogy(1:it,res/norm(F),'*')
     legend('relative 2-norm residual')
     if params.exact
