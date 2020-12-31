@@ -130,6 +130,7 @@ end
 cycles=0;
 t_cycle='first cycle not complete yet';
 for it=1:params.maxit
+    params.it(params.levels)=it;  % where we are, for prints and filenames
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
         fprintf('iteration %g level %g coarse correction\n',it,params.levels)
@@ -244,5 +245,9 @@ for it=1:params.maxit
     if res(it)<tol,
         break
     end
+end
+if params.save_files > 1
+    sfile=sprintf('%s_%i',params.id,params.levels);
+    save(sfile,'-v7.3')
 end
 end
