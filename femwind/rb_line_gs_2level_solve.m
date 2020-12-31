@@ -31,7 +31,7 @@ switch params.coarsening
             end
         end
     case '2 linear'
-        nc = ceil((n+1)/2-1);
+        nc = ceil((n-1)/2)+1;
         % decide on vertical coarse levels
         dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
         dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
@@ -88,8 +88,8 @@ switch params.coarsening
             fprintf('coarse layer %g at %g contributes to %g : %g\n',ic3,if3,ifs3,ife3)
             for ic1=1:nc(1)        % horizontal loops over coarse points
                 for ic2=1:nc(2)          
-                    if1=2*ic1-1;   % fine mesh indices of the coarse point
-                    if2=2*ic2-1;
+                    if1=min(2*ic1-1,n(1));   % fine mesh indices of the coarse point
+                    if2=min(2*ic2-1,n(2));
                     for l=1:3      % copy coordinates 
                         X_coarse{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);
                     end
