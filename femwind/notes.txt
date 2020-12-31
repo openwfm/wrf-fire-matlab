@@ -54,4 +54,42 @@ Rate
 
 **********************************************************************
 
+commit 660e41ab77cfc94714c6056b9af916dc0f878a07 (HEAD -> femwind)
+Author: Jan Mandel <jan.mandel@gmail.com>
+Date:   Wed Dec 30 19:52:24 2020 -0700
+
+params = 
+          graphics: 2
+            expand: 1.2000
+                sc: 1
+               sc2: 1
+            nelem3: [21 21 8]
+                 h: [10 10 10]
+                da: [1 1 1]
+      initial_wind: 1
+     terrain_shape: 'hill'
+       terrain_top: 'squash'
+    terrain_height: 0.2000
+            solver: '2-level'
+             maxit: 50
+        coarsening: '2 linear'
+         smoothing: 'vertical lines'
+           nsmooth: 3
+            restol: 1.0000e-06
+             exact: 0
+             slice: 0.5000
+     err_slice_fig: 12
+     res_slice_fig: 13
+    iterations_fig: 14
+         maxaspect: 3
+            levels: 3
+    nsmooth_coarse: 2
+      maxit_coarse: 8
+
+rate =
+    0.1335    0.2641
+
+params.levels=2:
+rate =
+    0.1335    0.1763
 
