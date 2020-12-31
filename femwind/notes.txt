@@ -89,7 +89,60 @@ params =
 rate =
     0.1335    0.2641
 
-params.levels=2:
+same, with params.levels=2:
 rate =
     0.1335    0.1763
+
+************************************************************
+commit 3306348da63093b8e4500cb7960d9af5c1c836f7
+Author: Jan Mandel <jan.mandel@gmail.com>
+Date:   Tue Dec 29 22:54:34 2020 -0700
+
+params = 
+
+  struct with fields:
+
+          graphics: 1
+            expand: 1.2000
+                sc: [1 2]
+               sc2: [1 2 4 8 16 32]
+            nelem3: [22 22 8]
+                 h: [10 10 10]
+                da: [1 1 1]
+      initial_wind: 1
+     terrain_shape: 'hill'
+       terrain_top: 'squash'
+    terrain_height: 0.2000
+            solver: '2-level'
+             maxit: 50
+        coarsening: '2 linear'
+         smoothing: 'vertical sweeps'
+           nsmooth: 3
+            restol: 1.0000e-06
+             exact: 0
+             slice: 0.5000
+     err_slice_fig: 12
+     res_slice_fig: 13
+    iterations_fig: 14
+         maxaspect: 3
+            levels: 3
+    nsmooth_coarse: 2
+      maxit_coarse: 8
+
+  Columns 1 through 13
+
+    0.1937    0.2442         0    0.4631         0         0         0    0.5760         0         0         0         0         0
+    0.2156    0.2512         0    0.2892         0         0         0    0.3404         0         0         0         0         0
+
+  Columns 14 through 26
+
+         0         0    0.6109         0         0         0         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0         0         0         0         0         0         0
+
+  Columns 27 through 32
+
+         0         0         0         0         0    0.6228
+         0         0         0         0         0         0
+
+reason: slow coarse convergence
 
