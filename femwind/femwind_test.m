@@ -36,17 +36,17 @@ params
 
 for sc = params.sc
     for sc2 = params.sc2
-        n = sc*params.nelem3;  % elements in the 3 directions
-        n(1:2)=n(1:2)*sc2
+        nel = sc*params.nelem3;  % elements in the 3 directions
+        nel(1:2)=nel(1:2)*sc2
         h = params.h/sc;
-        fprintf('mesh of %ix%ix%i cells\n',n(1),n(2),n(3))
+        fprintf('mesh of %ix%ix%i cells\n',nel(1),nel(2),nel(3))
         string_diag_A=sprintf('%g %g %g',params.da); % for figure titles
         A = diag(params.da);
-        lambda = zeros(prod(n+1),1); % placeholder solution
+        lambda = zeros(prod(nel+1),1); % placeholder solution
 
         % creating the grid
         expand=params.expand;
-        X = regular_mesh(n,h,params.expand^(1/sc));
+        X = regular_mesh(nel,h,params.expand^(1/sc));
         X = add_terrain_to_mesh(X,...
             params.terrain_shape,params.terrain_top,params.terrain_height);
         CX = center_mesh(X); % get midpoints of elements
@@ -56,15 +56,15 @@ for sc = params.sc
         switch params.initial_wind
             case 1
                 disp('initial wind uniform in x direction')
-                U0={ones(n),zeros(n),zeros(n)};
+                U0={ones(nel),zeros(nel),zeros(nel)};
             case 2
                 % to test iterative methods with non-smooth initial error
                 disp('initial wind uniform in x direction random in z direction')
-                U0={ones(n),zeros(n),randn(n)};
+                U0={ones(nel),zeros(nel),randn(nel)};
             case 3
                 % to test iterative methods with non-smooth initial error
                 disp('initial wind uniform in x direction and z direction')
-                U0={ones(n),zeros(n),ones(n)};
+                U0={ones(nel),zeros(nel),ones(nel)};
                 
         end
         if params.graphics>0
@@ -79,7 +79,7 @@ for sc = params.sc
         if params.graphics>1
             % show initial wind
             figure(2),clf
-            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,U0)
             hold off
             axis equal
@@ -87,7 +87,7 @@ for sc = params.sc
 
             % show initial wind
             figure(3),clf
-            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_mesh_3d(X,[1,nel(1),1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,U0,1)
             hold off
             axis equal
@@ -112,21 +112,21 @@ for sc = params.sc
 
             % plot resulting wind
             figure(4),clf
-            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,W)
             hold off
             axis equal
             title(['Final wind a=',string_diag_A])
 
             figure(5),clf
-            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,W,1)
             hold off
             axis equal
             title(['Final wind lowest layer a=',string_diag_A])
 
             figure(6),clf
-            plot_mesh_3d(X,[1,n(1),1,n(2),1,1]), hold on, 
+            plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,W,1:2)
             hold off
             axis equal
@@ -145,7 +145,7 @@ for sc = params.sc
             [XH,WH]=wind_at_h(X,CX,W,[20,20,1],bbox);
             plot_wind_3d(XH,WH)
             hold on
-            plot_mesh_3d(X,[1,n(1),1,n(2),1,1])
+            plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1])
             hold off
             axis equal
             title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
