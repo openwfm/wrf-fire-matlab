@@ -1,0 +1,55 @@
+commit 4307bbffee2e537e9ed71922b849ab3586cf3769
+Author: Jan Mandel <jan.mandel@gmail.com>
+Date:   Sun Dec 27 14:44:29 2020 -0700
+
+params 
+         graphics: 1
+            expand: 1.2000
+                sc: [1 2]
+               sc2: [1 2 4 8 16 32]
+            nelem3: [20 20 8]
+                 h: [10 10 10]
+                da: [1 1 1]
+      initial_wind: 1
+     terrain_shape: 'hill'
+       terrain_top: 'squash'
+    terrain_height: 0.2000
+            solver: '2-level'
+             maxit: 50
+        coarsening: '2 linear'
+         smoothing: 'vertical lines'
+           nsmooth: 5
+            restol: 1.0000e-06
+             exact: 0
+             slice: 0.5000
+     err_slice_fig: 12
+     res_slice_fig: 13
+         maxaspect: 3
+
+Rate
+ Columns 1 through 7
+
+    0.0605    0.0947         0    0.0925         0         0         0
+    0.0494    0.0804         0    0.0844         0         0         0
+
+  Columns 8 through 14
+
+    0.1028         0         0         0         0         0         0
+    0.1110         0         0         0         0         0         0
+
+  Columns 15 through 21
+
+         0    0.1085         0         0         0         0         0
+         0    0.1152         0         0         0         0         0
+
+  Columns 22 through 28
+
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+
+  Columns 29 through 32
+
+         0         0         0    0.1104
+         0         0         0         0
+
+**********************************************************************
