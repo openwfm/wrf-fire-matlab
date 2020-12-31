@@ -47,7 +47,7 @@ switch params.coarsening
             else
                 lcl=lcl+1; % next coarse level by 1
             end
-            if lcl < n(3)
+            if lcl <= n(3)
                 icl(i+1)=lcl;
             else % at the top already
                 nc(3)=i;
