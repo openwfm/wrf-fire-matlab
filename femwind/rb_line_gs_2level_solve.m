@@ -132,7 +132,7 @@ t_cycle='first cycle not complete yet';
 for it=1:params.maxit
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
-        fprintf('iteration %g coarse solve\n',it)
+        fprintf('iteration %g level %g coarse correction\n',it,params.levels)
         F_coarse = P'*(K*x-F);
         if params.levels<=2 % next is 1, the coarsest
             x_coarse = K_coarse\F_coarse;
@@ -145,13 +145,13 @@ for it=1:params.maxit
             params_coarse.res_slice_fig=params.res_slice_fig+10;
             params_coarse.err_slice_fig=params.err_slice_fig+10;
             [x_coarse,~,~,~,~]=rb_line_gs_2level_solve(K_coarse,F_coarse,X_coarse,params_coarse);
-            disp('coarse solve done, continuting')
         end
+        fprintf('coarse solve done, level %g continuting\n',params.levels)
         x = x - P*x_coarse; 
-        it_type='coarse correction';
+        it_type=sprintf('level %g coarse correction',params.levels);
     else
-        fprintf('iteration %g smoothing by %s\n',it,params.smoothing)
-        it_type='smoothing';
+        fprintf('iteration %g level %g smoothing by %s\n',it,params.levels,params.smoothing)
+        it_type=sprintf('level %g smoothing',params.levels);
         switch params.smoothing
             case {'horizontal planes'}
                 % disp('red-black vertical, planes horizontal')
@@ -221,7 +221,7 @@ for it=1:params.maxit
     if mod(it,params.nsmooth+1)==params.nsmooth
         cycles=cycles+1;
         rate = (res(it)/norm(F))^(1/cycles);
-        t_cycle=sprintf('cycle %g avg rate %g',cycles,rate);
+        t_cycle=sprintf('cycle %g level %g avg rate %g',cycles,params.levels,rate);
         disp(t_cycle)
     end
     tstring=sprintf('it=%g %s %s %s',it,it_type,t_cycle);
