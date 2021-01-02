@@ -123,6 +123,7 @@ switch params.coarsening
 end
 disp('coarse matrix')
 K_coarse = P'*K*P;
+check_nonzeros(K_coarse,X_coarse);
 if params.exact
     disp('exact solution, for comparison only')
     ex = K\F;  
