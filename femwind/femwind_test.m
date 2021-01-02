@@ -28,6 +28,7 @@ if ~exist('params','var')
     params.iterations_fig=14; % figure number for iterations progress
     params.maxaspect=3;  % semicoarsening: do not coarsen if fine layer too thick
     params.levels=3;
+    params.apply_coarse_boundary_conditions=1;
     params.nsmooth_coarse=2;
     params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     params.save_files=2; % save progress

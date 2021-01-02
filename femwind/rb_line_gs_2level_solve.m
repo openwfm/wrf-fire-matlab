@@ -135,6 +135,9 @@ for it=1:params.maxit
     if coarse
         fprintf('iteration %g level %g coarse correction\n',it,params.levels)
         F_coarse = P'*(K*x-F);
+        if params.apply_coarse_boundary_conditions
+            [K_coarse,F_coarse]=apply_boundary_conditions(K_coarse,F_coarse,X_coarse);
+        end
         if params.levels<=2 % next is 1, the coarsest
             x_coarse = K_coarse\F_coarse;
         else  % solve coarse problem recursively
