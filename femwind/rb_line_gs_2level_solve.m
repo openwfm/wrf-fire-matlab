@@ -85,20 +85,34 @@ switch params.coarsening
             else
                 ife3=icl(ic3);     % there is no next layer
             end
-            fprintf('coarse layer %g at %g contributes to %g : %g\n',ic3,if3,ifs3,ife3)
+            fprintf('coarse x3 %g at %g contributes to %g : %g\n',ic3,if3,ifs3,ife3)
             for ic1=1:nc(1)        % horizontal loops over coarse points
+                if1=2*ic1-1;       % fine mesh indices of the coarse point
+                if if1 > n(1)      % over high boundary
+                    ifs1=n(1);     % stay at boundary, do not interpolate anywerey
+                    ife1=n(1);
+                    if1 = n(1);
+                else
+                    ifs1=max(1,if1-1);       % start of the support on the fine mesh
+                    ife1=min(n(1),if1+1);    % end of the support on the fine mesh
+                end
+                % fprintf('coarse x1 %g at %g contributes to %g : %g\n',ic1,if1,ifs1,ife1)
                 for ic2=1:nc(2)          
-                    if1=min(2*ic1-1,n(1));   % fine mesh indices of the coarse point
-                    if2=min(2*ic2-1,n(2));
+                    if2=2*ic2-1; 
+                    if if2 > n(2)  % fine mesh indices of the coarse point
+                        ifs2=n(2);
+                        if2 = n(2);
+                        ife2=n(2);
+                    else
+                        ifs2=max(1,if2-1);   % start of the support on the fine mesh
+                        ife2=min(n(2),if2+1);% end of the support on the fine mesh
+                    end
+                    % fprintf('coarse x2 %g at %g contributes to %g : %g\n',ic2,if2,ifs2,ife2)
                     for l=1:3      % copy coordinates 
                         X_coarse{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);
                     end
                     ixc = sub2ind(nc,ic1,ic2,ic3); % index into coarse matrix
                     % loop over fine points coarse point ic1 ic2 ic3 contributes to
-                    ifs1=max(1,if1-1);
-                    ife1=min(n(1),if1+1);
-                    ifs2=max(1,if2-1);
-                    ife2=min(n(2),if2+1);
                     for i1=ifs1:ife1
                         for i2=ifs2:ife2
                             for i3=ifs3:ife3
@@ -123,7 +137,7 @@ switch params.coarsening
 end
 disp('coarse matrix')
 K_coarse = P'*K*P;
-check_nonzeros(K_coarse,X_coarse);
+check_nonzeros(K_coarse,X_coarse,P,K,X);
 if params.exact
     disp('exact solution, for comparison only')
     ex = K\F;  
