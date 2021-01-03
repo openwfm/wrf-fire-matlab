@@ -6,7 +6,7 @@ if ~exist('params','var')
     params.graphics=1;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.sc_all=[1,2]; % mesh refinements for tests at multiple scales 
-    params.sc2_all=[1,2,3];  % additional factors for horizonal mesh extent 
+    params.sc2_all=[1,2,4];  % additional factors for horizonal mesh extent 
     params.nelem3=[22,22,8]; % base size in elements, horizontal=2*odd 
     params.h=[10,10,10]; % base mesh spacing before scaling
     params.da=[1 1 1]; % penalty factors in x y z directions
