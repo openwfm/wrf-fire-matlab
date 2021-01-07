@@ -1,0 +1,8 @@
+better hexa_volume for divergence load:
+replace decomposition in tetras by jacobian or base times average height
+
+semicoarsening:
+decide using A not just geometry
+horizontal semicoarsening for large A(3,3)
+
+A variable with height?
