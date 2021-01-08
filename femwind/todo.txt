@@ -7,3 +7,5 @@ horizontal semicoarsening for large A(3,3)
 
 horizontal semicoarsening based on dx=dy, make explicit
 make sure there is some semicoarsening, horizontal or vertical
+
+comments in hexa_coupling.m and hexa_coupling_test.m
