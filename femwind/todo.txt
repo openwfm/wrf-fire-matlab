@@ -5,4 +5,5 @@ semicoarsening:
 decide using A not just geometry
 horizontal semicoarsening for large A(3,3)
 
-A variable with height?
+horizontal semicoarsening based on dx=dy, make explicit
+make sure there is some semicoarsening, horizontal or vertical

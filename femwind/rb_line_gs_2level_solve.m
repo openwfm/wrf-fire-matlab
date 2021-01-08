@@ -31,22 +31,34 @@ switch params.coarsening
             end
         end
     case '2 linear'
-        nc = ceil((n-1)/2)+1;
-        % decide on vertical coarse levels
-        dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
         dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
         dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
         dxy=min(dx,dy);  % horizontal step
+        dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
+        % decide on horizontal coarsening factor
+        crit=(dz(1)/dxy)/sqrt(params.da(3));
+        if crit > params.minaspect
+            hzc=2;  
+        else
+            hzc=1;
+        end
+        nc = ceil((n-1)/hzc)+1;
+        fprintf('horizontal coarsening factor %g scaled height %g\n',...
+            hzc, crit)
+        % decide on vertical coarse levels
         lcl=1; % last coarse level
         icl=zeros(1,nc(3));
         icl(1)=lcl;
         nc(3)=0;
         for i=1:n(3)
-            if lcl+2 <= n(3) & ((dz(lcl)+dz(lcl+1))/(2*dxy))/sqrt(params.da(3)) < params.maxaspect  
-                lcl=lcl+2; % next coarse level by 2
-            else
-                lcl=lcl+1; % next coarse level by 1
+            newlcl=lcl+1; % next coarse level by 1
+            if lcl+2 <= n(3) 
+                crit = ((dz(lcl)+dz(lcl+1))/(2*dxy*hzc/2))/sqrt(params.da(3));
+                if crit < params.maxaspect  
+                    newlcl=lcl+2; % next coarse level by 2
+                end
             end
+            lcl = newlcl;
             if lcl <= n(3)
                 icl(i+1)=lcl;
             else % at the top already
@@ -87,7 +99,7 @@ switch params.coarsening
             end
             fprintf('coarse x3 %g at %g contributes to %g : %g\n',ic3,if3,ifs3,ife3)
             for ic1=1:nc(1)        % horizontal loops over coarse points
-                if1=2*ic1-1;       % fine mesh indices of the coarse point
+                if1=hzc*ic1-(hzc-1);       % fine mesh indices of the coarse point
                 if if1 > n(1)      % over high boundary
                     ifs1=n(1);     % stay at boundary, do not interpolate anywerey
                     ife1=n(1);
@@ -98,7 +110,7 @@ switch params.coarsening
                 end
                 % fprintf('coarse x1 %g at %g contributes to %g : %g\n',ic1,if1,ifs1,ife1)
                 for ic2=1:nc(2)          
-                    if2=2*ic2-1; 
+                    if2=hzc*ic2-(hzc-1); 
                     if if2 > n(2)  % fine mesh indices of the coarse point
                         ifs2=n(2);
                         if2 = n(2);
