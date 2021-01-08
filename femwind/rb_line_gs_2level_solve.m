@@ -42,7 +42,7 @@ switch params.coarsening
         icl(1)=lcl;
         nc(3)=0;
         for i=1:n(3)
-            if lcl+2 <= n(3) & dz(lcl)+dz(lcl+1) < params.maxaspect * 2 *dxy 
+            if lcl+2 <= n(3) & ((dz(lcl)+dz(lcl+1))/(2*dxy))/sqrt(params.da(3)) < params.maxaspect  
                 lcl=lcl+2; % next coarse level by 2
             else
                 lcl=lcl+1; % next coarse level by 1
