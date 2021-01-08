@@ -1,4 +1,4 @@
-function [K,F,W]=sparse_assembly(A,X,u0,lambda)
+function [K,F,W]=sparse_assembly(A,X,u0,lambda,params)
 % in: 
 %  A  penalty coefficients matrix, size 3x3, s.p.d.
 %  X  cell array with 3d arrays x y z coordinates of mesh vertices
@@ -84,7 +84,7 @@ K = sparse(ii,jj,aa,nn,nn); % err_K=big(K-KK)
 nn=prod(n);
 % checks
 if length(F)>nn, size(F),error('size has grown by an index out of bounds'),end
-check_nonzeros(K,X)
+check_nonzeros(params.levels,K,X)
 check_symmetry(K,'K',eps)
 K = (K+K')/2; % symmetrize
 end

@@ -1,9 +1,9 @@
-function check_nonzeros(Kc,Xc,P,K,X)
+function check_nonzeros(level,Kc,Xc,P,K,X)
 % check_nonzeros(Kc,Xc,P,K,X)
 % checking nonzeros structure consistent with hexa grid
     disp('check_nonzeros: check if structure consistent with hexa grid')
-    fprintf('stiffness matrix size %g nonzeros %g density %g%%\n',...
-        length(Kc),nnz(Kc),100*nnz(Kc)/prod(size(Kc)))
+    fprintf('level %g stiffness matrix size %g nonzeros %g density %g%%\n',...
+        level,length(Kc),nnz(Kc),100*nnz(Kc)/prod(size(Kc)))
     if exist('P','var')
         fprintf('prolongation matrix size %g %g nonzeros %g density %g%%\n',...
             size(P),nnz(P),100*nnz(P)/prod(size(P)))

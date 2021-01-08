@@ -99,7 +99,7 @@ for sc = params.sc_all
         end
 
         % assemble sparse system matrix
-        [K,F,~] = sparse_assembly(A,X,U0,lambda);
+        [K,F,~] = sparse_assembly(A,X,U0,lambda,params);
 
         % dirichlet boundary conditions
         [K,F]=apply_boundary_conditions(K,F,X);
@@ -109,7 +109,7 @@ for sc = params.sc_all
         [lambda,it,rate(sc,sc2),XC,P] = sparse_solve(K,F,X,params);
 
         % assemble final wind
-        [~,~,W] = sparse_assembly(A,X,U0,lambda);
+        [~,~,W] = sparse_assembly(A,X,U0,lambda,params);
 
         if params.graphics>1
             disp('graphics: solution')
