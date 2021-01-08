@@ -35,7 +35,7 @@ Xloc = zeros(3,8);
 kglo=zeros(1,8);
 m = n-1;
 done_last=0;
-disp('accumulating entries')
+disp('accumulating global stiffness matrix entries')
 for i3=1:m(3)
     for i2=1:m(2)
         for i1=1:m(1)  % loop over elements
@@ -77,15 +77,14 @@ end
 for i=1:3
     W{i}=u0{i}+W{i};
 end
-fprintf('\n')
+% fprintf('\n')
 if kk~=nzelem, error('wrong element nonzeros'),end
-disp('building global sparse matrix')
+disp('building sparse global stiffness matrix')
 K = sparse(ii,jj,aa,nn,nn); % err_K=big(K-KK)
 nn=prod(n);
-nz=nnz(K);
-fprintf('stiffness matrix size %g nonzeros %g density %g%%\n',nn,nz,100*nz/nn^2)
 % checks
 if length(F)>nn, size(F),error('size has grown by an index out of bounds'),end
+check_nonzeros(K,X)
 check_symmetry(K,'K',eps)
 K = (K+K')/2; % symmetrize
 end

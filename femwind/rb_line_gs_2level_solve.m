@@ -17,7 +17,7 @@ x = zeros(nn,1);
 colz=1:n(3);
 onez=ones(1,n(3));
 
-% prolongation
+disp('building prolongation')
 switch params.coarsening
     case 'vertical lines'
         nnc = n(1)*n(2);  % number of coarse
@@ -43,7 +43,7 @@ switch params.coarsening
             hzc=1;
         end
         nc = ceil((n-1)/hzc)+1;
-        fprintf('horizontal coarsening factor %g scaled height %g\n',...
+        fprintf('horizontal coarsening factor %g because weighted height=%g\n',...
             hzc, crit)
         % decide on vertical coarse levels
         lcl=1; % last coarse level
@@ -70,11 +70,11 @@ switch params.coarsening
         if nc(3)==0
             error('bad number of coarse layers')
         end
-        disp(['coarse layers ',num2str(icl)])
+        disp(['vertical coarse layers ',num2str(icl)])
         hg=num2str(X{3}(1,1,icl));
-        disp(['corner height ',hg])
-        hg=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl));
-        disp(['center height ',hg])
+        disp(['heights at corner ',hg])
+        hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl));
+        disp(['heights at center ',hgc])
         % build the prolongation matrix
         nnc = prod(nc);  % number of coarse points
         nncz=nnc*27; % estimate number of nonzeros in coarse matrix
@@ -97,7 +97,7 @@ switch params.coarsening
             else
                 ife3=icl(ic3);     % there is no next layer
             end
-            fprintf('coarse x3 %g at %g contributes to %g : %g\n',ic3,if3,ifs3,ife3)
+            fprintf('coarse layer %g at %g contributes to layers %g : %g\n',ic3,if3,ifs3,ife3)
             for ic1=1:nc(1)        % horizontal loops over coarse points
                 if1=hzc*ic1-(hzc-1);       % fine mesh indices of the coarse point
                 if if1 > n(1)      % over high boundary
@@ -147,7 +147,7 @@ switch params.coarsening
     otherwise
         error(['unknown coarsening ',params.coarsening])
 end
-disp('coarse matrix')
+disp('computing coarse matrix')
 K_coarse = P'*K*P;
 check_nonzeros(K_coarse,X_coarse,P,K,X);
 if params.exact
