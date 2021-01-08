@@ -38,13 +38,14 @@ switch params.coarsening
         % decide on horizontal coarsening factor
         crit=(dz(1)/dxy)/sqrt(params.da(3));
         if crit > params.minaspect
-            hzc=2;  
+            hzc1=2;hzc2=2; % future proofing 
         else
-            hzc=1;
+            hzc1=1;hzc2=1;
         end
-        nc = ceil((n-1)/hzc)+1;
-        fprintf('horizontal coarsening factor %g because weighted height=%g\n',...
-            hzc, crit)
+        hzcavg=sqrt(hzc1*hzc2); 
+        nc = ceil((n-1)./[hzc1,hzc2,1])+1;
+        fprintf('horizontal coarsening factor %g %g because weighted height=%g\n',...
+            hzc1, hzc2, crit)
         % decide on vertical coarse levels
         lcl=1; % last coarse level
         icl=zeros(1,nc(3));
@@ -53,7 +54,7 @@ switch params.coarsening
         for i=1:n(3)
             newlcl=lcl+1; % next coarse level by 1
             if lcl+2 <= n(3) 
-                crit = ((dz(lcl)+dz(lcl+1))/(2*dxy*hzc/2))/sqrt(params.da(3));
+                crit = ((dz(lcl)+dz(lcl+1))/(2*dxy*hzcavg/2))/sqrt(params.da(3));
                 if crit < params.maxaspect  
                     newlcl=lcl+2; % next coarse level by 2
                 end
@@ -75,7 +76,8 @@ switch params.coarsening
         disp(['heights at corner ',hg])
         hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl));
         disp(['heights at center ',hgc])
-        % build the prolongation matrix
+        disp(['coarse grid size ',num2str(nc)])
+        disp('building the prolongation matrix')
         nnc = prod(nc);  % number of coarse points
         nncz=nnc*27; % estimate number of nonzeros in coarse matrix
         ia=zeros(nncz,1); % preallocate arrays for P matrix entries
@@ -99,9 +101,12 @@ switch params.coarsening
             end
             fprintf('coarse layer %g at %g contributes to layers %g : %g\n',ic3,if3,ifs3,ife3)
             for ic1=1:nc(1)        % horizontal loops over coarse points
-                if1=hzc*ic1-(hzc-1);       % fine mesh indices of the coarse point
-                if if1 > n(1)      % over high boundary
-                    ifs1=n(1);     % stay at boundary, do not interpolate anywerey
+                if1=hzc1*ic1-(hzc1-1);  
+                if  hzc1 == 1   
+                    ifs1=if1;   % no coarsening 
+                    ife1=if1;
+                elseif if1 > n(1)  % over high boundary   
+                    ifs1=n(1);     % fine mesh indices of the coarse point
                     ife1=n(1);
                     if1 = n(1);
                 else
@@ -110,9 +115,12 @@ switch params.coarsening
                 end
                 % fprintf('coarse x1 %g at %g contributes to %g : %g\n',ic1,if1,ifs1,ife1)
                 for ic2=1:nc(2)          
-                    if2=hzc*ic2-(hzc-1); 
-                    if if2 > n(2)  % fine mesh indices of the coarse point
-                        ifs2=n(2);
+                    if2=hzc2*ic2-(hzc2-1); 
+                    if hzc2 == 1     
+                       ifs2=if2;      % no coarsening
+                       ife2=if2;
+                    elseif if2 > n(2) % over high boundary
+                        ifs2=n(2);   % fine mesh indices of the coarse point
                         if2 = n(2);
                         ife2=n(2);
                     else
