@@ -15,7 +15,7 @@ function check_nonzeros(level,Kc,Xc,P,K,X)
     if any(size(Kc)~=nnc)
         error('Kc size inconsistent with mesh Xc')
     end
-    if any(any((Kc==0)~=(Kc'==0)))
+    if any(any(sign(Kc)-sign(Kc)'))
         error('K does not have symmetric structure')
     end
     [ii,jj,aij]=find(Kc);
