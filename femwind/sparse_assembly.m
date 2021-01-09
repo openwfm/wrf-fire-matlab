@@ -3,7 +3,7 @@ function [K,F,W]=sparse_assembly(A,X,u0,lambda,params)
 %  A  penalty coefficients matrix, size 3x3, s.p.d.
 %  X  cell array with 3d arrays x y z coordinates of mesh vertices
 %  u0 cell array with 3d arrays initial wind vector at centers in x y z directions
-%  lambda scalar field on node; if present, do not compute K and F
+%  lambda scalar field on node; if empty, do not compute K and F
 % out:
 %  K  stiffness matrix, sparse
 %  F  load vector

@@ -9,9 +9,8 @@ if ~exist('params','var')
     params.sc2_all=[1,2,4];  % additional factors for horizonal mesh extent 
     params.nelem3=[22,22,8]; % base size in elements, horizontal=2*odd 
     params.h=[1,1,1]; % base mesh spacing before scaling
-    params.da=[1 1 1]; % penalty factors in x y z directions
-    params.initial_wind=1;
-    params.initial_profile='log'; % or uniform
+    params.a=[1 1 1]; % penalty factors in x y z directions
+    params.initial_wind='log'; % or uniform
     params.roughness_height=0.5;
     params.terrain_shape='hill'; % terrain for add_terrain_to_mesh
     params.terrain_top='squash'; % mesh top treatment for add_terrain_to_mesh
@@ -46,8 +45,8 @@ for sc = params.sc_all
         h = params.h/sc;
         fprintf('mesh of %ix%ix%i cells\n',nel(1),nel(2),nel(3))
         params.id=sprintf('%ix%ix%i',nel); % to pass around 
-        string_diag_A=sprintf('%g %g %g',params.da); % for figure titles
-        A = diag(params.da);
+        string_diag_A=sprintf('%g %g %g',params.a); % for figure titles
+        A = diag(params.a.^2);
         lambda = zeros(prod(nel+1),1); % placeholder solution
 
         % creating the grid
@@ -60,7 +59,7 @@ for sc = params.sc_all
         % initial wind at the centers of the elements
         rng(1);
         switch params.initial_wind
-            case 'unifom'
+            case 'uniform'
                 disp('initial wind uniform in x direction')
                 U0={ones(nel),zeros(nel),zeros(nel)};
             case 'random-z'

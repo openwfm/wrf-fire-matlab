@@ -36,7 +36,7 @@ switch params.coarsening
         dxy=min(dx,dy);  % horizontal step
         dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
         % decide on horizontal coarsening factor
-        crit=(dz(1)/dxy)/sqrt(params.da(3));
+        crit=(dz(1)/dxy)/params.a(3);
         if crit > params.minaspect
             hzc1=2;hzc2=2; % future proofing 
         else
@@ -54,7 +54,7 @@ switch params.coarsening
         for i=1:n(3)
             newlcl=lcl+1; % next coarse level by 1
             if lcl+2 <= n(3) 
-                crit = ((dz(lcl)+dz(lcl+1))/(2*dxy*hzcavg/2))/sqrt(params.da(3));
+                crit = ((dz(lcl)+dz(lcl+1))/(2*dxy*hzcavg/2))/params.a(3);
                 if crit < params.maxaspect  
                     newlcl=lcl+2; % next coarse level by 2
                 end
