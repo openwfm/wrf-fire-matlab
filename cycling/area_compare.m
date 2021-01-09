@@ -1,10 +1,11 @@
-function ac = area_compare(ps,tign_b)
+function [ac,gs] = area_compare(ps,tign_b)
 %compares areas of fires over time
 % outputs graph, areas and a mask
 % ps = cluster_paths(w) --- Forecast
 % tign_b = quish2(ps) --- "Analysis"
 
-tign_a = ps.red.tign;
+%tign_a = ps.tign_g;
+tign_a = ps.red.tign_g;
 %create a mask 
 msk=tign_b-tign_a;
 msk(abs(msk)<0.2) = 0;
@@ -15,18 +16,18 @@ msk(msk<0)=-1; %subtract fuel moist ==> speed up fire
 t_1 = max(min(tign_a(:)),min(tign_b(:)));%+0.25;
 t_2 = min(max(tign_a(:)),max(tign_b(:)))-0.25;
 
-pts = 20;
+pts = 30;
 t = linspace(t_1,t_2,pts);
 
 for i = 1:pts
     area_a(i) = sum(sum(tign_a < t(i)));
     area_b(i) = sum(sum(tign_b < t(i)));
 end
-
-t_days = (t-ps.red.start_datenum-1)
+%figure,plot(t(1:end-1),area_a(1:end-1),t(1:end-1),area_b(1:end-1))
+t_days = (t-ps.red.start_datenum);
 figure
-plot(t_days,area_a,t_days,area_b)
-%plot(t/(24*3600),area_a,t/(24*3600),area_b)
+%plot(t_days,area_a,t_days,area_b)
+plot(t/(24*3600),area_a,t/(24*3600),area_b)
 %legend('wrf-a','wrf-b')
 legend('Forecast','Estimate')
 %legend('Wet fuel','Normal Fuel')
@@ -41,7 +42,7 @@ title('Comparison of Areas')
 ac.area_a = area_a;
 ac.area_b = area_b;
 ac.msk = msk;
-
+gs = norm(area_a-area_b)/norm(area_a);
 
 end
 

@@ -1,4 +1,4 @@
-function [mx,my] = moe_2d(w1,w2)
+function [mx,my,s] = moe_2d(w1,w2)
 %w1 is wrfout from forecast
 %w2 is wrfout with "ground truth" fire arrival time - optional if perimeter
 %              is used
@@ -46,7 +46,7 @@ if perim_use == 1
     perim_area = sum(perim_flat(:));
     
 else
-    t_g = min(max(w1.tign_g(:)),max(w2.tign_g(:)))-60;
+    t_g = min(max(w1.tign_g(:)),max(w2.tign_g(:)))-6*3600;
     tign_g = w1.tign_g;
     %area of ground truth
     in_perim = w2.tign_g<=t_g;
@@ -81,14 +81,19 @@ false_pos = logical(false_pos);
 %MOE
 mx = 1 - sum(false_neg(:))/perim_area;
 my = 1 - sum(false_pos(:))/w1_area;
+%s --- sorenson index
+s = 2*sum(overlap(:))/(w1_area+perim_area);
 
-
-
-figure(129),scatter(w1.fxlong(false_neg'),w1.fxlat(false_neg'),'r*')
-hold on,scatter(w1.fxlong(false_pos'),w1.fxlat(false_pos'),'k*'),
-scatter(w1.fxlong(overlap'),w1.fxlat(overlap'),'g*')
-legend('False Negative','False Positive','Overlap')
-tstr = sprintf('MOE = (%f,%f)',mx,my);
-title(tstr);
+plot_on = 1;
+if plot_on == 1
+    figure(129)
+    close(gcf)
+    figure(129),scatter(w1.fxlong(false_neg'),w1.fxlat(false_neg'),'r*')
+    hold on,scatter(w1.fxlong(false_pos'),w1.fxlat(false_pos'),'k*'),
+    scatter(w1.fxlong(overlap'),w1.fxlat(overlap'),'g*')
+    legend('False Negative','False Positive','Overlap')
+    tstr = sprintf('MOE = (%f,%f)',mx,my);
+    title(tstr);
+end
 
 end

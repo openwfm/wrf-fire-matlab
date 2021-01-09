@@ -7,9 +7,9 @@ pts = ps.grid_pts;
 pts(:,3) = ps.points(:,3);
 idx = ps.idx;
 
-n = length(ps.paths)
+n = length(ps.paths);
 %number of new points on segment
-np = 7;
+np = 2;
 new_points = [];
 news = [];
 new_idx = ps.idx;
@@ -17,7 +17,7 @@ new_grid_pts = ps.grid_pts;
 new_points = ps.points;
 new_points2 = ps.points;
 new_grids = [];
-min_path_points = 2
+min_path_points = 2;
 
 for i = 1:n
     p = ps.paths(i).p;
@@ -38,7 +38,9 @@ for i = 1:n
             q_j = idx(p(j),2);%+rm*round(randn);
             %distance between points in path
             dist = ps.raw_dist(p(j-1),p(j));
-            np = round(dist/600)+1;
+            %ts_4 --> dist/2000
+            %ts_5 --> dist/1000
+            np = round(dist/500)+1;
             %fprintf('Segment %d distance: %f new points: %d \n',j-1,dist,np);
             %linear interpolation of new points along the line
             new_lats = linspace(pts(p(j-1),1),pts(p(j),1),np)' ...

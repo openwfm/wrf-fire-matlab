@@ -18,9 +18,9 @@ times = times(st_2);
 
 
 n = length(times);
-end_time = max(max(times),ps.red.end_datenum)+0.01;
+end_time = max(max(times),ps.red.end_datenum);%+0.01;
 start_time = min(times);
-total_time = ceil(end_time-start_time);
+%total_time = ceil(end_time-start_time);
 
 tign = end_time*ones(size(ps.red.fxlong));
 temp_tign = tign;
@@ -57,6 +57,7 @@ for i = 1:det_steps:n
     times_set = times(pt_set);
     %figure,scatter3(lons_set,lats_set,times_set)
     in = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set,lons_set);
+    in = inpolygon(ps.red.fxlat,ps.red.fxlong,ps.red.fxlat(in),ps.red.fxlong(in));
     temp_tign(in) = max(times_set);
     temp_tign(~in) = end_time;
     tign = min(tign,temp_tign);
@@ -64,8 +65,8 @@ for i = 1:det_steps:n
     
 end
 
-%tign = imgaussfilt(tign,1)-0.25;
-%tign = smooth_up(ps.red.fxlong,ps.red.fxlat,tign);
+%tign = imgaussfilt(tign,1);%-0.25;
+tign = smooth_up(ps.red.fxlong,ps.red.fxlat,tign);
 figure,mesh(ps.red.fxlong,ps.red.fxlat,tign);
 hold on
 scatter3(lons,lats,times,'*r')
