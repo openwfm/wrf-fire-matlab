@@ -8,9 +8,11 @@ if ~exist('params','var')
     params.sc_all=[1]; % mesh refinements for tests at multiple scales 
     params.sc2_all=[1,2,4];  % additional factors for horizonal mesh extent 
     params.nelem3=[22,22,8]; % base size in elements, horizontal=2*odd 
-    params.h=[10,10,10]; % base mesh spacing before scaling
+    params.h=[1,1,1]; % base mesh spacing before scaling
     params.da=[1 1 1]; % penalty factors in x y z directions
     params.initial_wind=1;
+    params.initial_profile='log'; % or uniform
+    params.roughness_height=0.5;
     params.terrain_shape='hill'; % terrain for add_terrain_to_mesh
     params.terrain_top='squash'; % mesh top treatment for add_terrain_to_mesh
     params.terrain_height=0.2; % terrain height as part of domain height
@@ -53,23 +55,27 @@ for sc = params.sc_all
         X = regular_mesh(nel,h,params.expand^(1/sc));
         X = add_terrain_to_mesh(X,...
             params.terrain_shape,params.terrain_top,params.terrain_height);
-        CX = center_mesh(X); % get midpoints of elements
+        [CX,CH] = center_mesh(X); % get midpoints of elements
 
         % initial wind at the centers of the elements
         rng(1);
         switch params.initial_wind
-            case 1
+            case 'unifom'
                 disp('initial wind uniform in x direction')
                 U0={ones(nel),zeros(nel),zeros(nel)};
-            case 2
+            case 'random-z'
                 % to test iterative methods with non-smooth initial error
                 disp('initial wind uniform in x direction random in z direction')
                 U0={ones(nel),zeros(nel),randn(nel)};
-            case 3
+            case 'random-xz'
                 % to test iterative methods with non-smooth initial error
                 disp('initial wind uniform in x direction and z direction')
                 U0={ones(nel),zeros(nel),ones(nel)};
-                
+            case 'log'
+                disp('initial wind log profile in x direction')
+                U0={log(max(1,CH/params.roughness_height)),zeros(nel),zeros(nel)};
+            otherwise
+                error(['unknown initial wind ',params.initial_wind])
         end
         if params.graphics>0
             disp('graphics: problem setup')
@@ -80,7 +86,7 @@ for sc = params.sc_all
             title('The wind mesh, wind vector in centers, lambda in corners')
         end
 
-        if params.graphics>1
+        if params.graphics>0
             % show initial wind
             figure(2),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
@@ -88,7 +94,9 @@ for sc = params.sc_all
             hold off
             axis equal
             title('Initial wind')
+        end
 
+        if params.graphics>1
             % show initial wind
             figure(3),clf
             plot_mesh_3d(X,[1,nel(1),1,nel(2)+1,1,1]), hold on, 
