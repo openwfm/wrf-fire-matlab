@@ -1,5 +1,5 @@
 function [wz] = perim_cone(n,w)
-
+ HEAD
 [x,y,z] = perim();  %in-linefunction below
 for i = 2:n
     [x1,y1,z1] = perim();
@@ -115,7 +115,7 @@ end
 dim1 = 75;
 dim2 = 75;
 F = scatteredInterpolant(pts(:,1),pts(:,2),pts(:,3),'linear','nearest');
-d = round(max(max(pts(:,1:2))))+15+10*rand;
+d = round(max(max(pts(:,1:2))))+6;
 [x,y] = meshgrid(linspace(-d,d,dim1),linspace(-d,d,dim2));
 z = F(x,y);
 
