@@ -2,4 +2,8 @@
 *.bak
 *.dat
 *.m~
+*.zip
+*.tar
+*.tgz
+*.tbz
 
