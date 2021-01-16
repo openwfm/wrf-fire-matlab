@@ -5,12 +5,13 @@ if ~exist('params','var')
     disp('params do not exist yet, setting')
     params.graphics=1;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
-    params.sc_all=[1,2]; % mesh refinements for tests at multiple scales 
+    params.sc_all=[1]; % mesh refinements for tests at multiple scales 
     params.sc2_all=[1,2,4];  % additional factors for horizonal mesh extent 
     params.nelem3=[22,22,8]; % base size in elements, horizontal=2*odd 
-    params.h=[10,10,10]; % base mesh spacing before scaling
-    params.da=[1 1 1]; % penalty factors in x y z directions
-    params.initial_wind=1;
+    params.h=[1,1,1]; % base mesh spacing before scaling
+    params.a=[1 1 1]; % penalty factors in x y z directions
+    params.initial_wind='log'; % or uniform
+    params.roughness_height=0.5;
     params.terrain_shape='hill'; % terrain for add_terrain_to_mesh
     params.terrain_top='squash'; % mesh top treatment for add_terrain_to_mesh
     params.terrain_height=0.2; % terrain height as part of domain height
@@ -26,7 +27,8 @@ if ~exist('params','var')
     params.err_slice_fig=12; % figure number for residual slice
     params.res_slice_fig=13; % figure number for error slice
     params.iterations_fig=14; % figure number for iterations progress
-    params.maxaspect=3;  % semicoarsening: do not coarsen if fine layer too thick
+    params.maxaspect=3;  % do not coarsen vertically if vertical layer is too thick
+    params.minaspect=1/3; % do not coarsen horizontally if the layer is too thin
     params.levels=3;
     params.apply_coarse_boundary_conditions=1;
     params.nsmooth_coarse=2;
@@ -43,8 +45,8 @@ for sc = params.sc_all
         h = params.h/sc;
         fprintf('mesh of %ix%ix%i cells\n',nel(1),nel(2),nel(3))
         params.id=sprintf('%ix%ix%i',nel); % to pass around 
-        string_diag_A=sprintf('%g %g %g',params.da); % for figure titles
-        A = diag(params.da);
+        string_diag_A=sprintf('%g %g %g',params.a); % for figure titles
+        A = diag(params.a.^2);
         lambda = zeros(prod(nel+1),1); % placeholder solution
 
         % creating the grid
@@ -52,23 +54,27 @@ for sc = params.sc_all
         X = regular_mesh(nel,h,params.expand^(1/sc));
         X = add_terrain_to_mesh(X,...
             params.terrain_shape,params.terrain_top,params.terrain_height);
-        CX = center_mesh(X); % get midpoints of elements
+        [CX,CH] = center_mesh(X); % get midpoints of elements
 
         % initial wind at the centers of the elements
         rng(1);
         switch params.initial_wind
-            case 1
+            case 'uniform'
                 disp('initial wind uniform in x direction')
                 U0={ones(nel),zeros(nel),zeros(nel)};
-            case 2
+            case 'random-z'
                 % to test iterative methods with non-smooth initial error
                 disp('initial wind uniform in x direction random in z direction')
                 U0={ones(nel),zeros(nel),randn(nel)};
-            case 3
+            case 'random-xz'
                 % to test iterative methods with non-smooth initial error
                 disp('initial wind uniform in x direction and z direction')
                 U0={ones(nel),zeros(nel),ones(nel)};
-                
+            case 'log'
+                disp('initial wind log profile in x direction')
+                U0={log(max(1,CH/params.roughness_height)),zeros(nel),zeros(nel)};
+            otherwise
+                error(['unknown initial wind ',params.initial_wind])
         end
         if params.graphics>0
             disp('graphics: problem setup')
@@ -79,7 +85,7 @@ for sc = params.sc_all
             title('The wind mesh, wind vector in centers, lambda in corners')
         end
 
-        if params.graphics>1
+        if params.graphics>0
             % show initial wind
             figure(2),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
@@ -87,7 +93,9 @@ for sc = params.sc_all
             hold off
             axis equal
             title('Initial wind')
+        end
 
+        if params.graphics>1
             % show initial wind
             figure(3),clf
             plot_mesh_3d(X,[1,nel(1),1,nel(2)+1,1,1]), hold on, 
@@ -98,7 +106,7 @@ for sc = params.sc_all
         end
 
         % assemble sparse system matrix
-        [K,F,~] = sparse_assembly(A,X,U0,lambda);
+        [K,F,~] = sparse_assembly(A,X,U0,lambda,params);
 
         % dirichlet boundary conditions
         [K,F]=apply_boundary_conditions(K,F,X);
@@ -108,7 +116,7 @@ for sc = params.sc_all
         [lambda,it,rate(sc,sc2),XC,P] = sparse_solve(K,F,X,params);
 
         % assemble final wind
-        [~,~,W] = sparse_assembly(A,X,U0,lambda);
+        [~,~,W] = sparse_assembly(A,X,U0,lambda,params);
 
         if params.graphics>1
             disp('graphics: solution')

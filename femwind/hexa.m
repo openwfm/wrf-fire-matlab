@@ -22,7 +22,7 @@ ib =[  % coordinates of basis functions
      1     1     1];
 % the value of basis function k at x is
 % bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
-check_symmetry(A,'A',eps)
+%check_symmetry(A,'A',eps)
 % gaussian quadrature nodes
 g=0.5773502691896257;
 s = g*ib;
@@ -50,6 +50,6 @@ for j=1:Ng+1
         Floc = Floc - Jg * u0 * vol;
     end
 end
-check_symmetry(Kloc,'Kloc',eps)
+%check_symmetry(Kloc,'Kloc',eps)
 end
     
