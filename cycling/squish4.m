@@ -1,13 +1,21 @@
-function tign_new = squish4(ps)
+function tign_new = squish4(ps,a,b,gq)
 %% ps is struct with paths, red, graph,distances, etc.
+% a, b - parameters of the function smooth up function
 %% ps = graph_dets(w)
 
+if ~exist('a','var')
+    a = 100;
+    b = 1/3;
+end
 
 %combine l2 time with detection points fixed to grid
 pts = ps.grid_pts;
 pts(:,3) = ps.points(:,3);
+pts(1,3) = pts(1,3)-1/2;
 %forecast
 tign = ps.red.tign;
+% t_max = max(tign(:))-.1;
+% tign(tign>=t_max) =t_max+1;
 t0 = min(tign(:));
 [m,n]=size(ps.red.tign);
 
@@ -25,10 +33,11 @@ t0 = min(tign(:));
 % figure,plot(t,exp(ts))
 % hold on,plot(t,1-exp(ts))
 %make vector of data likelihoods
-
-gq = input_num('use ground detections? yes = [1]',1,1);
+if ~exist('gq','var')
+    gq = input_num('use ground detections? yes = [1]',1,1);
+end
 if gq
-    smooth_ground = max(m,n)/50;
+    smooth_ground = 1;%max(m,n)/50;
     fprintf('Collecting ground detection data\n')
     %grounds = ground_detects(ps.red);
     %[jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
@@ -45,18 +54,19 @@ end
 tmax=max(tign(:));
 tign_ground = tign;
 tign_flat = ps.red.end_datenum*ones(size(ps.red.tign));
-beta = 1/2;
 %figure(159),hold on,scatter(pts(:,2),pts(:,1),'*r')
 time_err = 0.0;
 g_diff = (tign_flat-tign+time_err)*24*3600;
 g_likes = p_like_spline(g_diff);
+beta = 1/10;
 beta_vect = exp(g_likes);
+use_beta_likes = 1;
 %%% ground detection likelihood
 % g_times = zeros(pts_length,1);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 20;
+ground_steps = 1;
 if gq
     data_area = sum(infire);
     for i = 1:ground_steps
@@ -74,12 +84,16 @@ if gq
             break
         end
         fprintf('Fire area: %f pixel_out/data area: %f  pixels_out %f\n',fire_area,out_sum(i)/data_area,out_sum(i));
-        %tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
-        tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
+        if use_beta_likes == 1
+            tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
+        else
+            tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
+        end
+        %flatten the top
         t_mask = tign_ground > tmax;
         tign_ground(t_mask) = tmax;
         %tign_temp = imgaussfilt(tign_ground,smooth_ground );
-        tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground);
+        tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground,a,b);
         tign_ground(~infire) = tign_temp(~infire);
 %         a = 1/10;%1/2-1/(2*i);
 %         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
@@ -165,17 +179,17 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
-rm = 1/2;
+rm = round(m/100)+1;
 
 % random multiplier, keep the same
 % perturbs points downward in time to
-rt = 0.0;
+rt = 1;
 % weight for tign_new
 
 %alhpa blends  estimate of tign at a point with old estimate
 % new_estimate = alph*current_setimate + (1-alpha)*old_estimate
 % for data assimilation, alpha will be computed from exp(likelihood)
-alpha = 0.5;
+% alpha = 0.5;
 %constant for smooth in rlx_shp
 alpha_2 = 0.7; %smaller alph_2 ==> smoother
 %number of loops to run
@@ -200,9 +214,9 @@ for k = 1:smoothings
             p_j = idx(p(j),2);%+rm*round(randn);
             %%% make mean of old and new, in small block around path point
             %alpha is now the data likelikehood
-            alpha = alpha_vect(p(j));
-            %alpha = 0.1;
-            tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt*rand;
+            %alpha = alpha_vect(p(j));
+            alpha = 0.0;
+            tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt;
             %%%% alternate strategy.
             %             if k == 1 && j > 1
             %             t1 = min(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
@@ -257,8 +271,11 @@ for k = 1:smoothings
     
     %smooth the tign
     %tign_new(tign_new < t0) = t0;
-    tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
-    %tign_new = rlx_shp(tign_new,alpha_2,patch);
+    tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new,a,b);
+    if k < smoothings/5
+        tign_new = imgaussfilt(tign_new,1);
+        tign_new = rlx_shp(tign_new,alpha_2,patch);
+    end
 %   tign_flat = rlx_shp(tign_flat,alpha_2,patch);
     
     %collect information about tign at the detection points
@@ -267,15 +284,8 @@ for k = 1:smoothings
         %flat_times(i) = tign_flat(ps.idx(i,1),ps.idx(i,2));
     end
     norms(k,1) = norm(t_times-ps.points(:,3),2);
-    % blend flat start with forecast start for analysis
-    
-%    tign_flat = rlx_shp(tign_flat,alpha_2,patch);
-%    norm_flat = norm(flat_times-ps.points(:,3),2);
     norm_tign_new = norms(k,1);
-%     if (norm_flat > norm_tign_new)
-%         %fprintf('blending flat start with forecast \n')
-%         tign_new = 0.5*(tign_new+tign_flat);
-%     end
+
     
     %only do norm for times before final detection time
     time_mask = tign_new < pts(end,3);  %max(max(pts(:,3)));
@@ -293,7 +303,9 @@ for k = 1:smoothings
     norm_break = 1;
     if k > 2 && norms(k,norm_break) >= norm(k-1,norm_break) && norms(k,norm_break) >= norms(k-2,norm_break)
         fprintf('graph norm increase \n')
-        break
+        rm = 0;
+        rt = 0;
+        %break
     end
 end
 %tign_new = [];
@@ -301,7 +313,7 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 5;
+ground_steps = 4;
 tign_ground = tign_new;
 if gq
     data_area = sum(infire);
@@ -317,15 +329,16 @@ if gq
             fprintf('decreasing ground smoothing \n')
         end
         if out_fraction < 0.1
-            break
+            %break
         end
         fprintf('Fire area: %f pixel_out/data area: %f  pixels_out %f\n',fire_area,out_sum(i)/data_area,out_sum(i));
-        %tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
-        tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
+        tign_ground(~infire) = beta*tign_ground(~infire)+(1-beta)*tign_flat(~infire);
+        %tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
         t_mask = tign_ground > tmax;
         tign_ground(t_mask) = tmax;
-        tign_temp = imgaussfilt(tign_ground,smooth_ground );
-        %tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground);
+        tign_temp = imgaussfilt(tign_ground,1/6);
+        %tign_temp = imgaussfilt(tign_ground,smooth_ground );
+        %tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground,a,b);
         tign_ground(~infire) = tign_temp(~infire);
 %         a = 1/10;%1/2-1/(2*i);
 %         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
@@ -347,10 +360,17 @@ if gq
     end
 end
 tign_new = tign_ground;
-
 %% end of post smoothing
 
-tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new);
+tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new,a,b);
+
+
+
+% %fix the ripple on the top
+% r_mask = tign_new >=max(tign_new(:))-0.05;
+% tign_new(r_mask) = max(tign_new(:));
+
+
 figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new-t0)
 title(title_str)
 hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3)-t0,'*r'),hold off
@@ -360,7 +380,7 @@ figure,mesh(ps.red.fxlong,ps.red.fxlat,ps.red.tign-t0)
 title('Forecast')
 hold on,scatter3(ps.grid_pts(:,2),ps.grid_pts(:,1),ps.points(:,3)-t0,'*r')
 
-filled_countours(ps,tign_new)
+filled_contours(ps,tign_new)
 
 end
 

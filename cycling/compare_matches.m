@@ -7,8 +7,8 @@ function [ scores ] = compare_matches(wrf_single, wrf_cycle, wrf_time_step )
 close all
 if nargin > 2
     ts = wrf_time_step;
-    scores(1) = match_detections(wrf_single,ts);
-    scores(2) = match_detections(wrf_cycle,ts);
+    scores(1) = match_detections(wrf_single,10,ts);
+    scores(2) = match_detections(wrf_cycle,10,ts);
 else
     scores(1) = match_detections(wrf_single);
     scores(2) = match_detections(wrf_cycle);

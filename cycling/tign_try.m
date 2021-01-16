@@ -2,13 +2,14 @@ function path_struct = tign_try(w,cpd,grid_dist)
 %scatter fake data on TIGN cone, try to recover the shape
 %cpd clusters per day of data
 %[fire_name,save_name,prefix] = fire_choice();
-clear_q = input_num('Delete mat files? 1 = yes',0,1);
+clear_q = input_num('Delete mat files? 1 = yes',1,1);
 if clear_q
     !rm red.mat pts.mat
+    %!rm pts.mat
 end
 
 if ~exist('red.mat','file')
-    red = subset_domain(w);
+    red = subset_domain(w,1);
     save red.mat red
 else
     load red.mat
@@ -51,13 +52,19 @@ fig.fig_interp=0;
 [m,n] = size(red.tign);
 rm = 0.1;
 [ig_x,ig_y] = find(red.tign == min(red.tign(:)));
+ig_x = ig_x(1);
+ig_y = ig_y(1);
+
 pts = [red.fxlat(ig_x,ig_y),red.fxlong(ig_x,ig_y),min(red.tign(:)),100,100,1];
 idx = [ig_x,ig_y];
+
+% k can be expanded to loop through discrete lime levels like MODIS, VIIRS
 for k = 1 : 1
+    % i,j are indices of the mesh
     for i = 1:m
         for j = 1:n
             if red.tign(i,j) < red.end_datenum - rm
-                if rand < 0.05
+                if rand < 5/100
                     %pts = [pts;[lats',lons',times',confs',frps',gran']];
                     pts = [pts;[red.fxlat(i,j),red.fxlong(i,j),red.tign(i,j),100,100,2*round(red.tign(i,j)-red.start_datenum)]];
                     idx = [idx;[i,j]];
@@ -66,12 +73,28 @@ for k = 1 : 1
         end
     end
 end
-if exist('pts.mat','file')
-    clear pts idx
-    load pts.mat
-else
-    save pts.mat pts idx
+%discretize the time
+dis_time = 0;
+if dis_time ==1
+    sim_days = time_bounds(2)-time_bounds(1);
+    over_passes = round(sim_days*3);
+    time_bin = linspace(time_bounds(1),time_bounds(2),over_passes)+1/10*randn(1,over_passes);
+    for i = 2:over_passes
+        for j = 1:length(pts)
+            if pts(j,3) > time_bin(i-1) && pts(j,3) <= time_bin(i)
+                pts(j,3) = time_bin(i);
+            end
+        end
+    end
 end
+
+%use same set of points from previous example / multi step
+% if exist('pts.mat','file')
+%     clear pts idx
+%     load pts.mat
+% else
+%     save pts.mat pts idx
+% end
 
 figure,mesh(red.fxlong,red.fxlat,red.tign-red.start_datenum),hold on
 scatter3(pts(:,2),pts(:,1),pts(:,3)-red.start_datenum,'r*')
@@ -86,9 +109,9 @@ cull = 1;
 %cluster the data
 t1 = red.min_tign;
 t2 = red.max_tign;
-clusters = round((t2-t1)*cpd);
+%clusters = round((t2-t1)*cpd);
 %clusters = round(length(pts)/20);
-clusters = 20;
+clusters = min(cpd,length(pts(:,3)));
 [s_idx,s_c] = kmeans(pts(:,1:2),clusters);
 %scatter the clusters with coloring
 figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3)-red.start_datenum);
@@ -179,6 +202,7 @@ path_count = 0;
 
 % new_points = pts;
 start_pt = 1;
+figure(222),close(gcf)
 for i = 1:start_pt
     for j = 1:cull:n
         % finds shortest path between points i,j
@@ -192,7 +216,7 @@ for i = 1:start_pt
             paths(path_count).c = prod(pts(p,4))^(1/length(p));
             %fprintf('%d points in path \n',length(p))
         end
-        figure(2),hold on
+        figure(222),hold on
         %l2 points
         %plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
         %grid points
