@@ -1,13 +1,21 @@
-function check_nonzeros(Kc,Xc,P,K,X)
-% check_nonzeros(K,X)
-% test if matrix K has structure consistent with finite element hexa grid 
-% with coordinates X
+function check_nonzeros(level,Kc,Xc,P,K,X)
+% check_nonzeros(Kc,Xc,P,K,X)
+% checking nonzeros structure consistent with hexa grid
+    disp('check_nonzeros: check if structure consistent with hexa grid')
+    fprintf('level %g stiffness matrix size %g nonzeros %g density %g%%\n',...
+        level,length(Kc),nnz(Kc),100*nnz(Kc)/prod(size(Kc)))
+    if exist('P','var')
+        fprintf('prolongation matrix size %g %g nonzeros %g density %g%%\n',...
+            size(P),nnz(P),100*nnz(P)/prod(size(P)))
+        fprintf('prolongation matrix max row nonzeros %g max column nonzeros %g\n',...
+            max(full(sum(P~=0,2))),max(full(sum(P~=0,1))))
+    end
     nc=size(Xc{1});
     nnc=prod(nc);
     if any(size(Kc)~=nnc)
         error('Kc size inconsistent with mesh Xc')
     end
-    if any(any((Kc==0)~=(Kc'==0)))
+    if any(any(sign(Kc)-sign(Kc)'))
         error('K does not have symmetric structure')
     end
     [ii,jj,aij]=find(Kc);
@@ -18,11 +26,11 @@ function check_nonzeros(Kc,Xc,P,K,X)
     if f
         for xj=f(:)'
             i = ii(xj);
-            j = jj(xj)
+            j = jj(xj);
             fprintf('%i mesh node %i %i %i and %i mesh node %i %i %i distance %i value %g\n',...
                 i,i1(xj),i2(xj),i3(xj),...
                 j,j1(xj),j2(xj),j3(xj),d(xj),aij(xj))
-            if exist('X','var')
+            if exist('P','var') & exist('X','var')
                 n = size(X{1});
                 fi = find(P(:,i))';
                 [fi1,fi2,fi3]=ind2sub(n,fi);

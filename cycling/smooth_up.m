@@ -1,4 +1,4 @@
-function sm_up = smooth_up(lon,lat,tign)
+function sm_up = smooth_up(lon,lat,tign,a,b)
 
 t0 = min(tign(:));
 t1 = max(tign(:));
@@ -9,9 +9,13 @@ t = linspace(t0,t1,steps);
 
 %compute different std. for imgausfilt
 %mx = 2;%
-mx = max(1.0,max(m,n)/100);
+if ~exist('a','var')
+    a = 100;
+    b = 1/3;
+end
+mx = max(1.0,max(m,n)/a);
 %mn = 1/2;
-mn = 1/3*mx;
+mn = b*mx;
 fprintf('Smooth paramaters : %f   %f   \n',mn,mx);
 m = (mn-mx)/(steps-2);
 y = @(t) mx + m*(t-2);

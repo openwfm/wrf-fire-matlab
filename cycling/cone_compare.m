@@ -1,10 +1,10 @@
-function [r1,r2,adjr0] = cone_compare(ps,tign2)
+function [r1,r2,adjr0] = cone_compare(ps,tign2,str_num)
 %compares feature of fire arrival cones
 %ps = tign_try(w), tign = squish(ps)
 
 
 if isfield(ps.red,'red')
-    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1);
+    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1,1);
     if upsize
         red_orig = ps.red.red;
         %interpolate back to original size grid
@@ -21,7 +21,7 @@ lat = ps.red.fxlat;
 %forecast
 tign = ps.red.tign;
 %blur the data for smoother gradients
-% st = 1;
+st = 1;
 % tign = imgaussfilt(tign,st);
 % tign2 = imgaussfilt(tign2,st);
 % use snmooth_up function to do smoothing
@@ -30,6 +30,7 @@ tign = ps.red.tign;
 
 %compare areas of the two and plot over time
 area_compare(ps,tign2); 
+close all
 
 %compute area of fires
 t_end = min(max(tign(:)),max(tign2(:)))-0.1;
@@ -41,17 +42,17 @@ adjr0 = sign(a2-a1)*1/10*sqrt(abs(a1-a2)/a2);
 % tign(tign>=t_end)=t_end;
 % tign2(tign2>=t_end)=t_end;
 fprintf('Forecast Area: %d Data area: %d adjr0: %f\n',a1,a2,adjr0);
-figure,contour(lon,lat,tign,[t_end t_end],'k')
-hold on,contour(lon,lat,tign2,[t_end t_end],'b')
-legend('forecast','estimate')
-t_str = sprintf('Perimeters \n Forecast Area = %d    Data Area = %d',a1,a2);
-title(t_str)
+% figure,contour(lon,lat,tign,[t_end t_end],'k')
+% hold on,contour(lon,lat,tign2,[t_end t_end],'b')
+% legend('forecast','estimate')
+% t_str = sprintf('Perimeters \n Forecast Area = %d    Data Area = %d',a1,a2);
+% title(t_str)
 cull = input_num('Thin data set? [1]',1,1);
 if cull ~= 1
-lon = lon(1:cull:end,1:cull:end);
-lat = lat(1:cull:end,1:cull:end);
-tign = tign(1:cull:end,1:cull:end);
-tign2 = tign2(1:cull:end,1:cull:end);
+    lon = lon(1:cull:end,1:cull:end);
+    lat = lat(1:cull:end,1:cull:end);
+    tign = tign(1:cull:end,1:cull:end);
+    tign2 = tign2(1:cull:end,1:cull:end);
 end
 
 %compute gradient step sizes
@@ -70,13 +71,16 @@ aspect_ratio = [1 hy/hx 1];
 % dx1=dx;
 % dy1=dy;
 % clear dx dy
-figure,contour(lon,lat,tign,20,'k');
-daspect(aspect_ratio)
-hold on
-quiver(lon,lat,dx1,dy1)
-hold off
-title('Contour and gradient of estimate')
+
+
+% figure,contour(lon,lat,tign,20,'k');
+% daspect(aspect_ratio)
+% hold on
+% quiver(lon,lat,dx1,dy1)
+% hold off
+% title('Contour and gradient of estimate')
 % dx1=dx1/hx;dy1=dy1/hy;
+
 %unit vector
 [dx2,dy2] = fire_gradients(lon,lat,tign2,1);
 % figure,contour(lon,lat,tign2,20,'k');
@@ -121,30 +125,34 @@ td_msk = ~isnan(td);
 b_msk = abs(td)<pi/6;
 figure,histogram(td)
 format short
-tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f',mean(td(td_msk)),std(td(td_msk)));
+str = ['05','10','20','40'];
+tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f \n Polygon Interpolation  %s % of Data',mean(td(td_msk)),std(td(td_msk)),str(str_num:str_num+1));
 title(tstr)
 xlabel('Difference of angles (radians)')
 ylabel('Number')
+% save_str = sprintf('patch_angle_diffs_%s_p',str(str_num:str_num+1))
+% savefig(save_str);
+% saveas(gcf,[save_str '.png']);
 
-figure
-quiver(lon(t_msk),lat(t_msk),dx1(t_msk),dy1(t_msk))
-% quiver(lon,lat,dy1,dx1)
-hold on
-quiver(lon(t_msk),lat(t_msk),dx2(t_msk),dy2(t_msk))
-% quiver(lon,lat,dx2,dy2)
-title('Gradients in fire surfaces, unit vectors')
-legend('Forecast','Interpolated')
+% figure
+% quiver(lon(t_msk),lat(t_msk),dx1(t_msk),dy1(t_msk))
+% % quiver(lon,lat,dy1,dx1)
+% hold on
+% quiver(lon(t_msk),lat(t_msk),dx2(t_msk),dy2(t_msk))
+% % quiver(lon,lat,dx2,dy2)
+% title('Gradients in fire surfaces, unit vectors')
+% legend('Forecast','Interpolated')
 
 %get vectors which are not unit vectors
 [du1,dv1] = fire_gradients(lon,lat,tign,0);
 [du2,dv2] = fire_gradients(lon,lat,tign2,0);
 
-figure
-quiver(lon(t_msk),lat(t_msk),du1(t_msk),du1(t_msk))
-hold on
-quiver(lon(t_msk),lat(t_msk),du2(t_msk),dv2(t_msk))
-title('Gradients in fire surfaces')
-legend('Forecast','Interpolated')
+% figure
+% quiver(lon(t_msk),lat(t_msk),du1(t_msk),du1(t_msk))
+% hold on
+% quiver(lon(t_msk),lat(t_msk),du2(t_msk),dv2(t_msk))
+% title('Gradients in fire surfaces')
+% legend('Forecast','Interpolated')
 
 %get magnitudes of these vectors for comparison
 % m1 = sqrt(du1(t_msk).^2+dv1(t_msk).^2);
@@ -184,16 +192,19 @@ r_msk = abs(r_diff)<5;
 avg_r_diff = mean(r_diff(r_msk));
 std_r_diff = std(r_diff(r_msk));
 figure,histogram(r_diff(r_msk));
-tstr= sprintf('Differences in ROS, forecast-estimate \n Mean = %f  Std Dev. = %f',avg_r_diff,std_r_diff);
+tstr= sprintf('Differences in ROS, forecast-estimate \n Mean = %f  Std Dev. = %f \n Polygon Interpolation  %s % of Data',avg_r_diff,std_r_diff,str(str_num:str_num+1));
 title(tstr)
 xlabel('ROS (m/s)')
 ylabel('Number')
+save_str = sprintf('patch_ros_diffs_%s_p',str(str_num:str_num+1));
+savefig(save_str);
+saveas(gcf,[save_str '.png']);
 r_fast = r_diff>0;%(avg_r_diff+1*std_r_diff);
 r_slow = r_diff<0;%(avg_r_diff-1*std_r_diff);
-figure,scatter(lon(r_fast),lat(r_fast),'*r');
-hold on,scatter(lon(r_slow),lat(r_slow),'b');
-title('Locations for fuel adjustment')
-legend('Forecast too fast','Forecast too slow')
+% figure,scatter(lon(r_fast),lat(r_fast),'*r');
+% hold on,scatter(lon(r_slow),lat(r_slow),'b');
+% title('Locations for fuel adjustment')
+% legend('Forecast too fast','Forecast too slow')
 
 %regression on slope and ros differences
 % r_diff(abs(r_diff)>2) = NaN;
@@ -214,8 +225,8 @@ legend('Forecast too fast','Forecast too slow')
 % quiver(lon(t_msk),lat(t_msk),rx2(t_msk),ry2(t_msk))
 % title('ROS vectors')
 % legend('Ground Truth','Interpolated')
-figure,histogram(ps.red.nfuel_cat(t_msk)),xticks(1:14)
-title('Fuel types')
+% figure,histogram(ps.red.nfuel_cat(t_msk)),xticks(1:14)
+% title('Fuel types')
 
 
 %find where the fire is burning too fast
