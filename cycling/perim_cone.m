@@ -1,5 +1,5 @@
 function [wz] = perim_cone(n,w)
- HEAD
+
 [x,y,z] = perim();  %in-linefunction below
 for i = 2:n
     [x1,y1,z1] = perim();
