@@ -34,7 +34,7 @@ t0 = min(tign(:));
 % hold on,plot(t,1-exp(ts))
 %make vector of data likelihoods
 if ~exist('gq','var')
-    gq = input_num('use ground detections? yes = [1]',1,1);
+    gq = input_num('use ground detections? yes = [1]',0,1);
 end
 if gq
     smooth_ground = 1;%max(m,n)/50;
@@ -66,7 +66,7 @@ use_beta_likes = 1;
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 1;
+ground_steps = 5;
 if gq
     data_area = sum(infire);
     for i = 1:ground_steps
@@ -179,8 +179,8 @@ norms=[];
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
 % try computing this as a fraction of grid size
-rm = round(m/100)+1;
-
+%rm = round(m/100)+1;
+rm = 0;
 % random multiplier, keep the same
 % perturbs points downward in time to
 rt = 1;
@@ -336,9 +336,9 @@ if gq
         %tign_ground(~infire) = beta_vect(~infire).*tign_ground(~infire)+(1-beta_vect(~infire)).*tign_flat(~infire);
         t_mask = tign_ground > tmax;
         tign_ground(t_mask) = tmax;
-        tign_temp = imgaussfilt(tign_ground,1/6);
+        %tign_temp = imgaussfilt(tign_ground,1/6);
         %tign_temp = imgaussfilt(tign_ground,smooth_ground );
-        %tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground,a,b);
+        tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground,a,b);
         tign_ground(~infire) = tign_temp(~infire);
 %         a = 1/10;%1/2-1/(2*i);
 %         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
