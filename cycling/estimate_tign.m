@@ -54,7 +54,7 @@ for i = 1:det_steps:n
 %    times_set = [times_set;times(pt_set)];
 %     lons_set = lons(pt_set);
 %     lats_set = lats(pt_set);
-    times_set = times(pt_set);
+    times_set = [times_set;times(pt_set)];
     %figure,scatter3(lons_set,lats_set,times_set)
     in = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set,lons_set);
     in = inpolygon(ps.red.fxlat,ps.red.fxlong,ps.red.fxlat(in),ps.red.fxlong(in));
