@@ -92,7 +92,7 @@ if plot_on == 1
     hold on,scatter(w1.fxlong(false_pos'),w1.fxlat(false_pos'),'k*'),
     scatter(w1.fxlong(overlap'),w1.fxlat(overlap'),'g*')
     legend('False Negative','False Positive','Overlap')
-    tstr = sprintf('MOE = (%f,%f)',mx,my);
+    tstr = sprintf('MOE = (%f,%f) \n Sorenson = %f',mx,my,s);
     title(tstr);
 end
 
