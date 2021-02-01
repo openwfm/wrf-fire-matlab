@@ -13,7 +13,7 @@ ps1 = cluster_paths(w,1,gs);
 ps = interp_paths(ps1,0.3);
 %ps = ps1;
 
-tn = squish4(ps);
+tn = squish4(ps,1,1);
 %avg ROS in the forecast and data estimate
 [r1,r2] = cone_compare(ps,tn);
 %load fuel information from the wrfout

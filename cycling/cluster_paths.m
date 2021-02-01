@@ -396,15 +396,18 @@ for i = 1:start_pt
             paths(path_count).c = prod(pts(p,4))^(1/length(p));
             %fprintf('%d points in path \n',length(p))
         end
-        figure(2),hold on
-        %l2 points
-        %plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
-        %grid points
-        plot3(grid_pts(p,4),grid_pts(p,3),pts(p,3)-red.start_datenum,'g');
-        for k = 1:length(p)
-            scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3)-red.start_datenum,'*r');
+        %only plot if n is less than 400
+        if n < 400
+            figure(2),hold on
+            %l2 points
+            %plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
+            %grid points
+            plot3(grid_pts(p,4),grid_pts(p,3),pts(p,3)-red.start_datenum,'g');
+            for k = 1:length(p)
+                scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3)-red.start_datenum,'*r');
+            end
+            hold off
         end
-        hold off
         %         % add a new point to the list by interpolation
         %         for k = 1:length(p)-1
         %             new_pt = ([pts(p(k),1),pts(p(k),2),pts(p(k),3)]+[pts(p(k+1),1),pts(p(k+1),2),pts(p(k+1),3)])/2;
@@ -421,6 +424,9 @@ for i = 1:start_pt
     %    path_struct.new_points = new_points;
     path_struct.grid_pts = grid_pts(:,3:4);
     path_struct.idx = grid_pts(:,1:2);
+    %cluster information
+    path_struct.s_idx = s_idx;
+    path_struct.s_c = s_c;
 end
 
 
