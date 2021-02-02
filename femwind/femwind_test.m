@@ -4,17 +4,17 @@ disp('femwind_test')
 if ~exist('params','var')
     disp('params do not exist yet, setting')
     params.graphics=1;  % 1=basic, 2=all
-    params.expand=1.2;  % exponential grid expansion in the vertical
+    params.expand=1;  % exponential grid expansion in the vertical
     params.sc_all=[1]; % mesh refinements for tests at multiple scales 
-    params.sc2_all=[1,2,4];  % additional factors for horizonal mesh extent 
-    params.nelem3=[22,22,8]; % base size in elements, horizontal=2*odd 
-    params.h=[1,1,1]; % base mesh spacing before scaling
+    params.sc2_all=[1,2,4,8,16,32];  % additional factors for horizonal mesh extent 
+    params.nelem3=[100,100,20]; % base size in elements, horizontal=2*odd 
+    params.h=[30,30,2]; % base mesh spacing before scaling
     params.a=[1 1 1]; % penalty factors in x y z directions
     params.initial_wind='log'; % or uniform
     params.roughness_height=0.5;
     params.terrain_shape='hill'; % terrain for add_terrain_to_mesh
-    params.terrain_top='squash'; % mesh top treatment for add_terrain_to_mesh
-    params.terrain_height=0.2; % terrain height as part of domain height
+    params.terrain_top='shift'; % mesh top treatment for add_terrain_to_mesh
+    params.terrain_height=0.1; % terrain height as part of domain height
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
     params.coarsening='2 linear';
