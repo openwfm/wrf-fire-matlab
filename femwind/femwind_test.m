@@ -1,13 +1,18 @@
+function params=femwind_test(params)
+% usage:
+% params=femwind_test    output params structure and exit
+% femwind_test(params)   run with params specified and copy to output
+% 
 disp('femwind_test')
 % test components of the femwind system
 
-if ~exist('params','var')
-    disp('params do not exist yet, setting')
+if ~exist('params','var') | isempty(params)
     params.graphics=1;  % 1=basic, 2=all
-    params.expand=1;  % exponential grid expansion in the vertical
-    params.sc_all=[1]; % mesh refinements for tests at multiple scales 
+    params.expand=1.2;  % exponential grid expansion in the vertical
+    params.mesh_top=1000; % if given, ignore params_expand 
+    params.sc_all=[1,2]; % mesh refinements for tests at multiple scales 
     params.sc2_all=[1,2,4,8,16,32];  % additional factors for horizonal mesh extent 
-    params.nelem3=[100,100,20]; % base size in elements, horizontal=2*odd 
+    params.nelem3=[50,50,10]; % base size in elements, horizontal=2*odd 
     params.h=[30,30,2]; % base mesh spacing before scaling
     params.a=[1 1 1]; % penalty factors in x y z directions
     params.initial_wind='log'; % or uniform
@@ -34,7 +39,18 @@ if ~exist('params','var')
     params.nsmooth_coarse=2;
     params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     params.save_files=2; % save progress
-    
+    return 
+end
+
+params
+
+if isfield(params,'mesh_top')
+    if params.mesh_top>0
+        disp('given params.mesh_top>0, computing params.expand') 
+        nz = params.nelem3(3); % elements in the vertical direction
+        a = params.mesh_top/params.h(3); % desired height as multiple of first layer
+        params.expand = findq(a,nz);
+    end
 end
 params
 
