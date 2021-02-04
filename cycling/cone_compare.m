@@ -199,9 +199,9 @@ tstr= sprintf('Differences in ROS, forecast-estimate \n Mean = %f  Std Dev. = %f
 title(tstr)
 xlabel('ROS (m/s)')
 ylabel('Number')
-save_str = sprintf('patch_ros_diffs_%s_p',str(str_num:str_num+1));
-savefig(save_str);
-saveas(gcf,[save_str '.png']);
+%save_str = sprintf('patch_ros_diffs_%s_p',str(str_num:str_num+1));
+%savefig(save_str);
+%saveas(gcf,[save_str '.png']);
 r_fast = r_diff>0;%(avg_r_diff+1*std_r_diff);
 r_slow = r_diff<0;%(avg_r_diff-1*std_r_diff);
 % figure,scatter(lon(r_fast),lat(r_fast),'*r');
