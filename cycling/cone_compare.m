@@ -1,10 +1,10 @@
-function [r1,r2,adjr0,outer] = cone_compare(ps,tign2,str_num)
+function [r1,r2,adjr0,outer] = cone_compare(ps,tign2)
 %compares feature of fire arrival cones
 %ps = tign_try(w), tign = squish(ps)
 
 
 if isfield(ps.red,'red')
-    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1,1);
+    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1);
     if upsize
         red_orig = ps.red.red;
         %interpolate back to original size grid
@@ -128,7 +128,7 @@ b_msk = abs(td)<pi/6;
 figure,histogram(td)
 format short
 str = ['05','10','20','40'];
-tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f \n Polygon Interpolation  %s % of Data',mean(td(td_msk)),std(td(td_msk)),str(str_num:str_num+1));
+tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f \n Polygon Interpolation',mean(td(td_msk)),std(td(td_msk)));%,str(str_num:str_num+1));
 title(tstr)
 xlabel('Difference of angles (radians)')
 ylabel('Number')
