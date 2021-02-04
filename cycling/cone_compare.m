@@ -195,7 +195,7 @@ std_r_diff = std(r_diff(r_msk));
 outer.avg_r_diff = avg_r_diff;
 outer.std_r_diff = std_r_diff;
 figure,histogram(r_diff(r_msk));
-tstr= sprintf('Differences in ROS, forecast-estimate \n Mean = %f  Std Dev. = %f \n Polygon Interpolation  %s % of Data',avg_r_diff,std_r_diff,str(str_num:str_num+1));
+tstr= sprintf('Differences in ROS, forecast-estimate \n Mean = %f  Std Dev. = %f \n Polygon Interpolation  %s % of Data',avg_r_diff,std_r_diff);%,str(str_num:str_num+1));
 title(tstr)
 xlabel('ROS (m/s)')
 ylabel('Number')
