@@ -26,6 +26,11 @@ real, intent(out):: Kloc(8,8), Floc(8), Jg(3)
 
 !*** executable
 
+! temporary, assign someting 
+! to prevent compiler warning about unassigned variables
+Kloc = 0 
+Floc = 0
+Jg = 0
 ! replace this by fortran code
 
 !% basis functions on reference element [-1,1]^3
