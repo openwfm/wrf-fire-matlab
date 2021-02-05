@@ -1,5 +1,9 @@
 FC = ifort
+#FC = gfortran
 FFLAGS = -g -C
+
+default: clean hexa_test.exe
+	./hexa_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o
