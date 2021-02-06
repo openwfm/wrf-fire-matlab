@@ -7,12 +7,12 @@ function g=gradbfs(x)
     Nb=8;
     ib =[  % coordinates of basis functions
     -1    -1    -1
-    -1    -1     1
-    -1     1    -1
-    -1     1     1
      1    -1    -1
-     1    -1     1
+    -1     1    -1
      1     1    -1
+    -1    -1     1
+     1    -1     1
+    -1     1     1
      1     1     1];
     g=zeros(Nb,3);
     for k=1:Nb

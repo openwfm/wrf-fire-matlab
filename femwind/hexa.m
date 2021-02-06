@@ -13,12 +13,12 @@ function [Kloc,Floc,Jg]=hexa(A,X,u0)
 Nb = 8;  % number of basis functions
 ib =[  % coordinates of basis functions
     -1    -1    -1
-    -1    -1     1
-    -1     1    -1
-    -1     1     1
      1    -1    -1
-     1    -1     1
+    -1     1    -1
      1     1    -1
+    -1    -1     1
+     1    -1     1
+    -1     1     1
      1     1     1];
 % the value of basis function k at x is
 % bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
@@ -41,12 +41,7 @@ for j=1:Ng+1
         K_at_s = Jg * A * Jg' * adetJx;
         Kloc = Kloc + K_at_s;
     else   % contribution to divergence load
-        % vol = adetJx * 8;
-        % TO DO: this is exact for a linearly deformed mesh but squashed is not.
-        % the decomposition in tetras used in hexa_volume will break
-        % non-planar faces. Compare the derminant and the average height method
-        % instead.
-        vol = hexa_volume(X);
+        vol = hexa_volume(X);   % volume by decompositon into tetras
         Floc = Floc - Jg * u0 * vol;
     end
 end
