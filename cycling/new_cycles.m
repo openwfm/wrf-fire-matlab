@@ -7,7 +7,7 @@ cycle = input_num('Which cycle? ',1);
 
 ts = choose_time_step(f);
 w = read_wrfout_tign(f,ts);
-gs = input_num('What grid spacing?',250)
+gs = input_num('What grid spacing?',1000)
 ps1 = cluster_paths(w,1,gs);
 %new points
 ps = interp_paths(ps1,0.3);
@@ -56,7 +56,9 @@ else
     %fmc_change(fmc_adjust,msk,rst);
     ncreplace(rst,'TIGN_G',new_w.analysis);
 end
+fprintf('Linking new namelist.input file\n')
+link_namelist(cycle);
 fprintf('All done. Copy files to directories and restart WRF-SFIRE\n');
-fprintf('Do not forget the namelist file needs to be re-linked \n');
+%fprintf('Do not forget the namelist file needs to be re-linked \n');
 
 end % function

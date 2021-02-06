@@ -82,7 +82,7 @@ beta_vect = 1-exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 10;
+ground_steps = 5;
 if gq
     data_area = sum(infire);
     for i = 1:ground_steps
@@ -329,7 +329,7 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 10;
+ground_steps = 5;
 tign_ground = tign_new;
 if gq
     data_area = sum(infire);

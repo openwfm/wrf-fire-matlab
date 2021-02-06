@@ -243,10 +243,10 @@ end
 
 %cluster the data 
 dt = 3*ceil(g(end).time - g(1).time);
-space_clusters = 100; %days
+space_clusters = 20; %days
 %more clusters for using perimeter data
 if use_perims == 1
-    space_clusters = dt*2;
+    space_clusters = dt;
 end
 
 %[s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
