@@ -20,6 +20,7 @@ ib =[  % coordinates of basis functions
      1    -1     1
     -1     1     1
      1     1     1];
+ibt=ib';
 % the value of basis function k at x is
 % bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
 %check_symmetry(A,'A',eps)
@@ -41,7 +42,22 @@ for j=1:Ng+1
         K_at_s = Jg * A * Jg' * adetJx;
         Kloc = Kloc + K_at_s;
     else   % contribution to divergence load
-        vol = hexa_volume(X);   % volume by decompositon into tetras
+        % find volume 
+        % rectangle base in x1 and x2 times average height in x3
+        % we really should be passing dx(1) dx(2) as arguments not compute them
+        dx(1) = X(1,:)*ib(:,1)/4; % average length of sides in x1 direction
+        dx(2) = X(2,:)*ib(:,2)/4; % average length of sides in x2 direction
+        dx(3) = X(3,:)*ib(:,3)/4; % average length of sides in x3 direction
+        vola=dx(1)*dx(2)*dx(3);
+        % determinant at midpoint times volume of reference element
+        % exact if element is linear image of reference element
+        vold = adetJx*8;   
+        % volume by decompositon into tetras
+        % exact if each side has corners in a plane
+        % but sides have kinks if not
+        volt = hexa_volume(X);   
+        vol_err=(abs([vola,vold]-volt))/volt
+        vol=vold;
         Floc = Floc - Jg * u0 * vol;
     end
 end
