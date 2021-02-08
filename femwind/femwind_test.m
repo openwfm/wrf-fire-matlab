@@ -36,7 +36,7 @@ if ~exist('params','var')
     params.save_files=2; % save progress
     %Define Streamline Starting Points: Defined in terms of scale*nelem
     params.in_pos_stream = {0, [0:5:params.nelem3(2)],10}; 
-    params.time_stream  = 0
+    params.time_stream  = 0;
     
 end
 params
