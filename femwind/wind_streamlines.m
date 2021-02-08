@@ -1,26 +1,26 @@
-function wind_streamline(X, CX, W, stream_params, nel)
+function wind_streamline(X, CX, W, init_height)
 
 %disp('wind_streamlines not done yet')
 %Extracting min and max values from mesh grid to create a valid n-d grid 
 %for streamlines function
 % Most work goes into creating a grid space with
-    xmin = min(CX{1}(:));
-    xmax = max(CX{1}(:));
-    ymin = min(CX{2}(:));
-    ymax = max(CX{2}(:));
-    zmin = min(CX{3}(:));
-    zmax = max(CX{3}(:));
+    xmin = min(X{1}(:));
+    xmax = max(X{1}(:));
+    ymin = min(X{2}(:));
+    ymax = max(X{2}(:));
+    zmin = min(X{3}(:));
+    zmax = max(X{3}(:));
     %Creating nd-meshgrid
-    [n(1),n(2),n(3)]=size(CX{1});
+    [n(1),n(2),n(3)]=size(X{1});
 
     level = 1:n(3);
-    [F1, F2, F3] = wind_interp(W,CX)
+    [F1, F2, F3] = wind_interp(W,CX);
     %The slice function requires an ndgrid or meshgrid to work. Create a
     %meshgrid with the same array and physical dimensions as the domain arrays
     %CX. Evaluate each grid point at the scattered interpolant
-    [CXG_X,CXG_Y,CXG_Z] = meshgrid(linspace(min(CX{1}(:)),max(CX{1}(:)), n(1)),...
-        linspace(min(CX{2}(:)),max(CX{2}(:)), n(2)), ...
-        linspace(min(CX{3}(:)),max(CX{3}(:)), n(3)));
+    [CXG_X,CXG_Y,CXG_Z] = meshgrid(linspace(min(X{1}(:)),max(X{1}(:)), n(1)),...
+        linspace(min(X{2}(:)),max(X{2}(:)), n(2)), ...
+        linspace(min(X{3}(:)),max(X{3}(:)), n(3)));
 
     WX = F1(CXG_X(:), CXG_Y(:), CXG_Z(:));
     WY = F2(CXG_X(:), CXG_Y(:), CXG_Z(:));
@@ -50,12 +50,12 @@ function wind_streamline(X, CX, W, stream_params, nel)
     %Note: To use the scattered interpolant function arrays
     %into column-vector format
 
-    [F1, F2, F3] = wind_interp(W,CX);
+    
     tspan = [0 1000];
     
-     x0 = stream_params{1};
-     y0 = stream_params{2};
-     z0 = stream_params{3};
+     x0 = 0;
+     y0 = 0: round(max(X{2}(:))/10):max(X{2}(:));
+     z0 = init_height;
 
     %plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
 
@@ -64,7 +64,7 @@ for i = 1:length(y0)
         [t,y] = ode45(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
         % Find indices that constrain the streamline to stay inside the
         % domain of the mesh domain.
-        k1 = find(y(:,1)< max(CX{1}(:)));
+        k1 = find(y(:,1)< max(X{1}(:)));
         
         
         hold on
