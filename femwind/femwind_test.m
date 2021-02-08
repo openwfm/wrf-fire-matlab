@@ -42,14 +42,14 @@ end
 
 params
 
-% if isfield(params,'mesh_top')
-%     if params.mesh_top>0
-%         disp('given params.mesh_top>0, computing params.expand') 
-%         nz = params.nelem3(3); % elements in the vertical direction
-%         a = params.mesh_top/params.h(3); % desired height as multiple of first layer
-%         params.expand = findq(a,nz);
-%     end
-% end
+if isfield(params,'mesh_top')
+    if params.mesh_top>0
+        disp('given params.mesh_top>0, computing params.expand') 
+        nz = params.nelem3(3); % elements in the vertical direction
+        a = params.mesh_top/params.h(3); % desired height as multiple of first layer
+        params.expand = findq(a,nz);
+    end
+end
 for sc = params.sc_all
     for sc2 = params.sc2_all
         nel = sc*params.nelem3;  % elements in the 3 directions
