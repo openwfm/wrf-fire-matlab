@@ -41,7 +41,7 @@ if ~exist('params','var') | isempty(params)
     params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     params.save_files=2; % save progress
     %Define Streamline Starting Points: Defined in terms of scale*nelem
-    params.in_pos_stream = {0, [0:5:params.nelem3(2)],10}; 
+    params.in_height_stream = [10]; 
     params.time_stream  = 0;
     
 
@@ -133,7 +133,7 @@ for sc = params.sc_all
             figure(4), clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
-            wind_streamlines(X, CX, U0, params.in_pos_stream, nel);
+            wind_streamlines(X, CX, U0, params.in_height_stream);
             hold off
         end
         % assemble sparse system matrix
@@ -197,7 +197,7 @@ for sc = params.sc_all
             figure(9),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
-            wind_streamlines(X, CX, W, params.in_pos_stream, nel)
+            wind_streamlines(X, CX, W, params.in_height_stream)
             hold off
         end    
         if params.save_files>0,
