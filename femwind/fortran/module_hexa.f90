@@ -1,6 +1,6 @@
-module module_hexa   ! testing only
+!module module_hexa   ! testing only
 
-contains
+!contains
 
 subroutine hexa(A,X,u0,Kloc,Floc,Jg,iflags)
 ! purpose: create local stiffness matrix etc for hexa 3d element
@@ -79,4 +79,4 @@ Jg = 0
     
 end subroutine hexa
 
-end module module_hexa
+!end module module_hexa

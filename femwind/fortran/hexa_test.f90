@@ -1,6 +1,6 @@
 program hexa_test
 
-use module_hexa   ! testing only
+!use module_hexa   ! testing only
 
 implicit none
 
