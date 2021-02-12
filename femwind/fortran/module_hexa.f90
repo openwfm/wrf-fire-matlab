@@ -23,6 +23,17 @@ integer, intent(in)::iflags(3)
 real, intent(out):: Kloc(8,8), Floc(8), Jg(3)
 
 !*** local variables
+real, parameter :: Nb = 8
+real, parameter :: Ng
+real, parameter :: tmp
+real, parameter :: g = 0.5773502691896257
+real, dimension(8, 3) :: ib
+real, dimension(8, 3) :: s
+real, dimension(3,3) :: Jx
+real, dimension(3,3) :: qdash
+real, dimension(3,3) :: Q
+real, dimension(3,3) :: R
+real, dimension(8,3) :: gradf
 
 !*** executable
 
@@ -31,6 +42,114 @@ real, intent(out):: Kloc(8,8), Floc(8), Jg(3)
 Kloc = 0 
 Floc = 0
 Jg = 0
+
+ib = reshape((/-1,-1,-1,-1,1,1,1,1,-1,-1,1,1,-1,-1,1,1,-1,1,-1,1,-1,1,-1,1/),shape(ib))
+Ng = Nb
+
+!current state of fortran code. still neds a lot of work to find mor efficient coding scheme
+!this will most likely break since it is incomplete
+do i = 1,9
+    do j = 1,3
+        s(i,j) = g*ib(i,j)
+    end do
+end do
+
+do i = 1,9  !ask Jan is this is correct or if I am misreading what is supposed to be happening with s
+
+        !gradf piece
+    do j = 1,8
+        do k = 1,3
+            gradf(j,k) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
+        end do
+    end do
+
+        !Jacobian at s
+    do j = 1,3
+        do m = 1,3
+            tmp = 0
+            do n = 1,8
+               tmp = tmp + X(m,n)*gradf(n,m)
+                end do
+                Jx(j,k) = tmp
+        end do
+    end do
+
+        !insert qr piece here
+        !gonna code it the long way and ask later if that is what was supposed to happen
+
+        !Get first column of Q
+    tmp = 0
+    do j = 1,3
+        qdash(j,1) = Jx(j,1)
+        tmp = tmp + qdash(j,1)*qdash(j,1)
+    end do
+
+    R(1,1) = sqrt(tmp)
+
+    do j = 1,3
+        Q(j,1) = qdash(j,1)/R(1,1)
+        R(1,2) = R(1,2) + Q(j,1)*Jx(j,2)
+    end do
+
+        !Get second column of Q
+    tmp = 0
+    do j =1,3
+        qdash(j,2) = Jx(j,2)-R(1,2)*Q(j,1)
+        tmp = tmp + qdash(j,2)*qdash(j,2)
+    end do
+
+    R(2,2) = sqrt(tmp)
+
+    do j =1,3
+        Q(j,2) = qdash(j,2)/R(2,2)
+        R(1,3) = R(1,3) + Q(j,1)*Jx(j,3)
+        R(2,3) = R(2,3) + Q(j,2)*Jx(j,3)
+    end do
+
+        !Get second column of Q
+    tmp = 0
+    do j =1,3
+        qdash(j,3) = Jx(j,3) - R(1,3)*Q(j,1) - R(2,3)*Q(j,2)
+        tmp = tmp + qdash(j,3)*qdash(j,3)
+    end do
+
+    R(3,3) = sqrt(tmp)
+
+    do j = 1,3
+        Q(j,3) = qdash(j,3)/R(3,3)
+    end do
+
+
+        !Jg piece
+        ! ask Jan about the division and tranpose in the code since that doesn't seem like it would be the inv of Jx
+
+        !det of Jx
+    detJx = abs(R(1,1)*R(2,2)*R(3,3))
+
+    if i <= Ng
+
+        !insert K stuff here
+
+
+    else
+       
+        !fill in what used to be hexa_volume piece
+        !Floc piece
+        do j = 1,8
+            tmp = 0
+            do m = 1,3
+                tmp = tmp+Jg(j,k)*u0(k,1)
+            end do
+            tmp_mat(j,1) = tmp*vol
+        end do
+
+        do j = 1,8
+            Floc(j,1) = Floc(j,1) - tmp_mat(j,1)
+        end do
+    end if
+end do
+
+
 ! replace this by fortran code
 
 !% basis functions on reference element [-1,1]^3
