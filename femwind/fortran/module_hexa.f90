@@ -34,6 +34,13 @@ real, dimension(3,3) :: qdash
 real, dimension(3,3) :: Q
 real, dimension(3,3) :: R
 real, dimension(8,3) :: gradf
+real, dimension(8, 3) :: Jg
+real, dimension(8, 3) :: Jg_tran
+real, dimension(8, 3) :: Jg_tmp
+real, dimension(8,8) :: Kloc
+real, dimension(8,8) :: K_at_s
+real, dimension(3,3) :: Q_tran
+real, dimension(3,3) :: R_inv
 
 !*** executable
 
@@ -42,19 +49,21 @@ real, dimension(8,3) :: gradf
 Kloc = 0 
 Floc = 0
 Jg = 0
+s = 0
 
 ib = reshape((/-1,-1,-1,-1,1,1,1,1,-1,-1,1,1,-1,-1,1,1,-1,1,-1,1,-1,1,-1,1/),shape(ib))
 Ng = Nb
 
 !current state of fortran code. still neds a lot of work to find mor efficient coding scheme
 !this will most likely break since it is incomplete
+
 do i = 1,9
     do j = 1,3
         s(i,j) = g*ib(i,j)
     end do
 end do
 
-do i = 1,9  !ask Jan is this is correct or if I am misreading what is supposed to be happening with s
+do i = 1,9  !need to turn these into subrountines
 
         !gradf piece
     do j = 1,8
@@ -74,9 +83,7 @@ do i = 1,9  !ask Jan is this is correct or if I am misreading what is supposed t
         end do
     end do
 
-        !insert qr piece here
-        !gonna code it the long way and ask later if that is what was supposed to happen
-
+        !QR Decoposition (long way)        
         !Get first column of Q
     tmp = 0
     do j = 1,3
@@ -118,18 +125,74 @@ do i = 1,9  !ask Jan is this is correct or if I am misreading what is supposed t
     do j = 1,3
         Q(j,3) = qdash(j,3)/R(3,3)
     end do
-
-
-        !Jg piece
-        ! ask Jan about the division and tranpose in the code since that doesn't seem like it would be the inv of Jx
-
+        
         !det of Jx
     detJx = abs(R(1,1)*R(2,2)*R(3,3))
+
+        !Jg piece
+    do j = 1,3
+        do k = 1,3
+            Q_tran(k,j) = Q(j,k)
+            R_inv(k,j) = R(j,k)/(detJx)
+        end do
+    end do
+
+    do j=1,8
+        tmp = 0
+        do k = 1,3
+            do m = 1,3
+                tmp = tmp+gradf(j,n)*R_inv(n,m)
+            end do
+        end do
+        Jg_tmp(j,k) = tmp
+    end do
+
+    do j=1,8
+        tmp = 0
+        do k = 1,3
+            do m = 1,3
+                tmp = tmp+Jg_tmp(j,n)*Q_trans(n,m)
+            end do
+        end do
+        Jg(j,k) = tmp
+    end do
 
     if i <= Ng
 
         !insert K stuff here
+        !K_at_s stuff here
+        do j = 1,8
+            do k = 1,3
+                Jg_tran(k,j) = Jg(j,k)*detJx
+            end do
+        end do
 
+        do j = 1,3
+            do k = 1,8
+                do m =1,3
+                    tmp = tmp + A(j,m)*Jg_trans(m,k)
+                end do
+            end do
+            A(j,k) = tmp
+        end do
+
+        do j = 1,8
+            do m = 1,8
+                tmp = 0
+                do n = 1,3
+                    tmp = tmp + Jg(m,n)*A(n,m)
+                end do
+                K_at_s(j,k) = tmp
+            end do
+        end do 
+
+
+        !Kloc stuff here
+        do j = 1,8
+            do k=1,8
+                Kloc(j,k) = Kloc(j,k)-K_at_s(j,k)
+            end do
+        end do
 
     else
        
