@@ -350,6 +350,14 @@ for i = 1:n
             j_point = [pts(j,1),pts(j,2)];
             a(i,j) = distance(i_point,j_point,E);
             v(i,j) = a(i,j)/max(time_diff,0.1);
+            if a(i,j) > 2e4
+                %fprintf('Points far apart  %d and %d\n',i,j)
+                a(i,j) = 0;
+                v(i,j) = 0;
+            end
+%             if v(i,j) > 2
+%                 fprintf('fast ROS beteween points %d and %d\n',i,j)
+%             end
         end
     end
 end
