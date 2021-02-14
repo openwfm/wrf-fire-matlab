@@ -18,11 +18,12 @@ if perim_use == 1
     if load_perim == 1 && exist('perim_moe.mat','file')
         load perim_moe.mat
     else
-        perim_choice = input_num('Which perimeter to use ?',3,1);
+        
         perim_struct = perim2gran(5000,perim);
         for i = 1:length(perim_struct)
             fprintf('%d : %s \n',i,perim_struct(i).file)
         end
+        perim_choice = input_num('Which perimeter to use ?',3);
         %interpolate the perimeter to the grid
         perim_points = fixpoints2grid(w1,[perim_struct(perim_choice).lat',perim_struct(perim_choice).lon']);
         perim_points = unique(perim_points,'rows');
@@ -36,6 +37,7 @@ if perim_use == 1
         tign_g = r.tign_g; %datenum2time(w1.tign_g,r);
         perim_time = perim_struct(perim_choice).time;
         t_g = datenum2time(perim_time,r);
+        t_g = r.end_time;
         
         save perim_moe.mat perim_points in_perim x y m n perim_struct perim_choice r perim_time t_g tign_g
     end
@@ -60,7 +62,7 @@ end %if perim_use...
 
 %start comparison with w.tign_g
 
-w1_mask = tign_g <= t_g;
+w1_mask = tign_g < t_g;
 w1_flat = zeros(m,n);;
 w1_flat(w1_mask') = 1;
 w1_area = sum(w1_flat(:));
