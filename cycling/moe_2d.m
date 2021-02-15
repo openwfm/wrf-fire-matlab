@@ -18,7 +18,7 @@ if perim_use == 1
     if load_perim == 1 && exist('perim_moe.mat','file')
         load perim_moe.mat
     else
-        
+        perim_points = input_num('Number of perim points to use?',200)
         perim_struct = perim2gran(5000,perim);
         for i = 1:length(perim_struct)
             fprintf('%d : %s \n',i,perim_struct(i).file)
