@@ -25,7 +25,6 @@ real, intent(out):: Kloc(8,8), Floc(8), Jg(3)
 !*** local variables
 real, parameter :: Nb = 8
 real, parameter :: Ng
-real, parameter :: tmp
 real, parameter :: g = 0.5773502691896257
 real, dimension(8, 3) :: ib
 real, dimension(8, 3) :: s
@@ -57,161 +56,90 @@ Ng = Nb
 !current state of fortran code. still neds a lot of work to find mor efficient coding scheme
 !this will most likely break since it is incomplete
 
-do i = 1,9
-    do j = 1,3
-        s(i,j) = g*ib(i,j)
-    end do
+s= g*ib
+
+if iflag(3) > 0
+
+!gradf piece
+do j = 1,8
+do k = 1,3
+gradf(j,k) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
+end do
 end do
 
-do i = 1,9  !need to turn these into subrountines
+Jx = matmul(X,gradf)
 
-        !gradf piece
-    do j = 1,8
-        do k = 1,3
-            gradf(j,k) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
-        end do
-    end do
+!QR Decoposition (long way)        
+!Get first column of Q
+tmp = 0
+do j = 1,3
+qdash(j,1) = Jx(j,1)
+tmp = tmp + qdash(j,1)*qdash(j,1)
+end do
 
-        !Jacobian at s
-    do j = 1,3
-        do m = 1,3
-            tmp = 0
-            do n = 1,8
-               tmp = tmp + X(m,n)*gradf(n,m)
-                end do
-                Jx(j,k) = tmp
-        end do
-    end do
+R(1,1) = sqrt(tmp)
 
-        !QR Decoposition (long way)        
-        !Get first column of Q
-    tmp = 0
-    do j = 1,3
-        qdash(j,1) = Jx(j,1)
-        tmp = tmp + qdash(j,1)*qdash(j,1)
-    end do
+do j = 1,3
+Q(j,1) = qdash(j,1)/R(1,1)
+R(1,2) = R(1,2) + Q(j,1)*Jx(j,2)
+end do
 
-    R(1,1) = sqrt(tmp)
+!Get second column of Q
+tmp = 0
+do j =1,3
+qdash(j,2) = Jx(j,2)-R(1,2)*Q(j,1)
+tmp = tmp + qdash(j,2)*qdash(j,2)
+end do
 
-    do j = 1,3
-        Q(j,1) = qdash(j,1)/R(1,1)
-        R(1,2) = R(1,2) + Q(j,1)*Jx(j,2)
-    end do
+R(2,2) = sqrt(tmp)
 
-        !Get second column of Q
-    tmp = 0
-    do j =1,3
-        qdash(j,2) = Jx(j,2)-R(1,2)*Q(j,1)
-        tmp = tmp + qdash(j,2)*qdash(j,2)
-    end do
+do j =1,3
+Q(j,2) = qdash(j,2)/R(2,2)
+R(1,3) = R(1,3) + Q(j,1)*Jx(j,3)
+R(2,3) = R(2,3) + Q(j,2)*Jx(j,3)
+end do
 
-    R(2,2) = sqrt(tmp)
+!Get second column of Q
+tmp = 0
+do j =1,3
+qdash(j,3) = Jx(j,3) - R(1,3)*Q(j,1) - R(2,3)*Q(j,2)
+tmp = tmp + qdash(j,3)*qdash(j,3)
+end do
 
-    do j =1,3
-        Q(j,2) = qdash(j,2)/R(2,2)
-        R(1,3) = R(1,3) + Q(j,1)*Jx(j,3)
-        R(2,3) = R(2,3) + Q(j,2)*Jx(j,3)
-    end do
+R(3,3) = sqrt(tmp)
 
-        !Get second column of Q
-    tmp = 0
-    do j =1,3
-        qdash(j,3) = Jx(j,3) - R(1,3)*Q(j,1) - R(2,3)*Q(j,2)
-        tmp = tmp + qdash(j,3)*qdash(j,3)
-    end do
-
-    R(3,3) = sqrt(tmp)
-
-    do j = 1,3
-        Q(j,3) = qdash(j,3)/R(3,3)
-    end do
+do j = 1,3
+Q(j,3) = qdash(j,3)/R(3,3)
+end do
         
-        !det of Jx
-    detJx = abs(R(1,1)*R(2,2)*R(3,3))
+detJx = abs(R(1,1)*R(2,2)*R(3,3))
 
-        !Jg piece
-    do j = 1,3
-        do k = 1,3
-            Q_tran(k,j) = Q(j,k)
-            R_inv(k,j) = R(j,k)/(detJx)
-        end do
-    end do
-
-    do j=1,8
-        tmp = 0
-        do k = 1,3
-            do m = 1,3
-                tmp = tmp+gradf(j,n)*R_inv(n,m)
-            end do
-        end do
-        Jg_tmp(j,k) = tmp
-    end do
-
-    do j=1,8
-        tmp = 0
-        do k = 1,3
-            do m = 1,3
-                tmp = tmp+Jg_tmp(j,n)*Q_trans(n,m)
-            end do
-        end do
-        Jg(j,k) = tmp
-    end do
-
-    if i <= Ng
-
-        !insert K stuff here
-        !K_at_s stuff here
-        do j = 1,8
-            do k = 1,3
-                Jg_tran(k,j) = Jg(j,k)*detJx
-            end do
-        end do
-
-        do j = 1,3
-            do k = 1,8
-                do m =1,3
-                    tmp = tmp + A(j,m)*Jg_trans(m,k)
-                end do
-            end do
-            A(j,k) = tmp
-        end do
-
-        do j = 1,8
-            do m = 1,8
-                tmp = 0
-                do n = 1,3
-                    tmp = tmp + Jg(m,n)*A(n,m)
-                end do
-                K_at_s(j,k) = tmp
-            end do
-        end do 
-
-
-        !Kloc stuff here
-        do j = 1,8
-            do k=1,8
-                Kloc(j,k) = Kloc(j,k)-K_at_s(j,k)
-            end do
-        end do
-
-    else
-       
-        !fill in what used to be hexa_volume piece
-        !Floc piece
-        do j = 1,8
-            tmp = 0
-            do m = 1,3
-                tmp = tmp+Jg(j,k)*u0(k,1)
-            end do
-            tmp_mat(j,1) = tmp*vol
-        end do
-
-        do j = 1,8
-            Floc(j,1) = Floc(j,1) - tmp_mat(j,1)
-        end do
-    end if
+do j = 1,3
+do k = 1,3
+Q_tran(k,j) = Q(j,k)
+R_inv(k,j) = R(j,k)/(detJx)
+end do
 end do
 
+Jg = matmul(matmul(gradf,R_inv),Q_tran)
+end if
+
+if iflag(1) > 0
+do j = 1,8
+do k = 1,3
+Jg_tran(k,j) = Jg(j,k)*detJx
+end do
+enddo
+
+K_at_s(j,k) = matmul(Jg,matmul(A,Jg_tran))
+Kloc = Kloc-K_at_s
+end if
+
+if iflag(2) > 0
+vol = detJx*8
+tmp_mat = vol*matmul(Jg,u0)
+Floc = Floc-tmp_mat
+end if
 
 ! replace this by fortran code
 
