@@ -38,11 +38,15 @@ exact = - gradmu*u*vol;
 err_F = V*F - exact
 
 % invariariant to random isometry
-S=vrrotvec2mat(vrrotvec(randn(3,1),randn(3,1)))*diag(sign(randn(3,1))); 
+% comment out - cheyenne does not have the Simulink 3D Animation toolbox
+%%S=vrrotvec2mat(vrrotvec(randn(3,1),randn(3,1)))*diag(sign(randn(3,1))); 
 [K0, ~, ~] = hexa(A,X,u);
-[K1, ~, ~] = hexa(A,S*X,u);
-err_iso=norm(K0-K1,'fro')
+%%K1, ~, ~] = hexa(A,S*X,u);
+%%rr_iso=norm(K0-K1,'fro')
 
 % test stretch
 X3 = diag([1 1 2])*X0; 
 [K3, ~, ~] = hexa(A,X3,u);
+
+% test same results from matlab and fortran
+err=hexa_fortran(A,X3,u)
