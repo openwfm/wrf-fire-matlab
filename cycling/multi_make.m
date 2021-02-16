@@ -13,7 +13,7 @@ gf = gs(1)/dlon;
 %make series of estimates
 grids = length(gs);
 %10 steps, max
-grids = 10;
+grids = 15;
 re1 = 1;
 do_plots = 0;
 for i = 1:grids
