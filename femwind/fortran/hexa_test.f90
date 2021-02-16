@@ -1,6 +1,7 @@
 program hexa_test
 
 use module_hexa   ! testing only
+use module_io_matlab ! to read and write matrices as text files from matlab
 
 implicit none
 
