@@ -20,56 +20,54 @@ implicit none
 
 real, intent(in):: A(3,3), X(3,8), u0(3)    ! fortran is not case sensitive
 integer, intent(in)::iflags(3)
-real, intent(out):: Kloc(8,8), Floc(8), Jg(3)
+real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3)
+!, Jg(3)
 
 !*** local variables
-real, parameter :: Nb = 8
-real, parameter :: Ng
-real, parameter :: g = 0.5773502691896257
-real, dimension(8, 3) :: ib
-real, dimension(8, 3) :: s
-real, dimension(3,3) :: Jx
-real, dimension(3,3) :: qdash
-real, dimension(3,3) :: Q
-real, dimension(3,3) :: R
-real, dimension(8,3) :: gradf
-real, dimension(8, 3) :: Jg
-real, dimension(8, 3) :: Jg_tran
-real, dimension(8, 3) :: Jg_tmp
-real, dimension(8,8) :: Kloc
-real, dimension(8,8) :: K_at_s
-real, dimension(3,3) :: Q_tran
-real, dimension(3,3) :: R_inv
-
+!real :: Nb = 8
+!real :: Ng
+real :: g = 0.5773502691896257
+real :: ib(8,3), s(8,3), gradf(8,3), Jg_tmp(8,3)
+real :: Jx(3,3), qdash(3,3), Q(3,3), R(3,3), Q_tran(3,3), R_inv(3,3)
+real :: Jg_tran(3,8), A_tmp(3,8)
+real :: K_at_s(8,8)
+real :: tmp_mat(8)
+integer :: i,j,k,m
+real :: detJx = 0
+real :: tmp = 0
+real :: vol = 0
 !*** executable
 
 ! temporary, assign someting 
 ! to prevent compiler warning about unassigned variables
-Kloc = 0 
-Floc = 0
-Jg = 0
-s = 0
+!Kloc = 0 
+!Floc = 0
+!Jg = 0
+!s = 0
+!i=0
+!j=0
+!k=0
+!m=0
 
 ib = reshape((/-1,-1,-1,-1,1,1,1,1,-1,-1,1,1,-1,-1,1,1,-1,1,-1,1,-1,1,-1,1/),shape(ib))
-Ng = Nb
-
-!current state of fortran code. still neds a lot of work to find mor efficient coding scheme
-!this will most likely break since it is incomplete
+!Still in testing process, so will most likely break
 
 s= g*ib
 
-if iflag(3) > 0
+if (iflags(3) > 0) then
 
 !gradf piece
+do i=1,8
 do j = 1,8
 do k = 1,3
 gradf(j,k) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
 end do
 end do
+end do
 
 Jx = matmul(X,gradf)
 
-!QR Decoposition (long way)        
+!!!Start QR Decomp!!!        
 !Get first column of Q
 tmp = 0
 do j = 1,3
@@ -99,7 +97,7 @@ R(1,3) = R(1,3) + Q(j,1)*Jx(j,3)
 R(2,3) = R(2,3) + Q(j,2)*Jx(j,3)
 end do
 
-!Get second column of Q
+!Get third column of Q
 tmp = 0
 do j =1,3
 qdash(j,3) = Jx(j,3) - R(1,3)*Q(j,1) - R(2,3)*Q(j,2)
@@ -111,6 +109,8 @@ R(3,3) = sqrt(tmp)
 do j = 1,3
 Q(j,3) = qdash(j,3)/R(3,3)
 end do
+!!!End QR Decomp!!!
+
         
 detJx = abs(R(1,1)*R(2,2)*R(3,3))
 
@@ -121,72 +121,36 @@ R_inv(k,j) = R(j,k)/(detJx)
 end do
 end do
 
-Jg = matmul(matmul(gradf,R_inv),Q_tran)
+
+Jg_tmp=matmul(gradf,R_inv)
+Jg = matmul(Jg_tmp,Q_tran)
 end if
 
-if iflag(1) > 0
+!check to calc Kloc
+if (iflags(1) > 0) then
 do j = 1,8
 do k = 1,3
 Jg_tran(k,j) = Jg(j,k)*detJx
 end do
 enddo
 
-K_at_s(j,k) = matmul(Jg,matmul(A,Jg_tran))
+A_tmp = matmul(A, Jg_tran)
+K_at_s = matmul(Jg,A_tmp)
 Kloc = Kloc-K_at_s
 end if
 
-if iflag(2) > 0
+!check to calc Floc
+if (iflags(2) > 0) then
 vol = detJx*8
-tmp_mat = vol*matmul(Jg,u0)
+do j = 1,8
+tmp = 0
+do m = 1,3
+tmp = tmp+Jg(j,k)*u0(k)
+end do
+tmp_mat(j) = tmp*vol        
+end do
 Floc = Floc-tmp_mat
-end if
-
-! replace this by fortran code
-
-!% basis functions on reference element [-1,1]^3
-!Nb = 8;  % number of basis functions
-!ib =[  % coordinates of basis functions
-!    -1    -1    -1
-!    -1    -1     1
-!    -1     1    -1
-!    -1     1     1
-!     1    -1    -1
-!     1    -1     1
-!     1     1    -1
-!     1     1     1];
-!% the value of basis function k at x is
-!% bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
-!%check_symmetry(A,'A',eps)
-!% gaussian quadrature nodes
-!g=0.5773502691896257;
-!s = g*ib;
-!Ng=Nb;  %  number of Gauss points
-!s(Ng+1,:)=0; % extra point at center
-!
-!Kloc = zeros(Nb);
-!Floc = zeros(Nb,1);
-!for j=1:Ng+1
-!    gradf = gradbfs(s(j,:));
-!    Jx = X*gradf; % Jacobian at s
-!    [q,r]=qr(Jx);
-!    Jg   = (gradf/r)*q'; % gradf*inv(Jx)
-!    adetJx = abs(prod(diag(r))); % det(Jx)
-!    if j<=Ng % contribution to stiffness
-!        K_at_s = Jg * A * Jg' * adetJx;
-!        Kloc = Kloc + K_at_s;
-!    else   % contribution to divergence load
-!        % vol = adetJx * 8;
-!        % TO DO: this is exact for a linearly deformed mesh but squashed is not.
-!        % the decomposition in tetras used in hexa_volume will break
-!        % non-planar faces. Compare the derminant and the average height method
-!        % instead.
-!        vol = hexa_volume(X);
-!        Floc = Floc - Jg * u0 * vol;
-!    end
-!end
-!%check_symmetry(Kloc,'Kloc',eps)
-!end
-    
+end if    
 end subroutine hexa
 
 end module module_hexa
