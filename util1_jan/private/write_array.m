@@ -1,5 +1,6 @@
 function write_array(a,name)
-% read matrix a from a given file name.txt
+% write_array(a,name)
+% matrix a to a given file name.txt
 if ndims(a)>3,
     error('array must have at most 3 dimensions')
 end
