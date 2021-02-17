@@ -52,4 +52,9 @@ X3 = diag([1 1 2])*X0;
 [K3, ~, ~] = hexa(A,X3,u);
 
 % test same results from matlab and fortran
-err=hexa_fortran(A,X3,u)
+if exist('fortran/hexa_test.exe') 
+    disp('testing if same result in fortran')
+    err=hexa_fortran(A,X3,u)
+else
+    disp('fortran/hexa_test.exe not available')
+end
