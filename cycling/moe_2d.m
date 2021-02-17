@@ -12,12 +12,13 @@ end
 
 %new grid size
 %compute grid sizes
+grid_space = input_num('Grid spacing?',250);
 red = subset_domain(w1,1);
 E = wgs84Ellipsoid;
 dlon= distance(red.min_lat,red.min_lon,red.min_lat,red.max_lon,E);
 dlat= distance(red.min_lat,red.min_lon,red.max_lat,red.min_lon,E);
-new_n = round(dlon/250);
-new_m = round(dlat/250);
+new_n = round(dlon/grid_space);
+new_m = round(dlat/grid_space);
 new_red = subset_small(red,new_m,new_n);
 
 w1.fxlong = new_red.fxlong;

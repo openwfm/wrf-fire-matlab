@@ -23,13 +23,14 @@ end
 %combine l2 time with detection points fixed to grid
 pts = ps.grid_pts;
 pts(:,3) = ps.points(:,3);
-pts(1,3) = pts(1,3)-1/2;
+%adjust time of ignition
+%pts(1,3) = pts(1,3)-1/2;
 %forecast
 tign = ps.red.tign;
 %experiments
-sat_max = max(ps.points(:,3));
-sat_msk = tign > sat_max;
-tign(sat_msk) = sat_max;
+% sat_max = max(ps.points(:,3));
+% sat_msk = tign > sat_max;
+% tign(sat_msk) = sat_max;
 
 % t_max = max(tign(:))-.1;
 % tign(tign>=t_max) =t_max+1;
