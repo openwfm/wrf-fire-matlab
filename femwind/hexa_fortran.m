@@ -10,13 +10,13 @@ system('./fortran/hexa_test.exe')
 
 Kloc_f=read_array('Kloc');
 Floc_f=read_array('Floc');
-Jg=read_array('Jg');
+Jg_f=read_array('Jg');
 
 Kloc_err = norm(Kloc-Kloc_f,1)
 Floc_err = norm(Floc-Floc_f,1)
-u0_err = norm(u0-u0_f,1)
+Jg_err = norm(Jg-Jg_f,1)
 
-err=max([Kloc_err,Floc_err,u0_err]);
+err=max([Kloc_err,Floc_err,Jg_err]);
 
 % compare the result of matlab hexa and fortran hexa
 
