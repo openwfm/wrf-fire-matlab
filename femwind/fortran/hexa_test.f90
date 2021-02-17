@@ -5,20 +5,32 @@ use module_io_matlab ! to read and write matrices as text files from matlab
 
 implicit none
 
-real:: A(3,3), X(3,8), u0(3)    ! fortran is not case sensitive
+real, pointer:: A(:,:,:), X(:,:,:), u0(:,:,:)    ! fortran is not case sensitive
+!real:: A(3,3), X(3,8), u0(3)    ! fortran is not case sensitive
 integer::iflags(3)
-real:: Kloc(8,8), Floc(8), Jg(8,3)
+real, pointer:: Kloc(:,:,:), Floc(:,:,:), Jg(:,:,:) ! for convenience, make all arrays 3D
+allocate(Kloc(8,8,1))
+allocate(Floc(8,1,1))
+allocate(Jg(8,3,1)) ! for convenience, make all arrays 3D
 
+call read_array(A,'A')
+call read_array(X,'X')
+call read_array(u0,'u0')
+
+write(*,*)'A=',A
+write(*,*)'X=',X
+write(*,*)'u0=',u0
+
+write(*,*)'calling hexa'
 call hexa(A,X,u0,Kloc,Floc,Jg,iflags)
-! purpose: create local stiffness matrix etc for hexa 3d element
-! in:
-!   A   coefficient matrix size 3x3, symmetric positive definite
-!   X   nodes coordinates size 3x8, one each column is one node
-!   u0   column vector of input wind at the center of the element
-!   iflags  iflags(1)>0 compute Kloc, iflags(2)>0 compute Floc, iflags(3)>0 compute Jg  
-! out:
-!   Kloc   local stiffness matrix
-!   Floc   local divergence load vector
-!   Jg     gradient at center of function with values V is V'*Jg          
+write(*,*)'hexa output'
+
+write(*,*)'Kloc=',Kloc
+write(*,*)'Floc=',Floc
+write(*,*)'Jg=',Jg
+
+call write_array(Kloc,'Kloc')
+call write_array(Floc,'Floc')
+call write_array(Jg,'Jg')
 
 end program hexa_test

@@ -3,7 +3,6 @@ FC = ifort
 FFLAGS = -g -C
 
 default: hexa_test.exe
-	./hexa_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
