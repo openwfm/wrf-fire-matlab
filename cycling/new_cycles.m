@@ -9,6 +9,8 @@ ts = choose_time_step(f);
 w = read_wrfout_tign(f,ts);
 gs = input_num('What grid spacing?',1000)
 ps1 = cluster_paths(w,1,gs);
+savestr = sprintf('ps_%d.mat',cycle);
+save(savestr,'ps1')
 %new points
 ps = interp_paths(ps1,0.3);
 %ps = ps1;
