@@ -43,9 +43,11 @@ if max(size(red.tign)) > target_size
 end
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
-new_end_time = input_num('Use alternate end time? Enter datenum of new time, 0 if no.',0,1)
+new_end_time = input_num('Use alternate end time? Enter number of extra days, 0 if no.',0)
 if new_end_time ~=0
-  time_bounds(2) = new_end_time;  
+  time_bounds(2) = time_bounds(2)+new_end_time;  
+  red.max_tign = time_bounds(2);
+  red.end_datenum = time_bounds(2);
 end
 % time_bounds(2) = 7.354591409722222e+05;
 
@@ -170,7 +172,7 @@ end
 
 %can change end time for comparisons
 if new_end_time ~= 0
-    end_time = new_end_time;
+    end_time = time_bounds(2);
 else 
     end_time = red.max_tign;
 end

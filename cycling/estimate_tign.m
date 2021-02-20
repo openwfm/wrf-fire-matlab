@@ -56,8 +56,13 @@ for i = 1:det_steps:n
 %     lats_set = lats(pt_set);
     times_set = [times_set;times(pt_set)];
     %figure,scatter3(lons_set,lats_set,times_set)
-    in = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set,lons_set);
-    in = inpolygon(ps.red.fxlat,ps.red.fxlong,ps.red.fxlat(in),ps.red.fxlong(in));
+    
+    %add new points to polygon set
+    p = make_poly(lons_set,lats_set,5);
+    in = inpolygon(ps.red.fxlat,ps.red.fxlong,p(:,2),p(:,1));
+    
+%     in = inpolygon(ps.red.fxlat,ps.red.fxlong,lats_set,lons_set);
+%     in = inpolygon(ps.red.fxlat,ps.red.fxlong,ps.red.fxlat(in),ps.red.fxlong(in));
     temp_tign(in) = max(times_set);
     temp_tign(~in) = end_time;
     tign = min(tign,temp_tign);

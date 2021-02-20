@@ -1,4 +1,4 @@
-function poly_list = make_poly(x,y)
+function poly_list = make_poly(x,y,rounds)
 %x,y lists of points, column vectors
 
 % N = 100 ;
@@ -11,13 +11,13 @@ th = atan2(d(:,2),d(:,1)); % angle above x axis
 [th, idx] = sort(th);   % sorting the angles 
 p = p(idx,:); % sorting the given points
 p = [p; p(1,:)]; % add the first at the end to close the polygon 
-figure,plot( p(:,1), p(:,2), '.-r');
-hold on,scatter(p(:,1),p(:,2),'*k'),hold off
-title('First')
+% figure,plot( p(:,1), p(:,2), '.-r');
+% hold on,scatter(p(:,1),p(:,2),'*k'),hold off
+% title('First')
 
 
 %fill in the gaps
-for j = 1:2
+for j = 1:rounds
     n = length(p);
     np = [];
     for i = 2:n
@@ -26,13 +26,14 @@ for j = 1:2
         np = [np;[px py]];
     end
     p = [p;np];
-    c = [mean(p(:,1)) mean(p(:,2))]; % mean/ central point
+    %c = [mean(p(:,1)) mean(p(:,2))]; % mean/ central point
     d = p-c ; % vectors connecting the central point and the given points
     th = atan2(d(:,2),d(:,1)); % angle above x axis
     [th, idx] = sort(th);   % sorting the angles
-    figure,plot( p(:,1), p(:,2), '.-r');
-    hold on,scatter(p(:,1),p(:,2),'*k'),hold off
+%     figure,plot( p(:,1), p(:,2), '.-r');
+%     hold on,scatter(p(:,1),p(:,2),'*k'),hold off
 end
+%p = unique(p,'rows');
 poly_list = p;
 
     

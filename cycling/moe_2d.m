@@ -25,19 +25,19 @@ w1.fxlong = new_red.fxlong;
 w1.fxlat = new_red.fxlat;
 w1.tign_g = new_red.tign_g;
 [m,n] = size(w1.fxlong);
-
 if perim_use == 1
 
     % load data if it has been processes already for another comparison
-    load_perim = input_num('Load perimeter data? Yes = 1',1,0);
+    load_perim = input_num('Load perimeter data? Yes = 1',0,0);
     if load_perim == 1 && exist('perim_moe.mat','file')
         load perim_moe.mat
     else
         perim_points = input_num('Number of perim points to use?',200)
         perim_struct = perim2gran(perim_points,perim);
         for i = 1:length(perim_struct)
-            fprintf('%d : %s \n',i,perim_struct(i).file)
+            fprintf('%d : %s %s\n',i,perim_struct(i).file,datestr(perim_struct(i).time))
         end
+        fprintf('End time of estimate %s\n',datestr(new_red.end_datenum));
         perim_choice = input_num('Which perimeter to use ?',3);
         %interpolate the perimeter to the grid
         perim_points = fixpoints2grid(w1,[perim_struct(perim_choice).lat',perim_struct(perim_choice).lon']);
@@ -52,7 +52,7 @@ if perim_use == 1
         figure,scatter(w1.fxlong(in_perim),w1.fxlat(in_perim),'k');
         hold on,scatter(perim_points(:,4),perim_points(:,3)),hold off
         fprintf('Choose default bounds 2\n')
-        r = subset_domain(w1,0);
+        r = subset_domain(w1,1);
         tign_g = r.tign_g; %datenum2time(w1.tign_g,r);
         perim_time = perim_struct(perim_choice).time;
         t_g = datenum2time(perim_time,r);
