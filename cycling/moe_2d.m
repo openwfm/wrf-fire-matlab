@@ -21,6 +21,7 @@ new_n = round(dlon/grid_space);
 new_m = round(dlat/grid_space);
 new_red = subset_small(red,new_m,new_n);
 
+
 w1.fxlong = new_red.fxlong;
 w1.fxlat = new_red.fxlat;
 w1.tign_g = new_red.tign_g;
@@ -47,10 +48,24 @@ if perim_use == 1
         %in_perim = inpolygon(y,x,perim_points(:,1),perim_points(:,2));
         %in_perim = inpolygon(y,x,x(in_perim),y(in_perim));
         %in_perim = inpolygon(y,x,x(in_perim),y(in_perim));
+        
         in_perim = inpolygon(w1.fxlong,w1.fxlat,perim_points(:,4),perim_points(:,3));
         in_perim = inpolygon(w1.fxlong,w1.fxlat,w1.fxlong(in_perim),w1.fxlat(in_perim));
         figure,scatter(w1.fxlong(in_perim),w1.fxlat(in_perim),'k');
         hold on,scatter(perim_points(:,4),perim_points(:,3)),hold off
+        title('old')
+        %new method
+        p = make_poly(perim_points(:,4),perim_points(:,3),2)
+        in_perim2 = inpolygon(w1.fxlong,w1.fxlat,p(:,1),p(:,2));
+        %in_perim = inpolygon(w1.fxlong,w1.fxlat,w1.fxlong(in_perim),w1.fxlat(in_perim));
+        figure,scatter(w1.fxlong(in_perim2),w1.fxlat(in_perim2),'k');
+        hold on,scatter(perim_points(:,4),perim_points(:,3)),hold off
+        title('New')
+        p_use = input_num('Use which perim? New = 1',1);
+        if p_use == 1
+            in_perim = in_perim2;
+        end
+        
         fprintf('Choose default bounds 2\n')
         r = subset_domain(w1,1);
         tign_g = r.tign_g; %datenum2time(w1.tign_g,r);
