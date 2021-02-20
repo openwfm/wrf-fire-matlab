@@ -7,7 +7,7 @@ disp('femwind_test')
 % test components of the femwind system
 
 if ~exist('params','var') | isempty(params)
-    params.graphics=1;  % 1=basic, 2=all
+    params.graphics=2;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.mesh_top=1000; % if given, ignore params_expand 
     params.sc_all=[1,2]; % mesh refinements for tests at multiple scales 
@@ -39,6 +39,10 @@ if ~exist('params','var') | isempty(params)
     params.nsmooth_coarse=2;
     params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     params.save_files=2; % save progress
+    %Define Streamline Starting Points: Defined in terms of scale*nelem
+    params.in_height_stream = [10]; 
+    params.time_stream  = 0;
+
     return 
 end
 
@@ -50,9 +54,11 @@ if isfield(params,'mesh_top')
         nz = params.nelem3(3); % elements in the vertical direction
         a = params.mesh_top/params.h(3); % desired height as multiple of first layer
         params.expand = findq(a,nz);
-    end
+    end    
 end
+
 params
+
 
 for sc = params.sc_all
     for sc2 = params.sc2_all
@@ -120,7 +126,15 @@ for sc = params.sc_all
             axis equal
             title('Initial wind lowest layer')
         end
-
+        
+%         Plot initial streamlines
+        if params.graphics > 1
+            figure(4), clf
+            plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
+            hold on
+            wind_streamlines(X, CX, U0, params.in_height_stream);
+            hold off
+        end
         % assemble sparse system matrix
         [K,F,~] = sparse_assembly(A,X,U0,lambda,params);
 
@@ -138,21 +152,21 @@ for sc = params.sc_all
             disp('graphics: solution')
 
             % plot resulting wind
-            figure(4),clf
+            figure(5),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,W)
             hold off
             axis equal
             title(['Final wind a=',string_diag_A])
 
-            figure(5),clf
+            figure(6),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,W,1)
             hold off
             axis equal
             title(['Final wind lowest layer a=',string_diag_A])
 
-            figure(6),clf
+            figure(7),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,W,1:2)
             hold off
@@ -164,7 +178,7 @@ for sc = params.sc_all
         if params.graphics>0
             disp('graphics: wind_at_h')
 
-            figure(7),clf
+            figure(8),clf
             height=10;
             bbox=[min(X{1}(:)),max(X{1}(:)),...
                 min(X{2}(:)),max(X{2}(:)),...
@@ -176,9 +190,14 @@ for sc = params.sc_all
             hold off
             axis equal
             title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
+        end
+        if params.graphics > 0
             
-            figure(8),clf
-            wind_streamlines(X,W,params)
+            figure(9),clf
+            plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
+            hold on
+            wind_streamlines(X, CX, W, params.in_height_stream)
+            hold off
         end    
         if params.save_files>0,
             save -v7.3
