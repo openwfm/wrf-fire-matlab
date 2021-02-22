@@ -46,7 +46,7 @@ for i3=1:m(3)
                         kloc=1+j1+2*(j2+2*j3);  % local index of the node in element (i1, i2. i3)
                         % kloc1=sub2ind([2,2,2],j1+1,j2+1,j3+1);  if kloc1~=kloc, error('kloc'),end 
                         k1 = i1+j1; k2 = i2+j2; k3 = i3+j3; %  position of the node in the global grid
-                        kglo(kloc)=k1+n(1)*(((i2+j2)-1)+n(2)*(i3+j3-1)); % global index
+                        kglo(kloc)=k1+n(1)*((k2-1)+n(2)*(k3-1)); % global index
                         % kglo1=sub2ind(n,i1+j1,i2+j2,i3+j3); if kglo1 ~= kglo(kloc), error('kglo'), end
                         for i=1:3
                             Xloc(i,kloc)=X{i}(i1+j1,i2+j2,i3+j3); % node coordinate i
