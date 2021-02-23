@@ -48,7 +48,6 @@ real :: vol = 0
 !j=0
 !k=0
 !m=0
-
 ib = reshape((/-1,-1,-1,-1,1,1,1,1,-1,-1,1,1,-1,-1,1,1,-1,1,-1,1,-1,1,-1,1/),shape(ib))
 !Still in testing process, so will most likely break
 
