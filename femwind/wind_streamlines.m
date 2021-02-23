@@ -57,6 +57,7 @@ function wind_streamline(X, CX, W, init_height)
      y0 = 0: round(max(X{2}(:))/10):max(X{2}(:));
      z0 = init_height;
 
+
     %plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
 
 for i = 1:length(y0)
