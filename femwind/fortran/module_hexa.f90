@@ -26,8 +26,9 @@ real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3)
 !*** local variables
 !real :: Nb = 8
 !real :: Ng
-real :: g = 0.5773502691896257
-real :: ib(9,3), s(9,3), gradf(8,3), Jg_tmp(8,3)
+real, parameter :: g = 0.5773502691896257
+real,dimension(9,3) :: ib = reshape((/-1,-1,-1,-1,1,1,1,1,0,-1,-1,1,1,-1,-1,1,1,0,-1,1,-1,1,-1,1,-1,1,0/),(/9,3/))
+real :: s(9,3), gradf(8,3), Jg_tmp(8,3)
 real :: Jx(3,3), Jx_inv(3,3), qdash(3,3), Q(3,3), R(3,3), Q_tran(3,3), R_inv(3,3)
 real :: Jg_tran(3,8), A_tmp(3,8)
 real :: K_at_s(8,8)
@@ -49,7 +50,7 @@ real :: vol = 0
 !j=0
 !k=0
 !m=0
-ib = reshape((/-1,-1,-1,-1,1,1,1,1,0,-1,-1,1,1,-1,-1,1,1,0,-1,1,-1,1,-1,1,-1,1,0/),shape(ib))
+!ib = reshape((/-1,-1,-1,-1,1,1,1,1,0,-1,-1,1,1,-1,-1,1,1,0,-1,1,-1,1,-1,1,-1,1,0/),shape(ib))
 !Still in testing process, so will most likely break
 
 s= g*ib
