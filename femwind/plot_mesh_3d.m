@@ -5,6 +5,8 @@ if exist('bbox','var')
     end
 end
 [n(1),n(2),n(3)] = size(X{1});
+
+
 hold on
 for j=1:n(2)
     for k=1:n(3)
@@ -16,11 +18,12 @@ for i=1:n(1)
         plot3(X{1}(i,:,k),X{2}(i,:,k),X{3}(i,:,k),'color','b'),
     end
 end
-for i=1:n(1)
-    for j=1:n(2)
-        plot3(squeeze(X{1}(i,j,:)),squeeze(X{2}(i,j,:)),squeeze(X{3}(i,j,:)),'color','b'),
-    end
-end
+%This creates a blue brick, and makes the meshgrid undetectable
+% for i=1:n(1)
+%     for j=1:n(2)
+%         plot3(squeeze(X{1}(i,j,:)),squeeze(X{2}(i,j,:)),squeeze(X{3}(i,j,:)),'color','b'),
+%     end
+% end
 hold off
 view(3)
 xlabel('x'), ylabel('y'), zlabel('z'),
