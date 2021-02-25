@@ -6,7 +6,7 @@ function path_struct = cluster_paths(w,cull,grid_dist)
 
 [fire_name,save_name,prefix,perim] = fire_choice();
 red = subset_domain(w);
-multi = input_num('Use multigrid? 1 = yes',1,0);
+multi = input_num('Use multigrid? 1 = yes',0,1);
 if multi
     if exist('ps_multi.mat','file')
         load ps_multi.mat
@@ -48,6 +48,7 @@ if new_end_time ~=0
   time_bounds(2) = time_bounds(2)+new_end_time;  
   red.max_tign = time_bounds(2);
   red.end_datenum = time_bounds(2);
+  fprintf('New end time %s\n',datestr(time_bounds(2)));
 end
 % time_bounds(2) = 7.354591409722222e+05;
 
