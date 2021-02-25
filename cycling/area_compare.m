@@ -5,7 +5,7 @@ function [ac,gs] = area_compare(ps,tign_b)
 % tign_b = quish2(ps) --- "Analysis"
 
 %tign_a = ps.tign_g;
-tign_a = ps.red.tign_g;
+tign_a = ps.red.tign;
 %create a mask 
 msk=tign_b-tign_a;
 msk(abs(msk)<0.2) = 0;
@@ -14,7 +14,7 @@ msk(msk<0)=-1; %subtract fuel moist ==> speed up fire
 
 %time +- 1/4 day at simulation start and end
 t_1 = max(min(tign_a(:)),min(tign_b(:)));%+0.25;
-t_2 = min(max(tign_a(:)),max(tign_b(:)))-0.25;
+t_2 = min(max(tign_a(:)),max(tign_b(:)))-0.1;
 
 pts = 30;
 t = linspace(t_1,t_2,pts);
@@ -27,7 +27,7 @@ end
 t_days = (t-ps.red.start_datenum);
 figure
 %plot(t_days,area_a,t_days,area_b)
-plot(t/(24*3600),area_a,t/(24*3600),area_b)
+plot(t-t_1,area_a,t-t_1,area_b)
 %legend('wrf-a','wrf-b')
 legend('Forecast','Estimate')
 %legend('Wet fuel','Normal Fuel')
