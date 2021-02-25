@@ -59,13 +59,18 @@ if gq
     fprintf('Collecting ground detection data\n')
     %grounds = ground_detects(ps.red);
     %[jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
-    [jgrid,igrid]=meshgrid([1:n]',[1:m]');
+    %[jgrid,igrid]=meshgrid([1:n]',[1:m]');
+    k = boundary(ps.points(:,2),ps.points(:,1),1);
+    lon_perim = ps.points(k,2);
+    lat_perim = ps.points(k,1);
+    in = inpolygon(ps.red.fxlong,ps.red.fxlat,lon_perim,lat_perim);
+    infire = in;
     %make polygon around detections
     %infire = inpolygon(grounds.land(:,4),grounds.land(:,3),pts(:,2),pts(:,1));
     %infire = inpolygon(grounds.land(:,4),grounds.land(:,3),grounds.land(infire,4),grounds.land(infire,3));
-    infire = inpolygon(igrid(:),jgrid(:),ps.idx(:,1),ps.idx(:,2));
+    %infire = inpolygon(igrid(:),jgrid(:),ps.idx(:,1),ps.idx(:,2));
     %remove holes in mask
-    infire = inpolygon(igrid(:),jgrid(:),igrid(infire),jgrid(infire));
+    %infire = inpolygon(igrid(:),jgrid(:),igrid(infire),jgrid(infire));
 end
 %try
 
@@ -85,11 +90,11 @@ beta_vect = 1-exp(g_likes);
 % end
 ground_steps = 5;
 if gq
-    data_area = sum(infire);
+    data_area = sum(infire(:));
     for i = 1:ground_steps
         fire_mask = tign_ground < tmax-0.1;
         fire_area = sum(fire_mask(:));
-        out_side = fire_mask(:)-infire;
+        out_side = fire_mask-infire;
         out_side(out_side<0)=0;
         out_sum(i) = sum(out_side(:));
         out_fraction = out_sum(i)/data_area;
@@ -333,11 +338,11 @@ end
 ground_steps = 5;
 tign_ground = tign_new;
 if gq
-    data_area = sum(infire);
+    data_area = sum(infire(:));
     for i = 1:ground_steps
         fire_mask = tign_ground < tmax-0.1;
         fire_area = sum(fire_mask(:));
-        out_side = fire_mask(:)-infire;
+        out_side = fire_mask(:)-infire(:);
         out_side(out_side<0)=0;
         out_sum(i) = sum(out_side(:));
         out_fraction = out_sum(i)/data_area;
