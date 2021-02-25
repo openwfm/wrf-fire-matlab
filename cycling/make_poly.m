@@ -1,16 +1,14 @@
 function poly_list = make_poly(x,y,rounds)
 %x,y lists of points, column vectors
+%fills in extra points along a ploygon
 
-% N = 100 ;
-% x = rand(1,N) ;
-% y = rand(1,N) ;
-p = [x, y]; % coordinates / points 
-c = [mean(x) mean(y)]; % mean/ central point 
-d = p-c ; % vectors connecting the central point and the given points 
-th = atan2(d(:,2),d(:,1)); % angle above x axis
-[th, idx] = sort(th);   % sorting the angles 
+p = [x, y];
+c = [mean(x) mean(y)];% center point 
+v = p-c ; % vectors connecting the central point and the given points 
+th = atan2(v(:,2),v(:,1));
+[th, idx] = sort(th);   % sort angles 
 p = p(idx,:); % sorting the given points
-p = [p; p(1,:)]; % add the first at the end to close the polygon 
+p = [p; p(1,:)];
 % figure,plot( p(:,1), p(:,2), '.-r');
 % hold on,scatter(p(:,1),p(:,2),'*k'),hold off
 % title('First')
@@ -27,8 +25,8 @@ for j = 1:rounds
     end
     p = [p;np];
     %c = [mean(p(:,1)) mean(p(:,2))]; % mean/ central point
-    d = p-c ; % vectors connecting the central point and the given points
-    th = atan2(d(:,2),d(:,1)); % angle above x axis
+    v = p-c ; % vectors connecting the central point and the given points
+    th = atan2(v(:,2),v(:,1)); % angle above x axis
     [th, idx] = sort(th);   % sorting the angles
 %     figure,plot( p(:,1), p(:,2), '.-r');
 %     hold on,scatter(p(:,1),p(:,2),'*k'),hold off
