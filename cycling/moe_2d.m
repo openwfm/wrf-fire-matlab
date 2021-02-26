@@ -12,20 +12,25 @@ end
 
 %new grid size
 %compute grid sizes
-grid_space = input_num('Grid spacing?',250);
-red = subset_domain(w1,1);
-E = wgs84Ellipsoid;
-dlon= distance(red.min_lat,red.min_lon,red.min_lat,red.max_lon,E);
-dlat= distance(red.min_lat,red.min_lon,red.max_lat,red.min_lon,E);
-new_n = round(dlon/grid_space);
-new_m = round(dlat/grid_space);
-new_red = subset_small(red,new_m,new_n);
-
-
-w1.fxlong = new_red.fxlong;
-w1.fxlat = new_red.fxlat;
-w1.tign_g = new_red.tign_g;
-[m,n] = size(w1.fxlong);
+if isfield(w1,'analysis')
+    w1.tign_g = w1.analysis;
+    fprintf('Using w.analysis for comparison\n')
+end
+resize_grid = input_num('Resize grids for comparison? 0 = no',0,1);
+if resize_grid
+    grid_space = input_num('Grid spacing?',250);
+    red = subset_domain(w1,1);
+    E = wgs84Ellipsoid;
+    dlon= distance(red.min_lat,red.min_lon,red.min_lat,red.max_lon,E);
+    dlat= distance(red.min_lat,red.min_lon,red.max_lat,red.min_lon,E);
+    new_n = round(dlon/grid_space);
+    new_m = round(dlat/grid_space);
+    new_red = subset_small(red,new_m,new_n);
+    w1.fxlong = new_red.fxlong;
+    w1.fxlat = new_red.fxlat;
+    w1.tign_g = new_red.tign_g;
+    [m,n] = size(w1.fxlong);
+end
 if perim_use == 1
 
     % load data if it has been processes already for another comparison
@@ -57,7 +62,7 @@ if perim_use == 1
         %new method
         p = make_poly(perim_points(:,4),perim_points(:,3),2)
         in_perim2 = inpolygon(w1.fxlong,w1.fxlat,p(:,1),p(:,2));
-        %in_perim = inpolygon(w1.fxlong,w1.fxlat,w1.fxlong(in_perim),w1.fxlat(in_perim));
+        in_perim2 = inpolygon(w1.fxlong,w1.fxlat,w1.fxlong(in_perim2),w1.fxlat(in_perim2));
         figure,scatter(w1.fxlong(in_perim2),w1.fxlat(in_perim2),'k');
         hold on,scatter(perim_points(:,4),perim_points(:,3)),hold off
         title('New')
@@ -82,13 +87,13 @@ if perim_use == 1
     perim_area = sum(perim_flat(:));
     
 else
-    t_g = min(max(w1.tign_g(:)),max(w2.tign_g(:)))-6*3600;
+    t_g = min(max(w1.tign_g(:)),max(w2.tign_g(:)))-1*3600;
     tign_g = w1.tign_g;
     %area of ground truth
     in_perim = w2.tign_g<=t_g;
     
     perim_flat = zeros(m,n);
-    perim_flat(in_perim') = 1;
+    perim_flat(in_perim) = 1;
     perim_area = sum(perim_flat(:));
     
     
