@@ -19,11 +19,12 @@ for i3=1:n3
                         %i1 and i2  and i3
                         if 1<=k1 && k1 <= n1 && 1 <= k2  && k2 <= n2 && 1 <= k3  && k3 <= n3 
                             s=s+K(i1,i2,i3,2 + j1,2 + j2,2 + j3).*x(k1,k2,k3);
+                            %Maybe replace s
                         end
                     end
                  end
             end
-            y(i1,i2,i3)=s;
+            y(i1,i2,i3)=s; %Possibly replace s with y in every location where we use it
         end
     end
 end
