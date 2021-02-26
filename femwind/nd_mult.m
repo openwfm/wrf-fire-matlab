@@ -9,13 +9,19 @@ for i3=1:n3
     for i2=1:n2
         for i1=1:n1
             s=0;
-            for j3=max(i3-1,1):min(i3+1,n3)  % i3-1:i3+1 & avoid overrun
-                for j2=max(i2-1,1):min(i2+1,3)
-                    for j1=max(i1-1,1):min(i1+1,3)
+            for j3=-1:1  % i3-1:i3+1 & avoid overrun                
+                for j2=-1:1 %If you run this                  
+                    for j1=-1:1 
+                        k1 = i1 + j1;
+                        k2 = i2 + j2;
+                        k3 = i3 + j3;
                         % contribution of K(i,j)*x(j)
-                        s=s+K(i1,i2,i3,2+j1-i1,2+j2-i2,2+j3-i3)*x(j1,j2,j3);
+                        %i1 and i2  and i3
+                        if 1<=k1 && k1 <= n1 && 1 <= k2  && k2 <= n2 && 1 <= k3  && k3 <= n3 
+                            s=s+K(i1,i2,i3,2 + j1,2 + j2,2 + j3).*x(k1,k2,k3);
+                        end
                     end
-                end
+                 end
             end
             y(i1,i2,i3)=s;
         end
