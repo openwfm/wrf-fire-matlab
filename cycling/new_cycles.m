@@ -27,10 +27,8 @@ fitter = fit(fuel(2).ros_fmc_g',fuel(2).fmc_g','cubicspline')
 %difference
 fmc_adjust = 1/2*(fitter(r2)-fitter(r1));
 %close all
-fprintf('Adjusting fuels by %f \n',fmc_adjust);
+fprintf('Adjusting fuels by %f percent\n',fmc_adjust);
 %adjiust fuel gloabally for starters
-msk = ones(size(w.xlong));
-
 new_w = insert_analysis(w,ps,tn);
 %maybe do this in the fmc_change function?
 if cycle == 1
