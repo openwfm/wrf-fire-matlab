@@ -1,4 +1,4 @@
-function K=nd_assembly(A,X,params)
+function K=nd_assembly(A,X,lambda,params);
 % in: 
 %  A  penalty coefficients matrix, size 3x3, s.p.d.
 %  X  cell array with 3d arrays x y z coordinates of mesh vertices
@@ -10,6 +10,7 @@ fprintf('sparse_assembly:')
 d = size(X,2);    % dimensions
 n = size(X{1});   % mesh size in nodes
 nn = prod(n);     % total nodes
+kk = 0;
 
 % initialize matrices
 F = zeros(nn,1);
@@ -57,38 +58,9 @@ for i3=1:m(3)
                         end
                     end
                 end
-            end
-
-            % KK(kglo,kglo)=KK(kglo,kglo)+Kloc; % assemble to global matrix
-            % instead, accumulate contributions to the global matrix
-            [ix,jx]=ndgrid(kglo,kglo);
-            nzloc=prod(size(Kloc));
-            ii(kk+1:kk+nzloc)=ix(:);
-            jj(kk+1:kk+nzloc)=jx(:);
-            aa(kk+1:kk+nzloc)=Kloc(:);
-            kk=kk+nzloc;
-            grad = lambda(kglo)'*Jg;  % grad lambda
-            grad = grad/A;
-            for i=1:3
-                W{i}(i1,i2,i3)=grad(i);
-            end                         
-        end
-        % done = 100*((i3-1)*m(2)+i2)/(m(3)*m(2));
-        % done = round(done);
-        % if done>done_last+5, fprintf(' %g%% ',done), done_last=done; end
+            end                   
+        end        
     end
 end
-for i=1:3
-    W{i}=u0{i}+W{i};
-end
-% fprintf('\n')
-if kk~=nzelem, error('wrong element nonzeros'),end
-disp('building sparse global stiffness matrix')
-K = sparse(ii,jj,aa,nn,nn); % err_K=big(K-KK)
-nn=prod(n);
-% checks
-if length(F)>nn, size(F),error('size has grown by an index out of bounds'),end
-check_nonzeros(params.levels,K,X)
-check_symmetry(K,'K',eps)
-K = (K+K')/2; % symmetrize
+
 end

@@ -1,4 +1,4 @@
-function params=femwind_test(params)
+%function params=femwind_test(params)
 % usage:
 % params=femwind_test    output params structure and exit
 % femwind_test(params)   run with params specified and copy to output
@@ -11,8 +11,8 @@ if ~exist('params','var') | isempty(params)
     params.graphics=1;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.mesh_top=1000; % if given, ignore params_expand 
-    params.sc_all=[1,2]; % mesh refinements for tests at multiple scales 
-    params.sc2_all=[1,2,4,8,16,32];  % additional factors for horizonal mesh extent 
+    params.sc_all=[1]; % mesh refinements for tests at multiple scales 
+    params.sc2_all=[1];  % additional factors for horizonal mesh extent 
     params.nelem3=[50,50,10]; % base size in elements, horizontal=2*odd 
     params.h=[30,30,2]; % base mesh spacing before scaling
     params.a=[1 1 1]; % penalty factors in x y z directions
