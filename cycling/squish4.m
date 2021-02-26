@@ -57,6 +57,13 @@ end
 if gq
     smooth_ground = 1;%max(m,n)/50;
     fprintf('Collecting ground detection data\n')
+    
+%     k = boundary(ps.points(:,2),ps.points(:,1),1);
+%     lon_perim = ps.points(k,2);
+%     lat_perim = ps.points(k,1);
+%     in = inpolygon(ps.red.fxlat,ps.red.fxlong,lat_perim,lon_perim);
+%     infire = in;
+
     %grounds = ground_detects(ps.red);
     %[jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
     [jgrid,igrid]=meshgrid([1:n]',[1:m]');
@@ -83,13 +90,13 @@ beta_vect = 1-exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 5;
+ground_steps = 2;
 if gq
-    data_area = sum(infire);
+    data_area = sum(infire(:));
     for i = 1:ground_steps
         fire_mask = tign_ground < tmax-0.1;
         fire_area = sum(fire_mask(:));
-        out_side = fire_mask(:)-infire;
+        out_side = fire_mask(:)-infire(:);
         out_side(out_side<0)=0;
         out_sum(i) = sum(out_side(:));
         out_fraction = out_sum(i)/data_area;
@@ -330,14 +337,14 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 5;
+ground_steps = 1;
 tign_ground = tign_new;
 if gq
-    data_area = sum(infire);
+    data_area = sum(infire(:));
     for i = 1:ground_steps
         fire_mask = tign_ground < tmax-0.1;
         fire_area = sum(fire_mask(:));
-        out_side = fire_mask(:)-infire;
+        out_side = fire_mask(:)-infire(:);
         out_side(out_side<0)=0;
         out_sum(i) = sum(out_side(:));
         out_fraction = out_sum(i)/data_area;
