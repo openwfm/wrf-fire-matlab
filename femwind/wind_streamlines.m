@@ -15,30 +15,34 @@ function wind_streamline(X, CX, W, init_height)
 
     level = 1:n(3);
     [F1, F2, F3] = wind_interp(W,CX);
-    %The slice function requires an ndgrid or meshgrid to work. Create a
-    %meshgrid with the same array and physical dimensions as the domain arrays
+    %The slice function requires a meshgrid to work, while X is an ndgrid, so all of the coordinates are transposed.
+    %Create a meshgrid with the same array and physical dimensions as the domain arrays
     %CX. Evaluate each grid point at the scattered interpolant
-    [CXG_X,CXG_Y,CXG_Z] = meshgrid(linspace(min(X{1}(:)),max(X{1}(:)), n(1)),...
-        linspace(min(X{2}(:)),max(X{2}(:)), n(2)), ...
+    [CXG_X,CXG_Y,CXG_Z] = meshgrid(linspace(min(X{2}(:)),max(X{2}(:)), n(2)),...
+        linspace(min(X{1}(:)),max(X{1}(:)), n(1)), ...
         linspace(min(X{3}(:)),max(X{3}(:)), n(3)));
-
-    WX = F1(CXG_X(:), CXG_Y(:), CXG_Z(:));
-    WY = F2(CXG_X(:), CXG_Y(:), CXG_Z(:));
-    WZ = F3(CXG_X(:), CXG_Y(:), CXG_Z(:));
+    
+    WX = F1(CXG_Y(:), CXG_X(:), CXG_Z(:));
+    WY = F2(CXG_Y(:), CXG_X(:), CXG_Z(:));
+    WZ = F3(CXG_Y(:), CXG_X(:), CXG_Z(:));
+    
+    
     %Convert individual wind vectors (x,y,z) into a full grid with 3-D wind
     %components at each coordinate in the 3-D grid space.
     WX = reshape(WX,n);
     WY = reshape(WY,n);
     WZ = reshape(WZ,n);
-
+    
+    
     wind_speed = sqrt(WX.^2 + WY.^2 + WZ.^2);
-    %Creating countour surfaces and colormaps of the magnitude of the
+    
+    %Creating contour surfaces and colormaps of the magnitude of the
     %wind-field at 3 different locations
-    hsurfaces = slice(CXG_X,CXG_Y,CXG_Z,wind_speed, [xmin, (xmax-xmin)/2, xmax], ymax,zmin);
+    hsurfaces = slice(CXG_X,CXG_Y,CXG_Z,wind_speed, [ymin, (ymax-ymin)/2, ymax], xmax,zmin);
     set(hsurfaces,'FaceColor','interp','EdgeColor','none')
     colormap turbo
     hcont = ...
-        contourslice(CXG_X,CXG_Y,CXG_Z,wind_speed,[xmin,(xmax-xmin)/2,xmax],ymax,zmin);
+        contourslice(CXG_X,CXG_Y,CXG_Z,wind_speed,[ymin, (ymax-ymin)/2, ymax], xmax,zmin);
     set(hcont,'EdgeColor',[0.7 0.7 0.7],'LineWidth',0.5)
     % % drawing on current figure
     
@@ -54,29 +58,35 @@ function wind_streamline(X, CX, W, init_height)
     tspan = [0 1000];
     
      x0 = 0;
-     y0 = 0: round(max(X{2}(:))/10):max(X{2}(:));
-     z0 = 10;
+     y0 = X{2}(1,5,1): (n(2) - 10) :X{2}(1,n(2) - 5,1);
+     z0 = 100;
+
 
     %plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
-
+if ~exist('scale','var')
+    scale = 0.9;
+end
 for i = 1:length(y0)
     for j = 1:length(z0)
         [t,y] = ode45(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
         % Find indices that constrain the streamline to stay inside the
         % domain of the mesh domain.
         k1 = find(y(:,1)< max(X{1}(:)));
+        k1 = k1(1: length(k1) - 1);
         
         
         hold on
         plot3(y(k1,1),y(k1,2), y(k1,3))
         
+        %Plot vectors until second to last index inside the bound to keep
+        %vectors in grid
         quiver3(y(k1,1),y(k1,2), y(k1,3), F1(y(k1,1),y(k1,2), y(k1,3)),...
-             F2(y(k1,1),y(k1,2), y(k1,3)),F3(y(k1,1),y(k1,2), y(k1,3)))
+             F2(y(k1,1),y(k1,2), y(k1,3)),F3(y(k1,1),y(k1,2), y(k1,3)), scale)
         
         
     end
 end
-
+axis tight
 %%
     function [F1,F2,F3] = wind_interp(W, CX)
         

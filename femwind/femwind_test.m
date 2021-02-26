@@ -59,7 +59,9 @@ if isfield(params,'mesh_top')
     end
 
 end
+
 params
+
 
 for sc = params.sc_all
     for sc2 = params.sc2_all
@@ -128,7 +130,7 @@ for sc = params.sc_all
             title('Initial wind lowest layer')
         end
         
-        %Plot initial streamlines
+%         Plot initial streamlines
         if params.graphics > 1
             figure(4), clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
