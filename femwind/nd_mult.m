@@ -1,5 +1,5 @@
 function y=nd_mult(K,x)
-%  y=nd_mult(K,x)
+%y=nd_mult(K,x)
 % multiply vector x by matrix K from nd_assembly
 [n1,n2,n3,m1,m2,m3]=size(K);
 if any([m1,m2,m3]~=3), error('K must be 3D stencil'),end
