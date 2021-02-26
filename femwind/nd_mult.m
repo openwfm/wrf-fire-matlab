@@ -13,7 +13,8 @@ for i3=1:n3
                 for j2=max(i2-1,1):min(i2+1,3)
                     for j1=max(i1-1,1):min(i1+1,3)
                         % contribution of K(i,j)*x(j)
-                        print('i1 =', i1, 'i2 =',i2,'i3 =',i3,'j1 =',j1,'j2 =',j2,'j3 =',j3)  
+                        i1,i2,i3,j1,j2,j3
+                        % print('i1 =', i1, 'i2 =',i2,'i3 =',i3,'j1 =',j1,'j2 =',j2,'j3 =',j3)  
                         s=s+K(i1,i2,i3,2+j1-i1,2+j2-i2,2+j3-i3)*x(j1,j2,j3);
                     end
                 end
