@@ -1,62 +1,64 @@
-function [K,F,W]=sparse_assembly(A,X,u0,lambda,params)
+function K=nd_assembly(A,X,params)
 % in: 
 %  A  penalty coefficients matrix, size 3x3, s.p.d.
 %  X  cell array with 3d arrays x y z coordinates of mesh vertices
-%  u0 cell array with 3d arrays initial wind vector at centers in x y z directions
-%  lambda scalar field on node; if empty, do not compute K and F
 % out:
-%  K  stiffness matrix, sparse
-%  F  load vector
-%  W  gradient of lambda
-
-% do to: now computing all three K,F,W, add a switch to compute only one
-% and save time
+%  K  stiffness matrix, stored as size (n1,n2,n3,3,3,3)
 
 fprintf('sparse_assembly:')
 
 d = size(X,2);    % dimensions
-n = size(X{1});   % mesh size
+n = size(X{1});   % mesh size in nodes
 nn = prod(n);     % total nodes
-nz = nn*27;        % estimated nonzeros
 
 % initialize matrices
-% KK = sparse([],[],[],nn,nn,nz);
 F = zeros(nn,1);
-W = {zeros(n-1),zeros(n-1),zeros(n-1)};
-nzelem=prod(n-1)*64;     % total nonzeros before assembly
-ii=zeros(nzelem,1);
-jj=zeros(nzelem,1);
-aa=zeros(nzelem,1);
-kk=0;
+K = zeros(n(1),n(2),n(3),3,3,3);
 
-% create matrices
-tstart=tic;
+% preallocate matrices
+tstart=tic;    % start timer
 Xloc = zeros(3,8);
 kglo=zeros(1,8);
-m = n-1;
-done_last=0;
+m = n-1;       % grid size in elements
 disp('accumulating global stiffness matrix entries')
 for i3=1:m(3)
     for i2=1:m(2)
         for i1=1:m(1)  % loop over elements
             % now in element (i1,i2,i3)
+            % build the matrix of node coordinates to pass to hexa
             for j3=0:1 % loop over corners of the element
                 for j2=0:1
                     for j1=0:1   
-                        kloc=1+j1+2*(j2+2*j3);  % local index of the node in element (i1, i2. i3)
-                        % kloc1=sub2ind([2,2,2],j1+1,j2+1,j3+1);  if kloc1~=kloc, error('kloc'),end 
-                        k1 = i1+j1; k2 = i2+j2; k3 = i3+j3; %  position of the node in the global grid
-                        kglo(kloc)=k1+n(1)*((k2-1)+n(2)*(k3-1)); % global index
-                        % kglo1=sub2ind(n,i1+j1,i2+j2,i3+j3); if kglo1 ~= kglo(kloc), error('kglo'), end
+                        jloc=1+j1+2*(j2+2*j3);  % local index of the node in element (i1, i2. i3)
                         for i=1:3
-                            Xloc(i,kloc)=X{i}(i1+j1,i2+j2,i3+j3); % node coordinate i
+                            Xloc(i,jloc)=X{i}(i1+j1,i2+j2,i3+j3); % node coordinate i
                         end
                     end
                 end
             end
-            u0loc=[u0{1}(i1,i2,i3),u0{2}(i1,i2,i3),u0{3}(i1,i2,i3)]';
-            [Kloc,Floc,Jg]=hexa(A,Xloc,u0loc); % create local matrix and rhs
-            F(kglo)=F(kglo)+Floc; % assemble to global rhs
+            [Kloc,~,~]=hexa(A,Xloc,zeros(3,1)); % compute the local matrix
+            % loop over local matrix entries j,k
+            for j3=0:1 % 
+                for j2=0:1
+                    for j1=0:1   
+                        jloc=1+j1+2*(j2+2*j3); % local index j
+                        for k3=0:1 % loop over corners of the element
+                            for k2=0:1
+                                for k1=0:1   
+                                    kloc=1+k1+2*(k2+2*k3);
+                                    % add entry of the local matrix; need
+                                    % to offset by 2 because all arrays 
+                                    % dimensions in matlab start at 1
+                                    K(i1+j1,i2+j2,i3+j3,2+k1-j1,2+k2-j2,2+k3-j3)=...
+                                        K(i1+j1,i2+j2,i3+j3,2+k1-j1,2+k2-j2,2+k3-j3)+...
+                                        Kloc(jloc,kloc);
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
             % KK(kglo,kglo)=KK(kglo,kglo)+Kloc; % assemble to global matrix
             % instead, accumulate contributions to the global matrix
             [ix,jx]=ndgrid(kglo,kglo);
