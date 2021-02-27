@@ -16,8 +16,7 @@ for j3=-1:1
                         k1 = i1 + j1;
                         % contribution of K(i,j)*x(j)
                         %i1 and i2  and i3
-                        y(i1,i2,i3)=y(i1,i2,i3)+K(i1,i2,i3,2 + j1,2 + j2,2 + j3).*x(k1,k2,k3);                       
-                        end
+                        y(i1,i2,i3)=y(i1,i2,i3)+K(i1,i2,i3,2 + j1,2 + j2,2 + j3)*x(k1,k2,k3);                       
                     end
                  end
             end
