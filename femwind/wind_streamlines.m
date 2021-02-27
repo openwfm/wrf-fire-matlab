@@ -59,7 +59,7 @@ function wind_streamline(X, CX, W, init_height)
     
      x0 = 0;
      y0 = X{2}(1,5,1): (n(2) - 10) :X{2}(1,n(2) - 5,1);
-     z0 = 100;
+     z0 = init_height;
 
 
     %plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
@@ -87,6 +87,40 @@ for i = 1:length(y0)
     end
 end
 axis tight
+
+
+     x0 = 0;
+     y0 = (max(X{2}(:)) + min(X{2}(:)))/2 ;
+     z0 = min(X{3}(:)):n(3): max(X{3}(:));
+
+
+    %plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
+if ~exist('scale','var')
+    scale = 0.9;
+end
+for i = 1:length(y0)
+    for j = 1:length(z0)
+        [t,y] = ode45(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
+        % Find indices that constrain the streamline to stay inside the
+        % domain of the mesh domain.
+        k1 = find(y(:,1)< max(X{1}(:)));
+        k1 = k1(1: length(k1) - 1);
+        
+        
+        hold on
+        %plot3(y(k1,1),y(k1,2), y(k1,3))
+        
+        %Plot vectors until second to last index inside the bound to keep
+        %vectors in grid
+        quiver(y(k1,2), y(k1,3),...
+             F2(y(k1,1),y(k1,2), y(k1,3)),F3(y(k1,1),y(k1,2), y(k1,3)), scale)
+        
+        
+    end
+end
+axis tight
+
+
 %%
     function [F1,F2,F3] = wind_interp(W, CX)
         

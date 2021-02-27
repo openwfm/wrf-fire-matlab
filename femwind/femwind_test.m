@@ -41,7 +41,7 @@ if ~exist('params','var') | isempty(params)
     params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     params.save_files=2; % save progress
     %Define Streamline Starting Points: Defined in terms of scale*nelem
-    params.in_height_stream = [10]; 
+    params.in_height_stream = [25]; 
     params.time_stream  = 0;
     
 
