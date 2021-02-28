@@ -1,3 +1,14 @@
 *.o
 *.exe
 *.mod
+*.asv
+*.m~
+*.bak
+*old
+*orig
+*.mat
+*.dat
+*.tar 
+*.zip
+*.tgz
+*.rar
