@@ -27,6 +27,11 @@ y27=ndt_mult(K27,x);
 yn=nd_mult(K,x);
 Kn_27_err=big(yn-y27)
 
+disp('convert to sparse compate matrix-vector multiply')
+Ks = ndt_convert(K,'sparse');  
+ys=Ks*x(:);
+K_Ks_err=big(ys(:)-y27(:))
+
 disp('converting to reduced storage format with 14 numbers per row')
 K14 = ndt_convert(K27,14);  
 
@@ -39,9 +44,6 @@ if abs(K14_err_zero)>1e-10, error('should be zero'),end
 y14=ndt_mult(K14,x);
 K14_K27_err=big(y14-y27)
 
-Ks = ndt_convert(K,0);  % convert to sparse
-ys=Ks*x(:);
-K_Ks_err=big(y(:)-yr(:))
 
 K_sparse=sparse_assembly(A,X,lambda,params);
 err_mat_sparse=big(Ks-K_sparse)
