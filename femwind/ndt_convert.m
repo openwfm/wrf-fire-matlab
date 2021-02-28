@@ -46,14 +46,16 @@ for i3=1:n3
                                 l1=i1+t2(1,2+j1,2+j2,2+j3); % row + offset
                                 l2=i2+t2(2,2+j1,2+j2,2+j3); % row + offset
                                 l3=i3+t2(3,2+j1,2+j2,2+j3); % row + offset
-                                lx=   t2(4,2+j1,2+j2,2+j3); % index in the row
-                                K2(l1,l2,l3,lx)=v;
+                                if ~(l1<1 || l1>n1 || l2<1 || l2>n2 || l3<1 || l3>n3) 
+                                    lx=   t2(4,2+j1,2+j2,2+j3); % index in the row
+                                    K2(l1,l2,l3,lx)=v;
+                                end
                             else
                                 % sparse, K2(i,j)=v
                                 nn=nn+1;
                                 ii(nn)=g(i1,i2,i3);
                                 jj(nn)=g(jj1,jj2,jj3);
-                                vv(nn)=1;
+                                vv(nn)=v;
                             end
                         end
                     end
@@ -62,8 +64,8 @@ for i3=1:n3
         end
     end
 end
-if mm2==0,
-    K2 = sparse(ii,jj,vv,n,n);
+if m2==0,
+    K2 = sparse(ii(1:nn),jj(1:nn),vv(1:nn),n,n);
 end
 end
         
