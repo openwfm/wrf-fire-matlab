@@ -10,20 +10,42 @@ switch m
         % flat indexing within the row
         t(4,:,:,:)=reshape(1:27,3,3,3);
     case 14
-        error('symmetric storage not implemented yet')
+        g=@(j1,j2,j3)1+j1+1+3*(j2+1+3*(j3+1)); % storage function
+        ud=@(j1,j2,j3)g(j1,j2,j3)>=g(0,0,0); % in upper triangle or diagonal
+        n=0;
         for j3=-1:1                  
             for j2=-1:1               
                 for j1=-1:1
-                    % in fortran won't have the 2+ because
-                    % the array t will be indexed -1:1
-                    t(1,2+j1,2+j2,2+j3)=0;  % no offset, all here
-                    t(2,2+j1,2+j2,2+j3)=0;
-                    t(3,2+j1,2+j2,2+j3)=0;
-                    % flatten (j1,j2,j3) storage, starting from 1
-                    t(4,2+j1,2+j2,2+j3)=1+j1+1+3*(j2+1+3*(j3+1));
+                    if ud(j1,j2,j3)
+                        % we are in the upper triangle including diagonal
+                        % connecting from 0 0 0 to j1 j2 j3
+                        n=n+1;
+                        t(1:3,2+j1,2+j2,2+j3)=0; % is centered at 2 not 0
+                        t(4  ,2+j1,2+j2,2+j3)=n;
+                    end
+                end
+            end
+        end
+        if n ~= 14  % just checking
+            nu, error('wrong size of upper triangular + diagonal part')
+        end
+        % now fill the lower triangular entries by index  
+        % to the upper triangular entry on the other row
+        for j3=-1:1                  
+            for j2=-1:1               
+                for j1=-1:1
+                    if ~ud(j1,j2,j3)
+                        % we are in lower triangle
+                        % conecting from -j1 -j2 -j3 to 0 0 0
+                        t(1:3,2+j1,2+j2,2+j3)=[-j1; -j2; -j3]; % from
+                        t(4  ,2+j1,2+j2,2+j3)=t(4  ,2-j1,2-j2,2-j3); % to
+                        if t(4  ,2+j1,2+j2,2+j3) == 0
+                            error('no target')
+                        end
+                    end
                 end
             end
         end
     otherwise
-        error('unknown storage scheme')
+        m,error('unknown storage scheme, must be 14 or 27')
 end
