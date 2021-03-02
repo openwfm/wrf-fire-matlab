@@ -1,4 +1,4 @@
-function mt = multi_make(ps,alpha,a,b,p_param,grid_fraction)
+function mt = multi_make(ps,alpha,p_param,grid_fraction)
 
 %do make_tign on set of grids of decreasing size
 gs = [2000,1000,750,600,500];
