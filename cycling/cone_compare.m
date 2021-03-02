@@ -25,8 +25,8 @@ st = 1;
 % tign = imgaussfilt(tign,st);
 % tign2 = imgaussfilt(tign2,st);
 % use snmooth_up function to do smoothing
-% tign = smooth_up(lon,lat,tign);
-% tign2 = smooth_up(lon,lat,tign2);
+% tign = smooth_up(tign);
+% tign2 = smooth_up(tign2);
 
 %compare areas of the two and plot over time
 area_compare(ps,tign2); 

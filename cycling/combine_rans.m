@@ -11,7 +11,7 @@ for i = 1:n
 end
 
 %c = imgaussfilt(c,1);
-c = smooth_up(w.fxlong,w.fxlat,c);
+c = smooth_up(c);
 % figure(123),mesh(c);
 %figure(124),contour(c,20,'k')
 

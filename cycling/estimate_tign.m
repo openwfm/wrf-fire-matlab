@@ -77,7 +77,7 @@ for i = 1:det_steps:n
 end
 
 %tign = imgaussfilt(tign,1);%-0.25;
-tign = smooth_up(ps.red.fxlong,ps.red.fxlat,tign);
+tign = smooth_up(tign);
 figure,mesh(ps.red.fxlong,ps.red.fxlat,tign);
 hold on
 scatter3(lons,lats,times,'*r')
