@@ -32,7 +32,7 @@ t = squish4(ps1,1,0);
 
 %alpha = 0.4;
 t = alpha*t+(1-alpha)*an;
-%t = smooth_up(ps1.red.fxlat,ps1.red.fxlong,t,a,b);
+%t = smooth_up(t,a,b);
 %t = imgaussfilt(an,1);
 figure,mesh(ps1.red.fxlong,ps1.red.fxlat,t);
 %title('Squish4')
