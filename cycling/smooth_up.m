@@ -1,4 +1,6 @@
-function sm_up = smooth_up(lon,lat,tign,a,b)
+function sm_up = smooth_up(tign,a,b)
+%applies gradual blurring at different contours of tign
+% a,b are optional parameters
 
 t0 = min(tign(:));
 t1 = max(tign(:));

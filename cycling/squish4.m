@@ -122,7 +122,7 @@ if gq
         t_mask = tign_ground > tmax;
         tign_ground(t_mask) = tmax;
         %tign_temp = imgaussfilt(tign_ground,smooth_ground );
-        tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground,a,b);
+        tign_temp = smooth_up(tign_ground,a,b);
         tign_ground(~infire) = tign_temp(~infire);
 %         a = 1/10;%1/2-1/(2*i);
 %         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
@@ -300,7 +300,7 @@ for k = 1:smoothings
     
     %smooth the tign
     %tign_new(tign_new < t0) = t0;
-    tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new,a,b);
+    tign_new = smooth_up(tign_new,a,b);
 %     if k < smoothings/5
 %         tign_new = imgaussfilt(tign_new,1);
 %         tign_new = rlx_shp(tign_new,alpha_2,patch);
@@ -372,7 +372,7 @@ if gq
         tign_ground(t_mask) = tmax;
         %tign_temp = imgaussfilt(tign_ground,1/6);
         %tign_temp = imgaussfilt(tign_ground,smooth_ground );
-        tign_temp = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_ground,a,b);
+        tign_temp = smooth_up(tign_ground,a,b);
         tign_ground(~infire) = tign_temp(~infire);
 %         a = 1/10;%1/2-1/(2*i);
 %         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
@@ -396,7 +396,7 @@ end
 tign_new = tign_ground;
 %% end of post smoothing
 
-tign_new = smooth_up(ps.red.fxlong,ps.red.fxlat,tign_new,a,b);
+tign_new = smooth_up(tign_new,a,b);
 
 
 
