@@ -5,6 +5,7 @@ function y=ndt_mult(K,x)
 t = ndt_storage_table(m); 
 u=reshape(x,n1,n2,n3);  % make x into grid vector if needed
 y=zeros(n1,n2,n3);
+n=0;
 for i3=1:n3   % global index of row = node i
     for i2=1:n2
         for i1=1:n1
@@ -29,9 +30,14 @@ for i3=1:n3   % global index of row = node i
                         % in fortran, we won't need to worry about out of bounds
                         % because K and x will be wrapped with zeros
                         if ~(m1<1 || m1>n1 || m2<1 || m2>n2 || m3<1 || m3>n3 || ...
-                             k1<1 || k1>n1 || k2<1 || k2>n2 || k3<1 || k3>n3 )   
-                            y(i1,i2,i3)=y(i1,i2,i3)...
-                                +K(m1,m2,m3,jx)*u(k1,k2,k3);
+                             k1<1 || k1>n1 || k2<1 || k2>n2 || k3<1 || k3>n3 ) 
+                            n=n+1;
+                            v=K(m1,m2,m3,jx);s=u(k1,k2,k3);
+%                            fprintf('i=(%g %g %g) j=(%g %g %g) m=(%g %g %g) jx=%g k=(%g %g %g) v=%g u=%g\n',...
+%                                     [i1 i2 i3     j1 j2 j3     m1 m2 m3     jx    k1 k2 k3     v    s])
+                            fprintf('i=(%g %g %g) j=(%g %g %g) m=(%g %g %g) k=(%g %g %g) v=%g u=%g\n',...
+                                     [i1 i2 i3     j1 j2 j3     m1 m2 m3       k1 k2 k3     v    s])
+                            y(i1,i2,i3)=y(i1,i2,i3)+v*s;
                         end
                     end
                  end
