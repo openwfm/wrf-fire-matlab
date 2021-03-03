@@ -18,7 +18,7 @@ if st2, % ndt storage
     t2=ndt_storage_table(st2);
     K2=zeros(n1,n2,n3,st2);
 else  % sparse storage
-    n=n1*n2*n2;
+    n=n1*n2*n3;
     mnz=n*27; % max nonzeros
     ii=zeros(mnz,1);
     jj=zeros(mnz,1);
@@ -26,7 +26,7 @@ else  % sparse storage
     nn=0;
     % K2=sparse([],[],[],n,n,mnz);
 end
-g=@(i1,i2,i3)i1+n1*(i2-1+n3*(i3-1));  % flattened index in 1:n by 1:n matrix
+g=@(i1,i2,i3)i1+n1*(i2-1+n2*(i3-1));  % flattened index in 1:n by 1:n matrix
 for i3=1:n3
     for i2=1:n2
         for i1=1:n1
