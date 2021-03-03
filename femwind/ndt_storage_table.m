@@ -23,7 +23,7 @@ switch m
                         n=n+1;
                         t(1:3,2+j1,2+j2,2+j3)=0; % is centered at 2 not 0
                         t(4  ,2+j1,2+j2,2+j3)=n;
-                        disp([gj,j1,j2,j3,squeeze(t(:,2+j1,2+j2,2+j3))'])
+                        % disp([gj,j1,j2,j3,squeeze(t(:,2+j1,2+j2,2+j3))'])
                     end
                 end
             end
@@ -39,10 +39,10 @@ switch m
                     gj=g(j1,j2,j3);
                     if gj < g0
                         % we are in lower triangle
-                        % conecting from -j1 -j2 -j3 to 0 0 0
-                        t(1:3,2+j1,2+j2,2+j3)=[-j1; -j2; -j3]; % from
+                        % conecting from j1 j2 j3 to 0 0 0
+                        t(1:3,2+j1,2+j2,2+j3)=[j1; j2; j3]; % from
                         t(4  ,2+j1,2+j2,2+j3)=t(4  ,2-j1,2-j2,2-j3); % to
-                        disp([gj,j1,j2,j3,squeeze(t(:,2+j1,2+j2,2+j3))'])
+                        % disp([gj,j1,j2,j3,squeeze(t(:,2+j1,2+j2,2+j3))'])
                         if t(4  ,2+j1,2+j2,2+j3) == 0
                             error('no target')
                         end

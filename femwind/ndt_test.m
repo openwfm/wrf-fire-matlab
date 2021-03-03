@@ -1,6 +1,6 @@
 % test for ndt_assembly and ndt_mult
 nel=[5,4,3]
-nel=[1 1 1]
+% nel=[1 1 1]
 n=nel+1
 h = [1,1,1]
 expand=1.3 
@@ -27,23 +27,23 @@ y27=ndt_mult(K27,xr);
 yn=nd_mult(K,xr);
 Kn_27_err=big(yn-y27)
 
-disp('convert to sparse compate matrix-vector multiply')
-Ks = ndt_convert(K,'sparse');  
-ys=Ks*xr(:);
-K_Ks_err=big(ys(:)-y27(:))
-
 disp('converting to reduced storage format with 14 numbers per row')
 K14 = ndt_convert(K27,14);  
-
-disp('multiplying st 14 by random')
-yr14=ndt_mult(K14,xr);
-K14_err_rand=big(yr14-yr)  % should be zero
-if abs(K14_err_rand)>1e-10, error('should be zero'),end
 
 disp('multiplying st 14 by all ones')
 x=ones(n1,n2,n3);
 y1=ndt_mult(K14,x1);
 K14_err_zero=big(y1)  % should be zero
+
+disp('multiplying st 14 by random')
+y14=ndt_mult(K14,xr);
+K14_err_rand=big(y14-y27)  % should be zero
+if abs(K14_err_rand)>1e-10, error('should be zero'),end
+
+disp('convert to sparse compare matrix-vector multiply')
+Ks = ndt_convert(K,'sparse');  
+ys=Ks*xr(:);
+K_Ks_err=big(ys(:)-y27(:))
 
 K_sparse=sparse_assembly(A,X,lambda,params);
 err_mat_sparse=big(Ks-K_sparse)
