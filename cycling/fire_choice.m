@@ -1,7 +1,9 @@
-function [fire_name,save_name,prefix,perim] = fire_choice()
+function [fire_name,save_name,prefix,perim] = fire_choice(fire_choice)
 
-fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3] other: [4]  Cal_2020 [5]',3,0);
-cycle = input_num('Which cycle? ',0,1)
+if ~exist('fire_choice','var')
+    fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar: [3] other: [4]  Cal_2020 [5]',3,0);
+end
+%cycle = input_num('Which cycle? ',0,1)
 if fire_choice == 1
     fire_name = 'Camp fire';
     save_name = 'camp';
