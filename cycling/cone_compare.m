@@ -25,17 +25,17 @@ st = 1;
 % tign = imgaussfilt(tign,st);
 % tign2 = imgaussfilt(tign2,st);
 % use snmooth_up function to do smoothing
-% tign = smooth_up(tign);
-% tign2 = smooth_up(tign2);
+% tign = smooth_up(lon,lat,tign);
+% tign2 = smooth_up(lon,lat,tign2);
 
 %compare areas of the two and plot over time
-area_compare(ps,tign2); 
+[ac,gs] = area_compare(ps,tign2); 
 close all
 
 %compute area of fires
-t_end = min(max(tign(:)),max(tign2(:)))-0.1;
-a1 = sum(sum(tign<t_end));
-a2 = sum(sum(tign2<t_end));
+%t_end = min(max(tign(:)),max(tign2(:)))-0.1;
+a1 = ac.area_a(end);
+a2 = ac.area_b(end);
 adjr0 = sign(a2-a1)*1/10*sqrt(abs(a1-a2)/a2);
 %adjr0 = 1/10*sqrt(abs(a1-a2)/a2);
 %make the top flate for each
