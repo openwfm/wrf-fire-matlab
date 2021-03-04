@@ -1,4 +1,4 @@
-function fmc_change(m,msk,f)
+function fmc_change(m,f)
 %perchentage change to add/subtract
 % msk - locations where to add subtract
 % f - string, path to a wrfinput or wrfrst file
