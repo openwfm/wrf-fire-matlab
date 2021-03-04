@@ -46,7 +46,6 @@ if size(t) ~= size(ps.red.fxlong)
     F = scatteredInterpolant(ps1.red.fxlong(:),ps1.red.fxlat(:),t(:));
     t = F(ps.red.fxlong,ps.red.fxlat);
 end
-
 %fix the ripple on the top
 r_mask = t >=max(t(:))-0.05;
 t(r_mask) = max(t(:));

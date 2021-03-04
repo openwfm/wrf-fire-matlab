@@ -12,7 +12,7 @@ t = linspace(t0,t1,steps);
 %compute different std. for imgausfilt
 %mx = 2;%
 if ~exist('a','var')
-    a = 100;
+    a = 300;
     b = 1/3;
 end
 mx = max(1.0,max(m,n)/a);

@@ -5,8 +5,8 @@ for i = 1:n
     c1 = ran_cone(w);
     a1 = sum(sum(c1<max(c1(:))));
     a = sum(sum(c<max(c(:))));
-    %c = a/(a+a1)*c+a1/(a+a1)*c1;
-    c = max(c,c1);
+    c = a/(a+a1)*c+a1/(a+a1)*c1;
+    %c = max(c,c1);
     %c = 1/2*(c+c1);
 end
 

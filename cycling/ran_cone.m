@@ -8,8 +8,8 @@ tx = linspace(-10,10,p);
 ty = linspace(-10,10,q);
 [x,y] = meshgrid(tx,ty);
 
-x0 = randn;
-y0 = randn;
+x0 = 2*randn;
+y0 = 4*randn;
 z0 = 0;
 z_max = 20;
 radius = 9+2*rand;

@@ -64,7 +64,7 @@ for k = 1 : 1
     for i = 1:m
         for j = 1:n
             if red.tign(i,j) < red.end_datenum - rm
-                if rand < 5/100
+                if rand < 1/100
                     %pts = [pts;[lats',lons',times',confs',frps',gran']];
                     pts = [pts;[red.fxlat(i,j),red.fxlong(i,j),red.tign(i,j),100,100,2*round(red.tign(i,j)-red.start_datenum)]];
                     idx = [idx;[i,j]];
@@ -73,6 +73,20 @@ for k = 1 : 1
         end
     end
 end
+if length(pts) > 500
+   pt_length = length(pts);
+   msk = rand(pt_length,1);
+   msk = msk > 500/pt_length;
+   pts(msk,:) = [];
+   idx(msk,:) = [];
+end
+
+%add perimeter, optional
+[new_pts,new_idx] = make_perims(red.tign,red);
+pts = [pts;new_pts];
+idx = [idx;new_idx];
+
+
 %discretize the time
 dis_time = 0;
 if dis_time ==1
