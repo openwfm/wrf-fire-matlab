@@ -65,6 +65,7 @@ params
 
 for sc = params.sc_all
     for sc2 = params.sc2_all
+        sc,sc2
         nel = sc*params.nelem3;  % elements in the 3 directions
         nel(1:2)=nel(1:2)*sc2
         h = params.h/sc;
@@ -147,6 +148,8 @@ for sc = params.sc_all
         % solve the equations
         % [lambda,it] = sparse_solve(K,F,X,'s');
         [lambda,it,rate(sc,sc2),XC,P] = sparse_solve(K,F,X,params);
+        format long
+        rate
 
         % assemble final wind
         [~,~,W] = sparse_assembly(A,X,U0,lambda,params);
@@ -202,7 +205,7 @@ for sc = params.sc_all
             wind_streamlines(X, CX, W, params.in_height_stream)
             hold off
         end    
-        params.rate=rate
+        params.rate=rate;
         if params.save_files>0,
             disp('saving femwind_test workspace to matlab.mat')
             save -v7.3
