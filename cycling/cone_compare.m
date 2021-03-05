@@ -36,6 +36,8 @@ close all
 %t_end = min(max(tign(:)),max(tign2(:)))-0.1;
 a1 = ac.area_a(end);
 a2 = ac.area_b(end);
+outer.a1 = a1;
+outer.a2 = a2;
 adjr0 = sign(a2-a1)*1/10*sqrt(abs(a1-a2)/a2);
 %adjr0 = 1/10*sqrt(abs(a1-a2)/a2);
 %make the top flate for each

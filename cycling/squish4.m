@@ -5,7 +5,7 @@ function tign_new = squish4(ps,gq,da)
 %% ps = graph_dets(w)
 
 if ~exist('a','var')
-    a = 100;
+    a = 300;
     b = 1/3;
 end
 

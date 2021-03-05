@@ -7,7 +7,7 @@ cycle = input_num('Which cycle? ',1);
 
 ts = choose_time_step(f);
 w = read_wrfout_tign(f,ts);
-gs = input_num('What grid spacing?',1000)
+gs = input_num('What grid spacing?',200)
 ps1 = cluster_paths(w,1,gs);
 savestr = sprintf('ps_%d.mat',cycle);
 save(savestr,'ps1')
@@ -17,7 +17,9 @@ ps = interp_paths(ps1,0.3);
 
 tn = squish4(ps,1,1);
 %avg ROS in the forecast and data estimate
-[r1,r2] = cone_compare(ps,tn);
+[r1,r2,adjr0,outer] = cone_compare(ps,tn);
+area_diff = outer.a1-outer.a2;
+ros_diff = r1-r2;
 %load fuel information from the wrfout
 fuels;
 %figure,plot(fuel(2).fmc_g,fuel(2).ros_fmc_g);
@@ -39,9 +41,7 @@ if cycle == 1
     wi = [wi,num2str(domain)];
     wi_bak = [wi,'.bak'];
     cpy_str = sprintf('cp %s %s',wi,wi_bak);
-    system(cpy_str)
-    %fmc_change(fmc_adjust,msk,rst);
-    ncreplace(wi,'TIGN_G',new_w.analysis);
+
 else
     d = dir('wrfrst*');
     for i = 1:length(d)
@@ -51,11 +51,14 @@ else
     rst = d(r).name;
     rst_bak = [rst,'.bak'];
     cpy_str = sprintf('cp %s %s',rst,rst_bak);
-    system(cpy_str);
-    %rst='wrfrst_d01_2013-08-13_00:00:00.bak';
-    %fmc_change(fmc_adjust,msk,rst);
-    ncreplace(rst,'TIGN_G',new_w.analysis);
 end
+
+system(cpy_str)
+%only change fmc content if a bigger fire has a bigger ROS
+if ros_diff*area_diff>0
+   fmc_change(fmc_adjust,msk,rst);
+end
+ncreplace(wi,'TIGN_G',new_w.analysis);
 fprintf('Linking new namelist.input file\n')
 link_namelist(cycle);
 fprintf('All done. Copy files to directories and restart WRF-SFIRE\n');
