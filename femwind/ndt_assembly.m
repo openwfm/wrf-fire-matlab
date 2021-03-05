@@ -53,13 +53,17 @@ for ie3=1:n(3)-1  % loop over elements
                                     % index triple of row m of K where the entry (i,k) is stored
                                     % in fortran we won't have the 2+ because
                                     % the array t will be indexed -1:1
+                                    % storing in this row only 
                                     m3 = i3+t(3,2+j1,2+j2,2+j3);
                                     m2 = i2+t(2,2+j1,2+j2,2+j3);
                                     m1 = i1+t(1,2+j1,2+j2,2+j3);
                                     % index of the matrix entry (i,k) in K(m,:) 
                                     jx=     t(4,2+j1,2+j2,2+j3);
-                                    % add entry of the local matrix
-                                    K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
+                                    % add entry of the local matrix 
+                                    % this row only, no duplicates if triangle
+                                    if m1==i1 && m2 == i2 && m3 == i3
+                                        K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
+                                    end
                                 end
                             end
                         end

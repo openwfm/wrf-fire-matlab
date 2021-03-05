@@ -1,6 +1,6 @@
 % test for ndt_assembly and ndt_mult
 nel=[5,4,3]
- nel=[1 1 1]
+%nel=[1 1 1]
 n=nel+1
 h = [1,1,1]
 expand=1.3 
@@ -34,6 +34,7 @@ disp('multiplying st 14 by all ones')
 x=ones(n1,n2,n3);
 y1=ndt_mult(K14,x1);
 K14_err_zero=big(y1)  % should be zero
+if abs(K14_err_zero)>1e-10, error('should be zero'),end
 
 disp('multiplying st 14 by random')
 y14=ndt_mult(K14,xr);
@@ -57,5 +58,11 @@ if abs(K27a_err)>1e-10, error('should be zero'),end
 
 
 K14a = ndt_assembly(A,X,u0,lambda,params,14);
+disp('multiplying st 14 by all ones')
+x=ones(n1,n2,n3);
+y1=ndt_mult(K14,x1);
+K14a_err_zero=big(y1)  % should be zero
+
+disp('comparing st 14 with converged st 27')
 K14a_err = big(K14 - K14a)
 if abs(K14a_err)>1e-10, error('should be zero'),end
