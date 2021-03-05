@@ -1,4 +1,4 @@
-function [A,X, lambda,params]=femwind_test(params)
+function params=femwind_test(params)
 % usage:
 % params=femwind_test    output params structure and exit
 % femwind_test(params)   run with params specified and copy to output
