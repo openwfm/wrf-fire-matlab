@@ -10,7 +10,6 @@ fprintf('sparse_assembly:')
 d = size(X,2);    % dimensions
 n = size(X{1});   % mesh size in nodes
 nn = prod(n);     % total nodes
-kk = 0;
 
 % initialize matrices
 F = zeros(nn,1);
