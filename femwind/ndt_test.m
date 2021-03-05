@@ -41,7 +41,7 @@ if abs(K14_err_rand)>1e-10, error('should be zero'),end
 
 disp('convert to sparse compare matrix-vector multiply')
 Ks = ndt_convert(K,'sparse');  
-!ys=Ks*xr(:);
+ys=Ks*xr(:);
 K_Ks_err=big(ys(:)-y27(:))
 
 K_sparse=sparse_assembly(A,X,lambda,params);
