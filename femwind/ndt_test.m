@@ -1,12 +1,13 @@
 % test for ndt_assembly and ndt_mult
 nel=[5,4,3]
-% nel=[1 1 1]
+ nel=[1 1 1]
 n=nel+1
 h = [1,1,1]
 expand=1.3 
 A = diag([1 1 1])
 lambda=[]
 params=[]
+u0=[];
 
 X = regular_mesh(nel,h,expand);
 
@@ -42,8 +43,19 @@ if abs(K14_err_rand)>1e-10, error('should be zero'),end
 disp('convert to sparse compare matrix-vector multiply')
 Ks = ndt_convert(K,'sparse');  
 ys=Ks*xr(:);
-K_Ks_err=big(ys(:)-y27(:))
+K_Ks_rand_err=big(ys(:)-y27(:))
+if abs(K_Ks_rand_err)>1e-10, error('should be zero'),end
 
-K_sparse=sparse_assembly(A,X,lambda,params);
+disp('convert to sparse compare matrix-vector multiply')
+K_sparse=sparse_assembly(A,X,u0,lambda,params);
 err_mat_sparse=big(Ks-K_sparse)
+if abs(err_mat_sparse)>1e-10, error('should be zero'),end
 
+K27a = ndt_assembly(A,X,u0,lambda,params,27);
+K27a_err = big(K27 - K27a)
+if abs(K27a_err)>1e-10, error('should be zero'),end
+
+
+K14a = ndt_assembly(A,X,u0,lambda,params,14);
+K14a_err = big(K14 - K14a)
+if abs(K14a_err)>1e-10, error('should be zero'),end

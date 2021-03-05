@@ -11,7 +11,7 @@ for i3=1:n3   % global index of row = node i
             for j3=-1:1   % relative index j of neighbor = nonzero in the row i               
                 for j2=-1:1               
                     for j1=-1:1
-                        % global index of neighbor node k is stored, 0 0 0 = this row 
+                        % global index triple of neighbor node k 
                         k3 = i3+j3;
                         k2 = i2+j2;
                         k1 = i1+j1;
