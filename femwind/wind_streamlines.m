@@ -40,7 +40,11 @@ function wind_streamline(X, CX, W, init_height)
     %wind-field at 3 different locations
     hsurfaces = slice(CXG_X,CXG_Y,CXG_Z,wind_speed, [ymin, (ymax-ymin)/2, ymax], xmax,zmin);
     set(hsurfaces,'FaceColor','interp','EdgeColor','none')
-    colormap turbo
+    if exist('turbo')==2
+        colormap turbo
+    else
+        colormap jet
+    end
     hcont = ...
         contourslice(CXG_X,CXG_Y,CXG_Z,wind_speed,[ymin, (ymax-ymin)/2, ymax], xmax,zmin);
     set(hcont,'EdgeColor',[0.7 0.7 0.7],'LineWidth',0.5)

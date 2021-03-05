@@ -44,7 +44,7 @@ if exist('vrrotvec2mat')
     [K1, ~, ~] = hexa(A,S*X,u);
     err_iso=norm(K0-K1,'fro')
 else
-    disp('no vrrotvec2mat, cannot test rotation invariance')
+    warning('no vrrotvec2mat, cannot test rotation invariance')
 end
 
 % test stretch
@@ -55,6 +55,11 @@ X3 = diag([1 1 2])*X0;
 if exist('fortran/hexa_test.exe') 
     disp('testing if same result in fortran')
     err=hexa_fortran(A,X3,u)
+    if abs(err)<1e-6
+        fprintf('error %g OK\n',err)
+    else
+        error(sprintf('error %g too large',err))
+    end
 else
-    disp('fortran/hexa_test.exe not available')
+    warning('fortran/hexa_test.exe not available')
 end

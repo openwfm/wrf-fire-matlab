@@ -40,7 +40,7 @@ for j=1:Ng+1
     if j<=Ng % contribution to stiffness
         K_at_s = Jg * A * Jg' * adetJx;
         Kloc = Kloc + K_at_s;
-    else   % contribution to divergence load
+    elseif ~isempty(u0)   % contribution to divergence load
         % volume = determinant at midpoint times the volume of reference element
         % exact if the element is linear image of reference 
         % or all sides planar, and sides in two directions are parallel 
