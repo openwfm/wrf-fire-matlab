@@ -1,6 +1,6 @@
 function [r1,r2,adjr0,outer] = cone_compare(ps,tign2)
 %compares feature of fire arrival cones
-%ps = tign_try(w), tign = squish(ps)
+%ps = tign_try(w), tign2 = squish(ps)
 
 
 if isfield(ps.red,'red')
@@ -192,11 +192,11 @@ b1 = r1<cut_off;b2 = r2 < cut_off;b_msk = logical(b1.*b2);
 r_diff = r1-r2;
 %r_diff = imgaussfilt(r_diff,1/2);
 r_msk = abs(r_diff)<5;
-avg_r_diff = mean(r_diff(r_msk));
-std_r_diff = std(r_diff(r_msk));
+avg_r_diff = mean(r_diff(b_msk));
+std_r_diff = std(r_diff(b_msk));
 outer.avg_r_diff = avg_r_diff;
 outer.std_r_diff = std_r_diff;
-figure,histogram(r_diff(r_msk));
+figure,histogram(r_diff(b_msk));
 tstr= sprintf('Differences in ROS, forecast-estimate \n Mean = %f  Std Dev. = %f \n Polygon Interpolation  %s % of Data',avg_r_diff,std_r_diff);%,str(str_num:str_num+1));
 title(tstr)
 xlabel('ROS (m/s)')
