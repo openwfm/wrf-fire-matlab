@@ -57,9 +57,15 @@ function wind_streamline(X, CX, W, init_height)
 
     %Note: To use the scattered interpolant function arrays
     %into column-vector format
-
+    if ~exist('scale_t','var') || isempty(scale_t)
+        scale_t = 1.1;
+    end
     
-    tspan = [0 1000];
+    if ~exist('t_final','var') || isempty(t_final)
+        t_final = scale_t*max(X{1}(:))/mean(W{1}(:));
+    end
+    
+     tspan = [0 t_final];
     
      x0 = 0;
      y0 = X{2}(1,5,1): (n(2) - 10) :X{2}(1,n(2) - 5,1);
@@ -72,20 +78,44 @@ if ~exist('scale','var')
 end
 for i = 1:length(y0)
     for j = 1:length(z0)
-        [t,y] = ode45(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
+        [t,y] = ode23(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
         % Find indices that constrain the streamline to stay inside the
         % domain of the mesh domain.
-        k1 = find(y(:,1)< max(X{1}(:)));
-        k1 = k1(1: length(k1) - 1);
+        count = 1;
+        if max(y(:,1)) < max(X{1}(:))
+            
+            t0 = min(t);
+            tf = count*scale_t*max(X{1}(:))/mean(W{1}(:));
+            t = [t0, tf];
+            [t,y_new] = ode23(@(t,y_new) odefun(t,y_new, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
+            size(y), size(y_new)
+            y = cat(1,y,y_new);
+            
+            count = count+ 1;
+        end
+        count  = 0;
+        ind1 = find(y(:,1)< max(X{1}(:)));
+        ind1 = ind1(1: length(ind1) -1);
+        ind2 = find(y(:,2)< max(X{2}(:)));
+        ind2 = ind2(1: length(ind2) - 1);
+        if length(ind1) < length(ind2)
+            ind1 = ind1;
+        else
+            ind1 = ind2;
+        end
+        
+        
+        ind1 = find(y(:,1)< max(X{1}(:)));
+        ind1 = ind1(1: length(ind1) - 1);
         
         
         hold on
-        plot3(y(k1,1),y(k1,2), y(k1,3))
+        plot3(y(ind1,1),y(ind1,2), y(ind1,3))
         
         %Plot vectors until second to last index inside the bound to keep
         %vectors in grid
-        quiver3(y(k1,1),y(k1,2), y(k1,3), F1(y(k1,1),y(k1,2), y(k1,3)),...
-             F2(y(k1,1),y(k1,2), y(k1,3)),F3(y(k1,1),y(k1,2), y(k1,3)), scale)
+        quiver3(y(ind1,1),y(ind1,2), y(ind1,3), F1(y(ind1,1),y(ind1,2), y(ind1,3)),...
+             F2(y(ind1,1),y(ind1,2), y(ind1,3)),F3(y(ind1,1),y(ind1,2), y(ind1,3)), scale)
         
         
     end
@@ -93,36 +123,7 @@ end
 axis tight
 
 
-     x0 = 0;
-     y0 = (max(X{2}(:)) + min(X{2}(:)))/2 ;
-     z0 = min(X{3}(:)):n(3): max(X{3}(:));
-
-
-    %plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
-if ~exist('scale','var')
-    scale = 0.9;
-end
-for i = 1:length(y0)
-    for j = 1:length(z0)
-        [t,y] = ode45(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
-        % Find indices that constrain the streamline to stay inside the
-        % domain of the mesh domain.
-        k1 = find(y(:,1)< max(X{1}(:)));
-        k1 = k1(1: length(k1) - 1);
-        
-        
-        hold on
-        %plot3(y(k1,1),y(k1,2), y(k1,3))
-        
-        %Plot vectors until second to last index inside the bound to keep
-        %vectors in grid
-        quiver(y(k1,2), y(k1,3),...
-             F2(y(k1,1),y(k1,2), y(k1,3)),F3(y(k1,1),y(k1,2), y(k1,3)), scale)
-        
-        
-    end
-end
-axis tight
+     
 
 
 %%
