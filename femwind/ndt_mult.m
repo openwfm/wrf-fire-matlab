@@ -35,6 +35,11 @@ for i2=1:n2
                                 case 2   % WRF storage ordering
                                     fprintf('ikj: row=(%g %g %g) rel.column=(%g %g %g) rel.row.stored=(%g %g %g) at %g\n',...
                                                     [ i1,i3,i2,             j1,j3,j2,             m1,m3,m2,    jx])
+                                case 3   % print code
+                                    if i1 == 2 && i2 == 2 && i3 == 2 
+                                        fprintf('        kmat(i%s,k%s,j%s,%2i)*u(i%s,k%s,j%s) +  &\n',...
+                                            pm(m1),pm(m3),pm(m2),jx,pm(j1),pm(j3),pm(j2))
+                                    end
                             end 
                         end
                     end
@@ -42,5 +47,18 @@ for i2=1:n2
             end
         end
     end
+end
+end
+
+function s=pm(j)
+switch j
+    case 1 
+        s='+1';
+    case -1
+        s='-1';
+    case 0
+        s='  ';
+    otherwise
+        error('pm: argument must be in -1:1')
 end
 end
