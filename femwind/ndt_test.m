@@ -17,6 +17,14 @@ K=nd_assembly(A,X,lambda,params);
 [n1,n2,n3,m1,m2,m3]=size(K);
 K27 = reshape(K,n1,n2,n3,m1*m2*m3);  % make to n x 27 nd format
 
+disp('converting to reduced storage format with 14 numbers per row')
+K14 = ndt_convert(K27,14); 
+disp('multiplying st 14 by all ones')
+x1=ones(n1,n2,n3);
+y1=ndt_mult(K14,x1);
+K14_err_zero=big(y1)  % should be zero
+if abs(K14_err_zero)>1e-10, error('should be zero'),end
+
 disp('testing multiplication by ones should give zero')
 x1=ones(n1,n2,n3);
 y27=ndt_mult(K27,x1);
@@ -28,13 +36,6 @@ y27=ndt_mult(K27,xr);
 yn=nd_mult(K,xr);
 Kn_27_err=big(yn-y27)
 
-disp('converting to reduced storage format with 14 numbers per row')
-K14 = ndt_convert(K27,14); 
-disp('multiplying st 14 by all ones')
-x=ones(n1,n2,n3);
-y1=ndt_mult(K14,x1);
-K14_err_zero=big(y1)  % should be zero
-if abs(K14_err_zero)>1e-10, error('should be zero'),end
 
 disp('multiplying st 14 by random')
 y14=ndt_mult(K14,xr);
