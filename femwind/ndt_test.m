@@ -10,6 +10,8 @@ params=[]
 u0=[];
 
 X = regular_mesh(nel,h,expand);
+% X = add_terrain_to_mesh(X, 'hill', 'shift', 0.1)
+X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1)  % more thorough testing
 
 plot_mesh_3d(X)
 
@@ -21,7 +23,7 @@ disp('converting to reduced storage format with 14 numbers per row')
 K14 = ndt_convert(K27,14); 
 disp('multiplying st 14 by all ones')
 x1=ones(n1,n2,n3);
-y1=ndt_mult(K14,x1,true);
+y1=ndt_mult(K14,x1,2);
 K14_err_zero=big(y1)  % should be zero
 if abs(K14_err_zero)>1e-10, error('should be zero'),end
 
