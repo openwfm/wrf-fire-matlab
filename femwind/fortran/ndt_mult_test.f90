@@ -5,4 +5,77 @@ use module_io_matlab ! to read and write matrices as text files from matlab
 
 implicit none
 
+real, pointer:: kmat(:,:,:,:), u(:,:,:), y(:,:,:), &  ! fortran is not case sensitive
+                kmat_m(:,:,:,:), u_m(:,:,:), y_m(:,:,:)   
+real, pointer::a(:)
+integer :: s(4),n(3)
+
+integer :: msize, &
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
+integer :: i,j,k,jx
+
+! read input arrays in ijk index ordering and tight bounds
+call read_array_nd(a,s,'kmat')
+kmat_m = reshape(a,s)
+call read_array_nd(a,n,'u')
+u_m = reshape(a,n)
+
+if (s(1).ne.n(1).or.s(2).ne.n(2).or.s(3).ne.n(3))call crash('ndt_mult_test: inconsistent size kmat and u')
+
+ifts = 1
+ifte = n(1)
+jfts = 1
+jfde = n(2)
+kfts = 1
+kfte = n(3)
+msize = s(4)
+ifms = ifts-1
+ifme = ifte+1
+jfms = jfts-1
+jfme = jfte+1
+kfms = kfts-1
+kfme = kfte+1
+
+! allocate a little bigger with zeros in extra areas
+allocate(kmat(ifms:ifme,kfms:kfme,jfms:jfme,1:msize))
+allocate(   u(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(   y(ifms:ifme,kfms:kfme,jfms:jfme))
+kmat = 0.
+u = 0.
+
+! copy the input data 
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
+      do jx = 1,msize
+        kmat(i,k,j,jx) = kmat_m(i,j,k,jx)
+      enddo
+      u(i,k,j)=u_m(i,j,k)
+    enddo
+  enddo
+enddo
+           
+write(*,*)'calling ntd_mult'
+call ndt_mult(  &
+  ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+  ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+  ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+  ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+  kmat, u, y)
+
+! copy the output data from WRF tile size and ikj ordering
+allocate(   y_m(ifts:ifte,kfms:kfme,jfms:jfme))
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
+      y_m(i,k,j)=y(i,j,k)
+    enddo
+  enddo
+enddo
+
+call write_array_nd(reshape(y_m,(/product(n)/)),n,'y')
+
 end program ndt_mult_test

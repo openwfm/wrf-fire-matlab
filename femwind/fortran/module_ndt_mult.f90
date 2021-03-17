@@ -3,10 +3,10 @@ module module_ndt_mult
 contains
 
 subroutine ndt_mult(                              &
-    ifds, ifde, jfds, jfde,                       & ! fire grid dimensions
+    ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts,ifte, kfts, kfte, jfts,jfte,             &
+    ifts, ifte, kfts, kfte, jfts,jfte,             &
     kmat, u, y)
 
 implicit none
@@ -14,10 +14,10 @@ implicit none
 !*** arguments
 
 integer, intent(in)::                             &
-    ifds, ifde, jfds, jfde,                       & ! fire domain bounds
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-    ifts,ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
+    ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
 
 integer, parameter:: msize = 14
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: kmat  ! global stiffness matrix
