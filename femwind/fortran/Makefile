@@ -1,6 +1,7 @@
 #FC = ifort
 #FC = gfortran
-FFLAGS = -g -C
+#FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow
+FFLAGS = -g -C -fpe0
 
 default: hexa_test.exe ndt_mult_test.exe
 

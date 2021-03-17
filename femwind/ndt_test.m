@@ -1,3 +1,4 @@
+format compact
 % test for ndt_assembly and ndt_mult
 nel=[5,4,3]
 %nel=[1 1 1]

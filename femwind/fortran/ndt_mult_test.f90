@@ -19,8 +19,10 @@ integer :: i,j,k,jx
 
 ! read input arrays in ijk index ordering and tight bounds
 call read_array_nd(a,s,'kmat')
+allocate(kmat_m(s(1),s(2),s(3),s(4)))
 kmat_m = reshape(a,s)
 call read_array_nd(a,n,'u')
+allocate(u_m(n(1),n(2),n(3)))
 u_m = reshape(a,n)
 
 if (s(1).ne.n(1).or.s(2).ne.n(2).or.s(3).ne.n(3))call crash('ndt_mult_test: inconsistent size kmat and u')
@@ -28,7 +30,7 @@ if (s(1).ne.n(1).or.s(2).ne.n(2).or.s(3).ne.n(3))call crash('ndt_mult_test: inco
 ifts = 1
 ifte = n(1)
 jfts = 1
-jfde = n(2)
+jfte = n(2)
 kfts = 1
 kfte = n(3)
 msize = s(4)
@@ -58,7 +60,7 @@ do j=jfts,jfte
   enddo
 enddo
            
-write(*,*)'calling ntd_mult'
+write(*,'(a)')'calling ntd_mult'
 call ndt_mult(  &
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds

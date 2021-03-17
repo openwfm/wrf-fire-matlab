@@ -29,7 +29,7 @@ read(iu,*)j
 if(j.ne.3)call crash('read_array: must have 3 dimensions')
 read(iu,*)n
 1 format('reading matrix size ',3i5,' from file ',a)
-write(*,1)n,trim(name)//'.txt.'
+write(*,1)n,trim(name)//'.txt'
 allocate(a(n(1),n(2),n(3)))
 read(iu,*)a
 close(iu)
@@ -117,7 +117,7 @@ integer::n(1),m(1),i,iu
 !*** executable
 iu=8
 1 format('writing ',a,' matrix size ',7i5)
-write(*,1)trim(name)//'.txt.'
+write(*,1)trim(name)//'.txt',s
 n = shape(s)
 m = shape(a)
 if (product(s).ne.m(1))call crash('write_array_nd: wrong size of a')
