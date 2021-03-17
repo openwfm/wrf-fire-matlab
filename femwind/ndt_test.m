@@ -44,6 +44,20 @@ y14=ndt_mult(K14,xr);
 K14_err_rand=big(y14-y27)  % should be zero
 if abs(K14_err_rand)>1e-10, error('should be zero'),end
 
+% test same results for ndt_mult from matlab and fortran
+if exist('fortran/ndt_mult_test.exe')
+    disp('testing if same result in fortran')
+    err=ndt_mult_fortran(K14,xr)
+    if abs(err)<1e-6
+        fprintf('error %g OK\n',err)
+    else
+        error(sprintf('error %g too large',err))
+    end
+else
+    warning('fortran/ndt_mult_test.exe not available')
+end
+
+
 disp('convert to sparse compare matrix-vector multiply')
 Ks = ndt_convert(K,'sparse');  
 ys=Ks*xr(:);

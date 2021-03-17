@@ -1,5 +1,5 @@
-function write_array_nd(filename,a)
-% write_array_nd(filename,a)
+function write_array_nd(a,filename)
+% write_array_nd(a,filename)
 % Purpose: write nd matrix 
 %
 % Arguments
