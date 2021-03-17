@@ -34,6 +34,7 @@ jfte = n(2)
 kfts = 1
 kfte = n(3)
 msize = s(4)
+if(msize.ne.14)call crash('msize must be 14')
 ifms = ifts-1
 ifme = ifte+1
 jfms = jfts-1
@@ -47,6 +48,7 @@ allocate(   u(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(   y(ifms:ifme,kfms:kfme,jfms:jfme))
 kmat = 0.
 u = 0.
+y = 0.
 
 ! copy the input data 
 do j=jfts,jfte
@@ -68,12 +70,12 @@ call ndt_mult(  &
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   kmat, u, y)
 
-! copy the output data from WRF tile size and ikj ordering
-allocate(   y_m(ifts:ifte,kfms:kfme,jfms:jfme))
+write(*,'(a,3i8)')'copying the output data to array size ',n
+allocate(y_m(1:n(1),1:n(2),1:n(3)))
 do j=jfts,jfte
   do k=kfts,kfte
     do i=ifts,ifte
-      y_m(i,k,j)=y(i,j,k)
+      y_m(i,j,k)=y(i,k,j)
     enddo
   enddo
 enddo
