@@ -156,6 +156,7 @@ switch params.coarsening
         error(['unknown coarsening ',params.coarsening])
 end
 disp('computing coarse matrix')
+diary;diary
 K_coarse = P'*K*P;
 check_nonzeros(params.levels-1,K_coarse,X_coarse,P,K,X);
 if params.exact
@@ -165,6 +166,7 @@ end
 cycles=0;
 t_cycle='first cycle not complete yet';
 for it=1:params.maxit
+    diary;diary
     params.it(params.levels)=it;  % where we are, for prints and filenames
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
@@ -284,8 +286,8 @@ for it=1:params.maxit
         break
     end
 end
-if params.save_files > 1
-    sfile=sprintf('%s_%i',params.id,params.levels);
+if params.save_files > 2
+    sfile=sprintf('%s_%s_%i.mat',params.save_file_prefix,params.id,params.levels);
     save(sfile,'-v7.3')
 end
 end

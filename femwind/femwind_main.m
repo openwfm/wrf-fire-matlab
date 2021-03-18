@@ -12,8 +12,6 @@ function params=femwind_main(params)
 %
 %           *** WARNING ***
 
-disp('femwind_main')
-
 
 if ~exist('params','var') | isempty(params)
     params.graphics=2;  % 1=basic, 2=all
@@ -47,7 +45,8 @@ if ~exist('params','var') | isempty(params)
     params.apply_coarse_boundary_conditions=1;
     params.nsmooth_coarse=2;
     params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
-    params.save_files=0; % save progress
+    params.save_files=0; % save progress levels=3, workspace=2 params only=1
+    params.save_file_prefix='femwind';  
     %Define Streamline Starting Points: Defined in terms of scale*nelem
     params.in_height_stream = [175]; 
     params.time_stream  = 0;
@@ -56,7 +55,11 @@ if ~exist('params','var') | isempty(params)
     return 
 end
 
-
+if params.save_files > 0
+    diary(['femwind_',params.save_file_prefix,'_diary.txt'])
+end
+disp('femwind_main')
+format compact
 
 if isfield(params,'mesh_top')
     if params.mesh_top>0
@@ -71,8 +74,8 @@ end
 params
 
 
-for sc = params.sc_all
-    for sc2 = params.sc2_all
+for sc2 = params.sc2_all
+    for sc = params.sc_all
         sc,sc2
         nel = sc*params.nelem3;  % elements in the 3 directions
         nel(1:2)=nel(1:2)*sc2
@@ -147,6 +150,7 @@ for sc = params.sc_all
             wind_streamlines(X, CX, U0, params.in_height_stream);
             hold off
         end
+        diary; diary
         % assemble sparse system matrix
         [K,F,~] = sparse_assembly(A,X,U0,lambda,params);
 
@@ -214,9 +218,15 @@ for sc = params.sc_all
             hold off
         end    
         params.rate=rate;
+        if params.save_files>1,
+            sfile=[params.save_file_prefix,'_workspace.mat'];
+            disp(['saving workspace to ',sfile])
+            save(sfile,'-v7.3') 
+        end
         if params.save_files>0,
-            disp('saving femwind_test workspace to matlab.mat')
-            save -v7.3
+            sfile=[params.save_file_prefix,'_params.mat'];
+            disp(['saving params to ',sfile])
+            save(sfile,'params','-v7.3') 
         end
     end
 end
