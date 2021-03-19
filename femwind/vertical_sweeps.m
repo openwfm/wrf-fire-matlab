@@ -1,5 +1,6 @@
-function [x]=vertical_sweeps(K,F,n,x,params)
+function [x]=vertical_sweeps(K,F,X,x)
 
+n = size(X{1});
 
 for rb1=1:2
     for rb2=1:2
