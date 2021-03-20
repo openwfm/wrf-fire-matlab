@@ -2,16 +2,16 @@ function check_nonzeros(level,Kc,Xc,P,K,X)
 % check_nonzeros(Kc,Xc,P,K,X)
 % checking nonzeros structure consistent with hexa grid
     disp('check_nonzeros: check if structure consistent with hexa grid')
-    fprintf('level %g stiffness matrix size %g nonzeros %g density %g%%\n',...
-        level,length(Kc),nnz(Kc),100*nnz(Kc)/prod(size(Kc)))
+    nc=size(Xc{1});
+    nnc=prod(nc);
+    fprintf('level %g size %g %g %g stiffness matrix size %g nonzeros %g density %g%%\n',...
+        level,nc,length(Kc),nnz(Kc),100*nnz(Kc)/prod(size(Kc)))
     if exist('P','var')
         fprintf('prolongation matrix size %g %g nonzeros %g density %g%%\n',...
             size(P),nnz(P),100*nnz(P)/prod(size(P)))
         fprintf('prolongation matrix max row nonzeros %g max column nonzeros %g\n',...
             max(full(sum(P~=0,2))),max(full(sum(P~=0,1))))
     end
-    nc=size(Xc{1});
-    nnc=prod(nc);
     if any(size(Kc)~=nnc)
         error('Kc size inconsistent with mesh Xc')
     end
