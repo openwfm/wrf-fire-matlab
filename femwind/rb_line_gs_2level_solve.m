@@ -8,6 +8,7 @@ nn = size(F,1);
 if nn~=prod(n)
     error('rb_line_gs_solve: inconsistent sizes')
 end
+rate = 0;
 
 % settings
 tol = params.restol*norm(F);
