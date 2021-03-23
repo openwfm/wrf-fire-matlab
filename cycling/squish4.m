@@ -344,7 +344,7 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 1;
+ground_steps = 4;
 tign_ground = tign_new;
 if gq
     data_area = sum(infire(:));
