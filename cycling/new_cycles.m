@@ -5,8 +5,13 @@ function new_cycles(f)
 
 cycle = input_num('Which cycle? ',1);
 
-ts = choose_time_step(f);
-w = read_wrfout_tign(f,ts);
+if strcmp('t',f(end)) %read saved .mat file
+    w = read_wrfout_tign(f)
+else %read wrfoutfile directly
+    ts = choose_time_step(f);
+    w = read_wrfout_tign(f,ts);
+end
+
 gs = input_num('What grid spacing?',250)
 ps1 = cluster_paths(w,1,gs);
 savestr = sprintf('ps_%d.mat',cycle);
