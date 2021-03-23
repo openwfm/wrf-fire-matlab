@@ -128,19 +128,18 @@ if gq
 %         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
 %         figure(73),scatter3(ps.red.fxlong(~infire),ps.red.fxlat(~infire),tign_ground(~infire))
 %         pause(1/2)
-        figure(159)
-        contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold on
-        scatter(pts(1:10:end,2),pts(1:10:end,1),'*r'),hold off
-        t_str = sprintf('Perimeter Shrinking \n Iteration %d',i);
-        save_str = sprintf('perim_shrink_%d',i);
-        xlabel('Lon'),ylabel('Lat'),title(t_str)
-%         xl=[-121.5094 -121.2496];xlim(xl)
-%         yl = [46.0367   46.2035];ylim(yl)
+%         figure(159)
+%         contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold on
+%         scatter(pts(1:10:end,2),pts(1:10:end,1),'*r'),hold off
+%         t_str = sprintf('Perimeter Shrinking \n Iteration %d',i);
+%         save_str = sprintf('perim_shrink_%d',i);
+%         xlabel('Lon'),ylabel('Lat'),title(t_str)
 %         savefig(save_str);
 %         saveas(gcf,[save_str '.png']);
         %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
         %pause(.5)
         %t_min(i) = min(tign_ground(:));
+%         close 159
     end
 end
 %plot(t_min)
@@ -164,7 +163,7 @@ tign_new = tign_ground;
 
 
 idx = ps.idx;
-fig_num = 33;
+fig_num = 179;
 pts_length = length(ps.grid_pts);
 %max time to look at detection data
 max_l2_time = max(max(pts(:,3)));
@@ -320,12 +319,15 @@ for k = 1:smoothings
     time_mask = tign_new < pts(end,3);  %max(max(pts(:,3)));
     norms(k,2) = norm(tign_new(time_mask)-tign_old(time_mask));%/norm(tign_old(time_mask));
     figure(fig_num+3);plot(norms(1:k,1));
+    xlabel('Iterations of Interpolation')
+    ylabel('Norm of difference')
     tstr = sprintf('Norm of difference between successive \n TIGN after each interpolation');
     title(tstr)
     figure(fig_num+4);plot(1:k,norms(1:k,2))
-    tstr = sprintf('Norm of difference between times of \n detections and TIGN at detectionon locations');
+    tstr = sprintf('Norm of difference between times of \n detections and TIGN at detection locations');
     title(tstr);
     xlabel('Iterations of Interpolation')
+    ylabel('Norm of difference')
     %temp_var(k) = min(tign_new(:))-ps.red.start_datenum;
     %figure(fig_num+5);plot(1:k,temp_var(1:k)*24),title('Change in ignition time'),xlabel('iteration'),ylabel('hours')
     fprintf('Loop %d complete norm of diff = %f \n', k,norms(k))
@@ -378,14 +380,14 @@ if gq
 %         tign_ground(infire) = a*tign_ground(infire)+(1-a)*tign_temp(infire);
 %         figure(73),scatter3(ps.red.fxlong(~infire),ps.red.fxlat(~infire),tign_ground(~infire))
 %         pause(1/2)
-        figure(159)
-        contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold on
-        scatter(pts(1:5:end,2),pts(1:5:end,1),'*r'),hold off
-        t_str = sprintf('Perimeter Shrinking \n Iteration %d',i);
-        save_str = sprintf('perim_shrink_%d',i);
-        xlabel('Lon'),ylabel('Lat'),title(t_str)
-%         xl=[-121.5094 -121.2496];xlim(xl)
-%         yl = [46.0367   46.2035];ylim(yl)
+% plot perimeter shrinking
+%         figure(159)
+%         contourf(ps.red.fxlong,ps.red.fxlat,tign_ground,20,'k'),hold on
+%         scatter(pts(1:5:end,2),pts(1:5:end,1),'*r'),hold off
+%         t_str = sprintf('Perimeter Shrinking \n Iteration %d',i);
+%         save_str = sprintf('perim_shrink_%d',i);
+%         xlabel('Lon'),ylabel('Lat'),title(t_str)
+%         close 159
 %         savefig(save_str);
 %         saveas(gcf,[save_str '.png']);
         %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
