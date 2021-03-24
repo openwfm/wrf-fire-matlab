@@ -402,7 +402,7 @@ tign_new = smooth_up(tign_new,a,b);
 
 
 
-% %fix the ripple on the top
+% %fix the ripple on the top induced by the smoothing
 r_mask = tign_new >=max(tign_new(:))-0.05;
 tign_new(r_mask) = max(tign_new(:));
 
