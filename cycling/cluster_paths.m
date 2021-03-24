@@ -1,7 +1,8 @@
 function path_struct = cluster_paths(w,cull,grid_dist)
 % assign shortest paths, using clustering
 % inputs - w = read_wrfout_tign(f)
-%          cull - number fo using smaller data sets
+%          cull - number for using smaller data sets cull = 1 --> use all
+%          data points.
 % output - cp , struct with path info
 
 [fire_name,save_name,prefix,perim] = fire_choice();
@@ -43,7 +44,7 @@ if max(size(red.tign)) > target_size
 end
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
-new_end_time = input_num('Use alternate end time? Enter number of extra days, 0 if no.',0)
+new_end_time = input_num('Use alternate end time? Enter number of extra days, 0 if no.',0);
 if new_end_time ~=0
   time_bounds(2) = time_bounds(2)+new_end_time;  
   red.max_tign = time_bounds(2);
@@ -286,10 +287,14 @@ end
 % hold off
 
 %scatter 3d  ldistances in lat/lon directions
-figure(7),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3));
+figure(177),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3)-red.start_datenum);
+title('Clustering of Data')
+xlabel('East-West Distance [m]')
+ylabel('North-South Distance [m]')
+zlabel('Time [days]')
 hold on
 for i = 2:space_clusters
-  scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3));
+  scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3)-red.start_datenum);
 end
 hold off
 
@@ -409,7 +414,11 @@ for i = 1:start_pt
         end
         %only plot if n is less than 400
         if n < 400
-            figure(2),hold on
+            figure(178),hold on
+            title('Shortest Paths')
+            xlabel('Lon')
+            ylabel('Lat')
+            zlabel('Time [days]')
             %l2 points
             %plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
             %grid points

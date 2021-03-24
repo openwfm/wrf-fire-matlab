@@ -9,11 +9,11 @@ tmin = min(min(ps.red.tign_g(:)),min(an(:)));
 clines = linspace(tmin,tmax,20);
 
 if isfield(ps.red,'red') && length(ps.red.fxlong) >2000
-    figure,contourf(ps.red.red.fxlong(1:10:end,1:10:end),ps.red.red.fxlat(1:10:end,1:10:end) ...
+    figure(190),contourf(ps.red.red.fxlong(1:10:end,1:10:end),ps.red.red.fxlat(1:10:end,1:10:end) ...
         ,ps.red.red.tign(1:10:end,1:10:end),'k')
 else
     %figure,contourf(ps.red.fxlong,ps.red.fxlat,ps.red.tign_g,clines,'k')
-    figure,contourf(ps.red.fxlong,ps.red.fxlat,ps.red.tign_g,'k')
+    figure(190),contourf(ps.red.fxlong,ps.red.fxlat,ps.red.tign_g,'k')
 end
 hold on
 
@@ -26,7 +26,7 @@ hold off
 
 
 %figure,contourf(ps.red.fxlong,ps.red.fxlat,an,clines,'k')
-figure,contourf(ps.red.fxlong,ps.red.fxlat,an,'k')
+figure(191),contourf(ps.red.fxlong,ps.red.fxlat,an,'k')
 hold on
 scatter(ps.points(:,2),ps.points(:,1),'*r')
 xlabel('Lon'),ylabel('Lat')
