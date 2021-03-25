@@ -46,10 +46,10 @@ do j=jfts,jfte
         kmat(i-1,k  ,j-1, 5)*u(i-1,k  ,j-1) +  &
         kmat(i  ,k  ,j-1, 4)*u(i  ,k  ,j-1) +  &
         kmat(i+1,k  ,j-1, 3)*u(i+1,k  ,j-1) +  &
-        kmat(i-1,k  ,j  , 2)*u(i-1,k  ,j  ) +  &
-        kmat(i  ,k  ,j  , 1)*u(i  ,k  ,j  ) +  &
-        kmat(i  ,k  ,j  , 2)*u(i+1,k  ,j  ) +  &
-        kmat(i  ,k  ,j  , 3)*u(i-1,k  ,j+1) +  &
+        kmat(i-1,k  ,j  , 2)*u(i-1,k  ,j  ) +  &  ! K(I,J)*x(J)   I=(i-1,j,k)  storing upper triangle of K only, K(I,J) stored in another row
+        kmat(i  ,k  ,j  , 1)*u(i  ,k  ,j  ) +  &  ! K(I,I)*x(I)   I=(i,j,k)
+        kmat(i  ,k  ,j  , 2)*u(i+1,k  ,j  ) +  &  ! K(I,J)*x(J)   J=(i+1,j,k)
+        kmat(i  ,k  ,j  , 3)*u(i-1,k  ,j+1) +  &  ! etc rest of the row I in upper triangle
         kmat(i  ,k  ,j  , 4)*u(i  ,k  ,j+1) +  &
         kmat(i  ,k  ,j  , 5)*u(i+1,k  ,j+1) +  &
         kmat(i  ,k  ,j  , 6)*u(i-1,k+1,j-1) +  &
