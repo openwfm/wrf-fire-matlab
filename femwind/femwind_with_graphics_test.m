@@ -1,4 +1,4 @@
-function femwind_graphics2_test
+function femwind_with_graphics_test
 disp('femwind_graphics2_test')
 p=femwind_main
 p.graphics=2; % te
