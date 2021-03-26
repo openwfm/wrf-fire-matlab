@@ -6,12 +6,12 @@ p.st_contour=1
 p.sc_all = 1;
 p.sc2_all =  [1 2];
 p=femwind_main(p);
-rate = [0.0858361045908 0.097188694734];
+rate = [0.0858361045908 0.088814805512714];
 if all(abs(p.rate - rate) < 1e-8)
     disp('convergence rate tests OK')
 else
-    error(sprintf('something changed, expected convergence rate %g got %g',...
-       rate(2),p.rate(2)))
+    error(sprintf('something changed, expected convergence rate %g %g got %g %g',...
+       rate,p.rate))
 end
 end
 
