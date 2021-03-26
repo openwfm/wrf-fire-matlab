@@ -1,5 +1,7 @@
 function gd = ground_detects(red)
-
+%function collects gound and water detections from fire product mask
+%locations are interpolated to the grid
+% red = subset_domain(w)
 if exist('g_ground.mat','file')
     load g_ground.mat
 else
