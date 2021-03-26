@@ -28,6 +28,7 @@ integer, intent(in)::nn                             !product of fire domain boun
 
 real, intent(in), dimension(3,8)::xloc
 real, intent(in), dimension(nn,1)::fmat
+real, dimension
 real, intent(in), dimension(3,1)::z
 
 

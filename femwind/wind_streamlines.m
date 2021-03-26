@@ -50,7 +50,7 @@ if params.st_contour == 1
     %Creating contour surfaces and colormaps of the magnitude of the
     %wind-field at 3 different locations
     hsurfaces = slice(CXG_X,CXG_Y,CXG_Z,wind_speed, [ymin, (ymax-ymin)/2, ymax], xmax,zmin);
-    set(hsurfaces,'FaceColor','interp','EdgeColor','interp')
+    set(hsurfaces,'FaceColor','interp','EdgeColor','interp');
     colormap(turbo)
 %     shading interp
 %     view(3); axis vis3d; camlight;
@@ -59,11 +59,11 @@ if params.st_contour == 1
     %end
     hcont = ...
         contourslice(CXG_X,CXG_Y,CXG_Z,wind_speed,[ymin, (ymax-ymin)/2, ymax], xmax,zmin);
-    set(hcont,'EdgeColor',[0.7 0.7 0.7],'LineWidth',0.5)
+    set(hcont,'EdgeColor',[0.7 0.7 0.7],'LineWidth',0.5);
     % % drawing on current figure
     %Setting up colorbar
     
-    c = colorbar
+    c = colorbar;
     c.TickLabelInterpreter = 'tex';
     c.Location = 'southoutside';
     c.Label.String = 'Wind Speed [m/s]';
@@ -84,7 +84,7 @@ end
         t_final = scale_t*max(X{1}(:))/mean(W{1}(:));
     end
     
-     tspan = [0 10000];
+     tspan = [0 t_final];
     
      x0 = 0;
      y0 = X{2}(1,5,1): (n(2) - 10) :X{2}(1,n(2) - 5,1);
@@ -99,21 +99,22 @@ end
 for i = 1:length(y0)
     for j = 1:length(z0)
         %Using stiff ODE23 solver
-        [t,y] = ode45(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
+        [t,y] = ode23s(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
         % Find indices that constrain the streamline to stay inside the
         % domain of the mesh domain.
-        count = 1;
-%         if max(y(:,1)) < max(X{1}(:))
-%             
-%             t0 = max(t);
+        count = 2;
+        if max(y(:,1)) < max(X{1}(:))
+            
+%             t0 = 0;
 %             tf = count*scale_t*max(X{1}(:))/mean(W{1}(:));
 %             t = [t0, tf];
-%             [t,y_new] = ode23s(@(t,y_new) odefun(t,y_new, F1, F2, F3), tspan, [x0,max(y(:,2)),z0(j)]);
-%             
-%             y = cat(1,y,y_new);
-%             
-%             count = count+ 1;
-%         end
+            L = length(y(:,1));
+            [t,y_new] = ode23s(@(t,y_new) odefun(t,y_new, F1, F2, F3), tspan, [y(L,1),y(L,2),y(L,3)]);
+            
+            y = cat(1,y,y_new);
+            
+            count = count+ 1
+        end
         count  = 0;
         ind1 = find(y(:,1)< max(X{1}(:)));
         ind1 = ind1(1: length(ind1) );
@@ -131,13 +132,14 @@ for i = 1:length(y0)
         
         
         hold on
-        plot3(y(ind1,1),y(ind1,2), y(ind1,3))
+        
+        plot3(y(ind1,1),y(ind1,2), y(ind1,3));
         
         %Plot vectors until second to last index inside the bound to keep
         %vectors in grid
         if params.st_quiver == 1
         quiver3(y(ind1,1),y(ind1,2), y(ind1,3), F1(y(ind1,1),y(ind1,2), y(ind1,3)),...
-             F2(y(ind1,1),y(ind1,2), y(ind1,3)),F3(y(ind1,1),y(ind1,2), y(ind1,3)), scale)
+             F2(y(ind1,1),y(ind1,2), y(ind1,3)),F3(y(ind1,1),y(ind1,2), y(ind1,3)), scale);
         end
         
     end
