@@ -6,7 +6,7 @@ function wind_speed = wind_streamline(X, CX, W, params)
 % Most work goes into creating a grid space with
 %Constructing the wind field interpolant
 %FX, 
-W{3}(:)
+
 [F1, F2, F3] = wind_interp(W,CX);
  [n(1),n(2),n(3)]=size(X{1});
 F1.Method = 'natural';

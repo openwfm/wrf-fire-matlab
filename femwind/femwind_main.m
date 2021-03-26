@@ -50,7 +50,8 @@ if ~exist('params','var') | isempty(params)
     %Define Streamline Starting Points: Defined in terms of scale*nelem
     params.in_height_stream = [175]; 
     params.time_stream  = 0;
-    params.st_contour = 1; %Produce contour planes in streamlines plot
+    params.st_contour = 1; %Produce contour planes in streamlines plot 0 off, 1 on
+    params.st_quiver = 1; %Produce vectors along streamlines 0 off, 1 on
     
 
     return 
@@ -148,7 +149,7 @@ for sc2 = params.sc2_all
             figure(4), clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
-            wind_streamlines(X, CX, U0, params.in_height_stream);
+            wind_streamlines(X, CX, U0, params);
             hold off
         end
         diary; diary
@@ -215,7 +216,7 @@ for sc2 = params.sc2_all
             figure(9),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
-            wind_streamlines(X, CX, W, params.in_height_stream)
+            wind_streamlines(X, CX, W, params)
             hold off
         end    
         params.rate=rate;
