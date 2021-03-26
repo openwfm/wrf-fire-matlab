@@ -50,6 +50,7 @@ if ~exist('params','var') | isempty(params)
     %Define Streamline Starting Points: Defined in terms of scale*nelem
     params.in_height_stream = [175]; 
     params.time_stream  = 0;
+    params.st_contour = 1; %Produce contour planes in streamlines plot
     
 
     return 

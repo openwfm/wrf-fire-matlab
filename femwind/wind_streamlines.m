@@ -13,6 +13,7 @@ F1.Method = 'natural';
 F2.Method = 'natural';
 F3.Method = 'natural';
 level = 1:n(3);
+
 if params.st_contour == 1
     xmin = min(X{1}(:));
     xmax = max(X{1}(:));
