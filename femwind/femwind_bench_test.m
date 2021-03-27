@@ -1,4 +1,4 @@
-function femwind_bench_test
+function p=femwind_bench_test
 disp(' convergence speed test')
 p=femwind_main
 p.graphics=0;

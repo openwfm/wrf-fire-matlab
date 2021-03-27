@@ -53,8 +53,9 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
     disp(['heights at corner ',hg])
     hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl));
     disp(['heights at center ',hgc])
-    disp(['coarse grid size ',num2str(nc)])
-    disp('building the prolongation matrix')
+    disp(['grid size ',num2str(n),' coarse grid size ',num2str(nc)])
+    
+    disp('building the prolongation')
     nnc = prod(nc);  % number of coarse points
     nncz=nnc*27; % estimate number of nonzeros in coarse matrix
     ia=zeros(nncz,1); % preallocate arrays for P matrix entries
