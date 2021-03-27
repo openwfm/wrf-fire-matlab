@@ -155,4 +155,5 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
         end
     end
     P = sparse(ia(1:k),ja(1:k),aa(1:k),nn,nnc);
+    check_P(P,X,X_coarse)
 end

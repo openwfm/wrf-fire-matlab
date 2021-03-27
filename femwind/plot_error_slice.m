@@ -17,7 +17,12 @@ if ~isempty(r),
     mesh(xx,zz,squeeze(residual(:,s,:)));
     xlabel('horizontal')
     ylabel('vertical')
-    title(['residual ',t])
+    ff = 'no_error_title';
+    if isfield(params,ff) && ~getfield(params,ff)
+        title(t)
+    else
+        title(['residual ',t])
+    end
 end
 if ~isempty(e)
     lambda_err=zeros(n);
