@@ -30,6 +30,7 @@ if ~exist('params','var') | isempty(params)
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
     params.coarsening='2 linear';
+    params.P_by_x=0;  % coarsening proportioned by x
     params.smoothing='vertical sweeps';
     % params.smoothing='3D red-black';
     params.nsmooth=3; % smoothing iterations before correcton

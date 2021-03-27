@@ -110,14 +110,40 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
                 end
                 ixc = sub2ind(nc,ic1,ic2,ic3); % index into coarse matrix
                 % loop over fine points coarse point ic1 ic2 ic3 contributes to
+                % coarse point ic1 ic2 ic3 is if1 if2 if3 on the fine grid
                 for i1=ifs1:ife1
                     for i2=ifs2:ife2
                         for i3=ifs3:ife3
-                            % should adapt from X 
                             ix=sub2ind(n,i1,i2,i3);
-                            val=(1-0.5*abs(i1-if1))...
-                                *(1-0.5*abs(i2-if2))...
-                                *(1-0.5*abs(i3-if3)); % horizontal
+                            if params.P_by_x
+                                % should adapt from X 
+                                if i1>if1
+                                    q1=(X{1}(i1,i2,i3)-X{1}(ife1+1,i2,i3))/(X{1}(if1,i2,i3)-X{1}(ife1+1,i2,i3));
+                                elseif i1<if1
+                                    q1=(X{1}(i1,i2,i3)-X{1}(ifs1+1,i2,i3))/(X{1}(if1,i2,i3)-X{1}(ifs1+1,i2,i3));
+                                else
+                                    q1=1;
+                                end
+                                if i2>if2
+                                    q2=(X{2}(i1,i2,i3)-X{2}(i1,ife2+1,i3))/(X{2}(i1,if2,i3)-X{2}(i1,ife2+1,i3));
+                                elseif i2<if2
+                                    q2=(X{2}(i1,i2,i3)-X{2}(i1,ifs2+1,i3))/(X{2}(i1,if2,i3)-X{2}(i1,ifs2+1,i3));
+                                else
+                                    q2=1;
+                                end
+                                if i3>if3
+                                    q3=(X{3}(i1,i2,i3)-X{3}(i1,i2,ife3+1))/(X{3}(i1,i2,if3)-X{3}(i1,i2,ife3+1));
+                                elseif i3<if3
+                                    q3=(X{3}(i1,i2,i3)-X{3}(i1,i2,ife3+1))/(X{3}(i1,i2,if3)-X{3}(i1,i2,ife3+1));
+                                else
+                                    q3=1;
+                                end
+                                val=q1*q2*q3;
+                            else
+                                val=(1-0.5*abs(i1-if1))...
+                                    *(1-0.5*abs(i2-if2))...
+                                    *(1-0.5*abs(i3-if3)); % horizontal
+                            end
                             k=k+1;
                             ia(k)=ix;
                             ja(k)=ixc;

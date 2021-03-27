@@ -98,8 +98,9 @@ end
 
 for i = 1:length(y0)
     for j = 1:length(z0)
-        %Using stiff ODE23 solver
-        [t,y] = ode23s(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
+        [t,y] = ode45(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
+        % Using stiff ODE23 solver
+        % [t,y] = ode23s(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
         % Find indices that constrain the streamline to stay inside the
         % domain of the mesh domain.
         count = 2;
