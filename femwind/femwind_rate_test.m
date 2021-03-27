@@ -7,7 +7,7 @@ p.sc2_all = 1;
 % p.levels=2;
 % params.P_by_x=1;  % coarsening proportioned by x
 p=femwind_main(p);
-rate = 0.0858361045908;
+rate = 0.066948270621534;
 if abs(p.rate - rate) < 1e-8
     disp('basic convergence rate test OK')
 else

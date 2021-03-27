@@ -111,6 +111,8 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
                 ixc = sub2ind(nc,ic1,ic2,ic3); % index into coarse matrix
                 % loop over fine points coarse point ic1 ic2 ic3 contributes to
                 % coarse point ic1 ic2 ic3 is if1 if2 if3 on the fine grid
+                % interpolating from between to (i1 i2 i3) from if1 if2 if3
+                % and the next coarse
                 for i1=ifs1:ife1
                     for i2=ifs2:ife2
                         for i3=ifs3:ife3
@@ -120,21 +122,21 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
                                 if i1>if1
                                     q1=(X{1}(i1,i2,i3)-X{1}(ife1+1,i2,i3))/(X{1}(if1,i2,i3)-X{1}(ife1+1,i2,i3));
                                 elseif i1<if1
-                                    q1=(X{1}(i1,i2,i3)-X{1}(ifs1+1,i2,i3))/(X{1}(if1,i2,i3)-X{1}(ifs1+1,i2,i3));
+                                    q1=(X{1}(i1,i2,i3)-X{1}(ifs1-1,i2,i3))/(X{1}(if1,i2,i3)-X{1}(ifs1-1,i2,i3));
                                 else
                                     q1=1;
                                 end
                                 if i2>if2
                                     q2=(X{2}(i1,i2,i3)-X{2}(i1,ife2+1,i3))/(X{2}(i1,if2,i3)-X{2}(i1,ife2+1,i3));
                                 elseif i2<if2
-                                    q2=(X{2}(i1,i2,i3)-X{2}(i1,ifs2+1,i3))/(X{2}(i1,if2,i3)-X{2}(i1,ifs2+1,i3));
+                                    q2=(X{2}(i1,i2,i3)-X{2}(i1,ifs2-1,i3))/(X{2}(i1,if2,i3)-X{2}(i1,ifs2-1,i3));
                                 else
                                     q2=1;
                                 end
                                 if i3>if3
                                     q3=(X{3}(i1,i2,i3)-X{3}(i1,i2,ife3+1))/(X{3}(i1,i2,if3)-X{3}(i1,i2,ife3+1));
                                 elseif i3<if3
-                                    q3=(X{3}(i1,i2,i3)-X{3}(i1,i2,ife3+1))/(X{3}(i1,i2,if3)-X{3}(i1,i2,ife3+1));
+                                    q3=(X{3}(i1,i2,i3)-X{3}(i1,i2,ifs3-1))/(X{3}(i1,i2,if3)-X{3}(i1,i2,ifs3-1));
                                 else
                                     q3=1;
                                 end
@@ -155,5 +157,7 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
         end
     end
     P = sparse(ia(1:k),ja(1:k),aa(1:k),nn,nnc);
-    check_P(P,X,X_coarse)
+    if params.graphics>=2
+        check_P(P,X,X_coarse)
+    end
 end

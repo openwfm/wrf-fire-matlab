@@ -6,7 +6,7 @@ p.st_contour=1
 p.sc_all = 1;
 p.sc2_all =  [1 2];
 p=femwind_main(p);
-rate = [0.0858361045908 0.088814805512714];
+rate = [0.066948270621534   0.069839695192657];
 if all(abs(p.rate - rate) < 1e-8)
     disp('convergence rate tests OK')
 else

@@ -7,6 +7,7 @@ xx=squeeze(X{1}(:,s,:));
 yy=squeeze(X{2}(:,s,:));
 zz=squeeze(X{3}(:,s,:));
 t=sprintf('slice %g y=%g %s',s,yy(1),tstring);
+ff = 'no_error_title';
 if ~isempty(r),
     residual=zeros(n);
     for i=1:nn
@@ -17,7 +18,6 @@ if ~isempty(r),
     mesh(xx,zz,squeeze(residual(:,s,:)));
     xlabel('horizontal')
     ylabel('vertical')
-    ff = 'no_error_title';
     if isfield(params,ff) && ~getfield(params,ff)
         title(t)
     else
@@ -35,6 +35,11 @@ if ~isempty(e)
     mesh(xx,zz,l)
     xlabel('horizontal')
     ylabel('vertical')
-    title(['error ',t])
+    if isfield(params,ff) && ~getfield(params,ff)
+        title(t)
+    else
+        title(['error ',t])
+    end
+    
 end
 drawnow

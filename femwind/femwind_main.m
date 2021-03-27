@@ -30,7 +30,7 @@ if ~exist('params','var') | isempty(params)
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
     params.coarsening='2 linear';
-    params.P_by_x=0;  % coarsening proportioned by x
+    params.P_by_x=1;  % prolongation by geometrically linear interpolation
     params.smoothing='vertical sweeps';
     % params.smoothing='3D red-black';
     params.nsmooth=3; % smoothing iterations before correcton
@@ -146,7 +146,7 @@ for sc2 = params.sc2_all
         end
         
 %         Plot initial streamlines
-        if params.graphics > 1
+        if params.graphics > 2
             figure(4), clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
@@ -212,8 +212,7 @@ for sc2 = params.sc2_all
             axis equal
             title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
         end
-        if params.graphics > 0
-            
+        if params.graphics > 2
             figure(9),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
