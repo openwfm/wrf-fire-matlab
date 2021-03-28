@@ -20,13 +20,22 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
         hzc1=1;hzc2=1;
     end
     hzcavg=sqrt(hzc1*hzc2); 
-    nc = ceil((n-1)./[hzc1,hzc2,1])+1;
     fprintf('horizontal coarsening factor %g %g because weighted height=%g\n',...
         hzc1, hzc2, crit)
+    icl1=1:hzc1:n(1);
+    if icl1(end) ~= n(1)
+        icl1(end+1)=n(1); % last is coarse
+    end
+    disp(['horizontal 1 coarse layers ',num2str(icl1)])
+    icl2=1:hzc2:n(2);
+    if icl2(end) ~= n(2)
+        icl2(end+1)=n(2); % last is coarse
+    end
+    disp(['horizontal 2 coarse layers ',num2str(icl2)])
     % decide on vertical coarse levels
     lcl=1; % last coarse level
-    icl=zeros(1,nc(3));
-    icl(1)=lcl;
+    icl3=zeros(1,n(3)); % allocate max
+    icl3(1)=lcl;
     nc(3)=0;
     for i=1:n(3)
         newlcl=lcl+1; % next coarse level by 1
@@ -38,22 +47,24 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
         end
         lcl = newlcl;
         if lcl <= n(3)
-            icl(i+1)=lcl;
+            icl3(i+1)=lcl;
         else % at the top already
             nc(3)=i;
-            icl=icl(1:i);
+            icl3=icl3(1:i);
             break
         end
     end     
     if nc(3)==0
         error('bad number of coarse layers')
     end
-    disp(['vertical coarse layers ',num2str(icl)])
-    hg=num2str(X{3}(1,1,icl));
+    disp(['vertical coarse layers ',num2str(icl3)])
+    hg=num2str(X{3}(1,1,icl3));
     disp(['heights at corner ',hg])
-    hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl));
+    hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl3));
     disp(['heights at center ',hgc])
-    disp(['level ',num2str(params.levels),' grid size ',num2str(n),' coarse grid size ',num2str(nc)])
+    
+    nc = [length(icl1),length(icl2),length(icl3)];
+    disp(['level ',num2str(params.levels),' grid size ',num2str([n,prod(n)]),' coarse grid size ',num2str([nc,prod(nc)])])
     
     disp('building the prolongation')
     nnc = prod(nc);  % number of coarse points
@@ -66,51 +77,23 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
         X_coarse{l}=zeros(nc); % preallocate coarse points coordinates
     end
     for ic3=1:nc(3)           % loop over coarse layers    
-        if3=icl(ic3);         % the fine level of the coarse layer
-        if ic3>1
-            ifs3=icl(ic3-1)+1; % from above previous layer     
-        else
-            ifs3=icl(ic3);     % there is no previous fine layer
-        end
-        if ic3<nc(3)
-            ife3=icl(ic3+1)-1; % up to under next layer
-        else
-            ife3=icl(ic3);     % there is no next layer
-        end
-        fprintf('coarse layer %g at %g contributes to layers %g : %g\n',ic3,if3,ifs3,ife3)
+        if3=icl3(ic3);         % the fine number of the coarse layer
+        [ifs3,ife3]=ifse(ic3,icl3,nc(3)); % get start and end of support
+        fprintf('vertical coarse layer %g at %g contributes to layers %g : %g\n',ic3,if3,ifs3,ife3)
         for ic1=1:nc(1)        % horizontal loops over coarse points
-            if1=hzc1*ic1-(hzc1-1);  
-            if  hzc1 == 1   
-                ifs1=if1;   % no coarsening 
-                ife1=if1;
-            elseif if1 > n(1)  % over high boundary   
-                ifs1=n(1);     % fine mesh indices of the coarse point
-                ife1=n(1);
-                if1 = n(1);
-            else
-                ifs1=max(1,if1-1);       % start of the support on the fine mesh
-                ife1=min(n(1),if1+1);    % end of the support on the fine mesh
-            end
+            if1=icl1(ic1);  % fine grid index of the coarse point
+            [ifs1,ife1]=ifse(ic1,icl1,nc(1)); % get start and end of support
             % fprintf('coarse x1 %g at %g contributes to %g : %g\n',ic1,if1,ifs1,ife1)
             for ic2=1:nc(2)          
-                if2=hzc2*ic2-(hzc2-1); 
-                if hzc2 == 1     
-                   ifs2=if2;      % no coarsening
-                   ife2=if2;
-                elseif if2 > n(2) % over high boundary
-                    ifs2=n(2);   % fine mesh indices of the coarse point
-                    if2 = n(2);
-                    ife2=n(2);
-                else
-                    ifs2=max(1,if2-1);   % start of the support on the fine mesh
-                    ife2=min(n(2),if2+1);% end of the support on the fine mesh
-                end
+                if2=icl2(ic2);  % fine grid index of the coarse point
+                [ifs2,ife2]=ifse(ic2,icl2,nc(2)); % get start and end of support
                 % fprintf('coarse x2 %g at %g contributes to %g : %g\n',ic2,if2,ifs2,ife2)
                 for l=1:3      % copy coordinates 
                     X_coarse{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);
                 end
                 ixc = sub2ind(nc,ic1,ic2,ic3); % index into coarse matrix
-                % loop over fine points coarse point ic1 ic2 ic3 contributes to
+                % loop over fine points coarse point ic1 ic2 ic3
+                % contributes to
                 % coarse point ic1 ic2 ic3 is if1 if2 if3 on the fine grid
                 % interpolating from between to (i1 i2 i3) from if1 if2 if3
                 % and the next coarse
@@ -160,5 +143,19 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
     P = sparse(ia(1:k),ja(1:k),aa(1:k),nn,nnc);
     if params.graphics>=2
         check_P(P,X,X_coarse)
+    end
+end
+
+
+function [ifs,ife]=ifse(ic,icl,ncn) 
+    if ic>1
+        ifs=icl(ic-1)+1; % from above previous coarse     
+    else
+        ifs=icl(ic);     % itself, there is no previous fine layer
+    end
+    if ic<ncn
+        ife=icl(ic+1)-1; % up to under next layer
+    else
+        ife=icl(ic);     % itself, there is no next layer
     end
 end
