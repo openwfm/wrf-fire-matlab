@@ -27,15 +27,15 @@ X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1)  % more thorough testing
 nn = size(F,1);
 x = zeros(nn,1);
 
-K=nd_assembly(A,X,lambda,params);
-[n1,n2,n3,m1,m2,m3]=size(K);
-K27 = reshape(K,n1,n2,n3,m1*m2*m3);  % make to n x 27 nd format
+K_1=nd_assembly(A,X,lambda,params);
+[n1,n2,n3,m1,m2,m3]=size(K_1);
+K27 = reshape(K_1,n1,n2,n3,m1*m2*m3);  % make to n x 27 nd format
 K14 = ndt_convert(K27,14); 
 
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/sweeps_test.exe')
     disp('testing if same result in fortran')
-    err=sweeps_fortran(K14,F,X,x)
+    err=sweeps_fortran(K,K14,F,X,x)
     if abs(err)<1e-6
         fprintf('error %g OK\n',err)
     else
