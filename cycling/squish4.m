@@ -209,7 +209,7 @@ norms=[];
 
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
-rm = 10;
+rm = 0;
 % random multiplier, keep the same
 % perturbs points downward in time to
 rt = 0;
