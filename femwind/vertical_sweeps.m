@@ -10,9 +10,7 @@ for rb1=1:2
                 for i3=1:n(3)
                     ix = sub2ind(n,i1,i2,i3); 
                     x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
-                    % WRF storage ordering
-                    fprintf('ikj: (%g,%g,%g) at %g\n',...
-                                 [ i1,i3,i2,    ix])
+                    x(ix)
                 end
             end
         end

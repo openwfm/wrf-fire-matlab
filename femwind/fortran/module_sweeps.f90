@@ -21,7 +21,7 @@ integer, intent(in)::                             &
 
 integer, parameter:: msize = 14
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: Kmat  ! global stiffness matrix
-real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfms):: F
+real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: F
 !real,intent(in),  dimension(ifms:ifme,kfms:kfme,jfms:jfme):: x          ! input vector
 real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: x          ! output vector
 
@@ -30,10 +30,11 @@ integer:: i, j, k, r1, r2
 do r1 = 1,2
     do r2 = 1,2
         do i = r1,ifte,2
+           !do k = 1,kfte
            do j =r2,jfte,2 
               do k = 1,kfte
                   x(i,k,j)= &
-       x(i,k,j)-&
+        x(i,k,j) - &
        (1/Kmat(i  ,k  ,j  , 1))* &
 
        ( &
@@ -67,6 +68,10 @@ do r1 = 1,2
         ) &
         - F(i,k,j) &
         )
+
+        print *,x(i,k,j)
+        print * 
+        print *
 
               end do
            end do  
