@@ -62,7 +62,7 @@ for ie3=1:n(3)-1  % loop over elements
                                     % add entry of the local matrix 
                                     % this row only, no duplicates if triangle
                                     if m1==i1 && m2 == i2 && m3 == i3
-                                        K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
+                                         K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
                                     end
                                 end
                             end

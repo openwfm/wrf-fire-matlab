@@ -34,40 +34,37 @@ do r1 = 1,2
            do j =r2,jfte,2 
               do k = 1,kfte
                   x(i,k,j)= &
-        x(i,k,j) - &
-       (1/Kmat(i  ,k  ,j  , 1))* &
-
-       ( &
-       ( &
-        Kmat(i-1,k-1,j-1,14)*x(i-1,k-1,j-1) +  &
-        Kmat(i  ,k-1,j-1,13)*x(i  ,k-1,j-1) +  &
-        Kmat(i+1,k-1,j-1,12)*x(i+1,k-1,j-1) +  &
-        Kmat(i-1,k-1,j  ,11)*x(i-1,k-1,j  ) +  &
-        Kmat(i  ,k-1,j  ,10)*x(i  ,k-1,j  ) +  &
-        Kmat(i+1,k-1,j  , 9)*x(i+1,k-1,j  ) +  &
-        Kmat(i-1,k-1,j+1, 8)*x(i-1,k-1,j+1) +  &
-        Kmat(i  ,k-1,j+1, 7)*x(i  ,k-1,j+1) +  &
-        Kmat(i+1,k-1,j+1, 6)*x(i+1,k-1,j+1) +  &
-        Kmat(i-1,k  ,j-1, 5)*x(i-1,k  ,j-1) +  &
-        Kmat(i  ,k  ,j-1, 4)*x(i  ,k  ,j-1) +  &
-        Kmat(i+1,k  ,j-1, 3)*x(i+1,k  ,j-1) +  &
-        Kmat(i-1,k  ,j  , 2)*x(i-1,k  ,j  ) +  &
-        Kmat(i  ,k  ,j  , 2)*x(i+1,k  ,j  ) +  &
-        Kmat(i  ,k  ,j  , 3)*x(i-1,k  ,j+1) +  &
-        Kmat(i  ,k  ,j  , 4)*x(i  ,k  ,j+1) +  &
-        Kmat(i  ,k  ,j  , 5)*x(i+1,k  ,j+1) +  &
-        Kmat(i  ,k  ,j  , 6)*x(i-1,k+1,j-1) +  &
-        Kmat(i  ,k  ,j  , 7)*x(i  ,k+1,j-1) +  &
-        Kmat(i  ,k  ,j  , 8)*x(i+1,k+1,j-1) +  &
-        Kmat(i  ,k  ,j  , 9)*x(i-1,k+1,j  ) +  &
-        Kmat(i  ,k  ,j  ,10)*x(i  ,k+1,j  ) +  &
-        Kmat(i  ,k  ,j  ,11)*x(i+1,k+1,j  ) +  &
-        Kmat(i  ,k  ,j  ,12)*x(i-1,k+1,j+1) +  &
-        Kmat(i  ,k  ,j  ,13)*x(i  ,k+1,j+1) +  &
-        Kmat(i  ,k  ,j  ,14)*x(i+1,k+1,j+1)    &
-        ) &
-        - F(i,k,j) &
-        )
+                 (1/Kmat(i  ,k  ,j  , 1))* &
+                 ( F(i,k,j) -  &
+                 ( &
+                  Kmat(i-1,k-1,j-1,14)*x(i-1,k-1,j-1) +  &
+                  Kmat(i  ,k-1,j-1,13)*x(i  ,k-1,j-1) +  &
+                  Kmat(i+1,k-1,j-1,12)*x(i+1,k-1,j-1) +  &
+                  Kmat(i-1,k-1,j  ,11)*x(i-1,k-1,j  ) +  &
+                  Kmat(i  ,k-1,j  ,10)*x(i  ,k-1,j  ) +  &
+                  Kmat(i+1,k-1,j  , 9)*x(i+1,k-1,j  ) +  &
+                  Kmat(i-1,k-1,j+1, 8)*x(i-1,k-1,j+1) +  &
+                  Kmat(i  ,k-1,j+1, 7)*x(i  ,k-1,j+1) +  &
+                  Kmat(i+1,k-1,j+1, 6)*x(i+1,k-1,j+1) +  &
+                  Kmat(i-1,k  ,j-1, 5)*x(i-1,k  ,j-1) +  &
+                  Kmat(i  ,k  ,j-1, 4)*x(i  ,k  ,j-1) +  &
+                  Kmat(i+1,k  ,j-1, 3)*x(i+1,k  ,j-1) +  &
+                  Kmat(i-1,k  ,j  , 2)*x(i-1,k  ,j  ) +  &
+                  Kmat(i  ,k  ,j  , 2)*x(i+1,k  ,j  ) +  &
+                  Kmat(i  ,k  ,j  , 3)*x(i-1,k  ,j+1) +  &
+                  Kmat(i  ,k  ,j  , 4)*x(i  ,k  ,j+1) +  &
+                  Kmat(i  ,k  ,j  , 5)*x(i+1,k  ,j+1) +  &
+                  Kmat(i  ,k  ,j  , 6)*x(i-1,k+1,j-1) +  &
+                  Kmat(i  ,k  ,j  , 7)*x(i  ,k+1,j-1) +  &
+                  Kmat(i  ,k  ,j  , 8)*x(i+1,k+1,j-1) +  &
+                  Kmat(i  ,k  ,j  , 9)*x(i-1,k+1,j  ) +  &
+                  Kmat(i  ,k  ,j  ,10)*x(i  ,k+1,j  ) +  &
+                  Kmat(i  ,k  ,j  ,11)*x(i+1,k+1,j  ) +  &
+                  Kmat(i  ,k  ,j  ,12)*x(i-1,k+1,j+1) +  &
+                  Kmat(i  ,k  ,j  ,13)*x(i  ,k+1,j+1) +  &
+                  Kmat(i  ,k  ,j  ,14)*x(i+1,k+1,j+1)    &
+                  ) &
+                  )
 
         print *,x(i,k,j)
         print * 

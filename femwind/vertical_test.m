@@ -2,8 +2,8 @@
 
 format compact
 % test for vertical_sweeps
-%nel=[5,4,3]
-nel=[1 1 1]
+nel=[5,4,3]
+%nel=[1 1 1]
 n=nel+1
 h = [1,1,1]
 expand=1.3 
