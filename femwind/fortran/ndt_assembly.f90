@@ -5,7 +5,7 @@ subroutine ndt_assembly(                              &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
-    A, X, u0, iflags,                                     & !Input from femwind
+    A, X,Y,Z, U0,V0,W0, iflags,                   & !Input from femwind
     K)                                             !Global stiffness matrix output  
 
 implicit none
@@ -13,45 +13,42 @@ implicit none
 
 !*** arguments
 
-integer, intent(in)::
-    ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
+integer, intent(in)::    			  &
+    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,            
+    ifts, ifte, kfts, kfte, jfts,jfte            
 
 
 
 
-integer, integer(in):: msize = 14
-integer, intent(in):: nn                             !product of fire domain bounds
-
-real, intent(in), dimension(3,ifms:ifme, kfms:kfme, jfms: jfme):: X !spatial grid
+integer, parameter:: msize=14
+real, intent(in), dimension(3,3):: A
+real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: X,Y,Z,U0,V0,W0 !spatial grid
 !Input for hexa
-real, intent(in):: A(3,3), Xloc(3,8), u0(3)    
 integer, intent(in)::iflags(3)
-real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3)
 
-real, intent(out), dimension(ifds:ifde, kfds:kfde, jfds:jfde,1:msize)::K
+real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme,1:msize)::K
 
 
 !*** local
 
-integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, i
-
-real, intent(in), dimension(3,8)::Xloc
+integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc
+real :: Kloc(8,8), Floc(8), Jg(8,3)
+real ::  Xloc(3,8), u0loc(3)    
 
 !** executable
-z=0.0
-do ie3=jfts,jfter -1
+do ie3=jfts,jfte -1
     do ie2=kfts, kfte -1
         do ie1=ifts, ifte -1
             do ic3=0,1
                 do ic2=0,1
                     do ic1=0,1
                         iloc=1+ic1+2*(ic2+2*ic3);  !local index of the node in the element
-                        do i=1,3
-                            Xloc(i,iloc)=X(i,ie1 + ic1, ie2 + ic2, ie3 + ic3)
-                        enddo
+                            Xloc(1,iloc)=X(ie1 + ic1, ie2 + ic2, ie3 + ic3)
+                            Xloc(2,iloc)=Y(ie1 + ic1, ie2 + ic2, ie3 + ic3)
+                            Xloc(3,iloc)=Z(ie1 + ic1, ie2 + ic2, ie3 + ic3)
+
                     enddo
                 enddo
             enddo
@@ -97,7 +94,7 @@ do ie3=jfts,jfter -1
 enddo
 
 end subroutine ndt_assembly
-end module_ndt_assembly
+end module  module_ndt_assembly
         
 
                             
