@@ -2,8 +2,8 @@
 
 format compact
 % test for vertical_sweeps
-nel=[5,4,3]
-%nel=[1 1 1]
+%nel=[5,4,3]
+nel=[1 1 1]
 n=nel+1
 h = [1,1,1]
 expand=1.3 
@@ -25,6 +25,7 @@ X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1)  % more thorough testing
 [K,F]=apply_boundary_conditions(K,F,X);
 
 nn = size(F,1);
+%xr=rand(n1,n2,n3);
 x = zeros(nn,1);
 
 K_1=nd_assembly(A,X,lambda,params);

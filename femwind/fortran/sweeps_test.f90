@@ -21,7 +21,7 @@ integer :: i,j,k,jx
 call read_array_nd(a,s,'Kmat')
 allocate(Kmat_m(s(1),s(2),s(3),s(4)))
 Kmat_m = reshape(a,s)
-call read_array_nd(a,n,'F')
+call read_array_nd(a,n,'Fmat')
 allocate(F_m(n(1),n(2),n(3)))
 F_m = reshape(a,n)
 call read_array_nd(a,n,'x_sweeps')
@@ -67,7 +67,7 @@ do j=jfts,jfte
   enddo
 enddo
 
-write(*,'(a)')'calling ntd_mult'
+write(*,'(a)')'calling sweeps'
 call sweeps(  &
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
