@@ -23,8 +23,8 @@ module_ndt_mult.o: module_ndt_mult.f90 Makefile
 ndt_mult_test.exe: ndt_mult_test.f90 module_ndt_mult.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o ndt_mult_test.exe ndt_mult_test.f90 module_ndt_mult.o module_io_matlab.o
 
-ndt_assembly.exe: ndt_assembly.o module_hexa.o Makefile
-	$(FC) $(FFLAGS) -o ndt_assembly.exe module_hexa.o
+ndt_assembly.exe: ndt_assembly.o module_hexa.o  Makefile
+    $(FC) $(FFLAGS) -o ndt_assembly.exe module_hexa.o 
 
 ndt_assembly.o: ndt_assembly.f90 module_hexa.o Makefile
 	$(FC) $(FFLAGS) -c ndt_assembly.f90
