@@ -63,6 +63,8 @@ for ie3=1:n(3)-1  % loop over elements
                                     % this row only, no duplicates if triangle
                                     if m1==i1 && m2 == i2 && m3 == i3
                                         K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
+                                        fprintf(' K(ie1%s,ie2%s,ie3%s,%2i) =   K(ie1%s,ie2%s,ie3%s,%2i) + Kloc(%2i, %2i) \n',...
+                                            pm(ic1), pm(ic2), pm(ic3), jx,pm(ic1), pm(ic2), pm(ic3),jx,iloc, kloc)
                                     end
                                 end
                             end
@@ -74,4 +76,14 @@ for ie3=1:n(3)-1  % loop over elements
     end
 end
 
+end
+function s=pm(j)
+switch j
+    case 1 
+        s='+1';
+    case 0
+        s='  ';
+    otherwise
+        error('pm: argument must be in 0:1')
+end
 end
