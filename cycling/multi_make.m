@@ -8,7 +8,7 @@ E = wgs84Ellipsoid;
 dlon= distance(red.min_lat,red.min_lon,red.min_lat,red.max_lon,E);
 dlat= distance(red.min_lat,red.min_lon,red.max_lat,red.min_lon,E);
 [m,n] = size(red.tign);
-gf = gs(1)/dlon;
+gf = (dlon/m)/gs(1);
 
 %make series of estimates
 grids = length(gs);
@@ -57,7 +57,7 @@ for i = 1:grids
         re1 = norm(mt(i).t-mt(i-1).t)/norm(mt(i-1).t-min(mt(i-1).t(:)));
     end
     fprintf('relative error from previous estimate : \n',re1)
-    if re1 < 0.01
+    if re1 < 0.001
         fprintf('not changing.....  exit loop  \n')
         break
     end
