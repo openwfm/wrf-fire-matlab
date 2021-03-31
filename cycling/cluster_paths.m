@@ -377,7 +377,7 @@ raw_dist = a;
 fprintf('matrices done\n')
 
 %start filtering distance
-cluster_mult = 0.25;
+cluster_mult = 0.15;
 for i = 1:n
     for j = 1:n
 %         % make points in same cluster close
@@ -448,8 +448,6 @@ for i = 1:start_pt
     path_struct.s_idx = s_idx;
     path_struct.s_c = s_c;
 end
-
-
 
 
 end %function
