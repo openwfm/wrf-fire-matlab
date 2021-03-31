@@ -1,8 +1,8 @@
 function tign_new = squish4(ps,gq,da)
-%% ps is struct with paths, red, graph,distances, etc.
+% ps is struct with paths, red, graph,distances, etc.
 %  gq  - use ground detetcions if gq == 1
 %  da - use in data assimilation mode if da == 1
-%% ps = graph_dets(w)
+% ps = graph_dets(w)
 
 if ~exist('a','var')
     a = 300;
@@ -50,7 +50,8 @@ t0 = min(tign(:));
 % ts = p_like_spline(t);
 % figure,plot(t,exp(ts))
 % hold on,plot(t,1-exp(ts))
-%make vector of data likelihoods
+
+%ground detection usage
 if ~exist('gq','var')
     gq = input_num('use ground detections? yes = [1]',0,1);
 end
@@ -83,10 +84,12 @@ end
 
 tmax=max(tign(:));
 tign_ground = tign;
+%tign_flat is a tign with time equal to simulation end
 tign_flat = ps.red.end_datenum*ones(size(ps.red.tign));
 %figure(159),hold on,scatter(pts(:,2),pts(:,1),'*r')
 time_err = 0.0;
 g_diff = (tign_flat-tign+time_err)*24*3600;
+%
 g_likes = p_like_spline(g_diff);
 beta = 1/10;
 beta_vect = 1-exp(g_likes);
@@ -206,8 +209,6 @@ norms=[];
 
 %random multiplier, increase for larger grids
 %perturbs points on path in x-y plane
-% try computing this as a fraction of grid size
-%rm = round(m/100)+1;
 rm = 0;
 % random multiplier, keep the same
 % perturbs points downward in time to
@@ -219,9 +220,9 @@ rt = 0;
 % for data assimilation, alpha will be computed from exp(likelihood)
 % alpha = 0.5;
 %constant for smooth in rlx_shp
-alpha_2 = 0.7; %smaller alph_2 ==> smoother
+%alpha_2 = 0.7; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 20;
+smoothings = 40;
 for k = 1:smoothings
 %     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
 %     title(title_str)
@@ -231,9 +232,9 @@ for k = 1:smoothings
     %figure(fig_num+17),plot(tign_new(:,202));
     for i = 1:length(ps.paths)
         p = ps.paths(i).p;
-        %         figure(73),hold on
-        %         plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
-        %         hold off
+        %figure(73),hold on
+        %plot3(pts(p,2),pts(p,1),pts(p,3)-ps.red.start_datenum,'r')
+        %hold off
         %plot3(pts(p,2),pts(p,1),tign(idx(p,1),idx(p,2))-ps.red.start_datenum,'g')
         for j = 1:length(p) %p(j) is the current detection vertex
             tign_old = tign_new;
@@ -247,50 +248,38 @@ for k = 1:smoothings
             else
                 alpha = 0.0;
             end
+            % adjust tign as weighted average of tign_new and time of detection
             tign_new(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = alpha*tign_new(p_i,p_j) + (1-alpha)*pts(p(j),3)-rt;
-            %%%% alternate strategy.
-            %             if k == 1 && j > 1
-            %             t1 = min(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
-            %             t2 = max(tign_new(p_i,p_j),tign_new(p_i-1,p_j-1));
-            %             dt12 = t2-t1;
-            %             dg = pts(p(j),3)-pts(p(j-1),3);
-            %             time_shift = 0.5*(dg-dt12);
-            %             t1 = t1-time_shift;
-            %             t2 = t2+time_shift;
-            %             tign_new(p_i,p_j) = max(t1,t2);
-            %             tign_new(p_i-1,p_j-1) = min(t1,t2);
-            %             end
-            
+            %
             %tign_flat(p_i-round(rm*rand):p_i+round(rm*rand),p_j-round(rm*rand):p_j+round(rm*rand)) = 0.5*(tign_new(p_i,p_j) + pts(p(j),3)-rt*rand);
             
             %no need to interpolate - already done
             % interpolate new point between adjacent path detections
-            if j > 1
-                %weighted average will move new point close to that with
-                %higher FRP
-                %                 frp1 = ps.points(p(j-1),5);
-                %                 frp2 = ps.points(p(j),5);
-                %                 w1 = frp1/(frp1+frp2);
-                %                 w2 = frp2/(frp1+frp2);
-                w1 = 0.5;
-                w2 = 0.5;
-                %assign tign for all in small, block around midpoint
-                %             frp1 = ps.points(p(j-1),5);
-                %             frp2 = ps.points(p(j),5);
-                %             w1 = frp1/(frp1+frp2);
-                %             w2 = frp2/(frp1+frp2);
-                new_lat = w1*pts(p(j-1),1)+w2*pts(p(j),1);
-                new_lon = w1*pts(p(j-1),2)+w2*pts(p(j),2);
-                new_t = w1*pts(p(j-1),3)+w2*pts(p(j),3);
-                [new_i,new_j,new_lat,new_lon]= fixpt(ps.red,[new_lat,new_lon]);
-                tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
-
-            end
+%             if j > 1
+%                 %weighted average will move new point close to that with
+%                 %higher FRP
+%                 %                 frp1 = ps.points(p(j-1),5);
+%                 %                 frp2 = ps.points(p(j),5);
+%                 %                 w1 = frp1/(frp1+frp2);
+%                 %                 w2 = frp2/(frp1+frp2);
+%                 w1 = 0.5;
+%                 w2 = 0.5;
+%                 %assign tign for all in small, block around midpoint
+%                 %             frp1 = ps.points(p(j-1),5);
+%                 %             frp2 = ps.points(p(j),5);
+%                 %             w1 = frp1/(frp1+frp2);
+%                 %             w2 = frp2/(frp1+frp2);
+%                 new_lat = w1*pts(p(j-1),1)+w2*pts(p(j),1);
+%                 new_lon = w1*pts(p(j-1),2)+w2*pts(p(j),2);
+%                 new_t = w1*pts(p(j-1),3)+w2*pts(p(j),3);
+%                 [new_i,new_j,new_lat,new_lon]= fixpt(ps.red,[new_lat,new_lon]);
+%                 tign_new(new_i-round(rm*rand):new_i+round(rm*rand),new_j-round(rm*rand):new_j+round(rm*rand)) = new_t-rt*rand;
+%             end %interpolate a point block
         end
     end
-    %size of local averaging to apply aoutomate by grid size?
+    %patch sets size of a local averaging in experimental process
     %patch = max(1,round(sqrt(smoothings-k)));
-    patch = 4*ceil(max(m,n)/100);
+    %patch = 4*ceil(max(m,n)/100);
     %fprintf('Using patch size %d in rlx_shp function \n',patch);
     %patch = 2;
     
