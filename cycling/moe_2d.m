@@ -4,7 +4,7 @@ function [mx,my,s] = moe_2d(w1,w2)
 %              is used
 perim_use = 0;
 if ~exist('w2','var')
-    [fire_name,save_name,prefix,perim] = fire_choice()
+    [fire_name,save_name,prefix,perim] = fire_choice();
     perim_use = 1;
 end
 [m,n] = size(w1.fxlong);
@@ -60,7 +60,7 @@ if perim_use == 1
         hold on,scatter(perim_points(:,4),perim_points(:,3)),hold off
         title('old')
         %new method
-        p = make_poly(perim_points(:,4),perim_points(:,3),2)
+        p = make_poly(perim_points(:,4),perim_points(:,3),2);
         in_perim2 = inpolygon(w1.fxlong,w1.fxlat,p(:,1),p(:,2));
         in_perim2 = inpolygon(w1.fxlong,w1.fxlat,w1.fxlong(in_perim2),w1.fxlat(in_perim2));
         figure,scatter(w1.fxlong(in_perim2),w1.fxlat(in_perim2),'k');
@@ -77,7 +77,7 @@ if perim_use == 1
         perim_time = perim_struct(perim_choice).time;
         t_g = datenum2time(perim_time,r);
         t_g = r.end_time;
-        x = [], y = []
+        x = []; y = [];
         save perim_moe.mat perim_points in_perim x y m n perim_struct perim_choice r perim_time t_g tign_g
     end    
 
