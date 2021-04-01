@@ -5,7 +5,7 @@ subroutine ndt_assembly(                              &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
-    A, X,Y,Z, U0,V0,W0, iflags,                   & !Input from femwind
+    A, X,Y,Z, iflags,                   & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
     K)                                             !Global stiffness matrix output  
 
 implicit none
@@ -26,7 +26,7 @@ integer, parameter:: msize=14
 real, intent(in), dimension(3,3):: A
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: X,Y,Z,U0,V0,W0 !spatial grid
 !Input for hexa
-integer, intent(in)::iflags(3)
+!integer, intent(in)::iflags(3)
 
 real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme,1:msize)::K
 
@@ -35,8 +35,13 @@ real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme,1:msize)::K
 
 integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc
 real :: Kloc(8,8), Floc(8), Jg(8,3)
-real ::  Xloc(3,8), u0loc(3)    
+real ::  Xloc(3,8), u0loc(3)    	
+!*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
+integer, dimension(3,1,1), save ::iflags = reshape((/1,0,1/),(/3,1,1/)) !define iflags to construct JG and Kloc in hexa
 
+
+
+u0loc = 0 					
 !** executable
 do ie3=jfts,jfte -1
     do ie2=kfts, kfte -1
@@ -52,7 +57,7 @@ do ie3=jfts,jfte -1
                     enddo
                 enddo
             enddo
-            call hexa(A,Xloc,u0,iflags,Kloc,Floc,Jg)
+            call hexa(A,Xloc,u0loc,iflags,Kloc,Floc,Jg)
             K(ie1  ,ie2  ,ie3  , 1) =   K(ie1  ,ie2  ,ie3  , 1) + Kloc( 1,  1)           
             K(ie1  ,ie2  ,ie3  , 4) =   K(ie1  ,ie2  ,ie3  , 4) + Kloc( 1,  3)
             K(ie1  ,ie2  ,ie3  , 5) =   K(ie1  ,ie2  ,ie3  , 5) + Kloc( 1,  4)
