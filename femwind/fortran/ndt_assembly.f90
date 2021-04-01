@@ -24,9 +24,9 @@ integer, intent(in)::    			  &
 
 integer, parameter:: msize=14
 real, intent(in), dimension(3,3):: A
-real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: X,Y,Z,U0,V0,W0 !spatial grid
+real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: X,Y,Z!spatial grid
 !Input for hexa
-!integer, intent(in)::iflags(3)
+integer, intent(in), dimension(3,1,1)::iflags
 
 real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme,1:msize)::K
 
@@ -37,7 +37,7 @@ integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc
 real :: Kloc(8,8), Floc(8), Jg(8,3)
 real ::  Xloc(3,8), u0loc(3)    	
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
-integer, dimension(3,1,1), save ::iflags = reshape((/1,0,1/),(/3,1,1/)) !define iflags to construct JG and Kloc in hexa
+!*** integer, dimension(3,1,1), save ::iflags = reshape((/1,0,1/),(/3,1,1/)) !define iflags to construct JG and Kloc in hexa
 
 
 
