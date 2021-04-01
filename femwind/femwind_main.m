@@ -12,8 +12,6 @@ function params=femwind_main(params)
 %
 %           *** WARNING ***
 
-disp('femwind_main')
-
 
 if ~exist('params','var') | isempty(params)
     params.graphics=2;  % 1=basic, 2=all
@@ -32,6 +30,7 @@ if ~exist('params','var') | isempty(params)
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
     params.coarsening='2 linear';
+    params.P_by_x=1;  % prolongation by geometrically linear interpolation
     params.smoothing='vertical sweeps';
     % params.smoothing='3D red-black';
     params.nsmooth=3; % smoothing iterations before correcton
@@ -47,16 +46,23 @@ if ~exist('params','var') | isempty(params)
     params.apply_coarse_boundary_conditions=1;
     params.nsmooth_coarse=2;
     params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
-    params.save_files=0; % save progress
+    params.save_files=0; % save progress levels=3, workspace=2 params only=1
+    params.save_file_prefix='femwind';  
     %Define Streamline Starting Points: Defined in terms of scale*nelem
     params.in_height_stream = [175]; 
     params.time_stream  = 0;
+    params.st_contour = 1; %Produce contour planes in streamlines plot 0 off, 1 on
+    params.st_quiver = 1; %Produce vectors along streamlines 0 off, 1 on
     
 
     return 
 end
 
-
+if params.save_files > 0
+    diary(['femwind_',params.save_file_prefix,'_diary.txt'])
+end
+disp('femwind_main')
+format compact
 
 if isfield(params,'mesh_top')
     if params.mesh_top>0
@@ -71,8 +77,8 @@ end
 params
 
 
-for sc = params.sc_all
-    for sc2 = params.sc2_all
+for sc2 = params.sc2_all
+    for sc = params.sc_all
         sc,sc2
         nel = sc*params.nelem3;  % elements in the 3 directions
         nel(1:2)=nel(1:2)*sc2
@@ -140,13 +146,14 @@ for sc = params.sc_all
         end
         
 %         Plot initial streamlines
-        if params.graphics > 1
+        if params.graphics > 2
             figure(4), clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
-            wind_streamlines(X, CX, U0, params.in_height_stream);
+            wind_streamlines(X, CX, U0, params);
             hold off
         end
+        diary; diary
         % assemble sparse system matrix
         [K,F,~] = sparse_assembly(A,X,U0,lambda,params);
 
@@ -205,18 +212,23 @@ for sc = params.sc_all
             axis equal
             title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
         end
-        if params.graphics > 0
-            
+        if params.graphics > 2
             figure(9),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
-            wind_streamlines(X, CX, W, params.in_height_stream)
+            wind_streamlines(X, CX, W, params)
             hold off
         end    
         params.rate=rate;
+        if params.save_files>1,
+            sfile=[params.save_file_prefix,'_workspace.mat'];
+            disp(['saving workspace to ',sfile])
+            save(sfile,'-v7.3') 
+        end
         if params.save_files>0,
-            disp('saving femwind_test workspace to matlab.mat')
-            save -v7.3
+            sfile=[params.save_file_prefix,'_params.mat'];
+            disp(['saving params to ',sfile])
+            save(sfile,'params','-v7.3') 
         end
     end
 end
