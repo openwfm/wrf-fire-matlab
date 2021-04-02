@@ -62,17 +62,12 @@ for ie3=1:n(3)-1  % loop over elements
                                     % add entry of the local matrix 
                                     % this row only, no duplicates if triangle
                                     if m1==i1 && m2 == i2 && m3 == i3
-<<<<<<< HEAD
-                                         K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
-                                    end
-=======
-                                        K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
-				    	if ie1 == 2 && ie2 == 2 && ie3 == 2
-                                        	fprintf(' K(ie1%s,ie2%s,ie3%s,%2i) =   K(ie1%s,ie2%s,ie3%s,%2i) + Kloc(%2i, %2i) \n',...
-                                            	pm(ic1), pm(ic2), pm(ic3), jx,pm(ic1), pm(ic2), pm(ic3),jx,iloc, kloc)
+                                        	K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
+				    		if ie1 == 2 && ie2 == 2 && ie3 == 2
+                                        		fprintf(' K(ie1%s,ie2%s,ie3%s,%2i) =   K(ie1%s,ie2%s,ie3%s,%2i) + Kloc(%2i, %2i) \n',...
+                                            		pm(ic1), pm(ic2), pm(ic3), jx,pm(ic1), pm(ic2), pm(ic3),jx,iloc, kloc)
                                     	end
 				    end
->>>>>>> stream
                                 end
                             end
                         end
