@@ -58,7 +58,7 @@ if ~exist('params','var') | isempty(params)
     return 
 end
 
-if params.save_files > 0
+if params.save_files >= 0
     diary(['femwind_',params.save_file_prefix,'_diary.txt'])
 end
 disp('femwind_main')

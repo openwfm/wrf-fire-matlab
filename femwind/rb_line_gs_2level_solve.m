@@ -134,23 +134,26 @@ for it=1:params.maxit
         t_cycle=sprintf('cycle %g level %g avg rate %g',cycles,params.levels,rate);
         disp(t_cycle)
     end
-    tstring=sprintf('it=%g %s %s %s',it,it_type,t_cycle);
-    plot_error_slice(e,r,X,tstring,params)
-    figure(params.iterations_fig)
-    semilogy(1:it,res/norm(F),'*')
-    legend('relative 2-norm residual')
+    if params.graphics > -1
+        tstring=sprintf('it=%g %s %s %s',it,it_type,t_cycle);
+        plot_error_slice(e,r,X,tstring,params)
+    end
+    if params.graphics > -2
+        figure(params.iterations_fig)
+        semilogy(1:it,res/norm(F),'*')
+        legend('relative 2-norm residual')
+        grid on
+        title([sprintf('mesh=%g %g %g ',n),t_cycle])
+        xlabel('iteration')
+        drawnow,pause(0.1)
+    end
     if params.exact
         err(it)=norm(e); % l2 error
         eer(it)=sqrt(e'*K*e); % energy norm error
         hold on, semilogy(1:it,err/err(1),'x',1:it,eer/eer(1),'+'), hold off
         legend('relative 2-norm residual','relative 2-norm error','relative energy norm error')
     end
-    grid on
-    title([sprintf('mesh=%g %g %g ',n),t_cycle])
-    xlabel('iteration')
-    drawnow,pause(0.1)
     fprintf('iteration %i residual %g tolerance %g\n',it,res(it),tol)
-
     if res(it)<tol,
         break
     end

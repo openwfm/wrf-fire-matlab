@@ -1,5 +1,8 @@
 function plot_error_slice(e,r,X,tstring,params)
 % plot_error_slice(e,r,F,K,X,tstring,params)
+if params.graphics < 0
+    return
+end
 n = size(X{1});
 nn=prod(n);
 s=round(0.5+params.slice*n(2)*(1-eps));  % y index of slice
