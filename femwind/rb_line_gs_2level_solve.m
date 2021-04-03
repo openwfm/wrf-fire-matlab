@@ -41,7 +41,20 @@ switch params.coarsening
 end
 disp('computing coarse matrix')
 diary;diary
-K_coarse = P'*K*P;
+switch params.coarse_K
+    case {1,'variational'}
+        disp('coarse K is variational')
+        K_coarse = P'*K*P;
+    case {2,'assembly'}
+        disp('coarse K by assembly')
+        % assemble sparse system matrix
+        [K_coarse,~,~] = sparse_assembly(diag(params.a),X_coarse,[],[],params);
+        % dirichlet boundary conditions
+        [K_coarse,~]=apply_boundary_conditions(K_coarse,[],X_coarse);
+    otherwise
+        disp(params.coarse_P)
+        error('unknown coarse_P method')
+end
 check_nonzeros(params.levels-1,K_coarse,X_coarse,P,K,X);
 if params.exact
     disp('exact solution, for comparison only')
