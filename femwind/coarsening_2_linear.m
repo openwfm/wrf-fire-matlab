@@ -64,7 +64,9 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
     disp(['heights at center ',hgc])
     
     nc = [length(icl1),length(icl2),length(icl3)];
-    disp(['level ',num2str(params.levels),' grid size ',num2str([n,prod(n)]),' coarse grid size ',num2str([nc,prod(nc)])])
+    disp(['level ',num2str(params.levels),' grid size ',num2str([n,prod(n)]),...
+        ' coarse grid size ',num2str([nc,prod(nc)]),' coarsening ratio ',num2str(prod(n)/prod(nc))])
+   
     
     disp('building the prolongation')
     nnc = prod(nc);  % number of coarse points
