@@ -1,83 +1,24 @@
-function [P,X_coarse]=coarsening_2_linear(X,params)
-% [P,X_coarse]=coarsening_2_linear(X,params)
-% in:
-%   X           grid coordinates
-%   params      structure
-% out:
-%   P           prolongation matrix, sparse
-%   X_coarse    coarse grid coordinates
-    n = size(X{1});
-    nn=prod(n);
-    dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
-    dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
-    dxy=min(dx,dy);  % horizontal step
-    dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
-    % decide on horizontal coarsening factor
-    crit=(dz(1)/dxy)/params.a(3);
-    if crit > params.minaspect
-        hzc1=2;hzc2=2; % future proofing 
-    else
-        hzc1=1;hzc2=1;
-    end
-    hzcavg=sqrt(hzc1*hzc2); 
-    fprintf('horizontal coarsening factor %g %g because weighted height=%g\n',...
-        hzc1, hzc2, crit)
-    icl1=1:hzc1:n(1);
-    if icl1(end) ~= n(1)
-        icl1(end+1)=n(1); % last is coarse
-    end
-    disp(['horizontal 1 coarse layers ',num2str(icl1)])
-    icl2=1:hzc2:n(2);
-    if icl2(end) ~= n(2)
-        icl2(end+1)=n(2); % last is coarse
-    end
-    disp(['horizontal 2 coarse layers ',num2str(icl2)])
-    % decide on vertical coarse levels
-    lcl=1; % last coarse level
-    icl3=zeros(1,n(3)); % allocate max
-    icl3(1)=lcl;
-    nc(3)=0;
-    for i=1:n(3)
-        newlcl=lcl+1; % next coarse level by 1
-        if lcl+2 <= n(3) 
-            crit = ((dz(lcl)+dz(lcl+1))/(2*dxy*hzcavg/2))/params.a(3);
-            if crit < params.maxaspect  
-                newlcl=lcl+2; % next coarse level by 2
-            end
-        end
-        lcl = newlcl;
-        if lcl <= n(3)
-            icl3(i+1)=lcl;
-        else % at the top already
-            nc(3)=i;
-            icl3=icl3(1:i);
-            break
-        end
-    end     
-    if nc(3)==0
-        error('bad number of coarse layers')
-    end
-    disp(['vertical coarse layers ',num2str(icl3)])
-    hg=num2str(X{3}(1,1,icl3));
-    disp(['heights at corner ',hg])
-    hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl3));
-    disp(['heights at center ',hgc])
-    
+function P=coarsening_P(icl,X,params)
+% [P,X_coarse]=coarsening_P(icl,X)
+% Build the prolongation matrix
+% In:
+%   icl     cell array size 3, indices of coarse grid in the 3 directions
+%   X       grid coordinates
+%   params
+  
+    n = size(X{1});   % grid size
+    nn = prod(n);     % number of grid points
+    % unwrap cell array
+    icl1=icl{1};icl2=icl{2};icl3=icl{3};  
     nc = [length(icl1),length(icl2),length(icl3)];
-    disp(['level ',num2str(params.levels),' grid size ',num2str([n,prod(n)]),...
-        ' coarse grid size ',num2str([nc,prod(nc)]),' coarsening ratio ',num2str(prod(n)/prod(nc))])
-   
-    
+    nnc = prod(nc);  % number of coarse grid points
+ 
     disp('building the prolongation')
-    nnc = prod(nc);  % number of coarse points
     nncz=nnc*27; % estimate number of nonzeros in coarse matrix
     ia=zeros(nncz,1); % preallocate arrays for P matrix entries
     ja=ia;aa=ia;
     % P = spalloc(nn,nnc,nnc*27);
     k=0;
-    for l=1:3
-        X_coarse{l}=zeros(nc); % preallocate coarse points coordinates
-    end
     for ic3=1:nc(3)           % loop over coarse layers    
         if3=icl3(ic3);         % the fine number of the coarse layer
         [ifs3,ife3]=ifse(ic3,icl3,nc(3)); % get start and end of support
@@ -90,9 +31,6 @@ function [P,X_coarse]=coarsening_2_linear(X,params)
                 if2=icl2(ic2);  % fine grid index of the coarse point
                 [ifs2,ife2]=ifse(ic2,icl2,nc(2)); % get start and end of support
                 % fprintf('coarse x2 %g at %g contributes to %g : %g\n',ic2,if2,ifs2,ife2)
-                for l=1:3      % copy coordinates 
-                    X_coarse{l}(ic1,ic2,ic3)=X{l}(if1,if2,if3);
-                end
                 ixc = sub2ind(nc,ic1,ic2,ic3); % index into coarse matrix
                 % loop over fine points coarse point ic1 ic2 ic3
                 % contributes to
