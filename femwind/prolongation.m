@@ -23,21 +23,21 @@ function u=prolongation(uc,icl,X,params)
         if3=icl3(ic3);         % the fine number of the coarse layer
         [ifs3,ife3]=ifse(ic3,icl3,nc(3)); % get start and end of support
         % fprintf('vertical coarse layer %g at %g contributes to layers %g : %g\n',ic3,if3,ifs3,ife3)
-        for ic1=1:nc(1)        % horizontal loops over coarse points
-            if1=icl1(ic1);  % fine grid index of the coarse point
-            [ifs1,ife1]=ifse(ic1,icl1,nc(1)); % get start and end of support
-            % fprintf('coarse x1 %g at %g contributes to %g : %g\n',ic1,if1,ifs1,ife1)
-            for ic2=1:nc(2)          
-                if2=icl2(ic2);  % fine grid index of the coarse point
-                [ifs2,ife2]=ifse(ic2,icl2,nc(2)); % get start and end of support
-                % fprintf('coarse x2 %g at %g contributes to %g : %g\n',ic2,if2,ifs2,ife2)
-                % loop over fine points coarse point ic1 ic2 ic3 contributes to
-                % coarse point ic1 ic2 ic3 is if1 if2 if3 on the fine grid
-                % interpolating from between to (i1 i2 i3) from if1 if2 if3
-                % and the next coarse
-                for i1=ifs1:ife1
-                    for i2=ifs2:ife2
-                        for i3=ifs3:ife3
+        for ic2=1:nc(2)          
+            if2=icl2(ic2);  % fine grid index of the coarse point
+            [ifs2,ife2]=ifse(ic2,icl2,nc(2)); % get start and end of support
+            for i3=ifs3:ife3
+                for i2=ifs2:ife2            
+                    for ic1=1:nc(1)        % horizontal loops over coarse points
+                        if1=icl1(ic1);  % fine grid index of the coarse point
+                        [ifs1,ife1]=ifse(ic1,icl1,nc(1)); % get start and end of support
+                        % fprintf('coarse x1 %g at %g contributes to %g : %g\n',ic1,if1,ifs1,ife1)
+                        % fprintf('coarse x2 %g at %g contributes to %g : %g\n',ic2,if2,ifs2,ife2)
+                        % loop over fine points coarse point ic1 ic2 ic3 contributes to
+                        % coarse point ic1 ic2 ic3 is if1 if2 if3 on the fine grid
+                        % interpolating from between to (i1 i2 i3) from if1 if2 if3
+                        % and the next coarse
+                        for i1=ifs1:ife1
                                 if i1>if1
                                     q1=(X{1}(i1,i2,i3)-X{1}(ife1+1,i2,i3))/(X{1}(if1,i2,i3)-X{1}(ife1+1,i2,i3));
                                 elseif i1<if1
