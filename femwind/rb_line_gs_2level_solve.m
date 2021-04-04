@@ -36,6 +36,7 @@ switch params.coarsening
         icl=coarsening_icl(X,params);
         X_coarse=coarsening_X(icl,X,params);
         P=coarsening_P(icl,X,params);
+        prol_rest_err(icl,X,params);
     otherwise
         error(['unknown coarsening ',params.coarsening])
 end

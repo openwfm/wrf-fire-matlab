@@ -1,14 +1,14 @@
-function u=prolongation(uc,icl,X,params)
-% u=prolongation(uc,icl,X,params)
-% Multiply by the prolongation matrix
+function uc=restriction(u,icl,X,params)
+% [P,X_coarse]=restriction(icl,X)
+% Multiply by prolongation matrix transpose
 % In:
-%   uc      coarse grid vector
+%   u       fine grid vector
 %   icl     cell array size 3, indices of coarse grid in the 3 directions
 %   X       grid coordinates
 %   params
 %
 % Out:
-%   u      fine grid vector 
+%   uc      coarse grid vector 
   
     n = size(X{1});   % grid size
     nn = prod(n);     % number of grid points
@@ -17,8 +17,8 @@ function u=prolongation(uc,icl,X,params)
     nc = [length(icl1),length(icl2),length(icl3)];
     nnc = prod(nc);  % number of coarse grid points
  
-    u = zeros(n);  % allocate
-    disp('prolongation')
+    uc = zeros(nc);  % allocate
+    disp('restriction')
     for ic3=1:nc(3)           % loop over coarse layers    
         if3=icl3(ic3);         % the fine number of the coarse layer
         [ifs3,ife3]=ifse(ic3,icl3,nc(3)); % get start and end of support
@@ -59,7 +59,7 @@ function u=prolongation(uc,icl,X,params)
                                 else
                                     q3=1;
                                 end
-                                u(i1,i2,i3) = u(i1,i2,i3) + q1*q2*q3*uc(ic1,ic2,ic3);
+                                uc(ic1,ic2,ic3) = uc(ic1,ic2,ic3) + q1*q2*q3*u(i1,i2,i3);
                         end
                     end
                 end
