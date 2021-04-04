@@ -1,4 +1,4 @@
-function [x,it,rate,X_coarse,P]=rb_line_gs_2level_solve(K,F,X,params)
+function [x,it,rate,X_coarse]=rb_line_gs_2level_solve(K,F,X,params)
 % x=rb_line_gs_solve(K,F,X)
 disp(['coarsening method ',params.coarsening])
 disp(['smoothing method ',params.smoothing])
@@ -35,7 +35,7 @@ switch params.coarsening
         % [P,X_coarse]=coarsening_2_linear(X,params);
         icl=coarsening_icl(X,params);
         X_coarse=coarsening_X(icl,X,params);
-        P=coarsening_P(icl,X,params);
+        % P=coarsening_P(icl,X,params);
         prol_rest_err(icl,X,params);
     otherwise
         error(['unknown coarsening ',params.coarsening])
@@ -45,7 +45,9 @@ diary;diary
 switch params.coarse_K
     case {1,'variational'}
         disp('coarse K is variational')
+        P=coarsening_P(icl,X,params);
         K_coarse = P'*K*P;
+        check_nonzeros(params.levels-1,K_coarse,X_coarse,P,K,X);
     case {2,'assembly'}
         disp('coarse K by assembly')
         % assemble sparse system matrix
@@ -56,7 +58,6 @@ switch params.coarse_K
         disp(params.coarse_P)
         error('unknown coarse_P method')
 end
-check_nonzeros(params.levels-1,K_coarse,X_coarse,P,K,X);
 if params.exact
     disp('exact solution, for comparison only')
     ex = K\F;  
@@ -69,7 +70,9 @@ for it=1:params.maxit
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
         fprintf('iteration %g level %g coarse correction\n',it,params.levels)
-        F_coarse = P'*(K*x-F);
+        % F_coarse = P'*(F - K*x);
+        F_coarse = restriction(reshape(F-K*x,n),icl,X,params);
+        F_coarse = F_coarse(:);
         if params.apply_coarse_boundary_conditions
             [K_coarse,F_coarse]=apply_boundary_conditions(K_coarse,F_coarse,X_coarse);
         end
@@ -83,10 +86,12 @@ for it=1:params.maxit
             params_coarse.iterations_fig=params.iterations_fig+10;
             params_coarse.res_slice_fig=params.res_slice_fig+10;
             params_coarse.err_slice_fig=params.err_slice_fig+10;
-            [x_coarse,~,~,~,~]=rb_line_gs_2level_solve(K_coarse,F_coarse,X_coarse,params_coarse);
+            [x_coarse,~,~,~]=rb_line_gs_2level_solve(K_coarse,F_coarse,X_coarse,params_coarse);
         end
         fprintf('coarse solve done, level %g continuting\n',params.levels)
-        x = x - P*x_coarse; 
+        % x = x + P*x_coarse
+        x_increment = prolongation(reshape(x_coarse,size(X_coarse{1})),icl,X,params);
+        x = x + x_increment(:);
         it_type=sprintf('level %g coarse correction',params.levels);
     else
         fprintf('iteration %g level %g smoothing by %s\n',it,params.levels,params.smoothing)
