@@ -10,7 +10,6 @@ for rb1=1:2
                 for i3=1:n(3)
                     ix = sub2ind(n,i1,i2,i3); 
                     x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
-                    x(ix)
                 end
             end
         end
