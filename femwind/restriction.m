@@ -1,4 +1,4 @@
-function uc=restriction(u,icl,X,params)
+function uc=restriction(u,hzc,icl3,X,params)
 % [P,X_coarse]=restriction(icl,X)
 % Multiply by prolongation matrix transpose
 % In:
@@ -12,8 +12,7 @@ function uc=restriction(u,icl,X,params)
   
     n = size(X{1});   % grid size
     nn = prod(n);     % number of grid points
-    % unwrap cell array
-    icl1=icl{1};icl2=icl{2};icl3=icl{3};  
+    [icl1,icl2]=hzc2icl(hzc,n);
     nc = [length(icl1),length(icl2),length(icl3)];
     nnc = prod(nc);  % number of coarse grid points
  
