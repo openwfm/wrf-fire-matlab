@@ -34,10 +34,10 @@ iate = n1(1)
 jats = 1
 jate = n1(2)
 
-iams = iats - 1
-iame = iate + 1
-jams = jats - 1
-jame = jate + 1
+iams = iats
+iame = iate
+jams = jats 
+jame = jate 
 
 allocate(Amat(iams:iame,jams:jame))
 
