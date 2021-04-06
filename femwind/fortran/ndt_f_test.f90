@@ -38,9 +38,11 @@ kfms = kfts-1
 kfme = kfte+1
 
 F_dim = size(X,1)*size(X,2)*size(X,3)
+allocate(F(F_dim))
+F = 0.
 
 write(*,'(a)')'calling ndt_f_assembly'
-call ndt_f_aseembly(  &
+call ndt_f_assembly(  &
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
