@@ -34,7 +34,7 @@ for i = 2:steps
     msk = logical(m2-m1);
     t_blur = imgaussfilt(tign,y(i));
     t_temp(msk) = t_blur(msk);
-    %figure(137),mesh(lon,lat,t_temp)
+    %figure(138),contour(t_temp,steps,'k')
     %pause(5/steps)
     t_diff(i) = min(t_temp(:))-t0;    
     t_temp(m2) = t_temp(m2)-i/steps*t_diff(i);
