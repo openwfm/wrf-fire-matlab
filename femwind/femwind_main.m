@@ -30,6 +30,8 @@ if ~exist('params','var') | isempty(params)
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
     params.coarsening='2 linear';
+    % params.coarse_P='variational';  
+    params.coarse_K='assembly';
     params.P_by_x=1;  % prolongation by geometrically linear interpolation
     params.smoothing='vertical sweeps';
     % params.smoothing='3D red-black';
@@ -58,7 +60,7 @@ if ~exist('params','var') | isempty(params)
     return 
 end
 
-if params.save_files > 0
+if params.save_files >= 0
     diary(['femwind_',params.save_file_prefix,'_diary.txt'])
 end
 disp('femwind_main')
@@ -162,7 +164,7 @@ for sc2 = params.sc2_all
 
         % solve the equations
         % [lambda,it] = sparse_solve(K,F,X,'s');
-        [lambda,it,rate(sc,sc2),XC,P] = sparse_solve(K,F,X,params);
+        [lambda,it,rate(sc,sc2),XC] = sparse_solve(K,F,X,params);
         format long
         rate
 
