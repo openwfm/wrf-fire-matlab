@@ -1,4 +1,4 @@
-function err = ndt_assembly_err(A,X,u0,lambda,params,m)
+function err = ndt_assembly_err
 format compact
 % test for ndt_assembly and ndt_mult
 nel=[5,4,3]
