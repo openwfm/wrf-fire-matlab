@@ -1,7 +1,7 @@
 format compact
 % test for ndt_assembly and ndt_mult
-%nel = [5,4,3]
-nel=[1 1 1]
+nel = [5,4,3]
+%nel=[1 1 1]
 n=nel+1
 h = [1,1,1]
 expand=1.3 
@@ -67,7 +67,7 @@ if abs(K_Ks_rand_err)>1e-10, error('should be zero'),end
 
 disp('convert to sparse compare matrix-vector multiply')
 K_sparse=sparse_assembly(A,X,u0,lambda,params);
-err_mat_sparse=big(Ks-K_sparse)
+err_mat_sparse=big(Ks-K_sparse);
 if abs(err_mat_sparse)>1e-10, error('should be zero'),end
 
 K27a = ndt_assembly(A,X,u0,lambda,params,27);

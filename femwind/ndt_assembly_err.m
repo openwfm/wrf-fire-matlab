@@ -1,4 +1,4 @@
-function err = ndt_assembly_err
+%function err = ndt_assembly_err
 format compact
 % test for ndt_assembly and ndt_mult
 nel=[5,4,3]
@@ -37,7 +37,7 @@ write_array_nd(K,'Kmat1');
 system('./fortran/ndt_assembly_test.exe');
 K_f = read_array_nd('K');
 
-err = norm(K(:) - K_f(:),inf);
-end
+err = norm(K(:) - K_f(:),inf)
+%end
 
 

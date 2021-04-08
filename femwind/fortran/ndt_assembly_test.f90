@@ -77,7 +77,7 @@ jfme = jfte+1
 kfms = kfts-1
 kfme = kfte+1
 
-ksize = (/ifte,kfte,jfte,msize/)
+ksize = (/ifte,jfte,kfte,msize/)
 
 
 ! allocate a little bigger with zeros in extra areas
