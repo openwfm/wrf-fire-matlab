@@ -31,7 +31,7 @@ write_array_nd(X{2},'Y');
 write_array_nd(X{3},'Z');
 
 
-write_array_nd(K,'Kmat1');
+write_array_nd(K,'K_m');
 
 
 system('./fortran/ndt_assembly_test.exe');

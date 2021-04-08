@@ -23,8 +23,8 @@ integer :: msize, &
     jams, jame
 
 integer :: i,j,k,jx
-integer :: iflags(3) = reshape((/1,0,1/),(/3/)) 
-integer:: ksize(4)
+integer :: iflags(3) = reshape((/1,0,1/),(/3/))                 !Flags to construct K in hexa module
+integer:: ksize(4)                                              ! Global Stifness Matrix Dimensions in Matlab
 
 call read_array_nd(a1,n1,'A') !Recovering X-Matrix and dimension of X matrix
 allocate(Amat_m(n1(1),n1(2))) !Do this again for Y, Z
@@ -70,12 +70,12 @@ kfts = 1
 kfte = n2(3)
 msize = 14
 
-ifms = ifts-1
-ifme = ifte+1
-jfms = jfts-1
-jfme = jfte+1
-kfms = kfts-1
-kfme = kfte+1
+ifms = ifts
+ifme = ifte
+jfms = jfts
+jfme = jfte
+kfms = kfts
+kfme = kfte
 
 ksize = (/ifte,jfte,kfte,msize/)
 
@@ -89,9 +89,9 @@ allocate(Zmat(ifms:ifme,kfms:kfme,jfms:jfme))
 
 
 Kmat = 0.
-Xmat = 0.
-Ymat = 0.
-Zmat = 0.
+Xmat = 9999.
+Ymat = 9999.
+Zmat = 9999.
 
 
 ! copy the input data 

@@ -46,6 +46,10 @@ real ::  Xloc(3,8), u0loc(3)
 !** executable
 Xloc = 99999.
 K = 0.
+!print *, 'A=', A(:,:)
+!print *, 'X=(:,1,:)', X(:,1,:)
+!print *, 'X=(:,2,:)', X(:,2,:)
+!print *, 'X=(:,3,:)', X(:,3,:)
 
 do ie2=jfts,jfte -1
     do ie3=kfts, kfte -1
@@ -53,16 +57,18 @@ do ie2=jfts,jfte -1
             do ic2=0,1
                 do ic3=0,1
                     do ic1=0,1
-                        iloc=1+ic1+2*(ic3+2*ic2);  !local index of the node in the element
+                        iloc=1+ic1+2*(ic2+2*ic3);  !local index of the node in the element
                             Xloc(1,iloc)=X(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                             Xloc(2,iloc)=Y(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                             Xloc(3,iloc)=Z(ie1 + ic1, ie3 + ic3, ie2 + ic2)
-
+				
                     enddo
                 enddo
             enddo
+	    print *,'Xloc(1,8)=', Xloc(:,:)
             call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,iflags)
-	    print *, ie1, ie2, ie3, K(1,1,2,1)
+	    !print *, 'Kloc(1,1)=',Kloc(1,1)
+	    !print *, ie1, ie2, ie3, K(1,1,2,1)
             K(ie1  ,ie3  ,ie2  , 1) =   K(ie1  ,ie3  ,ie2  , 1) + Kloc( 1,  1) 
             K(ie1  ,ie3  ,ie2  , 2) =   K(ie1  ,ie3  ,ie2  , 2) + Kloc( 1,  2) 
             K(ie1  ,ie3  ,ie2  , 4) =   K(ie1  ,ie3  ,ie2  , 4) + Kloc( 1,  3) 
@@ -82,24 +88,24 @@ do ie2=jfts,jfte -1
             K(ie1  ,ie3  ,ie2+1, 2) =   K(ie1  ,ie3  ,ie2+1, 2) + Kloc( 3,  4) 
             K(ie1  ,ie3  ,ie2+1, 7) =   K(ie1  ,ie3  ,ie2+1, 7) + Kloc( 3,  5) 
             K(ie1  ,ie3  ,ie2+1, 8) =   K(ie1  ,ie3  ,ie2+1, 8) + Kloc( 3,  6) 
- K(ie1  ,ie3  ,ie2+1,10) =   K(ie1  ,ie3  ,ie2+1,10) + Kloc( 3,  7) 
- K(ie1  ,ie3  ,ie2+1,11) =   K(ie1  ,ie3  ,ie2+1,11) + Kloc( 3,  8) 
- K(ie1+1,ie3  ,ie2+1, 1) =   K(ie1+1,ie3  ,ie2+1, 1) + Kloc( 4,  4) 
- K(ie1+1,ie3  ,ie2+1, 6) =   K(ie1+1,ie3  ,ie2+1, 6) + Kloc( 4,  5) 
- K(ie1+1,ie3  ,ie2+1, 7) =   K(ie1+1,ie3  ,ie2+1, 7) + Kloc( 4,  6) 
- K(ie1+1,ie3  ,ie2+1, 9) =   K(ie1+1,ie3  ,ie2+1, 9) + Kloc( 4,  7) 
- K(ie1+1,ie3  ,ie2+1,10) =   K(ie1+1,ie3  ,ie2+1,10) + Kloc( 4,  8) 
- K(ie1  ,ie3+1,ie2  , 1) =   K(ie1  ,ie3+1,ie2  , 1) + Kloc( 5,  5) 
- K(ie1  ,ie3+1,ie2  , 2) =   K(ie1  ,ie3+1,ie2  , 2) + Kloc( 5,  6) 
- K(ie1  ,ie3+1,ie2  , 4) =   K(ie1  ,ie3+1,ie2  , 4) + Kloc( 5,  7) 
- K(ie1  ,ie3+1,ie2  , 5) =   K(ie1  ,ie3+1,ie2  , 5) + Kloc( 5,  8) 
- K(ie1+1,ie3+1,ie2  , 1) =   K(ie1+1,ie3+1,ie2  , 1) + Kloc( 6,  6) 
- K(ie1+1,ie3+1,ie2  , 3) =   K(ie1+1,ie3+1,ie2  , 3) + Kloc( 6,  7) 
- K(ie1+1,ie3+1,ie2  , 4) =   K(ie1+1,ie3+1,ie2  , 4) + Kloc( 6,  8) 
- K(ie1  ,ie3+1,ie2+1, 1) =   K(ie1  ,ie3+1,ie2+1, 1) + Kloc( 7,  7) 
- K(ie1  ,ie3+1,ie2+1, 2) =   K(ie1  ,ie3+1,ie2+1, 2) + Kloc( 7,  8) 
- K(ie1+1,ie3+1,ie2+1, 1) =   K(ie1+1,ie3+1,ie2+1, 1) + Kloc( 8,  8) 
-	    print *, ie1, ie2, ie3, K(1,1,2,1)	    
+	 K(ie1  ,ie3  ,ie2+1,10) =   K(ie1  ,ie3  ,ie2+1,10) + Kloc( 3,  7) 
+	 K(ie1  ,ie3  ,ie2+1,11) =   K(ie1  ,ie3  ,ie2+1,11) + Kloc( 3,  8) 
+	 K(ie1+1,ie3  ,ie2+1, 1) =   K(ie1+1,ie3  ,ie2+1, 1) + Kloc( 4,  4) 
+	 K(ie1+1,ie3  ,ie2+1, 6) =   K(ie1+1,ie3  ,ie2+1, 6) + Kloc( 4,  5) 
+	 K(ie1+1,ie3  ,ie2+1, 7) =   K(ie1+1,ie3  ,ie2+1, 7) + Kloc( 4,  6) 
+	 K(ie1+1,ie3  ,ie2+1, 9) =   K(ie1+1,ie3  ,ie2+1, 9) + Kloc( 4,  7) 
+	 K(ie1+1,ie3  ,ie2+1,10) =   K(ie1+1,ie3  ,ie2+1,10) + Kloc( 4,  8) 
+	 K(ie1  ,ie3+1,ie2  , 1) =   K(ie1  ,ie3+1,ie2  , 1) + Kloc( 5,  5) 
+	 K(ie1  ,ie3+1,ie2  , 2) =   K(ie1  ,ie3+1,ie2  , 2) + Kloc( 5,  6) 
+	 K(ie1  ,ie3+1,ie2  , 4) =   K(ie1  ,ie3+1,ie2  , 4) + Kloc( 5,  7) 
+	 K(ie1  ,ie3+1,ie2  , 5) =   K(ie1  ,ie3+1,ie2  , 5) + Kloc( 5,  8) 
+	 K(ie1+1,ie3+1,ie2  , 1) =   K(ie1+1,ie3+1,ie2  , 1) + Kloc( 6,  6) 
+	 K(ie1+1,ie3+1,ie2  , 3) =   K(ie1+1,ie3+1,ie2  , 3) + Kloc( 6,  7) 
+	 K(ie1+1,ie3+1,ie2  , 4) =   K(ie1+1,ie3+1,ie2  , 4) + Kloc( 6,  8) 
+	 K(ie1  ,ie3+1,ie2+1, 1) =   K(ie1  ,ie3+1,ie2+1, 1) + Kloc( 7,  7) 
+	 K(ie1  ,ie3+1,ie2+1, 2) =   K(ie1  ,ie3+1,ie2+1, 2) + Kloc( 7,  8) 
+	 K(ie1+1,ie3+1,ie2+1, 1) =   K(ie1+1,ie3+1,ie2+1, 1) + Kloc( 8,  8) 
+	    !print *, ie1, ie2, ie3, K(1,1,2,1)	    
 
         enddo
     enddo

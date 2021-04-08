@@ -32,10 +32,12 @@ for ie2=1:n(2)-1  % loop over elements
                     end
                 end
             end
+            disp(Xloc(:,:))
             [Kloc,~,~]=hexa(A,Xloc,zeros(3,1)); % compute the local stiffness matrix
-            % loop over element corners ic, kc
-	    for ic3=0:1 % 
-                for ic2=0:1
+            %disp(Kloc(1,1))
+	    % loop over element corners ic, kc
+	    for ic2=0:1 % 
+                for ic3=0:1
                     for ic1=0:1   
                         for kc3=0:1 
                             for kc2=0:1
@@ -64,12 +66,12 @@ for ie2=1:n(2)-1  % loop over elements
                                     if m1==i1 && m2 == i2 && m3 == i3
 					        %disp([ie1, ie2, ie3, K(1,2,1,1)]);
                                         	K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
-				    		if ie1 == 2 && ie2 == 2 && ie3 == 2
-                                        		fprintf(' K(ie1%s,ie3%s,ie2%s,%2i) =   K(ie1%s,ie3%s,ie2%s,%2i) + Kloc(%2i, %2i) \n',...
-                                            		pm(ic1), pm(ic3), pm(ic2), jx,pm(ic1), pm(ic3), pm(ic2),jx,iloc, kloc)
+				    		%if ie1 == 2 && ie2 == 2 && ie3 == 2
+                                        		%fprintf(' K(ie1%s,ie3%s,ie2%s,%2i) =   K(ie1%s,ie3%s,ie2%s,%2i) + Kloc(%2i, %2i) \n',...
+                                            		%pm(ic1), pm(ic3), pm(ic2), jx,pm(ic1), pm(ic3), pm(ic2),jx,iloc, kloc)
                                     		
-					        %disp([ie1, ie2, ie3, K(1,2,1,1)]);
-					end
+					       % disp([ie1, ie2, ie3, K(1,2,1,1)]);
+						%end
 				    end
                                 end
                             end
