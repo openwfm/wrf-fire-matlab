@@ -1,11 +1,12 @@
 module module_coarsening
 
+use module_io_matlab, only: crash
+
 contains
 
 subroutine prolongation(   &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
@@ -27,7 +28,6 @@ implicit none
 integer, intent(in)::                             & 
     ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms,jfme,             &
-    ifps, ifpe, kfps, kfpe, jfps,jfpe,            & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte
 
 integer, intent(in)::                             &  
