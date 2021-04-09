@@ -17,8 +17,8 @@ t = ndt_storage_table(m);
 F = zeros(nn,1);
 K = zeros(n(1),n(2),n(3),m);
 Xloc = zeros(3,8); 
-for ie3=1:n(3)-1  % loop over elements
-    for ie2=1:n(2)-1
+for ie2=1:n(2)-1  % loop over elements
+    for ie3=1:n(3)-1
         for ie1=1:n(1)-1  
             % now in element (ie1,ie2,ie3)
             % build the matrix of node coordinates to pass to hexa
@@ -32,10 +32,13 @@ for ie3=1:n(3)-1  % loop over elements
                     end
                 end
             end
+            %ie1,ie2,ie3,Xloc
             [Kloc,~,~]=hexa(A,Xloc,zeros(3,1)); % compute the local stiffness matrix
-            % loop over element corners ic, kc
-            for ic3=0:1 % 
-                for ic2=0:1
+            %Kloc
+            %disp(Kloc(1,1))
+	    % loop over element corners ic, kc
+	    for ic2=0:1 % 
+                for ic3=0:1
                     for ic1=0:1   
                         for kc3=0:1 
                             for kc2=0:1
@@ -62,17 +65,15 @@ for ie3=1:n(3)-1  % loop over elements
                                     % add entry of the local matrix 
                                     % this row only, no duplicates if triangle
                                     if m1==i1 && m2 == i2 && m3 == i3
-<<<<<<< HEAD
-                                         K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
-                                    end
-=======
-                                        K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
-				    	if ie1 == 2 && ie2 == 2 && ie3 == 2
-                                        	fprintf(' K(ie1%s,ie2%s,ie3%s,%2i) =   K(ie1%s,ie2%s,ie3%s,%2i) + Kloc(%2i, %2i) \n',...
-                                            	pm(ic1), pm(ic2), pm(ic3), jx,pm(ic1), pm(ic2), pm(ic3),jx,iloc, kloc)
-                                    	end
+					        %disp([ie1, ie2, ie3, K(1,2,1,1)]);
+                                        	K(m1,m2,m3,jx) = K(m1,m2,m3,jx) + Kloc(iloc,kloc);
+				    		%if ie1 == 2 && ie2 == 2 && ie3 == 2
+                                        		%fprintf(' K(ie1%s,ie3%s,ie2%s,%2i) =   K(ie1%s,ie3%s,ie2%s,%2i) + Kloc(%2i, %2i) \n',...
+                                            		%pm(ic1), pm(ic3), pm(ic2), jx,pm(ic1), pm(ic3), pm(ic2),jx,iloc, kloc)
+                                    		
+					       % disp([ie1, ie2, ie3, K(1,2,1,1)]);
+						%end
 				    end
->>>>>>> stream
                                 end
                             end
                         end
@@ -82,7 +83,6 @@ for ie3=1:n(3)-1  % loop over elements
         end        
     end
 end
-
 end
 function s=pm(j)
 switch j
