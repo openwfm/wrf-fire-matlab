@@ -17,7 +17,7 @@ ps1 = cluster_paths(w,1,gs);
 savestr = sprintf('ps_%d.mat',cycle);
 save(savestr,'ps1')
 %new points
-ps = interp_paths(ps1,0.1);
+ps = interp_paths(ps1,0.9);
 %ps = ps1;
 
 tn = squish4(ps,1,1);
