@@ -17,7 +17,7 @@ integer :: msize, &
     ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
 integer :: i,j,k,jx
 
-! read input arrays in ijk index ordering and tight bounds
+! read input arrays in ikj index ordering and tight bounds
 call read_array_nd(a,s,'kmat')
 allocate(kmat_m(s(1),s(2),s(3),s(4)))
 kmat_m = reshape(a,s)

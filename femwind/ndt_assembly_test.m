@@ -15,29 +15,10 @@ u0=[]
 X = regular_mesh(nel,h,expand);
 X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1); 
 
-%K=nd_assembly(A,X,lambda,params);
-%[n1,n2,n3,m1,m2,m3]=size(K);
-%K27 = reshape(K,n1,n2,n3,m1*m2*m3);
+K_m = ndt_assembly(A,X,u0,lambda,params,14);
+K = ndt_assembly_fortran(A,X,u0,lambda,params,14);
 
-disp('converting to reduced storage format with 14 numbers per row')
-%K14 = ndt_convert(K27,14); 
-K = ndt_assembly(A,X,u0,lambda,params,14);
-
-%Writing all arrays to text files for use by fortran tester
-write_array_nd(A,'A');
-
-write_array_nd(X{1},'X');
-write_array_nd(X{2},'Y');
-write_array_nd(X{3},'Z');
-
-
-write_array_nd(K,'K_m');
-
-
-system('./fortran/ndt_assembly_test.exe');
-K_f = read_array_nd('K');
-
-err = norm(K(:) - K_f(:),inf)
+err = norm(K(:) - K_m(:),inf)
 %end
 
 
