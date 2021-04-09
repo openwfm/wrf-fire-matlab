@@ -9,6 +9,8 @@ A = diag([1 1 1])
 lambda=[]
 params=[]
 u0=[];
+iflags = [2 1 1]
+iflags = iflags(:)
 
 X = regular_mesh(nel,h,expand);
 % X = add_terrain_to_mesh(X, 'hill', 'shift', 0.1)
@@ -24,7 +26,7 @@ X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1)  % more thorough testing
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/ndt_f_test.exe')
     disp('testing if same result in fortran')
-    err=ndt_f_fortran(A,X,u0);
+    err=ndt_f_fortran(A,X,u0,iflags);
     if abs(err)<1e-6
     fprintf('error %g OK\n',err)
     else

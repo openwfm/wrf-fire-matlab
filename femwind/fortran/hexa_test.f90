@@ -6,7 +6,7 @@ use module_io_matlab ! to read and write matrices as text files from matlab
 implicit none
 
 real, pointer:: A(:,:,:), X(:,:,:), u0(:,:,:), aflags(:,:,:)    ! fortran is not case sensitive
-integer:: iflags(3,1,1)
+integer:: iflags
 !real:: A(3,3), X(3,8), u0(3)    ! fortran is not case sensitive
 real, pointer:: Kloc(:,:,:), Floc(:,:,:), Jg(:,:,:) ! for convenience, make all arrays 3D
 allocate(Kloc(8,8,1))
@@ -18,7 +18,8 @@ call read_array(X,'X')
 call read_array(u0,'u0')
 call read_array(aflags,'iflags')
 
-iflags = reshape(aflags,(/3,1,1/)) 
+
+iflags = aflags(1,1,1)
 
 write(*,*)'A=',A
 write(*,*)'X=',X

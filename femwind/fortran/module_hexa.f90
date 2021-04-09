@@ -19,7 +19,7 @@ implicit none
 !*** arguments
 
 real, intent(in):: A(3,3), X(3,8), u0(3)    ! fortran is not case sensitive
-integer, intent(in)::iflags(3)
+integer, intent(in)::iflags
 real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3)
 !*** local variables
 !real, parameter :: g = 0.5773502691896257
@@ -39,13 +39,14 @@ integer :: i,j,k,m
 real :: detJx = 0
 real :: tmp = 0
 real :: vol = 0
+Kloc = 0.
+Floc = 0.
+Jg = 0.
 !*** executable
 
-!Still in testing process, so will most likely break
+!Calculate Jg loop
+if (iflags .eq.  3) then
 
-if (iflags(3) > 0) then
-
-!Calculate Jg, Kloc, and Floc loop
 do i=1,9
 
 !Calculate gradf
@@ -81,8 +82,48 @@ Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
 
 Jg = matmul(gradf,Jx_inv)
 
+end do
+endif !end for computing Jg
+
+!Calculate Kloc loop
+if (iflags .eq.  1) then
+
+do i=1,9
+
+!Calculate gradf
+!first column of gradf
+do j = 1,8
+gradf(j,1) = (ib(j,1)*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
+end do
+!second coumn of gradf
+do j = 1,8
+gradf(j,2) = ((1+ib(j,1)*s(i,1))*ib(j,2)*(1+ib(j,3)*s(i,3)))/8
+end do
+!third column of gradf
+do j = 1,8
+gradf(j,3) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*ib(j,3))/8
+end do
+
+Jx = matmul(X,gradf)
+
+!!!Compute Jx_inv!!!
+detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
+         Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
+         Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
+
+Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
+Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
+Jx_inv(3,1) = +(1/detJx) * (Jx(2,1)*Jx(3,2) - Jx(2,2)*Jx(3,1))
+Jx_inv(1,2) = -(1/detJx) * (Jx(1,2)*Jx(3,3) - Jx(1,3)*Jx(3,2))
+Jx_inv(2,2) = +(1/detJx) * (Jx(1,1)*Jx(3,3) - Jx(1,3)*Jx(3,1))
+Jx_inv(3,2) = -(1/detJx) * (Jx(1,1)*Jx(3,2) - Jx(1,2)*Jx(3,1))
+Jx_inv(1,3) = +(1/detJx) * (Jx(1,2)*Jx(2,3) - Jx(1,3)*Jx(2,2))
+Jx_inv(2,3) = -(1/detJx) * (Jx(1,1)*Jx(2,3) - Jx(1,3)*Jx(2,1))
+Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
+Jg = matmul(gradf,Jx_inv)
+
 !check to calc Kloc
-if ((iflags(1) > 0).AND.(i < 9)) then
+if (i < 9) then
 do j = 1,8
 do k = 1,3
 Jg_tran(k,j) = Jg(j,k)
@@ -94,9 +135,47 @@ K_at_s = matmul(Jg,A_tmp)
 Kloc = Kloc+(K_at_s*abs(detJx))
 end if !end for computing Kloc
 end do !end of outter most do loop
+end if !end for computing Kloc
 
-!check to calc Floc
-if (iflags(2) > 0) then
+
+!Calculate Floc loop
+if (iflags .eq. 2) then
+
+do i=1,9
+
+!Calculate gradf
+!first column of gradf
+do j = 1,8
+gradf(j,1) = (ib(j,1)*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
+end do
+!second coumn of gradf
+do j = 1,8
+gradf(j,2) = ((1+ib(j,1)*s(i,1))*ib(j,2)*(1+ib(j,3)*s(i,3)))/8
+end do
+!third column of gradf
+do j = 1,8
+gradf(j,3) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*ib(j,3))/8
+end do
+
+Jx = matmul(X,gradf)
+
+!!!Compute Jx_inv!!!
+detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
+         Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
+         Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
+
+Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
+Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
+Jx_inv(3,1) = +(1/detJx) * (Jx(2,1)*Jx(3,2) - Jx(2,2)*Jx(3,1))
+Jx_inv(1,2) = -(1/detJx) * (Jx(1,2)*Jx(3,3) - Jx(1,3)*Jx(3,2))
+Jx_inv(2,2) = +(1/detJx) * (Jx(1,1)*Jx(3,3) - Jx(1,3)*Jx(3,1))
+Jx_inv(3,2) = -(1/detJx) * (Jx(1,1)*Jx(3,2) - Jx(1,2)*Jx(3,1))
+Jx_inv(1,3) = +(1/detJx) * (Jx(1,2)*Jx(2,3) - Jx(1,3)*Jx(2,2))
+Jx_inv(2,3) = -(1/detJx) * (Jx(1,1)*Jx(2,3) - Jx(1,3)*Jx(2,1))
+Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
+
+Jg = matmul(gradf,Jx_inv)
+
 vol = abs(detJx)*8
 u0_tmp = u0*vol
 do j = 1,8
@@ -107,9 +186,9 @@ end do
 tmp_mat(j) = tmp        
 end do
 Floc = Floc-tmp_mat
+end do
 end if !end for computing Floc
 
-end if !end for computing Jg    
 end subroutine hexa
 
 end module module_hexa

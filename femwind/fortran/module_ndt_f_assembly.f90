@@ -6,7 +6,7 @@ subroutine ndt_f_assembly(                        &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
-    A, X,Y,Z, u0, iflags,                         & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
+    A, X,Y,Z, iflags,                         & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
     F, F_dim)                                             !Global load vector output  
 
 implicit none
@@ -26,11 +26,11 @@ integer, intent(in)::                             &
 real, intent(in), dimension(3,3):: A
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: X,Y,Z!spatial grid
 !Input for hexa
-integer, intent(in), dimension(3,1,1)::iflags
+integer, intent(in)::iflags
 
 integer,intent(in)::F_dim
 
-real,intent(out), dimension(F_dim)::F
+real,intent(out), dimension(1:F_dim)::F
 
 !*** local
 
@@ -42,8 +42,8 @@ real :: kglo(8)
 !*** integer, dimension(3,1,1), save ::iflags = reshape((/1,0,1/),(/3,1,1/)) !define iflags to construct JG and Kloc in hexa
 
 
-
-u0 = 0.
+Xloc = 9999.
+F = 0.
 kglo = 0.
 
 !** executable
