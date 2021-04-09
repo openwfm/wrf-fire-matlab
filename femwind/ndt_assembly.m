@@ -32,8 +32,9 @@ for ie2=1:n(2)-1  % loop over elements
                     end
                 end
             end
-            disp(Xloc(:,:))
+            %ie1,ie2,ie3,Xloc
             [Kloc,~,~]=hexa(A,Xloc,zeros(3,1)); % compute the local stiffness matrix
+            %Kloc
             %disp(Kloc(1,1))
 	    % loop over element corners ic, kc
 	    for ic2=0:1 % 

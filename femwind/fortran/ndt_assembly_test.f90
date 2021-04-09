@@ -71,7 +71,7 @@ do j=jfts,jfte
   enddo
 enddo
 
-write(*,'(a)')'calling ndt_assembly'
+!write(*,'(a)')'calling ndt_assembly'
 call ndt_assembly(  &
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
@@ -79,7 +79,7 @@ call ndt_assembly(  &
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   Amat,Xmat,Ymat,Zmat, iflags, Kmat)
 
-write(*,'(a,3i8)')'copying the output data to array size ',n2,msize
+!write(*,'(a,3i8)')'copying the output data to array size ',n2,msize
 allocate(Km(ifts:ifte,kfts:kfte,jfts:jfte, 1:msize))
 do j=jfts,jfte
   do k=kfts,kfte
