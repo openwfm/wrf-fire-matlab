@@ -62,6 +62,7 @@ if ((cl_z(kfcts) .ne. kfts) .or. (cl_z(kfcte) .ne. kfte)) then
     call crash('vertical corsening must include all domain')
 endif
 
+open(10,file='ftn.txt',form='formatted',status='unknown')
 do kc=kfcts,kfcte           ! loop over coarse layers    
     kfc=cl_z(kc);          ! the fine grid number of the coarse layer
     if (kfc>kfts) then
@@ -79,13 +80,13 @@ do kc=kfcts,kfcte           ! loop over coarse layers
         ! really needs to be made fine point oriented and draw from coarse points
         do jc=jfcts,jfcte          
             jfc=cr_y*(jc-jfcds)+jfds ! fine grid index of the coarse point, global (domain)
-            jfs=max(jfc-cr_y,jfds)+1 ! start support
-            jfe=min(jfc+cr_y,jfde)-1 ! start support
+            jfs=max(jfc-cr_y+1,jfds) ! start support
+            jfe=min(jfc+cr_y-1,jfde) ! start support
             !print *,'coarse y ',jc,' at j ',jfc,' contributes to ',jfs,':',jfe
             do ic=ifcts,ifcte
                 ifc=cr_y*(ic-ifcds)+ifds ! fine grid index of the coarse point, global (domain)
-                ifs=max(ifc-cr_x,ifds)+1 ! start support
-                ife=min(ifc+cr_y,ifde)-1 ! start support
+                ifs=max(ifc-cr_x+1,ifds) ! start support
+                ife=min(ifc+cr_y-1,ifde) ! start support
                 !print *,'coarse x ',ic,' at i ',ifc,' contributes to ',ifs,':',ife
                 do j=jfs,jfe
                     do i=ifs,ife
@@ -105,18 +106,21 @@ do kc=kfcts,kfcte           ! loop over coarse layers
                         endif
                         if (k>kfc) then 
                             qk=(Z(i,k,j)-Z(i,kfe+1,j))/(Z(i,k,j)-Z(i,kfe+1,j))
-                        elseif (j<jfc) then 
+                        elseif (k<kfc) then 
                             qk=(Z(i,k,j)-Z(i,kfs-1,j))/(Z(i,k,j)-Z(i,kfs-1,j))
                         else
                             qk=1.
                         endif
                         u(i,k,j) = u(i,k,j) + qi*qk*qj*uc(ic,kc,jc);
+9                       format(12i4,5f10.7)
+                        write(10,9)ic,jc,kc,ifs,ife,jfs,jfe,kfs,kfe,i,j,k,qi,qj,qk,uc(ic,kc,jc),u(i,k,j)
                     enddo
                 enddo
             enddo
         enddo
     enddo
 enddo
+close(10)
 
 end subroutine prolongation
 
