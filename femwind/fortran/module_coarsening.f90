@@ -79,14 +79,24 @@ do kc=kfcts,kfcte           ! loop over coarse layers
     do k=kfs,kfe
         ! really needs to be made fine point oriented and draw from coarse points
         do jc=jfcts,jfcte          
-            jfc=cr_y*(jc-jfcds)+jfds ! fine grid index of the coarse point, global (domain)
+            jfc=cr_y*(jc-jfcds)+jfds ! fine grid index of the coarse point
             jfs=max(jfc-cr_y+1,jfds) ! start support
-            jfe=min(jfc+cr_y-1,jfde) ! start support
+            jfe=min(jfc+cr_y-1,jfde) ! end support
+            if (jfc > jfde) then  ! after end of domain not divisible by coarse ratio
+               jfc = jfde
+	    elseif (jfc > jfde - cr_y .and. jfc < jfde)then ! just before end of domain not divisible by coarse ratio
+               jfe = jfde -1
+            endif
             !print *,'coarse y ',jc,' at j ',jfc,' contributes to ',jfs,':',jfe
-            do ic=ifcts,ifcte
-                ifc=cr_y*(ic-ifcds)+ifds ! fine grid index of the coarse point, global (domain)
-                ifs=max(ifc-cr_x+1,ifds) ! start support
-                ife=min(ifc+cr_y-1,ifde) ! start support
+                do ic=ifcts,ifcte
+                ifc=cr_y*(ic-ifcds)+ifds ! fine grid index of the coarse point
+                ifs=max(ifc-cr_y+1,ifds) ! start support
+                ife=min(ifc+cr_y-1,ifde) ! end support
+                if (ifc > ifde) then  ! after end of domain not divisible by coarse ratio
+                   ifc = ifde
+    	        elseif (ifc > ifde - cr_x .and. ifc < ifde)then ! just before end of domain not divisible by coarse ratio
+                   ife = ifde -1
+                endif
                 !print *,'coarse x ',ic,' at i ',ifc,' contributes to ',ifs,':',ife
                 do j=jfs,jfe
                     do i=ifs,ife

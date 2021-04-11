@@ -11,7 +11,7 @@ u0 = reshape(P*uc(:),n);
 u1 = prolongation(uc,hzc,icl3,X,params);
 err1 = big(u0-u1);
 tol = eps(single(1))*10*big(u0);
-if err1 > big(u0)
+if err1 > tol 
     err1,tol
     warning('prol_restr_err: prolongation error vs. matrix P too large')
 end
@@ -19,7 +19,7 @@ if exist('fortran/prolongation_test.exe')
     disp('testing if same result in fortran')
     u2 = prolongation_fortran(uc,hzc,icl3,X,params);
     err2 = big(u0-u2);
-    if err2 > tol*big(u0)
+    if err2 > tol
     err2,tol
         warning('prol_restr_err: prolongation error fortran too large')
     end
