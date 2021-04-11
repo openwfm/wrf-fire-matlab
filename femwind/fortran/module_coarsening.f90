@@ -75,41 +75,43 @@ do kc=kfcts,kfcte           ! loop over coarse layers
         kfe=kfc            ! itself, there is no next layer
     endif
     print *,'vertical coarse layer ',kc,' at ',kfc,' contributes to layers ',kfs,':',kfe 
-    ! really needs to be made fine point oriented and draw from coarse points
-    do jc=jfcts,jfcte          
-        jfc=cr_y*(jc-jfcds)+jfds ! fine grid index of the coarse point, global (domain)
-        jfs=max(jfc-cr_y,jfds)+1 ! start support
-        jfe=min(jfc+cr_y,jfde)-1 ! start support
-        print *,'coarse y ',jc,' at j ',jfc,' contributes to ',jfs,':',jfe
-        do ic=ifcts,ifcte
-            ifc=cr_y*(ic-ifcds)+ifds ! fine grid index of the coarse point, global (domain)
-            ifs=max(ifc-cr_x,ifds)+1 ! start support
-            ife=min(ifc+cr_y,ifde)-1 ! start support
-            print *,'coarse x ',ic,' at i ',ifc,' contributes to ',ifs,':',ife
-            do j=jfs,jfe
-                do i=ifs,ife
-                    if (i>ifc) then 
-                        qi=(X(i,k,j)-X(ife+1,k,j))/(X(ife,k,j)-X(ife+1,k,j))
-                    elseif (i<ifc) then 
-                        qi=(X(i,k,j)-X(ifs-1,k,j))/(X(ifs,k,j)-X(ifs-1,k,j))
-                    else
-                        qi=1.
-                    endif
-                    if (j>jfc) then 
-                        qj=(Y(i,k,j)-Y(i,k,jfe+1))/(Y(i,k,j)-Y(i,k,jfe+1))
-                    elseif (j<jfc) then 
-                        qj=(Y(i,k,j)-Y(i,k,jfs-1))/(Y(i,k,j)-Y(i,k,jfs-1))
-                    else
-                        qj=1.
-                    endif
-                    if (k>kfc) then 
-                        qk=(Z(i,k,j)-Z(i,kfe+1,j))/(Z(i,k,j)-Z(i,kfe+1,j))
-                    elseif (j<jfc) then 
-                        qk=(Z(i,k,j)-Z(i,kfs-1,j))/(Z(i,k,j)-Z(i,kfs-1,j))
-                    else
-                        qk=1.
-                    endif
-                    u(i,k,j) = u(i,k,j) + qi*qk*qj*uc(ic,kc,jc);
+    do k=kfs,kfe
+        ! really needs to be made fine point oriented and draw from coarse points
+        do jc=jfcts,jfcte          
+            jfc=cr_y*(jc-jfcds)+jfds ! fine grid index of the coarse point, global (domain)
+            jfs=max(jfc-cr_y,jfds)+1 ! start support
+            jfe=min(jfc+cr_y,jfde)-1 ! start support
+            !print *,'coarse y ',jc,' at j ',jfc,' contributes to ',jfs,':',jfe
+            do ic=ifcts,ifcte
+                ifc=cr_y*(ic-ifcds)+ifds ! fine grid index of the coarse point, global (domain)
+                ifs=max(ifc-cr_x,ifds)+1 ! start support
+                ife=min(ifc+cr_y,ifde)-1 ! start support
+                !print *,'coarse x ',ic,' at i ',ifc,' contributes to ',ifs,':',ife
+                do j=jfs,jfe
+                    do i=ifs,ife
+                        if (i>ifc) then 
+                            qi=(X(i,k,j)-X(ife+1,k,j))/(X(ife,k,j)-X(ife+1,k,j))
+                        elseif (i<ifc) then 
+                            qi=(X(i,k,j)-X(ifs-1,k,j))/(X(ifs,k,j)-X(ifs-1,k,j))
+                        else
+                            qi=1.
+                        endif
+                        if (j>jfc) then 
+                            qj=(Y(i,k,j)-Y(i,k,jfe+1))/(Y(i,k,j)-Y(i,k,jfe+1))
+                        elseif (j<jfc) then 
+                            qj=(Y(i,k,j)-Y(i,k,jfs-1))/(Y(i,k,j)-Y(i,k,jfs-1))
+                        else
+                            qj=1.
+                        endif
+                        if (k>kfc) then 
+                            qk=(Z(i,k,j)-Z(i,kfe+1,j))/(Z(i,k,j)-Z(i,kfe+1,j))
+                        elseif (j<jfc) then 
+                            qk=(Z(i,k,j)-Z(i,kfs-1,j))/(Z(i,k,j)-Z(i,kfs-1,j))
+                        else
+                            qk=1.
+                        endif
+                        u(i,k,j) = u(i,k,j) + qi*qk*qj*uc(ic,kc,jc);
+                    enddo
                 enddo
             enddo
         enddo
