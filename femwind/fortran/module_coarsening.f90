@@ -62,7 +62,6 @@ if ((cl_z(kfcts) .ne. kfts) .or. (cl_z(kfcte) .ne. kfte)) then
     call crash('vertical corsening must include all domain')
 endif
 
-! open(10,file='ftn.txt',form='formatted',status='unknown')
 do kc=kfcts,kfcte           ! loop over coarse layers    
     kfc=cl_z(kc);          ! the fine grid number of the coarse layer
     if (kfc>kfts) then
@@ -75,7 +74,7 @@ do kc=kfcts,kfcte           ! loop over coarse layers
     else
         kfe=kfc            ! itself, there is no next layer
     endif
-    print *,'vertical coarse layer ',kc,' at ',kfc,' contributes to layers ',kfs,':',kfe 
+    !print *,'vertical coarse layer ',kc,' at ',kfc,' contributes to layers ',kfs,':',kfe 
     do k=kfs,kfe
         ! really needs to be made fine point oriented and draw from coarse points
         do jc=jfcts,jfcte          
@@ -122,15 +121,12 @@ do kc=kfcts,kfcte           ! loop over coarse layers
                             qk=1.
                         endif
                         u(i,k,j) = u(i,k,j) + qi*qk*qj*uc(ic,kc,jc);
-!9                       format(15i4,5f10.7)
-!                        write(10,9)ic,jc,kc,ifc,jfc,kfc,ifs,jfs,kfs,ife,jfe,kfe,i,j,k,qi,qj,qk,uc(ic,kc,jc),u(i,k,j)
                     enddo
                 enddo
             enddo
         enddo
     enddo
 enddo
-!close(10)
 
 end subroutine prolongation
 
