@@ -91,29 +91,29 @@ do kc=kfcts,kfcte           ! loop over coarse layers
                 do j=jfs,jfe
                     do i=ifs,ife
                         if (i>ifc) then 
-                            qi=(X(i,k,j)-X(ife+1,k,j))/(X(ife,k,j)-X(ife+1,k,j))
+                            qi=(X(i,k,j)-X(ife+1,k,j))/(X(ifc,k,j)-X(ife+1,k,j))
                         elseif (i<ifc) then 
-                            qi=(X(i,k,j)-X(ifs-1,k,j))/(X(ifs,k,j)-X(ifs-1,k,j))
+                            qi=(X(i,k,j)-X(ifs-1,k,j))/(X(ifc,k,j)-X(ifs-1,k,j))
                         else
                             qi=1.
                         endif
                         if (j>jfc) then 
-                            qj=(Y(i,k,j)-Y(i,k,jfe+1))/(Y(i,k,j)-Y(i,k,jfe+1))
+                            qj=(Y(i,k,j)-Y(i,k,jfe+1))/(Y(i,k,jfc)-Y(i,k,jfe+1))
                         elseif (j<jfc) then 
-                            qj=(Y(i,k,j)-Y(i,k,jfs-1))/(Y(i,k,j)-Y(i,k,jfs-1))
+                            qj=(Y(i,k,j)-Y(i,k,jfs-1))/(Y(i,k,jfc)-Y(i,k,jfs-1))
                         else
                             qj=1.
                         endif
                         if (k>kfc) then 
-                            qk=(Z(i,k,j)-Z(i,kfe+1,j))/(Z(i,k,j)-Z(i,kfe+1,j))
+                            qk=(Z(i,k,j)-Z(i,kfe+1,j))/(Z(i,kfc,j)-Z(i,kfe+1,j))
                         elseif (k<kfc) then 
-                            qk=(Z(i,k,j)-Z(i,kfs-1,j))/(Z(i,k,j)-Z(i,kfs-1,j))
+                            qk=(Z(i,k,j)-Z(i,kfs-1,j))/(Z(i,kfc,j)-Z(i,kfs-1,j))
                         else
                             qk=1.
                         endif
                         u(i,k,j) = u(i,k,j) + qi*qk*qj*uc(ic,kc,jc);
-9                       format(12i4,5f10.7)
-                        write(10,9)ic,jc,kc,ifs,ife,jfs,jfe,kfs,kfe,i,j,k,qi,qj,qk,uc(ic,kc,jc),u(i,k,j)
+9                       format(15i4,5f10.7)
+                        write(10,9)ic,jc,kc,ifc,jfc,kfc,ifs,jfs,kfs,ife,jfe,kfe,i,j,k,qi,qj,qk,uc(ic,kc,jc),u(i,k,j)
                     enddo
                 enddo
             enddo
