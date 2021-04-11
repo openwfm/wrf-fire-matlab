@@ -9,7 +9,7 @@ function u=prolongation(uc,hzc,icl3,X,params)
 %
 % Out:
 %   u      fine grid vector 
-  
+    disp('start prolongation.m') 
     n = size(X{1});   % grid size
     nn = prod(n);     % number of grid points
     [icl1,icl2]=hzc2icl(hzc,n);    
@@ -18,14 +18,15 @@ function u=prolongation(uc,hzc,icl3,X,params)
  
     u = zeros(n);  % allocate
     disp('prolongation')
+    %h = fopen('mat.txt','wt');
     for ic3=1:nc(3)           % loop over coarse layers    
         if3=icl3(ic3);         % the fine number of the coarse layer
         [ifs3,ife3]=ifse(ic3,icl3,nc(3)); % get start and end of support
         % fprintf('vertical coarse layer %g at %g contributes to layers %g : %g\n',ic3,if3,ifs3,ife3)
+        for i3=ifs3:ife3
         for ic2=1:nc(2)          
             if2=icl2(ic2);  % fine grid index of the coarse point
             [ifs2,ife2]=ifse(ic2,icl2,nc(2)); % get start and end of support
-            for i3=ifs3:ife3
                 for i2=ifs2:ife2            
                     for ic1=1:nc(1)        % horizontal loops over coarse points
                         if1=icl1(ic1);  % fine grid index of the coarse point
@@ -59,12 +60,14 @@ function u=prolongation(uc,hzc,icl3,X,params)
                                     q3=1;
                                 end
                                 u(i1,i2,i3) = u(i1,i2,i3) + q1*q2*q3*uc(ic1,ic2,ic3);
+                                %fprintf(h,'%g ',ic1,ic2,ic3,if1,if2,if3,ifs1,ifs2,ifs3,ife1,ife2,ife3,i1,i2,i3,q1,q2,q3,uc(ic1,ic2,ic3),u(i1,i2,i3));fprintf(h,'\n');
                         end
                     end
                 end
             end
         end
     end
+    %fclose(h);
 end
 
 
