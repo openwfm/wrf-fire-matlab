@@ -36,6 +36,8 @@ end
 err=max([err1,err2,errc]);
 if err>tol,
     error('prol_rest_err: error too large')
+else
+    fprintf('prol_rest_err %g OK\n',err)
 end
 
 end
