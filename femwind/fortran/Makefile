@@ -48,5 +48,8 @@ PROLONGATION = prolongation_test.f90  module_coarsening.o module_io_matlab.o
 prolongation_test.exe: $(PROLONGATION) 
 	$(FC) $(FFLAGS) -o prolongation_test.exe $(PROLONGATION) 
 
+RESTRICTION = restriction_test.f90  module_coarsening.o module_io_matlab.o
+restriction_test.exe: $(RESTRICTION) 
+	$(FC) $(FFLAGS) -o prolongation_test.exe $(PROLONGATION) 
 clean:
 	rm -rf *.mod *.o *.exe
