@@ -50,13 +50,7 @@ real:: qi,qj,qk
 !*** executable
 
 ! zero the output to ready for contributions
-do j=jfts,jfte
-    do k=kfts,kfte
-        do i=ifts,ifte
-            u(i,k,j)=0.
-        enddo
-    enddo
-enddo
+u(ifts:ifte,kfts:kfte,jfts:jfte) = 0.
 
 if ((cl_z(kfcts) .ne. kfts) .or. (cl_z(kfcte) .ne. kfte)) then
     call crash('vertical corsening must include all domain')
