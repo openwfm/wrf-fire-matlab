@@ -3,7 +3,12 @@
 #FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow
 FFLAGS = -g -C -fpe0 -traceback
 
-default: hexa_test.exe ndt_mult_test.exe  sweeps_test.exe ndt_assembly_test.exe prolongation_test.exe restriction_test.exe
+default: hexa_test.exe\
+ ndt_mult_test.exe\
+ sweeps_test.exe\
+ ndt_assembly_test.exe\
+ prolongation_test.exe\
+ restriction_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
