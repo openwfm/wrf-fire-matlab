@@ -10,13 +10,13 @@ uc = rand(nc);
 u0 = reshape(P*uc(:),n);
 u1 = prolongation(uc,hzc,icl3,X,params);
 err1 = big(u0-u1);
-tol = eps(single(1))*10*big(u0);
+tol = eps(single(1))*15*big(u0);
 if err1 > tol 
     err1,tol
     warning('prol_restr_err: prolongation error vs. matrix P too large')
 end
 if exist('fortran/prolongation_test.exe')
-    disp('testing if same result in fortran')
+    disp('testing if prolongation same result in fortran')
     u2 = prolongation_fortran(uc,hzc,icl3,X,params);
     err2 = big(u0-u2);
     if err2 > tol
@@ -33,7 +33,16 @@ if errc > tol
     errc,tol
     warning('prol_restr_err: restriction error vs. matrix P too large')
 end
-err=max([err1,err2,errc]);
+if exist('fortran/restriction_test.exe')
+    disp('testing if restriction same result in fortran')
+    uc2 = restriction_fortran(u,hzc,icl3,X,params);
+    errc2 = big(uc0-uc2);
+    if errc2 > tol
+    errc2,tol
+        warning('prol_restr_err: prolongation error fortran too large')
+    end
+end
+err=max([err1,err2,errc,errc2]);
 if err>tol,
     error('prol_rest_err: error too large')
 else
