@@ -1,4 +1,4 @@
-program prolongation_test
+program restriction_test
 
 use module_coarsening   
 use module_io_matlab ! to read and write matrices as text files from matlab
@@ -24,7 +24,8 @@ integer:: n(3),nc(3),cr_x,cr_y, nwrap = 0
 call read_array(X_m,'X')
 call read_array(Y_m,'Y')
 call read_array(Z_m,'Z')
-call read_array(uc_m,'uc')
+call read_array(u_m,'u')
+call read_array(uc_m,'uc')  ! for dimensions only
 call read_array(cl_z_m,'cl_z')
 call read_array(hcz_m,'hcz')
 
@@ -36,9 +37,6 @@ call set_indices(nc,nwrap,                  &    ! coarse mesh bounds
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme, &
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte)
 
-! allocate coarse input and copy
-allocate(uc(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme))
-uc(ifcts:ifcte,kfcts:kfcte,jfcts:jfcte)=uc_m
 
 ! set coarsening indices
 if(nc(2).ne.size(cl_z_m))call crash('coarse index array size')
@@ -59,58 +57,25 @@ allocate(Y(ifms:ifme,kfms:kfme,jfms:jfme))
 Y(ifts:ifte,kfts:kfte,jfts:jfte)=Y_m
 allocate(Z(ifms:ifme,kfms:kfme,jfms:jfme))
 Z(ifts:ifte,kfts:kfte,jfts:jfte)=Z_m
+allocate(u(ifms:ifme,kfms:kfme,jfms:jfme))
+u(ifts:ifte,kfts:kfte,jfts:jfte)=u_m
 
 ! allocate output
-allocate(u(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(uc(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme))
 
-write(*,*)'calling prolongation'
-call prolongation(   &
+write(*,*)'calling restriction'
+call restriction(   &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile
-    u,uc,cr_x,cr_y,cl_z,X,Y,Z)
+    uc,u,cr_x,cr_y,cl_z,X,Y,Z)
 
-! copy output to tight and write to file
-allocate(u_m(n(1),n(2),n(3)))
-u_m = u(ifts:ifte,kfts:kfte,jfts:jfte)
-call write_array(u_m,'u')
+! allocate coarse output and copy
+allocate(uc_m(nc(1),nc(2),nc(3)))
+uc_m=uc(ifcts:ifcte,kfcts:kfcte,jfcts:jfcte)
+call write_array(uc_m,'uc')
 
-end program prolongation_test
-
-subroutine set_indices(n,nwrap,                   &
-    ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms,jfme,             &
-    ifts, ifte, kfts,kfte, jfts,jfte)
-implicit none
-
-integer, intent(in)::n(3),nwrap
-integer, intent(out)::                            &
-    ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms,jfme,             &
-    ifts, ifte, kfts,kfte, jfts,jfte
-
-! tile dimensions from matrix size
-ifts=1
-ifte=n(1)
-kfts=1
-kfte=n(2)
-jfts=1
-jfte=n(3)
-! domain = tile
-ifds=ifts
-ifde=ifte
-kfds=kfts
-kfde=kfte
-jfds=jfts
-jfde=jfte
-ifms=ifts - nwrap
-ifme=ifte + nwrap
-kfms=kfts
-kfme=kfte
-jfms=jfts - nwrap
-jfme=jfte + nwrap
-
-end subroutine set_indices
+end program restriction_test
