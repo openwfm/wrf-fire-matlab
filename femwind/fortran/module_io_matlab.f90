@@ -132,5 +132,41 @@ do i=1,m(1)
 enddo
 close(iu)
 end subroutine write_array_nd
+ 
+
+subroutine set_indices(n,nwrap,                   &
+    ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
+    ifms, ifme, kfms,kfme, jfms,jfme,             &
+    ifts, ifte, kfts,kfte, jfts,jfte)
+implicit none
+
+integer, intent(in)::n(3),nwrap
+integer, intent(out)::                            &
+    ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
+    ifms, ifme, kfms,kfme, jfms,jfme,             &
+    ifts, ifte, kfts,kfte, jfts,jfte
+
+! tile dimensions from matrix size
+ifts=1
+ifte=n(1)
+kfts=1
+kfte=n(2)
+jfts=1
+jfte=n(3)
+! domain = tile
+ifds=ifts
+ifde=ifte
+kfds=kfts
+kfde=kfte
+jfds=jfts
+jfde=jfte
+ifms=ifts - nwrap
+ifme=ifte + nwrap
+kfms=kfts
+kfme=kfte
+jfms=jfts - nwrap
+jfme=jfte + nwrap
+
+end subroutine set_indices
 
 end module module_io_matlab

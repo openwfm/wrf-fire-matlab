@@ -1,7 +1,8 @@
-function X_coarse=coarsening_X(icl,X,params)
+function X_coarse=coarsening_X(hzc,icl3,X,params)
 % [P,X_coarse]=coarsening_2_linear_decide(X,params)
 % in:
-%   icl         icl{i} are coarse indices in direction i=1:3
+%   hzc         coarsening factors in horizontal directions 1 and 2
+%   icl3        coarse indices in direction 3
 %   X           grid coordinates
 %   params      structure
 % out:
@@ -9,8 +10,9 @@ function X_coarse=coarsening_X(icl,X,params)
 
     n = size(X{1});
     nn=prod(n);
-    icl1=icl{1};icl2=icl{2};icl3=icl{3};  % unwrap cell array
+    [icl1,icl2]=hzc2icl(hzc,n);
     nc = [length(icl1),length(icl2),length(icl3)];
+    
     for l=1:3
         X_coarse{l}=zeros(nc); % preallocate coarse points coordinates
     end

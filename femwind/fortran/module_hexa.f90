@@ -45,6 +45,8 @@ real :: vol = 0
 
 if (iflags(3) > 0) then
 
+Kloc = 0.
+
 !Calculate Jg, Kloc, and Floc loop
 do i=1,9
 
