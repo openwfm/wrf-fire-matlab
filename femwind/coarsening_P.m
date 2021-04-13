@@ -1,15 +1,15 @@
-function P=coarsening_P(icl,X,params)
+function P=coarsening_P(hzc,icl3,X,params)
 % [P,X_coarse]=coarsening_P(icl,X)
 % Build the prolongation matrix
 % In:
-%   icl     cell array size 3, indices of coarse grid in the 3 directions
+%   hzc     coarsening factor in the horizontal directions 1 and 2
+%   icl     indices of coarse grid in the 3 directions
 %   X       grid coordinates
 %   params
   
     n = size(X{1});   % grid size
     nn = prod(n);     % number of grid points
-    % unwrap cell array
-    icl1=icl{1};icl2=icl{2};icl3=icl{3};  
+    [icl1,icl2]=hzc2icl(hzc,n);
     nc = [length(icl1),length(icl2),length(icl3)];
     nnc = prod(nc);  % number of coarse grid points
  
