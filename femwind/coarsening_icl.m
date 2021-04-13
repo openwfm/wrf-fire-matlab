@@ -1,11 +1,12 @@
-function icl=coarsening_icl(X,params)
+function [hzc,icl3]=coarsening_icl(X,params)
 % [P,X_coarse]=coarsening_2_linear_decide(X,params)
 % in:
 %   X           grid coordinates
 %   params      structure
 % out:
-%   icl         icl{i} are coarse indices in direction i=1:3
-
+%   hzc         horizontal coarsening factors in directions 1 and 2
+%   icl3        coarse indices in direction 3
+% 
     n = size(X{1});
     nn=prod(n);
     dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
@@ -46,20 +47,18 @@ function icl=coarsening_icl(X,params)
             icl3(i+1)=lcl;
         else % at the top already
             nc(3)=i;
-            icl{3}=icl3(1:i);
+            icl3 = icl3(1:i);
             break
         end
     end     
     if nc(3)==0
         error('number of coarse layers is 0')
     end
-    disp(['vertical coarse layers ',num2str(icl{3})])
-    hg=num2str(X{3}(1,1,icl{3}));
+    disp(['vertical coarse layers ',num2str(icl3)])
+    hg=num2str(X{3}(1,1,icl3));
     disp(['heights at corner ',hg])
-    hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl{3}));
+    hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl3));
     disp(['heights at center ',hgc])
-    
-    nc = [length(icl{1}),length(icl{2}),length(icl{3})];
     disp(['level ',num2str(params.levels),' grid size ',num2str([n,prod(n)]),...
         ' coarse grid size ',num2str([nc,prod(nc)]),' coarsening ratio ',num2str(prod(n)/prod(nc))])
 end

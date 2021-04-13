@@ -3,8 +3,12 @@
 #FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow
 FFLAGS = -g -C -fpe0 -traceback
 
-default: hexa_test.exe ndt_mult_test.exe sweeps_test.exe ndt_f_test.exe 
-#ndt_assembly_test.exe 
+default: hexa_test.exe\
+ ndt_mult_test.exe\
+ sweeps_test.exe\
+ ndt_f_test.exe\
+ prolongation_test.exe\
+ restriction_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
@@ -50,6 +54,17 @@ module_ndt_f_assembly.o: module_ndt_f_assembly.f90 module_hexa.o Makefile
 
 ndt_f_test.o: ndt_f_test.f90 module_ndt_f_assembly.o module_io_matlab.o module_hexa.o Makefile
 	$(FC) $(FFLAGS) -c ndt_f_test.f90
+
+module_coarsening.o: module_coarsening.f90 module_hexa.o Makefile
+	$(FC) $(FFLAGS) -c module_coarsening.f90  
+
+PROLONGATION = prolongation_test.f90  module_coarsening.o module_io_matlab.o
+prolongation_test.exe: $(PROLONGATION) 
+	$(FC) $(FFLAGS) -o prolongation_test.exe $(PROLONGATION) 
+
+RESTRICTION = restriction_test.f90  module_coarsening.o module_io_matlab.o
+restriction_test.exe: $(RESTRICTION) 
+	$(FC) $(FFLAGS) -o restriction_test.exe $(RESTRICTION) 
 
 clean:
 	rm -rf *.mod *.o *.exe

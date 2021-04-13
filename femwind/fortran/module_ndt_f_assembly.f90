@@ -6,7 +6,7 @@ subroutine ndt_f_assembly(                        &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
-    A, X,Y,Z, u0, iflags,                         & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
+    A, X,Y,Z, iflags,                         & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
     F, F_dim)                                             !Global load vector output  
 
 implicit none
@@ -26,11 +26,11 @@ integer, intent(in)::                             &
 real, intent(in), dimension(3,3):: A
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: X,Y,Z!spatial grid
 !Input for hexa
-integer, intent(in), dimension(3,1,1)::iflags
+integer, intent(in)::iflags
 
 integer,intent(in)::F_dim
 
-real,intent(out), dimension(F_dim)::F
+real,intent(out), dimension(1:F_dim)::F
 
 !*** local
 
@@ -42,8 +42,8 @@ real :: kglo(8)
 !*** integer, dimension(3,1,1), save ::iflags = reshape((/1,0,1/),(/3,1,1/)) !define iflags to construct JG and Kloc in hexa
 
 
-
-u0 = 0.
+Xloc = 9999.
+F = 0.
 kglo = 0.
 
 !** executable
@@ -54,21 +54,29 @@ do ie3=jfts,jfte -1
                 do ic2=0,1
                     do ic1=0,1
                         iloc=1+ic1+2*(ic2+2*ic3);  !local index of the node in the element
-                        k1 = ie1 + ic1; 
-                        k2 = ie2+ic2;
-                        k3 = ie3+ic3;
-                        kglo(iloc) = k1+ifte*((k2-1)+jfte*(k3-1));
-                            Xloc(1,iloc)=X(ie1 + ic1, ie2 + ic2, ie3 + ic3)
-                            Xloc(2,iloc)=Y(ie1 + ic1, ie2 + ic2, ie3 + ic3)
-                            Xloc(3,iloc)=Z(ie1 + ic1, ie2 + ic2, ie3 + ic3)
+            !            k1 = ie1 + ic1; 
+            !            k2 = ie2+ic2;
+            !            k3 = ie3+ic3;
+            !            kglo(iloc) = k1+ie1*((k2-1)+ie3*(k3-1));
+                        Xloc(1,iloc)=X(ie1 + ic1, ie2 + ic2, ie3 + ic3)
+                        Xloc(2,iloc)=Y(ie1 + ic1, ie2 + ic2, ie3 + ic3)
+                        Xloc(3,iloc)=Z(ie1 + ic1, ie2 + ic2, ie3 + ic3)
 
                     enddo
                 enddo
             enddo
             call hexa(A,Xloc,u0,Kloc,Floc,Jg,iflags)
-            do i = 1,8
-                F(kglo(i)) = F(kglo(i)) + Floc(i)
-            enddo
+           ! do i = 1,8
+           !     F(kglo(i)) = F(kglo(i)) + Floc(i)
+           ! enddo
+           ! F() = F() + Floc(1)
+           ! F() = F() + Floc(2)
+           ! F() = F() + Floc(3)
+           ! F() = F() + Floc(4)
+           ! F() = F() + Floc(5)
+           ! F() = F() + Floc(6)
+           ! F() = F() + Floc(7)
+           ! F() = F() + Floc(8)
         enddo
     enddo
 enddo

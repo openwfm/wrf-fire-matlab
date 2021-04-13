@@ -33,10 +33,10 @@ switch params.coarsening
         end
     case '2 linear'
         % [P,X_coarse]=coarsening_2_linear(X,params);
-        icl=coarsening_icl(X,params);
-        X_coarse=coarsening_X(icl,X,params);
+        [hzc,icl3]=coarsening_icl(X,params);
+        X_coarse=coarsening_X(hzc,icl3,X,params);
         % P=coarsening_P(icl,X,params);
-        prol_rest_err(icl,X,params);
+        prol_rest_err(hzc,icl3,X,params);
     otherwise
         error(['unknown coarsening ',params.coarsening])
 end
@@ -71,7 +71,7 @@ for it=1:params.maxit
     if coarse
         fprintf('iteration %g level %g coarse correction\n',it,params.levels)
         % F_coarse = P'*(F - K*x);
-        F_coarse = restriction(reshape(F-K*x,n),icl,X,params);
+        F_coarse = restriction(reshape(F-K*x,n),hzc,icl3,X,params);
         F_coarse = F_coarse(:);
         if params.apply_coarse_boundary_conditions
             [K_coarse,F_coarse]=apply_boundary_conditions(K_coarse,F_coarse,X_coarse);
@@ -90,7 +90,7 @@ for it=1:params.maxit
         end
         fprintf('coarse solve done, level %g continuting\n',params.levels)
         % x = x + P*x_coarse
-        x_increment = prolongation(reshape(x_coarse,size(X_coarse{1})),icl,X,params);
+        x_increment = prolongation(reshape(x_coarse,size(X_coarse{1})),hzc,icl3,X,params);
         x = x + x_increment(:);
         it_type=sprintf('level %g coarse correction',params.levels);
     else
