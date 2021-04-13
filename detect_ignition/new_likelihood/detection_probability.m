@@ -10,11 +10,11 @@ function [ detect_prob ] = detection_probability(tign)
 detect_prob = zeros(size(tign));
 
 % use exponential increase in heat
-heat_up = 0;
+heat_up = 1;
 
 %for new burn model, set to zero for old model
 % length of time heat is maximum, constant
-const_time = 0;
+const_time = 10;
 
 %needed for computing with time instead of heat
 decay = 0.3;
@@ -25,7 +25,7 @@ m3 = tign >= const_time;
 
 
 if heat_up == 1
-    heat(m1) = exp(10*decay*tign(m1));
+    heat(m1) = exp(100*decay*tign(m1));
     heat(m2) = 1;
     tign_shift = tign-const_time;
     heat(m3) = exp(-decay*tign_shift(m3));

@@ -99,7 +99,7 @@ if real_data == 0
     title('Histogram of ROS')
 else
     t_str = sprintf('Histogram of ROS \n Path: %d Points: %d and %d',path_num,path_end-1,path_end);
-    t_str2 = sprintf('Distance: %f [m] Time: %f [h]',dist_r,time_r)
+    t_str2 = sprintf('Distance: %f [m] Time: %f [h]',dist_r,time_r*24)
     title({t_str,t_str2})
 end
 xlabel('ROS'),ylabel('Number')

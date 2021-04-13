@@ -37,7 +37,7 @@ d_strip = dp(domain_size/2,:);
 % ylim([0 1]);
 
 like = [];
-radius = 60; %size over which to "integrate"
+radius = 30; %size over which to "integrate"
 %weight = gauss_weight(radius); %not needed, we shift the curve up
 dx = 30; %in meters, this is grid spacing, dy = dx also, maybe compute this by passing 
          % in some tign data
@@ -55,7 +55,7 @@ end
 
 d_squared = d_squared+d_squared';
 d_squared = dx^2*d_squared;
-sig = 1000/3; %1000 meters at sig 3 
+sig = 750/3; %1000 meters at sig 3 
 
 counter = 1;
 for i=radius+1:domain_size-radius
