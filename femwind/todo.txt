@@ -9,3 +9,9 @@ horizontal semicoarsening based on dx=dy, make explicit
 make sure there is some semicoarsening, horizontal or vertical
 
 comments in hexa_coupling.m and hexa_coupling_test.m
+
+4/13/2021
+sparse assembly 3 functionalities
+apply bc to K and F separately
+explain variational multigrid in notes
+cycling logic in fortran
