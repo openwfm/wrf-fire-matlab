@@ -177,7 +177,7 @@ Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
 Jg = matmul(gradf,Jx_inv)
 
 
-if(i = 9) then
+if(i .eq. 9) then
 vol = abs(detJx)*8
 u0_tmp = u0*vol
 do j = 1,8

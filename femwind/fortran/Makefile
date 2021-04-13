@@ -6,7 +6,7 @@ FFLAGS = -g -C -fpe0 -traceback
 default: hexa_test.exe\
  ndt_mult_test.exe\
  sweeps_test.exe\
- ndt_assembly_test.exe\
+ ndt_assembly.exe\
  prolongation_test.exe\
  restriction_test.exe
 
