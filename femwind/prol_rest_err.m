@@ -23,6 +23,8 @@ if exist('fortran/prolongation_test.exe')
     err2,tol
         warning('prol_restr_err: prolongation error fortran too large')
     end
+else
+    err2=0;
 end
 
 u = rand(n);
@@ -41,6 +43,8 @@ if exist('fortran/restriction_test.exe')
     errc2,tol
         warning('prol_restr_err: prolongation error fortran too large')
     end
+else
+    errc2=0;
 end
 err=max([err1,err2,errc,errc2]);
 if err>tol,
