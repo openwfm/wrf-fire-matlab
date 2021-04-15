@@ -1,4 +1,4 @@
-function [pr,pv] = path_ros(ps)
+function [pr,pv,mpv,np] = path_ros(ps)
 
 n = length(ps.paths);
 pr = [];
@@ -37,10 +37,10 @@ ylabel('Frequency')
 
 msk = isnan(pv);
 nan_var = sum(msk(:));
-nan_perc = nan_var/n;
-mean_var = mean(pv(~msk));
-fprintf('Mean of std deviations on paths: %f \n',mean_var)
-fprintf('Percentage of path without variance: %f \n',nan_perc*100);
+np = nan_var/n;
+mpv = mean(pv(~msk));
+fprintf('Mean of std deviations on paths: %f \n',mpv)
+fprintf('Percentage of path without variance: %f \n',np*100);
 figure,histogram(pv(~msk));
 title('Std deviation of ROS on paths')
 
