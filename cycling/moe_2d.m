@@ -16,9 +16,9 @@ if isfield(w1,'analysis')
     w1.tign_g = w1.analysis;
     fprintf('Using w.analysis for comparison\n')
 end
-resize_grid = input_num('Resize grids for comparison? 0 = no',1,1);
+resize_grid = input_num('Resize grids for comparison? 0 = no',0,1);
 if resize_grid
-    grid_space = input_num('Grid spacing?',250);
+    grid_space = input_num('Grid spacing?',250,1);
     red = subset_domain(w1,1);
     E = wgs84Ellipsoid;
     dlon= distance(red.min_lat,red.min_lon,red.min_lat,red.max_lon,E);
