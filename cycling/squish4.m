@@ -91,14 +91,14 @@ time_err = 0.0;
 g_diff = (tign_flat-tign+time_err)*24*3600;
 %
 g_likes = p_like_spline(g_diff);
-beta = 1/10;
+beta = 1/100;
 beta_vect = 1-exp(g_likes);
 %%% ground detection likelihood
 % g_times = zeros(pts_length,1);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 2;
+ground_steps = 1;
 if gq
     data_area = sum(infire(:));
     for i = 1:ground_steps
@@ -222,7 +222,7 @@ rt = 0;
 %constant for smooth in rlx_shp
 %alpha_2 = 0.7; %smaller alph_2 ==> smoother
 %number of loops to run
-smoothings = 40;
+smoothings = 20;
 for k = 1:smoothings
 %     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
 %     title(title_str)
@@ -325,7 +325,7 @@ for k = 1:smoothings
         fprintf('graph norm increase \n')
         rm = 0;
         rt = 0;
-        %break
+        break
     end
 end
 %tign_new = [];
@@ -333,7 +333,7 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 2;
+ground_steps = 1;
 tign_ground = tign_new;
 if gq
     data_area = sum(infire(:));
