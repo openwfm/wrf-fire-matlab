@@ -30,15 +30,15 @@ x_dim = shape(X)
 ifts = 1
 ifte = x_dim(1)
 jfts = 1
-jfte = x_dim(2)
+jfte = x_dim(3)
 kfts = 1
-kfte = x_dim(3)
-ifms = ifts-1
-ifme = ifte+1
-jfms = jfts-1
-jfme = jfte+1
-kfms = kfts-1
-kfme = kfte+1
+kfte = x_dim(2)
+ifms = ifts
+ifme = ifte
+jfms = jfts
+jfme = jfte
+kfms = kfts
+kfme = kfte
 
 F_dim = x_dim(1)*x_dim(2)*x_dim(3)
 allocate(F(1:F_dim))
@@ -52,7 +52,7 @@ call ndt_f_assembly(  &
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   A, X ,Y ,Z, iflags, F, F_dim)
 
-F_m = reshape(F,(/F_dim,1,1/))
+!F_m = reshape(F,(/F_dim,1,1/))
 
 call write_array_nd(F,(/F_dim,1,1/),'Fvec')
 

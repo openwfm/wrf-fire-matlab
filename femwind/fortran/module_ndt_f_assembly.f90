@@ -47,36 +47,28 @@ F = 0.
 kglo = 0.
 
 !** executable
-do ie3=jfts,jfte -1
-    do ie2=kfts, kfte -1
+do ie2=jfts,jfte -1
+    do ie3=kfts, kfte -1
         do ie1=ifts, ifte -1
-            do ic3=0,1
-                do ic2=0,1
+            do ic2=0,1
+                do ic3=0,1
                     do ic1=0,1
-                        iloc=1+ic1+2*(ic2+2*ic3);  !local index of the node in the element
-            !            k1 = ie1 + ic1; 
-            !            k2 = ie2+ic2;
-            !            k3 = ie3+ic3;
-            !            kglo(iloc) = k1+ie1*((k2-1)+ie3*(k3-1));
-                        Xloc(1,iloc)=X(ie1 + ic1, ie2 + ic2, ie3 + ic3)
-                        Xloc(2,iloc)=Y(ie1 + ic1, ie2 + ic2, ie3 + ic3)
-                        Xloc(3,iloc)=Z(ie1 + ic1, ie2 + ic2, ie3 + ic3)
+                        iloc=1+ic1+2*(ic2+2*ic3)  !local index of the node in the element
+                        k1 = ie1 + ic1; 
+                        k2 = ie2+ic2;
+                        k3 = ie3+ic3;
+                        kglo(iloc) = k1+ie1*((k2-1)+ie2*(k3-1));
+                        Xloc(1,iloc)=X(ie1 + ic1, ie3 + ic3, ie2 + ic2)
+                        Xloc(2,iloc)=Y(ie1 + ic1, ie3 + ic3, ie2 + ic2)
+                        Xloc(3,iloc)=Z(ie1 + ic1, ie3 + ic3, ie2 + ic2)
 
                     enddo
                 enddo
             enddo
             call hexa(A,Xloc,u0,Kloc,Floc,Jg,iflags)
-           ! do i = 1,8
-           !     F(kglo(i)) = F(kglo(i)) + Floc(i)
-           ! enddo
-           ! F() = F() + Floc(1)
-           ! F() = F() + Floc(2)
-           ! F() = F() + Floc(3)
-           ! F() = F() + Floc(4)
-           ! F() = F() + Floc(5)
-           ! F() = F() + Floc(6)
-           ! F() = F() + Floc(7)
-           ! F() = F() + Floc(8)
+            do i = 1,8
+                F(kglo(i)) = F(kglo(i)) + Floc(i)
+            enddo
         enddo
     enddo
 enddo
