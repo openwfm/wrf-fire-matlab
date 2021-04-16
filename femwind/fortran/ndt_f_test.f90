@@ -6,23 +6,27 @@ use module_io_matlab
 
 implicit none
 
-real, pointer:: F(:), F_m(:,:,:)  ! fortran is not case sensitive
+real, pointer:: F(:),Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), Xu0mat(:,:,:), Yu0mat(:,:,:), Zu0mat(:,:,:)  ! fortran is not case sensitive
 
-integer :: F_dim, x_dim(3),                                       &
+integer :: F_dim, x_dim(3),u_dim(3),                          &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte                           ! fire tile bounds
-    
+    ifts, ifte, kfts, kfte, jfts, jfte,                       &  ! fire tile bounds
+    iuds, iude, kuds, kude, juds, jude,                       &
+    iums, iume, kums, kume, jums, jume
 
-real, pointer:: A(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:), u0(:,:,:), aflags(:,:,:)    ! fortran is not case sensitive
-integer:: iflags
+real, pointer:: A(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:), Xu0(:,:,:), Yu0(:,:,:), Zu0(:,:,:), aflags(:,:,:)    ! fortran is not case sensitive
+integer:: iflags, i, j, k
 
 call read_array(A,'A')
 call read_array(aflags,'iflags')
 call read_array(X,'X')
 call read_array(Y,'Y')
 call read_array(Z,'Z')
+call read_array(Xu0, 'Xu0')
+call read_array(Yu0, 'Yu0')
+call read_array(Zu0, 'Zu0')
 
 iflags = aflags(1,1,1) 
 x_dim = shape(X)
@@ -40,6 +44,39 @@ jfme = jfte
 kfms = kfts
 kfme = kfte
 
+iuds = 1
+iude = u_dim(1)
+juds = 1
+jude = u_dim(3)
+kuds = 1
+kude = u_dim(2)
+iums = iuds
+iume = iude
+jums = juds
+jume = jude
+kums = kuds
+kume = kude
+
+
+allocate(Xmat(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(Ymat(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(Zmat(ifms:ifme,kfms:kfme,jfms:jfme))
+
+! copy the input data to tile sized bounds
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
+        Xmat(i,k,j) = X(i,k,j)
+        Ymat(i,k,j) = Y(i,k,j)
+        Zmat(i,k,j) = Z(i,k,j)
+    enddo
+  enddo
+enddo
+
+
+
+
+
 F_dim = x_dim(1)*x_dim(2)*x_dim(3)
 allocate(F(1:F_dim))
 F = 0.
@@ -50,7 +87,7 @@ call ndt_f_assembly(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  A, X ,Y ,Z, iflags, F, F_dim)
+  A, Xmat , Ymat, Zmat, Xu0, Yu0, Zu0, iflags, F, F_dim)
 
 !F_m = reshape(F,(/F_dim,1,1/))
 
