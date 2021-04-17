@@ -8,7 +8,8 @@ default: hexa_test.exe\
  sweeps_test.exe\
  ndt_assembly_test.exe\
  prolongation_test.exe\
- restriction_test.exe
+ restriction_test.exe\
+ ndt_boundary_conditions_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
@@ -54,8 +55,15 @@ prolongation_test.exe: $(PROLONGATION)
 	$(FC) $(FFLAGS) -o prolongation_test.exe $(PROLONGATION) 
 
 RESTRICTION = restriction_test.f90  module_coarsening.o module_io_matlab.o
-restriction_test.exe: $(RESTRICTION) 
+restriction_test.exe: $(RESTRICTION) Makefile
 	$(FC) $(FFLAGS) -o restriction_test.exe $(RESTRICTION) 
+
+module_boundary_conditions.o: module_boundary_conditions.f90 Makefile
+	$(FC) $(FFLAGS) -c module_boundary_conditions.f90  
+
+NDT_BOUNDARY_CONDITIONS = ndt_boundary_conditions_test.f90  module_boundary_conditions.o module_io_matlab.o
+ndt_boundary_conditions_test.exe: $(NDT_BOUNDARY_CONDITIONS) Makefile
+	$(FC) $(FFLAGS) -o $@ $(NDT_BOUNDARY_CONDITIONS) 
 
 clean:
 	rm -rf *.mod *.o *.exe
