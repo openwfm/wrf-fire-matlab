@@ -1,6 +1,7 @@
 #FC = ifort
 #FC = gfortran
 #FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow
+#FFLAGS = -fast
 FFLAGS = -g -C -fpe0 -traceback
 
 default: hexa_test.exe\
@@ -63,6 +64,10 @@ module_boundary_conditions.o: module_boundary_conditions.f90 Makefile
 
 NDT_BOUNDARY_CONDITIONS = ndt_boundary_conditions_test.f90  module_boundary_conditions.o module_io_matlab.o
 ndt_boundary_conditions_test.exe: $(NDT_BOUNDARY_CONDITIONS) Makefile
+	$(FC) $(FFLAGS) -o $@ $(NDT_BOUNDARY_CONDITIONS) 
+
+VEC_BOUNDARY_CONDITIONS = vec_boundary_conditions_test.f90  module_boundary_conditions.o module_io_matlab.o
+vec_boundary_conditions_test.exe: $(VEC_BOUNDARY_CONDITIONS) Makefile
 	$(FC) $(FFLAGS) -o $@ $(NDT_BOUNDARY_CONDITIONS) 
 
 clean:
