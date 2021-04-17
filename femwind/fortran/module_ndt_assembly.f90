@@ -29,7 +29,7 @@ integer, parameter:: msize=14
 real, intent(in), dimension(3,3):: A
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: X,Y,Z!spatial grid
 !Input for hexa
-integer, intent(in), dimension(3,1,1)::iflags
+integer, intent(in)::iflags
 
 real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme,1:msize)::K
 
