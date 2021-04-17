@@ -1,5 +1,5 @@
-function [x,it,rate,X_coarse]=rb_line_gs_2level_solve(K,F,X,params)
-% x=rb_line_gs_solve(K,F,X)
+function [x,it,rate,X_coarse]=multigrid_solve(K,F,X,params)
+% x=multigrid_solve(K,F,X)
 disp(['coarsening method ',params.coarsening])
 disp(['smoothing method ',params.smoothing])
 
@@ -86,7 +86,7 @@ for it=1:params.maxit
             params_coarse.iterations_fig=params.iterations_fig+10;
             params_coarse.res_slice_fig=params.res_slice_fig+10;
             params_coarse.err_slice_fig=params.err_slice_fig+10;
-            [x_coarse,~,~,~]=rb_line_gs_2level_solve(K_coarse,F_coarse,X_coarse,params_coarse);
+            [x_coarse,~,~,~]=multigrid_solve(K_coarse,F_coarse,X_coarse,params_coarse);
         end
         fprintf('coarse solve done, level %g continuting\n',params.levels)
         % x = x + P*x_coarse
