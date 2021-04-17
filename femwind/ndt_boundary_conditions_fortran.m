@@ -1,34 +1,27 @@
-function K=ndt_assembly_fortran(A,X,u0,lambda,params,m); 
-% call fortran version and compare resultso
+function Kb=ndt_boundary_conditions_fortran(K,params); 
+% Kb=ndt_boundary_conditions_fortran(K,params); 
+% call fortran version and compare results
+% in:
+%     K global stiffness matrix ndt14 format
 
+m=size(K,4);
 if m~=14, 
-    error('must have m=14')
+    error('K must be in ndt 14 storage scheme')
 end
 
-K_m=ndt_assembly(A,X,[],[],params,m);
+%Writing to file for use by fortran tester
+write_array_nd(swap23(K),'K');
 
-%Writing all arrays to text files for use by fortran tester
-write_array_nd(A,'A');
-write_array_nd(swap23(X{1}),'X');
-write_array_nd(swap23(X{2}),'Y');
-write_array_nd(swap23(X{3}),'Z');
+system('./fortran/ndt_boundary_conditions_test.exe');
 
-system('./fortran/ndt_assembly_test.exe');
-K = swap23(read_array_nd('K'));
+Kb = swap23(read_array_nd('Kb'));
 
-err = norm(K_m(:) - K(:),inf)
+% the same in matlab
+Ks = ndt_convert(K,'sparse');
+[Ksb,~]=apply_boundary_conditions(Ks,[],{K(:,:,:,1)});
+
+% convert to sparse and compare
+Kbs = ndt_convert(Kb,'sparse');
+err = big(Ksb - Kbs)
 end
 
-function u=swap23(v)
-[n1,n2,n3,n4]=size(v);
-u=zeros(n1,n3,n2,n4);
-for l=1:n4
-    for k=1:n3
-        for j=1:n2
-            for i=1:n1
-                 u(i,k,j,l)=v(i,j,k,l);
-            end
-        end
-    end
-end
-end
