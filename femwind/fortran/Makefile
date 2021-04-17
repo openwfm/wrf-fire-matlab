@@ -7,7 +7,7 @@ FFLAGS = -g -C -fpe0 -traceback
 default: hexa_test.exe\
  ndt_mult_test.exe\
  sweeps_test.exe\
- ndt_assembly_test.exe\
+ ndt_f_test.exe\
  prolongation_test.exe\
  restriction_test.exe\
  ndt_boundary_conditions_test.exe\
@@ -48,6 +48,15 @@ ndt_assembly_test.o: ndt_assembly_test.f90 module_hexa.o module_io_matlab.o modu
 
 module_ndt_assembly.o: module_ndt_assembly.f90 module_hexa.o Makefile
 	$(FC) $(FFLAGS) -c module_ndt_assembly.f90  
+
+ndt_f_test.exe: ndt_f_test.o module_ndt_f_assembly.o module_io_matlab.o module_hexa.o  Makefile
+	$(FC) $(FFLAGS) -o ndt_f_test.exe ndt_f_test.o  module_ndt_f_assembly.o module_io_matlab.o module_hexa.o
+
+module_ndt_f_assembly.o: module_ndt_f_assembly.f90 module_hexa.o Makefile
+	$(FC) $(FFLAGS) -c module_ndt_f_assembly.f90
+
+ndt_f_test.o: ndt_f_test.f90 module_ndt_f_assembly.o module_io_matlab.o module_hexa.o Makefile
+	$(FC) $(FFLAGS) -c ndt_f_test.f90
 
 module_coarsening.o: module_coarsening.f90 module_hexa.o Makefile
 	$(FC) $(FFLAGS) -c module_coarsening.f90  
