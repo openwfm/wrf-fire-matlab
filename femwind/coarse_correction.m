@@ -1,12 +1,19 @@
 function x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params)
     n = size(X{1});
-    F_coarse = restriction(reshape(F-K*x,n),hzc,icl3,X,params);
-    F_coarse = F_coarse(:);
+    F_coarse3d = restriction(reshape(F-K*x,n),hzc,icl3,X,params);
+    F_coarse = F_coarse3d(:);
     if params.apply_coarse_boundary_conditions
         [K_coarse,F_coarse]=apply_boundary_conditions(K_coarse,F_coarse,X_coarse);
     end
     if params.levels<=2 % next is 1, the coarsest
-        x_coarse = K_coarse\F_coarse;
+        if params.coarsest_iter==0
+            x_coarse = K_coarse\F_coarse;
+        else
+            x_coarse =zeros(size(F_coarse));
+            for it=1:params.coarsest_iter
+                x_coarse=smoothing(K_coarse,F_coarse,X_coarse,x_coarse,params);
+            end
+        end
     else  % solve coarse problem recursively
         params_coarse=params;  % copy all params 
         params_coarse.levels=params.levels-1;

@@ -29,13 +29,15 @@ if ~exist('params','var') | isempty(params)
     params.terrain_height=0.1; % terrain height as part of domain height
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
+    params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
+    params.coarsest_iter=100; % 0 = direct solver n>0 number of iterations
+    params.nsmooth=3; % smoothing iterations before correcton
     params.coarsening='2 linear';
     % params.coarse_P='variational';  
     params.coarse_K='assembly';
     params.P_by_x=1;  % prolongation by geometrically linear interpolation
     params.smoothing='vertical sweeps';
     % params.smoothing='3D red-black';
-    params.nsmooth=3; % smoothing iterations before correcton
     params.restol=1e-6;
     params.exact=0; % compare with exact solution to compute error
     params.slice=0.5; % vertical y slice of error to display, 0 to 1
@@ -47,7 +49,6 @@ if ~exist('params','var') | isempty(params)
     params.levels=3;
     params.apply_coarse_boundary_conditions=1;
     params.nsmooth_coarse=2;
-    params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     params.save_files=0; % save progress levels=3, workspace=2 params only=1
     params.save_file_prefix='femwind';  
     %Define Streamline Starting Points: Defined in terms of scale*nelem
