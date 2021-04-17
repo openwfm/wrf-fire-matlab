@@ -10,7 +10,8 @@ default: hexa_test.exe\
  ndt_assembly_test.exe\
  prolongation_test.exe\
  restriction_test.exe\
- ndt_boundary_conditions_test.exe
+ ndt_boundary_conditions_test.exe\
+ vec_boundary_conditions_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
@@ -68,7 +69,7 @@ ndt_boundary_conditions_test.exe: $(NDT_BOUNDARY_CONDITIONS) Makefile
 
 VEC_BOUNDARY_CONDITIONS = vec_boundary_conditions_test.f90  module_boundary_conditions.o module_io_matlab.o
 vec_boundary_conditions_test.exe: $(VEC_BOUNDARY_CONDITIONS) Makefile
-	$(FC) $(FFLAGS) -o $@ $(NDT_BOUNDARY_CONDITIONS) 
+	$(FC) $(FFLAGS) -o $@ $(VEC_BOUNDARY_CONDITIONS)
 
 clean:
 	rm -rf *.mod *.o *.exe

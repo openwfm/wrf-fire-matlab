@@ -82,7 +82,7 @@ subroutine vec_boundary_conditions(                              &
     ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifts, ifte, kfts, kfte, jfts,jfte,             &
-    lambda)
+    F)
 
 implicit none
 
@@ -94,7 +94,7 @@ integer, intent(in)::                             &
     ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
 
 integer, parameter:: msize = 14
-real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: lambda  ! corner-based scalar field
+real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: F  ! corner-based scalar field
 
 !*** local
 
@@ -107,7 +107,7 @@ do j=jfts,jfte
     do i=ifts,ifte
       ! not efficient, change later 
       if(i.eq.ifds.or.i.eq.ifde.or.j.eq.jfds.or.j.eq.jfde.or.k.eq.kfde)then
-        lambda(i,k,j)=0.
+        F(i,k,j)=0.
       endif
     enddo
   enddo
