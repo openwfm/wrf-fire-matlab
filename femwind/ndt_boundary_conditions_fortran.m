@@ -23,5 +23,8 @@ Ks = ndt_convert(K,'sparse');
 % convert to sparse and compare
 Kbs = ndt_convert(Kb,'sparse');
 err = big(Ksb - Kbs)
+if err > eps(single(1.0))*big(Ksb)*10
+    error('error too large')
+end
 end
 
