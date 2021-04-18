@@ -67,15 +67,18 @@ RESTRICTION = restriction_test.f90  module_coarsening.o module_io_matlab.o
 restriction_test.exe: $(RESTRICTION) 
 	$(FC) $(FFLAGS) -o restriction_test.exe $(RESTRICTION) 
 
-w_assembly_test.exe: w_assembly_test.o module_w_assembly.o module_io_matlab.o module_hexa.o Makefile
-	$(FC) $(FFLAGS) -o w_assembly_test.exe w_assembly_test.o module_w_assembly.o module_io_matlab.o module_hexa.o
+w_assembly_test.exe: w_assembly_test.o module_w_assembly.o module_io_matlab.o module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -o w_assembly_test.exe w_assembly_test.o module_w_assembly.o module_io_matlab.o module_hexa.o module_lin_alg.o
 
 w_assembly_test.o: w_assembly_test.f90  module_hexa.o module_io_matlab.o module_ndt_assembly.o module_w_assembly.o Makefile
 	$(FC) $(FFLAGS) -c w_assembly_test.f90
 
-module_w_assembly.o:  module_w_assembly.f90 module_hexa.o Makefile
+module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
 	$(FC) $(FFLAGS) -c module_w_assembly.f90
- 
+
+module_lin_alg.o:  module_lin_alg.f90 Makefile
+	$(FC) $(FFLAGS) -c module_lin_alg.f90 
+
 
 clean:
 	rm -rf *.mod *.o *.exe
