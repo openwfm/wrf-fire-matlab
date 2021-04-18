@@ -9,7 +9,7 @@ A = diag([1 1 1])
 lambda=[]
 params=[]
 % [u1, u2, u3] = ndgrid()
-u0={rand(nel), rand(nel), rand(nel)};
+u0={rand(n), rand(n), rand(n)};
 iflags = [2 1 1]
 iflags = iflags(:)
 

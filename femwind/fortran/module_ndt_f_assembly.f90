@@ -52,8 +52,8 @@ kglo = 0.
 do ie2=jfts,jfte -1
     do ie3=kfts, kfte -1
         do ie1=ifts, ifte -1
-            do ic3=0,1
-                do ic2=0,1
+            do ic2=0,1
+                do ic3=0,1
                     do ic1=0,1
                         iloc=1+ic1+2*(ic2+2*ic3)  !local index of the node in the element
                         k1 = ie1+ic1 
@@ -71,11 +71,15 @@ do ie2=jfts,jfte -1
             u0loc(2) = Yu0(ie1,ie3,ie2)
             u0loc(3) = Zu0(ie1,ie3,ie2)
 
-            print *, kglo 
             call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,iflags)
-            do i = 1,8
-                F(kglo(i)) = F(kglo(i)) + Floc(i)
-            enddo
+            F(kglo(1)) = F(kglo(1)) + Floc(1)
+            F(kglo(2)) = F(kglo(2)) + Floc(2)
+            F(kglo(3)) = F(kglo(3)) + Floc(3)
+            F(kglo(4)) = F(kglo(4)) + Floc(4)
+            F(kglo(5)) = F(kglo(5)) + Floc(5)
+            F(kglo(6)) = F(kglo(6)) + Floc(6)
+            F(kglo(7)) = F(kglo(7)) + Floc(7)
+            F(kglo(8)) = F(kglo(8)) + Floc(8)
         enddo
     enddo
 enddo

@@ -9,15 +9,15 @@ nn = prod(n);     % total nodes
 F = zeros(nn,1);
 Xloc = zeros(3,8);
 kglo=zeros(1,8);
-uloc = zeros(3);
+u0loc = zeros(3);
 
 for ie2=1:n(2)-1  % loop over elements
     for ie3=1:n(3)-1
         for ie1=1:n(1)-1  
             % now in element (ie1,ie2,ie3)
             % build the matrix of node coordinates to pass to hexa
-            for ic3=0:1 % loop over corners of the element
-                for ic2=0:1
+            for ic2=0:1 % loop over corners of the element
+                for ic3=0:1
                     for ic1=0:1   
                         iloc=1+ic1+2*(ic2+2*ic3);  % local index of the node in the element
                         k1 = ie1+ic1; k2 = ie2+ic2; k3 = ie3+ic3; %  position of the node in the global grid
@@ -33,7 +33,6 @@ for ie2=1:n(2)-1  % loop over elements
             else
                 u0loc=[];
             end
-            kglo
             [~,Floc,~]=hexa(A,Xloc,u0loc); % compute the local load vector
             for i = 1:8
                 F(kglo(i)) = F(kglo(i))+Floc(i);
