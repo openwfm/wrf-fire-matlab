@@ -1,9 +1,12 @@
 function [x,it,rate,X_coarse]=multigrid_solve(K,F,X,params)
 % x=multigrid_solve(K,F,X)
+
+n = size(X{1});
+fprintf('multigrid level %i grid size %i %i %i rhs %g\n',params.levels,n,big(F))
+
 disp(['coarsening method ',params.coarsening])
 disp(['smoothing method ',params.smoothing])
 
-n = size(X{1});
 nn = size(F,1);
 if nn~=prod(n)
     error('rb_line_gs_solve: inconsistent sizes')
@@ -35,11 +38,13 @@ switch params.coarsening
         % [P,X_coarse]=coarsening_2_linear(X,params);
         [hzc,icl3]=coarsening_icl(X,params);
         X_coarse=coarsening_X(hzc,icl3,X,params);
+        nnc=prod(size(X_coarse{1}));
         % P=coarsening_P(icl,X,params);
         prol_rest_err(hzc,icl3,X,params);
     otherwise
         error(['unknown coarsening ',params.coarsening])
 end
+fprintf('coarsening level variables %i coarse %i ratio %g\n',params.levels,nn,nnc,nn/nnc);  
 disp('computing coarse matrix')
 diary;diary
 switch params.coarse_K
@@ -64,6 +69,21 @@ if params.exact
 end
 cycles=0;
 t_cycle='first cycle not complete yet';
+if params.levels<=1 || nn == nnc % coarsest level
+    if params.coarsest_iter==0   % direct 
+        fprintf('multigrid coarsest level %i solving directly\n',params.levels)
+        x = K\F;
+    else
+        x =zeros(size(F));       % iterative
+        fprintf('multigrid coarsest level %i solving by %i iterations\n',params.levels,params.coarsest_iter)
+        for it=1:params.coarsest_iter
+            x=smoothing(K,F,X,x,params);
+        end
+        res=big(K*x-F);relres=res/big(F);rate=relres^(1/params.coarsest_iter);
+        fprintf('multigrid coarsest residual %g relative %g rate %g\n',res,relres,rate);
+    end
+    return
+end
 for it=1:params.maxit
     diary;diary
     params.it(params.levels)=it;  % where we are, for prints and filenames

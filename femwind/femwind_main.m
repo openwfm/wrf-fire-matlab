@@ -46,7 +46,7 @@ if ~exist('params','var') | isempty(params)
     params.iterations_fig=14; % figure number for iterations progress
     params.maxaspect=3;  % do not coarsen vertically if vertical layer is too thick
     params.minaspect=1/3; % do not coarsen horizontally if the layer is too thin
-    params.levels=3;
+    params.levels=15;
     params.apply_coarse_boundary_conditions=1;
     params.nsmooth_coarse=2;
     params.save_files=0; % save progress levels=3, workspace=2 params only=1
