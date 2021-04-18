@@ -2,7 +2,7 @@ module module_lin_alg
 
 contains
 
-subroutine inv(M, M_inv)
+subroutine inv3(M, Inv_M)
 !Purpose: Calculate the inverse of a 3X3 matrix
 !In:
 !M  3X3 matrix
@@ -14,7 +14,7 @@ real,intent(out), dimension(3,3):: Inv_M
 
 !Local Variables
 real, dimension(3,3)::M_T
-
+real :: det_M, det_M_inv
 
 !!Compute Inverse of M!!
 det_M =   M(1,1)*(M(2,2)*M(3,3)-M(3,2)*M(2,3)) -  &
@@ -25,15 +25,15 @@ det_M_inv = 1/det_M
 
 M_T   =  transpose(M)
 
-Inv_M(1,1) = det_M_inv*(M_T(2,2)*M_T(3,3) - M_T(2,3)M_T(3,2))
-Inv_M(1,2) = det_M_inv*(M_T(2,1)*M_T(3,3) - M_T(3,1)M_T(2,3))
-Inv_M(1,3) = det_M_inv*(M_T(2,1)*M_T(3,2) - M_T(2,2)M_T(3,1))
-Inv_M(2,1) = det_M_inv*(M_T(1,2)*M_T(3,3) - M_T(3,2)M_T(1,3))
-Inv_M(2,2) = det_M_inv*(M_T(1,1)*M_T(3,3) - M_T(3,1)M_T(1,3))
-Inv_M(2,3) = det_M_inv*(M_T(1,1)*M_T(3,2) - M_T(3,1)M_T(1,2))
-Inv_M(3,1) = det_M_inv*(M_T(1,2)*M_T(2,3) - M_T(1,3)M_T(2,2))
-Inv_M(3,2) = det_M_inv*(M_T(1,1)*M_T(2,3) - M_T(2,1)M_T(1,3))
-Inv_M(3,3) = det_M_inv*(M_T(1,1)*M_T(2,2) - M_T(1,2)M_T(2,1))
+Inv_M(1,1) = det_M_inv*(M_T(2,2)*M_T(3,3) - M_T(2,3)*M_T(3,2))
+Inv_M(1,2) = det_M_inv*(M_T(2,1)*M_T(3,3) - M_T(3,1)*M_T(2,3))
+Inv_M(1,3) = det_M_inv*(M_T(2,1)*M_T(3,2) - M_T(2,2)*M_T(3,1))
+Inv_M(2,1) = det_M_inv*(M_T(1,2)*M_T(3,3) - M_T(3,2)*M_T(1,3))
+Inv_M(2,2) = det_M_inv*(M_T(1,1)*M_T(3,3) - M_T(3,1)*M_T(1,3))
+Inv_M(2,3) = det_M_inv*(M_T(1,1)*M_T(3,2) - M_T(3,1)*M_T(1,2))
+Inv_M(3,1) = det_M_inv*(M_T(1,2)*M_T(2,3) - M_T(1,3)*M_T(2,2))
+Inv_M(3,2) = det_M_inv*(M_T(1,1)*M_T(2,3) - M_T(2,1)*M_T(1,3))
+Inv_M(3,3) = det_M_inv*(M_T(1,1)*M_T(2,2) - M_T(1,2)*M_T(2,1))
 
-end subroutine inv
+end subroutine inv3
 end module module_lin_alg 
