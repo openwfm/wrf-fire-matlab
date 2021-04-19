@@ -1,18 +1,19 @@
-function [hzc,icl3]=coarsening_icl(X,params)
-% [P,X_coarse]=coarsening_2_linear_decide(X,params)
+function [hzc,icl3]=coarsening_icl(dx,dy,dz,params)
+% [[hzc,icl3]=coarsening_icldx,dy,dz,params)
 % in:
-%   X           grid coordinates
+%   dx,dy       mesh spacings, scalars
+%   dz          vertical element sizes, vector
 %   params      structure
 % out:
 %   hzc         horizontal coarsening factors in directions 1 and 2
 %   icl3        coarse indices in direction 3
 % 
-    n = size(X{1});
-    nn=prod(n);
-    dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
-    dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
+    if ~isvector(dz),
+          error('dz must be a vector')
+    end
+    dz = dz(:)';  % make sure dz is a row
     dxy=min(dx,dy);  % horizontal step
-    dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
+    n3 = length(dz)+1;
     % decide on horizontal coarsening factor
     crit=(dz(1)/dxy)/params.a(3);
     if crit > params.minaspect
@@ -23,42 +24,33 @@ function [hzc,icl3]=coarsening_icl(X,params)
     hzcavg=sqrt(hzc(1)*hzc(2)); 
     fprintf('horizontal coarsening factor %g %g because weighted height=%g\n',...
         hzc, crit)
-    for i=1:2
-        icl{i}=1:hzc(i):n(i);
-        if icl{i}(end) ~= n(i)
-            icl{i}(end+1)=n(i); % last is coarse
-        end
-        disp(['horizontal ',num2str(i),' coarse layers ',num2str(icl{i})])
-    end
-    icl3=zeros(1,n(3)); % allocate max
+    icl3=zeros(1,n3); % allocate max
     lcl=1; % last coarse level
     icl3(1)=lcl;
-    nc(3)=0;
-    for i=1:n(3)
+    nc3=0;
+    for i=1:n3
         newlcl=lcl+1; % next coarse level by 1
-        if lcl+2 <= n(3) 
+        if lcl+2 <= n3 
             crit = ((dz(lcl)+dz(lcl+1))/(2*dxy*hzcavg/2))/params.a(3);
             if crit < params.maxaspect  
                 newlcl=lcl+2; % next coarse level by 2
             end
         end
         lcl = newlcl;
-        if lcl <= n(3)
+        if lcl <= n3
             icl3(i+1)=lcl;
         else % at the top already
-            nc(3)=i;
+            nc3=i;
             icl3 = icl3(1:i);
             break
         end
     end     
-    if nc(3)==0
+    if nc3==0
         error('number of coarse layers is 0')
     end
     disp(['vertical coarse layers ',num2str(icl3)])
-    hg=num2str(X{3}(1,1,icl3));
-    disp(['heights at corner ',hg])
-    hgc=num2str(X{3}(round(n(1)/2),round(n(2)/2),icl3));
-    disp(['heights at center ',hgc])
-    disp(['level ',num2str(params.levels),' grid size ',num2str([n,prod(n)]),...
-        ' coarse grid size ',num2str([nc,prod(nc)]),' coarsening ratio ',num2str(prod(n)/prod(nc))])
+    hg=[0,cumsum(dz)];
+    hgc=hg(icl3);
+    disp(['heights above terrain ',num2str(hg)])
+    disp(['coarse heights above terrain ',num2str(hgc)])
 end

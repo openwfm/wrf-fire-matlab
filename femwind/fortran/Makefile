@@ -1,6 +1,7 @@
 #FC = ifort
 #FC = gfortran
 #FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow
+#FFLAGS = -fast
 FFLAGS = -g -C -fpe0 -traceback
 
 default: hexa_test.exe\
@@ -8,7 +9,12 @@ default: hexa_test.exe\
  sweeps_test.exe\
  ndt_f_test.exe\
  prolongation_test.exe\
- restriction_test.exe
+ restriction_test.exe\
+ coarsening_icl_test.exe\
+ ndt_boundary_conditions_test.exe\
+ vec_boundary_conditions_test.exe\
+ ndt_assembly_test.exe\
+ w_assembly_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
@@ -63,8 +69,35 @@ prolongation_test.exe: $(PROLONGATION)
 	$(FC) $(FFLAGS) -o prolongation_test.exe $(PROLONGATION) 
 
 RESTRICTION = restriction_test.f90  module_coarsening.o module_io_matlab.o
-restriction_test.exe: $(RESTRICTION) 
+restriction_test.exe: $(RESTRICTION) Makefile
 	$(FC) $(FFLAGS) -o restriction_test.exe $(RESTRICTION) 
+
+ICL = coarsening_icl_test.f90  module_coarsening.o module_io_matlab.o
+coarsening_icl_test.exe: $(ICL) Makefile
+	$(FC) $(FFLAGS) -o $@ $(ICL) 
+
+module_boundary_conditions.o: module_boundary_conditions.f90 Makefile
+	$(FC) $(FFLAGS) -c module_boundary_conditions.f90  
+
+NDT_BOUNDARY_CONDITIONS = ndt_boundary_conditions_test.f90  module_boundary_conditions.o module_io_matlab.o
+ndt_boundary_conditions_test.exe: $(NDT_BOUNDARY_CONDITIONS) Makefile
+	$(FC) $(FFLAGS) -o $@ $(NDT_BOUNDARY_CONDITIONS) 
+
+VEC_BOUNDARY_CONDITIONS = vec_boundary_conditions_test.f90  module_boundary_conditions.o module_io_matlab.o
+vec_boundary_conditions_test.exe: $(VEC_BOUNDARY_CONDITIONS) Makefile
+	$(FC) $(FFLAGS) -o $@ $(VEC_BOUNDARY_CONDITIONS)
+
+w_assembly_test.exe: w_assembly_test.o module_w_assembly.o module_io_matlab.o module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -o w_assembly_test.exe w_assembly_test.o module_w_assembly.o module_io_matlab.o module_hexa.o module_lin_alg.o
+
+w_assembly_test.o: w_assembly_test.f90  module_hexa.o module_io_matlab.o module_ndt_assembly.o module_w_assembly.o Makefile
+	$(FC) $(FFLAGS) -c w_assembly_test.f90
+
+module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -c module_w_assembly.f90
+
+module_lin_alg.o:  module_lin_alg.f90 Makefile
+	$(FC) $(FFLAGS) -c module_lin_alg.f90 
 
 clean:
 	rm -rf *.mod *.o *.exe

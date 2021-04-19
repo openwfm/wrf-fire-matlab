@@ -1,9 +1,12 @@
-function [x,it,rate,X_coarse]=rb_line_gs_2level_solve(K,F,X,params)
-% x=rb_line_gs_solve(K,F,X)
+function [x,it,rate,X_coarse]=multigrid_solve(K,F,X,params)
+% x=multigrid_solve(K,F,X)
+
+n = size(X{1});
+fprintf('multigrid level %i grid size %i %i %i rhs %g\n',params.levels,n,big(F))
+
 disp(['coarsening method ',params.coarsening])
 disp(['smoothing method ',params.smoothing])
 
-n = size(X{1});
 nn = size(F,1);
 if nn~=prod(n)
     error('rb_line_gs_solve: inconsistent sizes')
@@ -33,13 +36,18 @@ switch params.coarsening
         end
     case '2 linear'
         % [P,X_coarse]=coarsening_2_linear(X,params);
-        [hzc,icl3]=coarsening_icl(X,params);
+        dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
+        dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
+        dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
+        [hzc,icl3]=coarsening_icl_fortran(dx,dy,dz,params);
         X_coarse=coarsening_X(hzc,icl3,X,params);
+        nnc=prod(size(X_coarse{1}));
         % P=coarsening_P(icl,X,params);
         prol_rest_err(hzc,icl3,X,params);
     otherwise
         error(['unknown coarsening ',params.coarsening])
 end
+fprintf('coarsening level variables %i coarse %i ratio %g\n',params.levels,nn,nnc,nn/nnc);  
 disp('computing coarse matrix')
 diary;diary
 switch params.coarse_K
@@ -64,86 +72,34 @@ if params.exact
 end
 cycles=0;
 t_cycle='first cycle not complete yet';
+if params.levels<=1 || nn == nnc % coarsest level
+    if params.coarsest_iter==0   % direct 
+        fprintf('multigrid coarsest level %i solving directly\n',params.levels)
+        x = K\F;
+    else
+        x =zeros(size(F));       % iterative
+        fprintf('multigrid coarsest level %i solving by %i iterations\n',params.levels,params.coarsest_iter)
+        for it=1:params.coarsest_iter
+            x=smoothing(K,F,X,x,params);
+        end
+        res=big(K*x-F);relres=res/big(F);rate=relres^(1/params.coarsest_iter);
+        fprintf('multigrid coarsest residual %g relative %g rate %g\n',res,relres,rate);
+    end
+    return
+end
 for it=1:params.maxit
     diary;diary
     params.it(params.levels)=it;  % where we are, for prints and filenames
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
         fprintf('iteration %g level %g coarse correction\n',it,params.levels)
-        % F_coarse = P'*(F - K*x);
-        F_coarse = restriction(reshape(F-K*x,n),hzc,icl3,X,params);
-        F_coarse = F_coarse(:);
-        if params.apply_coarse_boundary_conditions
-            [K_coarse,F_coarse]=apply_boundary_conditions(K_coarse,F_coarse,X_coarse);
-        end
-        if params.levels<=2 % next is 1, the coarsest
-            x_coarse = K_coarse\F_coarse;
-        else  % solve coarse problem recursively
-            params_coarse=params;  % copy all params 
-            params_coarse.levels=params.levels-1;
-            params_coarse.nsmooth=params.nsmooth_coarse;
-            params_coarse.maxit=params.maxit_coarse;
-            params_coarse.iterations_fig=params.iterations_fig+10;
-            params_coarse.res_slice_fig=params.res_slice_fig+10;
-            params_coarse.err_slice_fig=params.err_slice_fig+10;
-            [x_coarse,~,~,~]=rb_line_gs_2level_solve(K_coarse,F_coarse,X_coarse,params_coarse);
-        end
-        fprintf('coarse solve done, level %g continuting\n',params.levels)
-        % x = x + P*x_coarse
-        x_increment = prolongation(reshape(x_coarse,size(X_coarse{1})),hzc,icl3,X,params);
-        x = x + x_increment(:);
+        x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params);
         it_type=sprintf('level %g coarse correction',params.levels);
     else
         fprintf('iteration %g level %g smoothing by %s\n',it,params.levels,params.smoothing)
-        it_type=sprintf('level %g smoothing',params.levels);
-        switch params.smoothing
-            case {'horizontal planes'}
-                % disp('red-black vertical, planes horizontal')
-                for rb3=1:2
-                    for i3=rb3:2:n(3)
-                            [planex,planey]=ndgrid(1:n(1),1:n(2));
-                            planez = i3*ones(n(1),n(2));
-                            % solving horizontal layer
-                            ix = sub2ind(n,planex,planey,planez); 
-                            x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
-                    end
-                end
-            case {'vertical lines'}
-                % disp('red-black relaxation horizontal, lines vertical')
-                for rb1=1:2
-                    for rb2=1:2
-                        for i1=rb1:2:n(1)
-                            for i2=rb2:2:n(2)
-                                % solving horizontal location i1 i2 and vertical line
-                                ix = sub2ind(n,i1*onez,i2*onez,colz); 
-                                x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
-                            end
-                        end
-                    end
-                end
-            case {'vertical sweeps'}
-                % disp('red-black relaxation horizontal, down to up sweep vertical')
-                x = vertical_sweeps(K,F,X,x);
-            case '3D red-black'
-                for rb1=1:2
-                    for rb2=1:2
-                        for rb3=1:2    
-                            for i1=rb1:2:n(1)
-                                for i2=rb2:2:n(2)
-                                    for i3=rb3:2:n(3)
-                                        ix = sub2ind(n,i1,i2,i3); 
-                                        x(ix) = x(ix) - K(ix,ix)\(K(:,ix)'*x - F(ix));
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            otherwise
-                error(['smoothing ',params.smoothing,' unknown'])
-        end
+        x=smoothing(K,F,X,x,params);
     end
-    r=F-K*x;  % residualm diagnostics only
+    r=F-K*x;  % residual for diagnostics only
     if params.exact
         e=x-ex;   % error
     else
@@ -185,3 +141,5 @@ if params.save_files > 2
     save(sfile,'-v7.3')
 end
 end
+
+

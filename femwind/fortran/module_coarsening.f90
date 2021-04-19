@@ -11,13 +11,13 @@ subroutine prolongation(   &
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile 
-    u,uc,cr_x,cr_y,cl_z,X,Y,Z)
+    u,uc,cr_x,cr_y,icl_z,X,Y,Z)
 
 ! Multiply by the prolongation matrix
 ! In:
 !   uc      coarse grid vector
 !   cr_x, cr_y  coarsening factor in horizontal directions x and y
-!   cl_z    1D array, indices of coarse grid in the z directions
+!   icl_z    1D array, indices of coarse grid in the z directions
 !   X,Y,Z   grid coordinates 
 ! Out:
 !   u      fine grid vector 
@@ -39,7 +39,7 @@ real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: X,Y,Z !spatial grid
 real, intent(in), dimension(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme):: uc ! coarse vector
 
 integer, intent(in):: cr_x, cr_y, &       ! coarsening factors in the horizonal directions
-    cl_z(kfcts:kfcte)                      ! indices of coarse grid in the vertical direction
+    icl_z(kfcts:kfcte)                      ! indices of coarse grid in the vertical direction
 
 real, intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: u ! fine grid interpolant
 
@@ -52,19 +52,19 @@ real:: qi,qj,qk
 ! zero the output to ready for contributions
 u(ifts:ifte,kfts:kfte,jfts:jfte) = 0.
 
-if ((cl_z(kfcts) .ne. kfts) .or. (cl_z(kfcte) .ne. kfte)) then
+if ((icl_z(kfcts) .ne. kfts) .or. (icl_z(kfcte) .ne. kfte)) then
     call crash('vertical corsening must include all domain')
 endif
 
 do kc=kfcts,kfcte           ! loop over coarse layers    
-    kfc=cl_z(kc);          ! the fine grid number of the coarse layer
+    kfc=icl_z(kc);          ! the fine grid number of the coarse layer
     if (kfc>kfts) then
-        kfs=cl_z(kc-1)+1   ! from above previous coarse     
+        kfs=icl_z(kc-1)+1   ! from above previous coarse     
     else
         kfs=kfc            ! itself, there is no previous fine layer
     endif
     if (kfc<kfde) then
-        kfe=cl_z(kc+1)-1   ! up to under next layer
+        kfe=icl_z(kc+1)-1   ! up to under next layer
     else
         kfe=kfc            ! itself, there is no next layer
     endif
@@ -131,13 +131,13 @@ subroutine restriction(   &
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile 
-    uc,u,cr_x,cr_y,cl_z,X,Y,Z)
+    uc,u,cr_x,cr_y,icl_z,X,Y,Z)
 
 ! Multiply by the prolongation matrix transpose
 ! In:
 !   u      fine grid vector 
 !   cr_x, cr_y  coarsening factor in horizontal directions x and y
-!   cl_z    1D array, indices of coarse grid in the z directions
+!   icl_z    1D array, indices of coarse grid in the z directions
 !   X,Y,Z   grid coordinates 
 ! Out:
 !   uc      coarse grid vector
@@ -159,7 +159,7 @@ real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: X,Y,Z !spatial grid
 real, intent(out), dimension(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme):: uc ! coarse vector
 
 integer, intent(in):: cr_x, cr_y, &       ! coarsening factors in the horizonal directions
-    cl_z(kfcts:kfcte)                      ! indices of coarse grid in the vertical direction
+    icl_z(kfcts:kfcte)                      ! indices of coarse grid in the vertical direction
 
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: u ! fine grid interpolant
 
@@ -172,19 +172,19 @@ real:: qi,qj,qk
 ! zero the output to ready for contributions
 uc(ifcts:ifcte,kfcts:kfcte,jfcts:jfcte) = 0.
 
-if ((cl_z(kfcts) .ne. kfts) .or. (cl_z(kfcte) .ne. kfte)) then
+if ((icl_z(kfcts) .ne. kfts) .or. (icl_z(kfcte) .ne. kfte)) then
     call crash('vertical corsening must include all domain')
 endif
 
 do kc=kfcts,kfcte           ! loop over coarse layers    
-    kfc=cl_z(kc);          ! the fine grid number of the coarse layer
+    kfc=icl_z(kc);          ! the fine grid number of the coarse layer
     if (kfc>kfts) then
-        kfs=cl_z(kc-1)+1   ! from above previous coarse     
+        kfs=icl_z(kc-1)+1   ! from above previous coarse     
     else
         kfs=kfc            ! itself, there is no previous fine layer
     endif
     if (kfc<kfde) then
-        kfe=cl_z(kc+1)-1   ! up to under next layer
+        kfe=icl_z(kc+1)-1   ! up to under next layer
     else
         kfe=kfc            ! itself, there is no next layer
     endif
@@ -243,5 +243,74 @@ do kc=kfcts,kfcte           ! loop over coarse layers
 enddo
 
 end subroutine restriction
+
+subroutine coarsening_icl(cr_x,cr_y,icl_z,dx,dy,dz,A,minaspect,maxaspect)
+! decide on coarsening
+! in:
+!   dx,dy       mesh spacings, scalar
+!   dz          verticl element size, vector
+!   A           matrix size (3,3), only diagonal used
+! out:
+!   cr_x,cr_y   horizontal coarsening factors in directions 1 and 2
+!   icl_z       coarse indices in direction 3
+implicit none
+
+!*** arguments
+real,intent(in):: dx,dy,dz(:),A(:,:)
+real,intent(in):: minaspect,maxaspect
+integer,intent(out):: cr_x,cr_y
+integer,pointer,intent(out):: icl_z(:)
+
+!*** local
+real:: dxy,crit,hzcavg,arat
+integer, allocatable:: icl3(:)
+integer:: nc3,newlcl,lcl,i,n3
+
+
+!*** executable
+    dxy=min(dx,dy)  ! horizontal step
+    n3 = size(dz)+1 !
+    arat = A(3,3)/min(A(1,1),A(2,2))  ! scaled vertical penalty
+    ! decide on horizontal coarsening factors
+    crit=(dz(1)/dxy)/arat
+    if (crit > minaspect) then
+        cr_x = 2 
+        cr_y = 2 
+    else
+        cr_x = 1 
+        cr_y = 1 
+    endif
+    hzcavg=sqrt(real(cr_x*cr_y)); 
+    print *,'horizontal coarsening factors ',cr_x,cr_y, ' because weighted height is ', crit
+    allocate(icl3(n3+1))
+    icl3=0
+    lcl=1 ! last coarse level
+    icl3(1)=lcl
+    nc3=0
+    do i=1,n3
+        newlcl=lcl+1  ! next coarse level by 1
+        if (lcl+2 <= n3) then
+            crit = ((dz(lcl)+dz(lcl+1))/(dxy*hzcavg))/arat
+            if (crit < maxaspect ) then
+                newlcl=lcl+2 ! next coarse level by 2
+            endif
+        endif
+        lcl = newlcl;
+        if (lcl <= n3) then
+            icl3(i+1)=lcl
+        else ! at the top already
+            nc3=i
+            allocate(icl_z(i))
+            icl_z = icl3(1:i)
+            exit
+        endif
+    enddo     
+    deallocate(icl3)
+    if (nc3==0) then
+        call crash('coarsening_icl: number of coarse layers is 0')
+    endif
+    print *,'vertical coarse layers ',icl_z
+
+end subroutine coarsening_icl
 end module module_coarsening
 

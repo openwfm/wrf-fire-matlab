@@ -33,12 +33,19 @@ x1=ones(n1,n2,n3);
 y27=ndt_mult(K27,x1);
 K27_err_zero=big(y27)  % should be zero
 
+
 disp('compare matrix vector multiply nd and ndt 27 numbers per row')
 xr=rand(n1,n2,n3);
 y27=ndt_mult(K27,xr);
 yn=nd_mult(K,xr);
 Kn_27_err=big(yn-y27)
 
+if exist('fortran/ndt_boundary_conditions_test.exe')
+    disp('testing if ndt_boundary_conditions gives same result in fortran')
+    ndt_boundary_conditions_fortran(K14);
+else
+    warning('fortran/ndt_boundary_conditions_test.exe not available')
+end
 
 disp('multiplying st 14 by random')
 y14=ndt_mult(K14,xr);
@@ -47,7 +54,7 @@ if abs(K14_err_rand)>1e-10, error('should be zero'),end
 
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/ndt_mult_test.exe')
-    disp('testing if same result in fortran')
+    disp('testing if ndt_mult same result in fortran')
     err=ndt_mult_fortran(K14,xr)
     if abs(err)<1e-6
         fprintf('error %g OK\n',err)
