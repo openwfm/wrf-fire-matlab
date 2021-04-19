@@ -36,6 +36,9 @@ kglo=zeros(1,8);
 m = n-1;
 done_last=0;
 disp('accumulating global stiffness matrix entries')
+
+F_other = ndt_f_assembly(A,X,u0,params);
+
 for i3=1:m(3)
     for i2=1:m(2)
         for i1=1:m(1)  % loop over elements
@@ -82,6 +85,9 @@ for i3=1:m(3)
         % if done>done_last+5, fprintf(' %g%% ',done), done_last=done; end
     end
 end
+
+F_err = norm(F(:)-F_other(:),inf);
+
 if ~isempty(u0)
     for i=1:3
         W{i}=u0{i}+W{i};

@@ -33,6 +33,11 @@ for ie2=1:n(2)-1  % loop over elements
             else
                 u0loc=[];
             end
+            ie1;
+            ie2;
+            ie3;
+            u0loc;
+            
             [~,Floc,~]=hexa(A,Xloc,u0loc); % compute the local load vector
             for i = 1:8
                 F(kglo(i)) = F(kglo(i))+Floc(i);
