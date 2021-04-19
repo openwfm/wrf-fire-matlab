@@ -6,6 +6,9 @@ y= ndt_f_assembly(A,X,u0);
 write_array_nd(swap23(X{1}),'X');
 write_array_nd(swap23(X{2}),'Y');
 write_array_nd(swap23(X{3}),'Z');
+write_array_nd(swap23(u0{1}),'Xu0');
+write_array_nd(swap23(u0{2}),'Yu0');
+write_array_nd(swap23(u0{3}),'Zu0');
 
 write_array(A,'A')
 write_array(iflags,'iflags')

@@ -2,7 +2,7 @@ function err=hexa_fortran(A,X,u0)
 
 [Kloc,Floc,Jg]=hexa(A,X,u0)
 
-iflags = [3 1 1]
+iflags = [2 1 1]
 iflags = iflags(:)
 write_array(A,'A')
 write_array(X,'X')
