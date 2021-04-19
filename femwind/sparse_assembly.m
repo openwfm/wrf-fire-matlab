@@ -88,7 +88,7 @@ end
 
 F_err = norm(F(:)-F_other(:),inf)
 if F_err > 1e-10*norm(F(:)),
-    error('ndt_f_assembly errror too large')
+    warning('ndt_f_assembly errror too large')
 end
 
 if ~isempty(u0)
