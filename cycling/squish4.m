@@ -306,11 +306,11 @@ for k = 1:smoothings
     
     %only do norm for times before final detection time
     time_mask = tign_new < pts(end,3);  %max(max(pts(:,3)));
-    norms(k,2) = norm(tign_new(time_mask)-tign_old(time_mask));%/norm(tign_old(time_mask));
+    norms(k,2) = norm(tign_new(time_mask)-tign_old(time_mask))/norm(tign_old(time_mask)-min(tign_old(:)));
     figure(fig_num+3);plot(norms(1:k,1));
     xlabel('Iterations of Interpolation')
-    ylabel('Norm of difference')
-    tstr = sprintf('Norm of difference between successive \n TIGN after each interpolation');
+    ylabel('Relative of difference')
+    tstr = sprintf('Relative difference between successive \n TIGN after each interpolation');
     title(tstr)
     figure(fig_num+4);plot(1:k,norms(1:k,2))
     tstr = sprintf('Norm of difference between times of \n detections and TIGN at detection locations');
