@@ -86,7 +86,7 @@ for i3=1:m(3)
     end
 end
 
-F_err = norm(F(:)-F_other(:),inf);
+F_err = norm(F(:)-F_other(:),inf)
 
 if ~isempty(u0)
     for i=1:3
