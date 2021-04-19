@@ -86,7 +86,8 @@ for i3=1:m(3)
     end
 end
 
-F_err = norm(F(:)-F_other(:),inf)
+ F_err = norm(F(:)-F_other(:),inf)
+
 if F_err > 1e-10*norm(F(:)),
     warning('ndt_f_assembly errror too large')
 end

@@ -9,7 +9,7 @@ subroutine ndt_f_assembly(                        &
     !iude, jude, kude,                             & !domain bounds for u0
     iums, iume, kums, kume, jums, jume,           &
     A, X, Y, Z, Xu0, Yu0, Zu0,iflags,             & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
-    F, F_dim)                                             !Global load vector output  
+    F)                                             !Global load vector output  
 
 implicit none
 
@@ -33,13 +33,13 @@ real, intent(in), dimension(iums:iume, kums:kume, jums:jume):: Xu0, Yu0, Zu0
 !Input for hexa
 integer, intent(in)::iflags
 
-integer,intent(in)::F_dim
+!integer,intent(in)::F_dim
 
-real,intent(out), dimension(1:F_dim)::F
+real,intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::F
 
 !*** local
 
-integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, k1, k2, k3, i
+integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, k1, k2, k3, id1, id2, id3
 real :: Kloc(8,8), Floc(8), Jg(8,3)
 real ::  Xloc(3,8), u0loc(3) 
 real :: kglo(8)
@@ -63,7 +63,6 @@ do ie2=jfts,jfte -1
                         k1 = ie1+ic1 
                         k2 = ie2+ic2
                         k3 = ie3+ic3
-                        kglo(iloc) = k1+(ifte)*((k2-1)+kfte*(k3-1))
                         Xloc(1,iloc)=X(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                         Xloc(2,iloc)=Y(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                         Xloc(3,iloc)=Z(ie1 + ic1, ie3 + ic3, ie2 + ic2)
@@ -75,19 +74,18 @@ do ie2=jfts,jfte -1
             u0loc(2) = Yu0(ie1,ie3,ie2)
             u0loc(3) = Zu0(ie1,ie3,ie2)
             
-            !print*, ie1, ie3, ie2
-
-            !print *, u0loc
-            
             call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,iflags)
-            F(kglo(1)) = F(kglo(1)) + Floc(1)
-            F(kglo(2)) = F(kglo(2)) + Floc(2)
-            F(kglo(3)) = F(kglo(3)) + Floc(3)
-            F(kglo(4)) = F(kglo(4)) + Floc(4)
-            F(kglo(5)) = F(kglo(5)) + Floc(5)
-            F(kglo(6)) = F(kglo(6)) + Floc(6)
-            F(kglo(7)) = F(kglo(7)) + Floc(7)
-            F(kglo(8)) = F(kglo(8)) + Floc(8)
+            do id2 = 0,1
+                do id3 = 0,1
+                    do id1 = 0,1
+                        iloc=1+id1+2*(id2+2*id3)  !local index of the node in the element
+                        k1 = ie1+id1
+                        k2 = ie2+id2
+                        k3 = ie3+id3
+                        F(k1,k3,k2) = F(k1,k3,k2) + Floc(iloc)
+                    enddo
+                enddo
+            end do
         enddo
     enddo
 enddo
