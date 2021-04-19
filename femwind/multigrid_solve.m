@@ -36,7 +36,10 @@ switch params.coarsening
         end
     case '2 linear'
         % [P,X_coarse]=coarsening_2_linear(X,params);
-        [hzc,icl3]=coarsening_icl(X,params);
+        dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
+        dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
+        dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
+        [hzc,icl3]=coarsening_icl(dx,dy,dz,params);
         X_coarse=coarsening_X(hzc,icl3,X,params);
         nnc=prod(size(X_coarse{1}));
         % P=coarsening_P(icl,X,params);
