@@ -39,6 +39,16 @@ integer :: i,j,k,m
 real :: detJx = 0
 real :: tmp = 0
 real :: vol = 0
+gradf = 0.
+Jg_tmp = 0.
+Jx = 0.
+Jx_inv = 0.
+Jg_tran = 0.
+A_tmp = 0.
+K_at_s = 0.
+tmp_mat = 0.
+u0_tmp = 0.
+
 Kloc = 0.
 Floc = 0.
 Jg = 0.
