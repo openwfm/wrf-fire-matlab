@@ -25,7 +25,7 @@ T = rand(3);
 % T = magic(3);
 X = T*X0+rand(3,1)*ones(1,8);
 
-u = [1, 2, 3]';
+u = rand(3,1);
 [K, F, Jg] = hexa(A,X,u);
 eig(K)  % one eigenvalue zero
 

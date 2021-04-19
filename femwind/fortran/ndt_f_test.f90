@@ -30,6 +30,7 @@ call read_array(Zu0, 'Zu0')
 
 iflags = aflags(1,1,1) 
 x_dim = shape(X)
+u_dim = shape(Xu0)
 
 ifts = 1
 ifte = x_dim(1)
@@ -61,7 +62,9 @@ kume = kude
 allocate(Xmat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Ymat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Zmat(ifms:ifme,kfms:kfme,jfms:jfme))
-
+allocate(Xu0mat(iums:iume,kums:kume,jums:jume))
+allocate(Yu0mat(iums:iume,kums:kume,jums:jume))
+allocate(Zu0mat(iums:iume,kums:kume,jums:jume))
 ! copy the input data to tile sized bounds
 do j=jfts,jfte
   do k=kfts,kfte
@@ -73,6 +76,15 @@ do j=jfts,jfte
   enddo
 enddo
 
+do j=juds,jude
+  do k=kuds,kude
+    do i=iuds,iude
+        Xu0mat(i,k,j) = Xu0(i,k,j)
+        Yu0mat(i,k,j) = Yu0(i,k,j)
+        Zu0mat(i,k,j) = Zu0(i,k,j)
+    enddo
+  enddo
+enddo
 
 
 
@@ -87,7 +99,9 @@ call ndt_f_assembly(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  A, Xmat , Ymat, Zmat, Xu0, Yu0, Zu0, iflags, F, F_dim)
+  iums, iume, kums, kume, jums, jume,                       &
+  A, Xmat , Ymat, Zmat, Xu0mat, Yu0mat, Zu0mat,             &
+  iflags, F, F_dim)
 
 !F_m = reshape(F,(/F_dim,1,1/))
 
