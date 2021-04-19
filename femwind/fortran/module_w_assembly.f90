@@ -10,9 +10,9 @@ subroutine w_assembly(                              &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     iuds, iude, kuds, kude, juds, jude,           & ! Wind tile and and memory bounds
-    iums, iume, kums, kume, jums, jume 
-    A, u0,v0,w0, lambda, aflags, n,               & !Input from femwind, u0, v0, w0
-    X, Y, Z,                                      & !Spatial Grid Data     
+    iums, iume, kums, kume, jums, jume,           & 
+    A, u0,v0,w0, lambda, aflags,               & !Input from femwind, u0, v0, w0
+    dim_lam,dim_x, X, Y, Z,                                      & !Spatial Grid Data     
     U,V,W)                                          !U,V,W  
 !Purpose: Create Arrays of Wind Vector Component Values at Center Points of Spatial Grid
 !In:
@@ -33,7 +33,7 @@ integer, intent(in)::                     &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
-    iuds, iude, kuds, kude, juds, jude,                       & ! Wind tile and and memory bounds
+    iuds, iude, kuds, kude, juds, jude,          & ! Wind tile and and memory bounds
     iums, iume, kums, kume, jums, jume  
 
 
@@ -42,14 +42,14 @@ integer, intent(in)::                     &
 real, intent(in), dimension(3,3):: A
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: u0,v0,w0
 integer, intent(in) :: aflags(2)
-integer, intent(in) :: n(3)
-integer, intent(in) :: lambda(product(n))
+integer, intent(in) :: dim_lam, dim_x(3)
+integer, intent(in) :: lambda(dim_lam)
 !Input for hexa
 
 
-real, intent(out), dimension(iums:iume, kums:kume, jums:jume)::U,V,W
-real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::X,Y,Z
 
+real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::X,Y,Z
+real, intent(out), dimension(iums:iume, kums:kume, jums:jume)::U,V,W
 
 !*** local
 
@@ -84,7 +84,7 @@ do ie2=jfts,jfte-1
                         k1 = ie1 + ic1
                         k2 = ie2 + ic2 
                         k3 = ie3 + ic3
-                        kgloi(kloci) = k1 + n2(1)*((k2-1) + n2(3)*(k3-1))  
+                        kgloi(kloci) = k1 + dim_x(1)*((k2-1) + dim_x(3)*(k3-1))  
                     enddo
                 enddo
             enddo
