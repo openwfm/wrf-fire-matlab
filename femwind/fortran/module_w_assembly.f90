@@ -9,7 +9,9 @@ subroutine w_assembly(                              &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
-    A, u0,v0,w0, lambda, iflags1, iflags2,n2,     & !Input from femwind, u0, v0, w0
+    iuds, iude, kuds, kude, juds, jude,           & ! Wind tile and and memory bounds
+    iums, iume, kums, kume, jums, jume 
+    A, u0,v0,w0, lambda, aflags, n,               & !Input from femwind, u0, v0, w0
     X, Y, Z,                                      & !Spatial Grid Data     
     U,V,W)                                          !U,V,W  
 !Purpose: Create Arrays of Wind Vector Component Values at Center Points of Spatial Grid
@@ -30,20 +32,23 @@ integer, intent(in)::                     &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte            
+    ifts, ifte, kfts, kfte, jfts,jfte,            &
+    iuds, iude, kuds, kude, juds, jude,                       & ! Wind tile and and memory bounds
+    iums, iume, kums, kume, jums, jume  
 
 
 
 
 real, intent(in), dimension(3,3):: A
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: u0,v0,w0
-integer, intent(in) :: iflags1, iflags2
-integer, intent(in) :: n2(3)
-integer, intent(in) :: lambda(product(n2))
+integer, intent(in) :: aflags(2)
+integer, intent(in) :: n(3)
+integer, intent(in) :: lambda(product(n))
 !Input for hexa
 
 
-real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::U,V,W
+real, intent(out), dimension(iums:iume, kums:kume, jums:jume)::U,V,W
+real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::X,Y,Z
 
 
 !*** local
@@ -60,7 +65,7 @@ Jg = 0.
 Kloc = 0.
 Floc = 0.
 grad = 0.
-
+u0loc = 99999.
         
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !** executable
@@ -83,10 +88,16 @@ do ie2=jfts,jfte-1
                     enddo
                 enddo
             enddo
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,iflags1)
+
+            u0loc(1) = u0(ie1,ie3,ie2)
+            u0loc(2) = v0(ie1,ie3,ie2)
+            u0loc(3) = w0(ie1,ie3,ie2)
+
+            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,aflags(1))
             grad = matmul(transpose(Jg),lambda(kgloi))
             call Inv3(A, A_inv)
             grad = matmul(transpose(A_inv),grad)
+
             U(ie1, ie2, ie3)=grad(1)
             V(ie1, ie2, ie3)=grad(2)
             W(ie1, ie2, ie3)=grad(3) 
@@ -94,7 +105,7 @@ do ie2=jfts,jfte-1
     enddo
 enddo
 
-if (iflags2.eq.1) then
+if (aflags(2).eq.1) then
              U = U + u0
              V = V + v0
              W = W + w0
