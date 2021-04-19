@@ -20,8 +20,8 @@ real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:), &
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:), &
                 U(:,:,:), V(:,:,:),W(:,:,:)
 integer, pointer :: lambda(:) 
-real, pointer::a1(:), a2(:), a3(:), a4(:)
-integer ::n1(2),n2(3),n3(3), n4(3), m(3)
+real, pointer::a1(:)
+integer ::n1(2),n2(3),  m(3)
 
 integer :: msize, &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -44,9 +44,9 @@ endif
 Amat = reshape(a1,n1)
 
 ! read input arrays in ikj index ordering and tight bounds
-call read_array(u0,'u0')        !Recovering X-Matrix and dimension of X matrix
-call read_array(v0,'v0')        !Recovering X-Matrix and dimension of X matrix
-call read_array(w0,'w0')        !Recovering X-Matrix and dimension of X matrix
+call read_array(u0,'u0')        !Recovering Inital Wind Arrays
+call read_array(v0,'v0')        
+call read_array(w0,'w0')        
 
 n2 = shape(u0)
 

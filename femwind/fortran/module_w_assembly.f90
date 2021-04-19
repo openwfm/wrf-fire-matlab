@@ -58,9 +58,9 @@ real :: A_inv(3,3)
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !** executable
 
-do ie2=jfts,jfte
-    do ie3=kfts, kfte
-        do ie1=ifts, ifte
+do ie2=jfts,jfte-1
+    do ie3=kfts, kfte-1
+        do ie1=ifts, ifte-1
             do ic2=0,1
                 do ic3=0,1
                     do ic1=0,1
