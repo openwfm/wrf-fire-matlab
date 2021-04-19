@@ -19,9 +19,9 @@ real:: Amat(3,3)
 real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:), &
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:), &
                 U(:,:,:), V(:,:,:),W(:,:,:)
-integer, pointer :: lambda(:) 
-real, pointer::a1(:)
-integer ::n1(2),n2(3),  m(3)
+real:: lambda(120) 
+real, pointer::a1(:), a2(:)
+integer ::n1(2),n2(3),n3(3), m(3)
 
 integer :: msize, &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -43,22 +43,25 @@ endif
 
 Amat = reshape(a1,n1)
 
+call read_array_nd(a2,n2, 'lambda')
+
+
+lambda = reshape(a2,n2)
+
 ! read input arrays in ikj index ordering and tight bounds
 call read_array(u0,'u0')        !Recovering Inital Wind Arrays
 call read_array(v0,'v0')        
 call read_array(w0,'w0')        
 
-n2 = shape(u0)
+n3 = shape(u0)
 
-allocate(lambda(product(n2)))
-lambda = 0.
 
 ifts = 1
-ifte = n2(1)
+ifte = n3(1)
 jfts = 1 
-jfte = n2(3)
+jfte = n3(3)
 kfts = 1
-kfte = n2(2)
+kfte = n3(2)
 
 ifms = ifts - 1
 ifme = ifte + 1
@@ -94,7 +97,7 @@ call w_assembly(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  Amat, u0,v0,w0, lambda, iflags1, iflags2,n2,          & !Input from femwind, u0, v0, w0 
+  Amat, u0,v0,w0, lambda, iflags1, iflags2,n3,          & !Input from femwind, u0, v0, w0 
     U,V,W)                                  
 
 !write(*,'(a,3i8)')'copying the output data to array size ',n2,msize

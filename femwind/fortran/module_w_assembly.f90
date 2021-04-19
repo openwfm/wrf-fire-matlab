@@ -9,7 +9,8 @@ subroutine w_assembly(                              &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
-    A, u0,v0,w0, lambda, iflags1, iflags2,n2,          & !Input from femwind, u0, v0, w0 
+    A, u0,v0,w0, lambda, iflags1, iflags2,n2,     & !Input from femwind, u0, v0, w0
+    X, Y, Z,                                      & !Spatial Grid Data     
     U,V,W)                                          !U,V,W  
 !Purpose: Create Arrays of Wind Vector Component Values at Center Points of Spatial Grid
 !In:
@@ -54,6 +55,12 @@ real ::  Xloc(3,8), u0loc(3)
 real :: grad(3)
 real :: kgloi(8)
 real :: A_inv(3,3)
+Xloc = 99999.
+Jg = 0.
+Kloc = 0.
+Floc = 0.
+grad = 0.
+
         
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !** executable
@@ -64,11 +71,15 @@ do ie2=jfts,jfte-1
             do ic2=0,1
                 do ic3=0,1
                     do ic1=0,1
-                          kloci = 1 + ic1 + 2*(ic2 + 2*ic3)
-                          k1 = ie1 + ic1
-                          k2 = ie2 + ic2 
-                          k3 = ie3 + ic3
-                          kgloi(kloci) = k1 + n2(1)*((k2-1) + n2(3)*(k3-1))  
+                        iloc=1+ic1+2*(ic2+2*ic3);  !local index of the node in the element
+                        Xloc(1,iloc)=X(ie1 + ic1, ie3 + ic3, ie2 + ic2)
+                        Xloc(2,iloc)=Y(ie1 + ic1, ie3 + ic3, ie2 + ic2)
+                        Xloc(3,iloc)=Z(ie1 + ic1, ie3 + ic3, ie2 + ic2)
+                        kloci = 1 + ic1 + 2*(ic2 + 2*ic3)
+                        k1 = ie1 + ic1
+                        k2 = ie2 + ic2 
+                        k3 = ie3 + ic3
+                        kgloi(kloci) = k1 + n2(1)*((k2-1) + n2(3)*(k3-1))  
                     enddo
                 enddo
             enddo
