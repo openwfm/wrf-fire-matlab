@@ -1,12 +1,12 @@
 format compact
 % test for ndt_f_assembly from wrfout file
-path = '/path/to/wrfout'
-X,u0 = read_fmw_wrfout(path)
-A = diag([1 1 1])
-lambda=[]
-params=[]
-iflags = [2 1 1]
-iflags = iflags(:)
+path='./wrfout_d01_0001-01-01_00:00:00' % path to wrfout file
+[X,u0]=read_fmw_wrfout(path);
+A=diag([1 1 1]);
+lambda=[];
+params=[];
+iflags=[2 1 1];
+iflags=iflags(:);
 
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/ndt_f_test.exe')
