@@ -1,8 +1,8 @@
 function [hzc,icl3]=coarsening_icl(dx,dy,dz,params)
-% [P,X_coarse]=coarsening_2_linear_decide(X,params)
+% [[hzc,icl3]=coarsening_icldx,dy,dz,params)
 % in:
-%   dx,dy       mesh spacings, scalar
-%   dz          verticl element size, vector
+%   dx,dy       mesh spacings, scalars
+%   dz          vertical element sizes, vector
 %   params      structure
 % out:
 %   hzc         horizontal coarsening factors in directions 1 and 2
@@ -12,7 +12,6 @@ function [hzc,icl3]=coarsening_icl(dx,dy,dz,params)
           error('dz must be a vector')
     end
     dz = dz(:)';  % make sure dz is a row
-    % add 0 to htt bottom
     dxy=min(dx,dy);  % horizontal step
     n3 = length(dz)+1;
     % decide on horizontal coarsening factor
