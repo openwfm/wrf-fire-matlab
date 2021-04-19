@@ -20,9 +20,10 @@ real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),           
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:),         &
                 U(:,:,:), V(:,:,:),W(:,:,:),                                       &  ! Calculated final windFinal 
                 Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:)
-real, pointer :: lambda(:) 
+
+real, pointer :: lambda_v(:) 
 real, pointer :: a1(:), a2(:)
-integer :: n1(3), dim_A(2),dim_lam,u_dim(3), x_dim(3)
+integer :: n1(3), dim_A(2),dim_lam(1),u_dim(3), x_dim(3)
 
 integer :: msize, &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -49,8 +50,8 @@ endif
 Amat = reshape(a1,dim_A)
 
 call read_array_nd(a2,dim_lam, 'lambda')
-allocate(lambda(dim_lam))
-lambda = a2
+allocate(lambda_v(dim_lam))
+lambda_v = a2
 
 ! read input arrays in ikj index ordering and tight bounds
 call read_array(X,'X')
