@@ -10,6 +10,7 @@ default: hexa_test.exe\
  ndt_f_test.exe\
  prolongation_test.exe\
  restriction_test.exe\
+ coarsening_icl_test.exe\
  ndt_boundary_conditions_test.exe\
  vec_boundary_conditions_test.exe\
  ndt_assembly_test.exe\
@@ -70,6 +71,10 @@ prolongation_test.exe: $(PROLONGATION)
 RESTRICTION = restriction_test.f90  module_coarsening.o module_io_matlab.o
 restriction_test.exe: $(RESTRICTION) Makefile
 	$(FC) $(FFLAGS) -o restriction_test.exe $(RESTRICTION) 
+
+ICL = coarsening_icl_test.f90  module_coarsening.o module_io_matlab.o
+coarsening_icl_test.exe: $(ICL) Makefile
+	$(FC) $(FFLAGS) -o $@ $(ICL) 
 
 module_boundary_conditions.o: module_boundary_conditions.f90 Makefile
 	$(FC) $(FFLAGS) -c module_boundary_conditions.f90  
