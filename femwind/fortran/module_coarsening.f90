@@ -244,76 +244,73 @@ enddo
 
 end subroutine restriction
 
-subroutine coarsening_icl(cr_x,cr_y,icl_z,dx,dy,dz)
+subroutine coarsening_icl(cr_x,cr_y,icl_z,dx,dy,dz,A,minaspect,maxaspect)
 ! decide on coarsening
 ! in:
 !   dx,dy       mesh spacings, scalar
 !   dz          verticl element size, vector
-!   params      structure
+!   A           matrix size (3,3), only diagonal used
 ! out:
-!   hzc         horizontal coarsening factors in directions 1 and 2
-!   icl_z        coarse indices in direction 3
+!   cr_x,cr_y   horizontal coarsening factors in directions 1 and 2
+!   icl_z       coarse indices in direction 3
 implicit none
 
 !*** arguments
-real,intent(in)::dx,dy,dz(:)
-real,intent(out)::cr_x,cr_y
-real,pointer,intent(out):icl_z(:)
+real,intent(in):: dx,dy,dz(:),A(:,:)
+real,intent(in):: minaspect,maxaspect
+integer,intent(out):: cr_x,cr_y
+integer,pointer,intent(out):: icl_z(:)
 
 !*** local
+real:: dxy,crit,hzcavg,arat
+integer, allocatable:: icl3(:)
+integer:: nc3,newlcl,lcl,i,n3
 
 
 !*** executable
-    if ~isvector(dz),
-          error('dz must be a vector')
-    end
-    dz = dz(:)';  % make sure dz is a row
-    % add 0 to htt bottom
-    dxy=min(dx,dy);  % horizontal step
-    n3 = length(dz)+1;
-    % decide on horizontal coarsening factor
-    crit=(dz(1)/dxy)/params.a(3);
-    if crit > params.minaspect
-        hzc=[2,2]; % future proofing if they are different 
+    dxy=min(dx,dy)  ! horizontal step
+    n3 = size(dz)+1 !
+    arat = A(3,3)/min(A(1,1),A(2,2))  ! scaled vertical penalty
+    ! decide on horizontal coarsening factors
+    crit=(dz(1)/dxy)/arat
+    if (crit > minaspect) then
+        cr_x = 2 
+        cr_y = 2 
     else
-        hzc=[1,1];
-    end
-    hzcavg=sqrt(hzc(1)*hzc(2)); 
-    fprintf('horizontal coarsening factor %g %g because weighted height=%g\n',...
-        hzc, crit)
-    icl3=zeros(1,n3); % allocate max
-    lcl=1; % last coarse level
-    icl3(1)=lcl;
-    nc3=0;
-    for i=1:n3
-        newlcl=lcl+1; % next coarse level by 1
-        if lcl+2 <= n3 
-            crit = ((dz(lcl)+dz(lcl+1))/(2*dxy*hzcavg/2))/params.a(3);
-            if crit < params.maxaspect  
-                newlcl=lcl+2; % next coarse level by 2
-            end
-        end
+        cr_x = 1 
+        cr_y = 1 
+    endif
+    hzcavg=sqrt(real(cr_x*cr_y)); 
+    print *,'horizontal coarsening factors ',cr_x,cr_y, ' because weighted height is ', crit
+    allocate(icl3(n3+1))
+    icl3=0
+    lcl=1 ! last coarse level
+    icl3(1)=lcl
+    nc3=0
+    do i=1,n3
+        newlcl=lcl+1  ! next coarse level by 1
+        if (lcl+2 <= n3) then
+            crit = ((dz(lcl)+dz(lcl+1))/(dxy*hzcavg))/arat
+            if (crit < maxaspect ) then
+                newlcl=lcl+2 ! next coarse level by 2
+            endif
+        endif
         lcl = newlcl;
-        if lcl <= n3
-            icl3(i+1)=lcl;
-        else % at the top already
-            nc3=i;
-            icl3 = icl3(1:i);
-            break
-        end
-    end     
-    if nc3==0
-        error('number of coarse layers is 0')
-    end
-    disp(['vertical coarse layers ',num2str(icl3)])
-    hg=[0,cumsum(dz)];
-    hgc=hg(icl3);
-    disp(['heights above terrain ',num2str(hg)])
-    disp(['coarse heights above terrain ',num2str(hgc)])
-end
+        if (lcl <= n3) then
+            icl3(i+1)=lcl
+        else ! at the top already
+            nc3=i
+            allocate(icl_z(i))
+            icl_z = icl3(1:i)
+            exit
+        endif
+    enddo     
+    deallocate(icl3)
+    if (nc3==0) then
+        call crash('coarsening_icl: number of coarse layers is 0')
+    endif
+    print *,'vertical coarse layers ',icl_z
 
-
-! 
 end subroutine coarsening_icl
 end module module_coarsening
 
