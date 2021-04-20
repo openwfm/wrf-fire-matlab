@@ -10,7 +10,8 @@ A = diag([1 1 1])
 params=[]
 %iflags = [2 1 1]
 %iflags = iflags(:)
-lambda = rand(nel(1),nel(2),nel(3));
+%In femwind main 1 is added to each element
+lambda = rand(nel(1)+1,nel(2)+1,nel(3)+1);
 
 X = regular_mesh(nel,h,expand);
 X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1);
@@ -27,5 +28,5 @@ disp('testing if same result in fortran')
     error(sprintf('error %g too large',err))
     end
 else
-    warning('fortran/w_assembly_test.exe not available')
+    warning('fortran/ndt_w_test.exe not available')
 end

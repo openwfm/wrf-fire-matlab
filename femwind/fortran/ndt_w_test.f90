@@ -16,7 +16,7 @@ use module_io_matlab
 
 implicit none
 
-real, pointer:: Amat(:,:), u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
+real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:),         &
                 U(:,:,:), V(:,:,:),W(:,:,:),lambda(:,:,:), lambdamat(:,:,:),       &  ! Calculated final windFinal 
                 Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:)
@@ -32,7 +32,7 @@ integer :: &
     ifts, ifte, kfts, kfte, jfts,jfte                         ! fire tile bounds
                               
   
-
+real ::Amat(3,3)
 integer :: i,j,k,jx
 integer :: aflags(2) = (/3,1/)                 !Set iflags=1 to construct K in hexa module, iflags = 3 to construct Jg
 !integer :: iflags2 = 1

@@ -21,7 +21,7 @@ write_array_nd(swap23(u0{1}),'u0');
 write_array_nd(swap23(u0{2}),'v0');
 write_array_nd(swap23(u0{3}),'w0');
 
-system('./fortran/w_assembly_test.exe');
+system('./fortran/ndt_w_test.exe');
 U = swap23(read_array_nd('U'));
 V = swap23(read_array_nd('V'));
 W = swap23(read_array_nd('W'));
