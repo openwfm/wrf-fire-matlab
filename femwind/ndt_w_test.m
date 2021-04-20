@@ -18,7 +18,7 @@ X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1);
 U0={rand(nel),rand(nel),rand(nel)};
 
 % test same results for ndt_mult from matlab and fortran
-if exist('fortran/w_assembly_test.exe')
+if exist('fortran/ndt_w_test.exe')
 disp('testing if same result in fortran')
     err=ndt_w_test_fortran(A,X, U0,lambda, params);
     if abs(err)<1e-6
