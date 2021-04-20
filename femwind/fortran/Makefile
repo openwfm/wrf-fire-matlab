@@ -9,8 +9,8 @@ default: hexa_test.exe\
  ndt_f_test.exe\
  prolongation_test.exe\
  restriction_test.exe\
- ndt_assembly_test.exe\
- w_assembly_test.exe
+ ndt_k_test.exe\
+ ndt_w_test.exe
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
 
@@ -38,14 +38,14 @@ module_sweeps.o: module_sweeps.f90 Makefile
 sweeps_test.o: sweeps_test.f90 module_sweeps.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -c sweeps_test.f90
 
-ndt_assembly_test.exe: ndt_assembly_test.o module_ndt_assembly.o module_io_matlab.o module_hexa.o  Makefile
-	$(FC) $(FFLAGS) -o ndt_assembly_test.exe ndt_assembly_test.o  module_ndt_assembly.o module_io_matlab.o module_hexa.o 
+ndt_k_test.exe: ndt_k_test.o module_ndt_k_assembly.o module_io_matlab.o module_hexa.o  Makefile
+	$(FC) $(FFLAGS) -o ndt_k_test.exe ndt_k_test.o  module_ndt_k_assembly.o module_io_matlab.o module_hexa.o 
 
-ndt_assembly_test.o: ndt_assembly_test.f90 module_hexa.o module_io_matlab.o module_ndt_assembly.o Makefile
-	$(FC) $(FFLAGS) -c ndt_assembly_test.f90 
+ndt_k_test.o: ndt_k_test.f90 module_hexa.o module_io_matlab.o module_ndt_k_assembly.o Makefile
+	$(FC) $(FFLAGS) -c ndt_k_test.f90 
 
-module_ndt_assembly.o: module_ndt_assembly.f90 module_hexa.o Makefile
-	$(FC) $(FFLAGS) -c module_ndt_assembly.f90  
+module_ndt_k_assembly.o: module_ndt_k_assembly.f90 module_hexa.o Makefile
+	$(FC) $(FFLAGS) -c module_ndt_k_assembly.f90  
 
 ndt_f_test.exe: ndt_f_test.o module_ndt_f_assembly.o module_io_matlab.o module_hexa.o  Makefile
 	$(FC) $(FFLAGS) -o ndt_f_test.exe ndt_f_test.o  module_ndt_f_assembly.o module_io_matlab.o module_hexa.o
@@ -67,14 +67,14 @@ RESTRICTION = restriction_test.f90  module_coarsening.o module_io_matlab.o
 restriction_test.exe: $(RESTRICTION) 
 	$(FC) $(FFLAGS) -o restriction_test.exe $(RESTRICTION) 
 
-w_assembly_test.exe: w_assembly_test.o module_w_assembly.o module_io_matlab.o module_hexa.o module_lin_alg.o Makefile
-	$(FC) $(FFLAGS) -o w_assembly_test.exe w_assembly_test.o module_w_assembly.o module_io_matlab.o module_hexa.o module_lin_alg.o
+ndt_w_test.exe: ndt_w_test.o module_ndt_w_assembly.o module_io_matlab.o module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -o ndt_w_test.exe ndt_w_test.o module_ndt_w_assembly.o module_io_matlab.o module_hexa.o module_lin_alg.o
 
-w_assembly_test.o: w_assembly_test.f90  module_hexa.o module_io_matlab.o module_ndt_assembly.o module_w_assembly.o Makefile
-	$(FC) $(FFLAGS) -c w_assembly_test.f90
+ndt_w_test.o: ndt_w_test.f90  module_hexa.o module_io_matlab.o  module_ndt_w_assembly.o Makefile
+	$(FC) $(FFLAGS) -c ndt_w_test.f90
 
-module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
-	$(FC) $(FFLAGS) -c module_w_assembly.f90
+module_ndt_w_assembly.o:  module_ndt_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -c module_ndt_w_assembly.f90
 
 module_lin_alg.o:  module_lin_alg.f90 Makefile
 	$(FC) $(FFLAGS) -c module_lin_alg.f90 
