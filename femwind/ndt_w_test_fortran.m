@@ -10,6 +10,9 @@ W_m = W_m{3};
 
 %Writing all arrays to text files for use by fortran tester
 write_array_nd(A,'A');
+
+write_array_nd(swap23(lambda), 'lambda');
+
 write_array_nd(swap23(X{1}),'X');
 write_array_nd(swap23(X{2}),'Y');
 write_array_nd(swap23(X{3}),'Z');

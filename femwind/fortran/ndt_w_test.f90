@@ -153,9 +153,9 @@ enddo
 
 
 usize = (/ifte-ifts+1,kfte-kfts+1,jfte-jfts+1/)
-call write_array_nd(reshape(U,(/product(usize)/)),usize,'U')
-call write_array_nd(reshape(V,(/product(usize)/)),usize,'V')
-call write_array_nd(reshape(W,(/product(usize)/)),usize,'W')
+call write_array_nd(reshape(Umat,(/product(usize)/)),usize,'U')
+call write_array_nd(reshape(Vmat,(/product(usize)/)),usize,'V')
+call write_array_nd(reshape(Wmat,(/product(usize)/)),usize,'W')
 
 
 end program w_assembly_test

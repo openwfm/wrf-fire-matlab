@@ -10,7 +10,7 @@ lambda=[]
 params=[]
 %iflags = [2 1 1]
 %iflags = iflags(:)
-lambda = rand(prod(nel+1),1);
+lambda = rand(nel(1),nel(2),nel(3));
 
 X = regular_mesh(nel,h,expand);
 X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1);
