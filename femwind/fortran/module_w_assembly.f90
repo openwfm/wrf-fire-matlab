@@ -10,7 +10,7 @@ subroutine w_assembly(                              &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     lambda,u0, v0, w0,                            & !Input from femwind, u0, v0, w0
-    X, Y, Z,                                      & !Spatial Grid Data     
+    A,  X, Y, Z,                                      & !Spatial Grid Data     
     U,V,W)                                          !U,V,W  
 !Purpose: Create Arrays of Wind Vector Component Values at Center Points of Spatial Grid
 !In:
@@ -40,7 +40,7 @@ real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: lambda
 !Input for hexa
 
 
-
+real, intent(in) :: A(3,3)
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::X,Y,Z, u0, v0, w0
 
 real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::U,V,W
@@ -52,14 +52,14 @@ real ::  Kloc(8,8), Floc(8), Jg(8,3)
 real ::  Xloc(3,8), u0loc(3)
 real :: grad(3)
 real :: lambda_loc(8)
-real ::A(3,3), A_inv(3,3)
+real :: A_inv(3,3)
 Xloc = 99999.
 Jg = 0.
 Kloc = 0.
 Floc = 0.
 grad = 0.
 u0loc =0.
-A =0.
+
         
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !** executable

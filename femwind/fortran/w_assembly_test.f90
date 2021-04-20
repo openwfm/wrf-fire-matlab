@@ -8,6 +8,7 @@ use module_io_matlab
 !In:
 !A Coefficient Matrix size 3X3, symmetric positive definite
 !u0, v0, w0  Initial wind speed values in x,y,z direction at grid cell centers
+!X,Y,Z       3-D Physical Location in the Mesh Grid
 !iflags1 iflags1 = 1 returns Kloc and Jg from hexa, iflags2 = 2 returns Floc and Jg from hexa
 !iflags2 iflags2 =1  indicates add initial wind to calculated wind
 !out:
@@ -15,7 +16,7 @@ use module_io_matlab
 
 implicit none
 
-real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
+real, pointer:: Amat(:,:), u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:),         &
                 U(:,:,:), V(:,:,:),W(:,:,:),lambda(:,:,:), lambdamat(:,:,:),       &  ! Calculated final windFinal 
                 Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:),   &
@@ -39,6 +40,13 @@ integer :: aflags(2) = (/3,1/)                 !Set iflags=1 to construct K in h
 !integer :: iflags2 = 1
 integer :: usize(3)
 
+call read_array_nd(a1,n1,'A') !Recovering X-Matrix and dimension of X matrix
+if (n1(1).ne.3.or.n1(2).ne.3)then
+    call crash('A must be 3 by 3')
+    stop
+endif
+
+Amat = reshape(a1,n1)
 
 !call read_array_nd(a,n,'u')
 !allocate(u_m(n(1),n(2),n(3)))
@@ -121,7 +129,7 @@ enddo
 do j=jums,jume
   do k=kums,kume
     do i=iums,iume
-        u0mat(i,k,j) = u0(i,k,j)
+    u0mat(i,k,j) = u0(i,k,j)
 	v0mat(i,k,j) = v0(i,k,j)
 	w0mat(i,k,j) = w0(i,k,j)	
     enddo
@@ -137,8 +145,8 @@ call w_assembly(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  u0mat,v0mat,w0mat, lambda, aflags,     & !Input from femwind, u0, v0, w0
-  dim_lam,x_dim, Xmat, Ymat, Zmat,                                      & !Spatial Grid Data     
+  lambda,u0, v0, w0,                            & !Input from femwind, u0, v0, w0
+  Amat, X, Y, Z,                                      & !Spatial Grid Data     
   U,V,W)                                    
 
 !write(*,'(a,3i8)')'copying the output data to array size ',n2,msize
