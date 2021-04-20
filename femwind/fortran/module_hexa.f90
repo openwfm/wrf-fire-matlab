@@ -2,13 +2,13 @@ module module_hexa   ! testing only
 
 contains
 
-subroutine hexa(A,X,u0,Kloc,Floc,Jg,iflags)
+subroutine hexa(A,X,u0,Kloc,Floc,Jg,iflag)
 ! purpose: create local stiffness matrix etc for hexa 3d element
 ! in:
 !   A   coefficient matrix size 3x3, symmetric positive definite
 !   X   nodes coordinates size 3x8, one each column is one node
 !   u0   column vector of input wind at the center of the element
-!   iflags  iflags(1)>0 compute Kloc, iflags(2)>0 compute Floc, iflags(3)>0 compute Jg  
+!   iflags  iflags = 1 compute Kloc, iflag = 2 compute Floc, iflag = 3 compute Jg  
 ! out:
 !   Kloc   local stiffness matrix
 !   Floc   local divergence load vector
@@ -19,7 +19,7 @@ implicit none
 !*** arguments
 
 real, intent(in):: A(3,3), X(3,8), u0(3)    ! fortran is not case sensitive
-integer, intent(in)::iflags
+integer, intent(in)::iflag
 real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3)
 !*** local variables
 !real, parameter :: g = 0.5773502691896257
@@ -55,7 +55,7 @@ Jg = 0.
 !*** executable
 
 !Calculate Jg loop
-if (iflags .eq.  3) then
+if (iflag .eq.  3) then
 
     do i=1,9
     
@@ -96,7 +96,7 @@ if (iflags .eq.  3) then
 endif !end for computing Jg
 
 !Calculate Kloc loop
-if (iflags .eq.  1) then
+if (iflag .eq.  1) then
 
 do i=1,9
 
@@ -149,7 +149,7 @@ end if !end for computing Kloc
 
 
 !Calculate Floc loop
-if (iflags .eq. 2) then
+if (iflag .eq. 2) then
 
 do i=1,9
 

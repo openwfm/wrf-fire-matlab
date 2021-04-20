@@ -6,7 +6,8 @@ use module_io_matlab
 
 implicit none
 
-real, pointer:: F(:),Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), Xu0mat(:,:,:), Yu0mat(:,:,:), Zu0mat(:,:,:)  ! fortran is not case sensitive
+real, pointer:: F(:,:,:),Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), &
+                Xu0mat(:,:,:), Yu0mat(:,:,:), Zu0mat(:,:,:)  ! fortran is not case sensitive
 
 integer :: F_dim, x_dim(3),u_dim(3),                          &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -16,11 +17,13 @@ integer :: F_dim, x_dim(3),u_dim(3),                          &
     iuds, iude, kuds, kude, juds, jude,                       &
     iums, iume, kums, kume, jums, jume
 
-real, pointer:: A(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:), Xu0(:,:,:), Yu0(:,:,:), Zu0(:,:,:), aflags(:,:,:)    ! fortran is not case sensitive
-integer:: iflags, i, j, k
+real, pointer:: A(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:), &
+                Xu0(:,:,:), Yu0(:,:,:), Zu0(:,:,:),   &
+                Fm(:,:,:)    ! fortran is not case sensitive
+integer:: i, j, k
+integer:: fsize(3)
 
 call read_array(A,'A')
-call read_array(aflags,'iflags')
 call read_array(X,'X')
 call read_array(Y,'Y')
 call read_array(Z,'Z')
@@ -28,7 +31,6 @@ call read_array(Xu0, 'Xu0')
 call read_array(Yu0, 'Yu0')
 call read_array(Zu0, 'Zu0')
 
-iflags = aflags(1,1,1) 
 x_dim = shape(X)
 u_dim = shape(Xu0)
 
@@ -90,7 +92,7 @@ enddo
 
 
 F_dim = x_dim(1)*x_dim(2)*x_dim(3)
-allocate(F(1:F_dim))
+allocate(F(ifms:ifme, kfms:kfme, jfms:jfme))
 F = 0.
 
 write(*,'(a)')'calling ndt_f_assembly'
@@ -101,10 +103,20 @@ call ndt_f_assembly(  &
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   iums, iume, kums, kume, jums, jume,                       &
   A, Xmat , Ymat, Zmat, Xu0mat, Yu0mat, Zu0mat,             &
-  iflags, F, F_dim)
+  F)
 
 !F_m = reshape(F,(/F_dim,1,1/))
+allocate(Fm(ifts:ifte,kfts:kfte,jfts:jfte))
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
+        Fm(i,k,j)=F(i,k,j)
+    enddo
+  enddo
+enddo
 
-call write_array_nd(F,(/F_dim,1,1/),'Fvec')
+fsize = (/ifte-ifts+1,kfte-kfts+1,jfte-jfts+1/)
+
+call write_array_nd(reshape(Fm,(/product(fsize)/)),fsize,'Fvec')
 
 end program ndt_f_test
