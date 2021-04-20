@@ -15,7 +15,7 @@ write_array(iflags,'iflags')
 
 system('./fortran/ndt_f_test.exe');
 
-y_f=read_array_nd('Fvec');
+y_f=swap23(read_array_nd('Fvec'));
 
 err= norm(y(:)-y_f(:),inf);
 
