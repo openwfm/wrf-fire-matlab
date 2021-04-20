@@ -29,7 +29,9 @@ integer :: &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte                         ! fire tile bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+    iuts, iute, kuts, kute, juts, jute,                       &
+    iums, iume, kums, kume, jums, jume
                               
   
 real ::Amat(3,3)
@@ -85,6 +87,20 @@ jfme = jfte + 1
 kfms = kfts - 1
 kfme = kfte + 1 
 
+iuts = 1
+iute = u_dim(1)
+juts = 1
+jute = u_dim(3)
+kuts = 1
+kute = u_dim(2)
+iums = iuts - 1
+iume = iute + 1
+jums = juts - 1
+jume = jute + 1
+kums = kuts - 1
+kume = kute + 1
+
+
 
 allocate(lambdamat(ifms:ifme, kfms:kfme, jfms:jfme))
 
@@ -93,9 +109,9 @@ allocate(Xmat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Ymat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Zmat(ifms:ifme,kfms:kfme,jfms:jfme))
 
-allocate(u0mat(ifms:ifme,kfms:kfme,jfms:jfme))
-allocate(v0mat(ifms:ifme,kfms:kfme,jfms:jfme))
-allocate(w0mat(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(u0mat(iums:iume,kums:kume,jums:jume))
+allocate(v0mat(iums:iume,kums:kume,jums:jume))
+allocate(w0mat(iums:iume,kums:kume,jums:jume))
 
 
 
@@ -112,9 +128,9 @@ do j=jfts,jfte
 enddo
 
 ! copy the input data to tile sized bounds
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+do j=juts,jute
+  do k=kuts,kute
+    do i=iuts,iute
     u0mat(i,k,j) = u0(i,k,j)
 	v0mat(i,k,j) = v0(i,k,j)
 	w0mat(i,k,j) = w0(i,k,j)	
@@ -141,9 +157,9 @@ allocate(Umat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
 allocate(Vmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
 allocate(Wmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
 !keep track of indexing
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+do j=juts,jute
+  do k=kuts,kute
+    do i=iuts,iute
       	    Umat(i,k,j)=U(i,k,j)
             Vmat(i,k,j)=V(i,k,j)
             Wmat(i,k,j)=W(i,k,j)
