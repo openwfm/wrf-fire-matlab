@@ -30,9 +30,8 @@ integer, intent(in)::                     &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,            &
-    iuds, iude, kuds, kude, juds, jude,          & ! Wind tile and and memory bounds
-    iums, iume, kums, kume, jums, jume  
+    ifts, ifte, kfts, kfte, jfts,jfte           
+     
 
 
 

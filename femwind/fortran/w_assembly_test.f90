@@ -15,17 +15,16 @@ use module_io_matlab
 
 implicit none
 
-real:: Amat(3,3)
 real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:),         &
-                U(:,:,:), V(:,:,:),W(:,:,:),                                       &  ! Calculated final windFinal 
-                Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:)
+                U(:,:,:), V(:,:,:),W(:,:,:),lambda(:,:,:), lambdamat(:,:,:),       &  ! Calculated final windFinal 
+                Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:),   &
+               
 
-real, pointer :: lambda_v(:) 
 real, pointer :: a1(:), a2(:)
-integer :: n1(3), dim_A(2),dim_lam(1),u_dim(3), x_dim(3)
+integer :: n1(2),lambda_dim(3),u_dim(3), x_dim(3)
 
-integer :: msize, &
+integer :: , &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
@@ -41,17 +40,13 @@ integer :: aflags(2) = (/3,1/)                 !Set iflags=1 to construct K in h
 integer :: usize(3)
 
 
-call read_array_nd(a1,dim_A,'A') !Recovering X-Matrix and dimension of X matrix
-if (n1(1).ne.3.or.n1(2).ne.3)then
-    call crash('A must be 3 by 3')
-    stop
-endif
+!call read_array_nd(a,n,'u')
+!allocate(u_m(n(1),n(2),n(3)))
+!u_m = reshape(a,n)
 
-Amat = reshape(a1,dim_A)
+call read_array(lambda, 'lambda')
+lambda_dim = shape(lambda)
 
-call read_array_nd(a2,dim_lam, 'lambda')
-allocate(lambda_v(dim_lam))
-lambda_v = a2
 
 ! read input arrays in ikj index ordering and tight bounds
 call read_array(X,'X')
@@ -97,6 +92,8 @@ jume = jude+1
 kums = kuds-1
 kume = kude+1
 
+allocate(lambdamat(ifms:ifme, kfms:kfme, jfms:jfme))
+
 
 allocate(Xmat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Ymat(ifms:ifme,kfms:kfme,jfms:jfme))
@@ -115,6 +112,7 @@ do j=jfts,jfte
         Xmat(i,k,j) = X(i,k,j)
         Ymat(i,k,j) = Y(i,k,j)
         Zmat(i,k,j) = Z(i,k,j)
+        lambdamat(i,k,j) = lambda(i,k,j)
     enddo
   enddo
 enddo
@@ -139,34 +137,31 @@ call w_assembly(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  iuds, iude, kuds, kude, juds, jude,                       & ! Wind tile and and memory bounds
-  iums, iume, kums, kume, jums, jume,                       &
-  Amat, u0mat,v0mat,w0mat, lambda, aflags,     & !Input from femwind, u0, v0, w0
+  u0mat,v0mat,w0mat, lambda, aflags,     & !Input from femwind, u0, v0, w0
   dim_lam,x_dim, Xmat, Ymat, Zmat,                                      & !Spatial Grid Data     
   U,V,W)                                    
 
 !write(*,'(a,3i8)')'copying the output data to array size ',n2,msize
 
-!allocate(U(ifms:ifme,kfms:kfme,jfms:jfme))
-!allocate(V(ifms:ifme,kfms:kfme,jfms:jfme))
-!allocate(W(ifms:ifme,kfms:kfme,jfms:jfme))
-!keep track of indexing
-!do j=jfts,jfte
-  !do k=kfts,kfte
-    !do i=ifts,ifte
-      	    !Umat(i,k,j)=U(i,k,j)
-            !Vmat(i,k,j)=V(i,k,j)
-            !Wmat(i,k,j)=W(i,k,j)
-    !enddo
-  !enddo
-!enddo
+allocate(Umat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
+allocate(Vmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
+allocate(Wmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
+keep track of indexing
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
+      	    Umat(i,k,j)=U(i,k,j)
+            Vmat(i,k,j)=V(i,k,j)
+            Wmat(i,k,j)=W(i,k,j)
+    enddo
+  enddo
+enddo
 
 
 usize = (/ifte-ifts+1,kfte-kfts+1,jfte-jfts+1/)
 call write_array_nd(reshape(U,(/product(usize)/)),usize,'U')
 call write_array_nd(reshape(V,(/product(usize)/)),usize,'V')
 call write_array_nd(reshape(W,(/product(usize)/)),usize,'W')
-!***print *,product(ksize)
 
 
 end program w_assembly_test
