@@ -1,8 +1,8 @@
 function err=ndt_assembly_fortran(A,X,u0,lambda,params); 
 % call fortran version and compare resultso
 
-
-W_m=ndt_w_assembly(A,X,u0, lambda,params);
+lambda2 = lambda(:);
+W_m=ndt_w_assembly(A,X,u0, lambda2,params);
 U_m = W_m{1};
 V_m = W_m{2};
 W_m = W_m{3};
