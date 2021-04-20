@@ -44,9 +44,6 @@ for ie2=1:n(2)-1  % loop over elements
                     end
                 end
             end
-%             for i = 1:8
-%                 F(kglo(i)) = F(kglo(i))+Floc(i);
-%             end
         end
     end
 end

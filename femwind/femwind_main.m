@@ -14,7 +14,7 @@ function params=femwind_main(params)
 
 
 if ~exist('params','var') | isempty(params)
-    params.test_fortran=0;
+    params.test_fortran=1;
     params.graphics=2;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.mesh_top=1000; % if given, ignore params_expand 
@@ -159,7 +159,8 @@ for sc2 = params.sc2_all
         end
         diary; diary
         % assemble sparse system matrix
-        [K,F,~] = sparse_assembly(A,X,U0,lambda,params);
+        [K,~,~] = sparse_assembly(A,X,U0,lambda,params);
+        F = ndt_f_assembly_fortran(A,X,U0,lambda,params);
 
         % dirichlet boundary conditions
         [K,~]=apply_boundary_conditions(K,[],X);   % to K - once

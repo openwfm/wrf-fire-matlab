@@ -8,7 +8,7 @@ subroutine ndt_f_assembly(                        &
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     !iude, jude, kude,                             & !domain bounds for u0
     iums, iume, kums, kume, jums, jume,           &
-    A, X, Y, Z, Xu0, Yu0, Zu0,iflags,             & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
+    A, X, Y, Z, Xu0, Yu0, Zu0,                    & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
     F)                                             !Global load vector output  
 
 implicit none
@@ -31,7 +31,6 @@ real, intent(in), dimension(3,3):: A
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms:jfme):: X,Y,Z!spatial grid
 real, intent(in), dimension(iums:iume, kums:kume, jums:jume):: Xu0, Yu0, Zu0
 !Input for hexa
-integer, intent(in)::iflags
 
 !integer,intent(in)::F_dim
 
@@ -50,7 +49,6 @@ real :: kglo(8)
 Xloc = 9999.
 u0loc = 0.
 F = 0.
-kglo = 0.
 
 !** executable
 do ie2=jfts,jfte -1
@@ -60,9 +58,6 @@ do ie2=jfts,jfte -1
                 do ic3=0,1
                     do ic1=0,1
                         iloc=1+ic1+2*(ic2+2*ic3)  !local index of the node in the element
-                        k1 = ie1+ic1 
-                        k2 = ie2+ic2
-                        k3 = ie3+ic3
                         Xloc(1,iloc)=X(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                         Xloc(2,iloc)=Y(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                         Xloc(3,iloc)=Z(ie1 + ic1, ie3 + ic3, ie2 + ic2)
@@ -74,7 +69,7 @@ do ie2=jfts,jfte -1
             u0loc(2) = Yu0(ie1,ie3,ie2)
             u0loc(3) = Zu0(ie1,ie3,ie2)
             
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,iflags)
+            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,2)
             do id2 = 0,1
                 do id3 = 0,1
                     do id1 = 0,1
