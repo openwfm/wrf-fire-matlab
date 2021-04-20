@@ -29,7 +29,7 @@ integer :: &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+    ifts, ifte, kfts, kfte, jfts,jfte                         ! fire tile bounds
                               
   
 
@@ -67,8 +67,8 @@ x_dim = shape(X)
 u_dim = shape(u0)
 
 !Checking that dimensions of lambda and are X arrays are consistent
-if (product(x_dim).ne.dim_lam) then
-    call crash('Length of lambda must equal the product of dimensions of X')
+if (x_dim(1).ne.lambda_dim(1).or.x_dim(2).ne.lambda_dim(2).or.x_dim(3).ne.lambda_dim(3)) then
+    call crash('Lambda dimensions must equal the dimensions of X')
     stop
 endif
 
@@ -85,18 +85,6 @@ jfme = jfte + 1
 kfms = kfts - 1
 kfme = kfte + 1 
 
-iuds = 1
-iude = u_dim(1)
-juds = 1
-jude = u_dim(3)
-kuds = 1
-kude = u_dim(2)
-iums = iuds-1
-iume = iude+1
-jums = juds-1
-jume = jude+1
-kums = kuds-1
-kume = kude+1
 
 allocate(lambdamat(ifms:ifme, kfms:kfme, jfms:jfme))
 
@@ -152,7 +140,7 @@ call w_assembly(  &
 allocate(Umat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
 allocate(Vmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
 allocate(Wmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
-keep track of indexing
+!keep track of indexing
 do j=jfts,jfte
   do k=kfts,kfte
     do i=ifts,ifte
