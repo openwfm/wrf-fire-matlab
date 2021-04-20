@@ -19,21 +19,19 @@ implicit none
 real, pointer:: Amat(:,:), u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:),         &
                 U(:,:,:), V(:,:,:),W(:,:,:),lambda(:,:,:), lambdamat(:,:,:),       &  ! Calculated final windFinal 
-                Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:),   &
+                Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:)
                
 
 real, pointer :: a1(:), a2(:)
 integer :: n1(2),lambda_dim(3),u_dim(3), x_dim(3)
 
-integer :: , &
+integer :: &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-    iats, iate, jats, jate, iams,iame, 			      & ! Amat bounds
-    jams, jame,                                               &
-    iuds, iude, kuds, kude, juds, jude,                       & ! Wind tile and and memory bounds
-    iums, iume, kums, kume, jums, jume
+                              
+  
 
 integer :: i,j,k,jx
 integer :: aflags(2) = (/3,1/)                 !Set iflags=1 to construct K in hexa module, iflags = 3 to construct Jg
@@ -107,9 +105,9 @@ allocate(Xmat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Ymat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Zmat(ifms:ifme,kfms:kfme,jfms:jfme))
 
-allocate(u0mat(iums:iume,kums:kume,jums:jume))
-allocate(v0mat(iums:iume,kums:kume,jums:jume))
-allocate(w0mat(iums:iume,kums:kume,jums:jume))
+allocate(u0mat(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(v0mat(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(w0mat(ifms:ifme,kfms:kfme,jfms:jfme))
 
 
 
@@ -126,9 +124,9 @@ do j=jfts,jfte
 enddo
 
 ! copy the input data to tile sized bounds
-do j=jums,jume
-  do k=kums,kume
-    do i=iums,iume
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
     u0mat(i,k,j) = u0(i,k,j)
 	v0mat(i,k,j) = v0(i,k,j)
 	w0mat(i,k,j) = w0(i,k,j)	

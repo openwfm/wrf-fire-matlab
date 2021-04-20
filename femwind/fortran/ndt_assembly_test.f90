@@ -30,7 +30,7 @@ if (n1(1).ne.3.or.n1(2).ne.3)then
 endif
 
 Amat = reshape(a1,n1)
-
+    
 ! read input arrays in ikj index ordering and tight bounds
 call read_array(X,'X')        !Recovering X-Matrix and dimension of X matrix
 call read_array(Y,'Y')        !Recovering X-Matrix and dimension of X matrix
