@@ -312,5 +312,44 @@ integer:: nc3,newlcl,lcl,i,n3
     print *,'vertical coarse layers ',icl_z
 
 end subroutine coarsening_icl
+
+subroutine hzc2icl(nc_x, nc_y, icl_x, icl_y, cr_x, cr_y, n_x, n_y)
+! compute horizontal coarse index vectors 
+!
+! In:
+!   cr_x, cr_y coarsening factors in x and y
+!   n_x, n_y   fine mesh size in x and y
+! Out:
+!   nc_x, nc_y      coarse mesh size
+!   icl_x, icl_y    fine indices of coarse grid lines
+
+implicit none
+
+!*** arguments
+integer, intent(in)::cr_x, cr_y, n_x, n_y
+integer, intent(out):: nc_x, nc_y
+integer, intent(out), pointer, dimension(:) :: icl_x, icl_y
+
+!*** local
+integer::i
+
+nc_x = (n_x + 2)/2
+nc_y = (n_y + 2)/2
+
+allocate(icl_x(nc_x))
+allocate(icl_y(nc_y))
+
+do i=1,n_x,2
+    icl_x(i)=1+2*(i-1)  ! every second node
+enddo
+icl_x(nc_x)=n_x ! last coarse is last fine
+
+do i=1,n_y,2
+    icl_y(i)=1+2*(i-1)  ! every second node
+enddo
+icl_y(nc_y)=n_y ! last coarse is last fine
+
+end subroutine hzc2icl
+
 end module module_coarsening
 
