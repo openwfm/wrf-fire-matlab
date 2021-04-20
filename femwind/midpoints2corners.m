@@ -2,8 +2,8 @@ function C=midpoints2corners(M)
 % extrapolation formula
 extra = @(a,b) 2*a-b;
 
-n=size(M)
-d=length(n)
+n=size(M);
+d=length(n);
 C=zeros(n+1);
 if d==1
     % inner-corners
@@ -35,27 +35,27 @@ elseif d==3
     C(2:end-1,2:end-1,1)=extra(C(2:end-1,2:end-1,2),C(2:end-1,2:end-1,3));
     C(2:end-1,2:end-1,end)=extra(C(2:end-1,2:end-1,end-1),C(2:end-1,2:end-1,end-2));
     % edge-corners
-    C(1,1,2:end-1)=extra(C(2,2,2:end-1),C(3,3,2:end-1))
-    C(end,1,2:end-1)=extra(C(end-1,2,2:end-1),C(end-2,3,2:end-1))
-    C(1,end,2:end-1)=extra(C(2,end-1,2:end-1),C(3,end-2,2:end-1))
-    C(end,end,2:end-1)=extra(C(end-1,end-1,2:end-1),C(end-2,end-2,2:end-1))
-    C(1,2:end-1,1)=extra(C(2,2:end-1,2),C(3,2:end-1,3))
-    C(end,2:end-1,1)=extra(C(end-1,2:end-1,2),C(end-2,2:end-1,3))
-    C(1,2:end-1,end)=extra(C(2,2:end-1,end-1),C(3,2:end-1,end-2))
-    C(end,2:end-1,end)=extra(C(end-1,2:end-1,end-1),C(end-2,2:end-1,end-2))
-    C(2:end-1,1,1)=extra(C(2:end-1,2,2),C(2:end-1,3,3))
-    C(2:end-1,end,1)=extra(C(2:end-1,end-1,2),C(2:end-1,end-2,3))
-    C(2:end-1,1,end)=extra(C(2:end-1,2,end-1),C(2:end-1,3,end-2))
-    C(2:end-1,end,end)=extra(C(2:end-1,end-1,end-1),C(2:end-1,end-2,end-2))
+    C(1,1,2:end-1)=extra(C(2,2,2:end-1),C(3,3,2:end-1));
+    C(end,1,2:end-1)=extra(C(end-1,2,2:end-1),C(end-2,3,2:end-1));
+    C(1,end,2:end-1)=extra(C(2,end-1,2:end-1),C(3,end-2,2:end-1));
+    C(end,end,2:end-1)=extra(C(end-1,end-1,2:end-1),C(end-2,end-2,2:end-1));
+    C(1,2:end-1,1)=extra(C(2,2:end-1,2),C(3,2:end-1,3));
+    C(end,2:end-1,1)=extra(C(end-1,2:end-1,2),C(end-2,2:end-1,3));
+    C(1,2:end-1,end)=extra(C(2,2:end-1,end-1),C(3,2:end-1,end-2));
+    C(end,2:end-1,end)=extra(C(end-1,2:end-1,end-1),C(end-2,2:end-1,end-2));
+    C(2:end-1,1,1)=extra(C(2:end-1,2,2),C(2:end-1,3,3));
+    C(2:end-1,end,1)=extra(C(2:end-1,end-1,2),C(2:end-1,end-2,3));
+    C(2:end-1,1,end)=extra(C(2:end-1,2,end-1),C(2:end-1,3,end-2));
+    C(2:end-1,end,end)=extra(C(2:end-1,end-1,end-1),C(2:end-1,end-2,end-2));
     % corners
-    C(1,1,1)=extra(C(2,2,2),C(3,3,3))
-    C(end,1,1)=extra(C(end-1,2,2),C(end-2,3,3))
-    C(1,end,1)=extra(C(2,end-1,2),C(3,end-2,3))
-    C(1,1,end)=extra(C(2,2,end-1),C(3,3,end-2))
-    C(1,end,end)=extra(C(2,end-1,end-1),C(3,end-2,end-2))
-    C(end,1,end)=extra(C(end-1,2,end-1),C(end-2,3,end-2))
-    C(end,end,1)=extra(C(end-1,end-1,2),C(end-2,end-2,3))
-    C(end,end,end)=extra(C(end-1,end-1,end-1),C(end-2,end-2,end-2))
+    C(1,1,1)=extra(C(2,2,2),C(3,3,3));
+    C(end,1,1)=extra(C(end-1,2,2),C(end-2,3,3));
+    C(1,end,1)=extra(C(2,end-1,2),C(3,end-2,3));
+    C(1,1,end)=extra(C(2,2,end-1),C(3,3,end-2));
+    C(1,end,end)=extra(C(2,end-1,end-1),C(3,end-2,end-2));
+    C(end,1,end)=extra(C(end-1,2,end-1),C(end-2,3,end-2));
+    C(end,end,1)=extra(C(end-1,end-1,2),C(end-2,end-2,3));
+    C(end,end,end)=extra(C(end-1,end-1,end-1),C(end-2,end-2,end-2));
 else
     error(['Not implemented number of dimensions ',d]);
 end
