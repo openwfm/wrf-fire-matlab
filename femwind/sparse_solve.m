@@ -12,7 +12,7 @@ switch params.solver
     case {'r','red-black'}
         [lambda,it] = rb_line_gs_solve(K,F,X);
     case {'2','2-level'}
-        [lambda,it,rate,XC] = rb_line_gs_2level_solve(K,F,X,params);
+        [lambda,it,rate,XC] = multigrid_solve(K,F,X,params);
     case {'s','schwarz'}
         [lambda,it] = rb_schwarz_solve(K,F,X);
     otherwise

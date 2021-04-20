@@ -14,6 +14,7 @@ function params=femwind_main(params)
 
 
 if ~exist('params','var') | isempty(params)
+    params.test_fortran=0;
     params.graphics=2;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.mesh_top=1000; % if given, ignore params_expand 
@@ -29,13 +30,15 @@ if ~exist('params','var') | isempty(params)
     params.terrain_height=0.1; % terrain height as part of domain height
     params.solver='2-level' ; % see sparse_solve.m
     params.maxit=50; % max iterations
+    params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
+    params.coarsest_iter=100; % 0 = direct solver n>0 number of iterations
+    params.nsmooth=3; % smoothing iterations before correcton
     params.coarsening='2 linear';
     % params.coarse_P='variational';  
     params.coarse_K='assembly';
     params.P_by_x=1;  % prolongation by geometrically linear interpolation
     params.smoothing='vertical sweeps';
     % params.smoothing='3D red-black';
-    params.nsmooth=3; % smoothing iterations before correcton
     params.restol=1e-6;
     params.exact=0; % compare with exact solution to compute error
     params.slice=0.5; % vertical y slice of error to display, 0 to 1
@@ -44,10 +47,9 @@ if ~exist('params','var') | isempty(params)
     params.iterations_fig=14; % figure number for iterations progress
     params.maxaspect=3;  % do not coarsen vertically if vertical layer is too thick
     params.minaspect=1/3; % do not coarsen horizontally if the layer is too thin
-    params.levels=3;
+    params.levels=15;
     params.apply_coarse_boundary_conditions=1;
     params.nsmooth_coarse=2;
-    params.maxit_coarse=8; % 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     params.save_files=0; % save progress levels=3, workspace=2 params only=1
     params.save_file_prefix='femwind';  
     %Define Streamline Starting Points: Defined in terms of scale*nelem
@@ -157,10 +159,12 @@ for sc2 = params.sc2_all
         end
         diary; diary
         % assemble sparse system matrix
-        [K,F,~] = sparse_assembly(A,X,U0,lambda,params);
+        [K,~,~] = sparse_assembly(A,X,U0,lambda,params);
+        F = ndt_f_assembly_fortran(A,X,U0,lambda,params);
 
         % dirichlet boundary conditions
-        [K,F]=apply_boundary_conditions(K,F,X);
+        [K,~]=apply_boundary_conditions(K,[],X);   % to K - once
+        [~,F]=apply_boundary_conditions([],F,X);   % to F - every time
 
         % solve the equations
         % [lambda,it] = sparse_solve(K,F,X,'s');

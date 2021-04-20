@@ -38,7 +38,7 @@ end subroutine read_array
 subroutine write_array(a,name)
 !*** purpose write array to text file
 !*** arguments
-real, pointer, intent(in):: a(:,:,:)  
+real, intent(in):: a(:,:,:)  
 character(len=*),intent(in)::name! file name root, .txt will be added
 
 !*** internal

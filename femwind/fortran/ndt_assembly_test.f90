@@ -20,7 +20,7 @@ integer :: msize, &
     jams, jame
 
 integer :: i,j,k,jx
-integer :: iflags(3) = (/1,0,1/)                 !Flags to construct K in hexa module
+integer :: iflags = 1                !Flags to construct K in hexa module
 integer:: ksize(4)                               ! Global Stifness Matrix Dimensions in Matlab
 
 call read_array_nd(a1,n1,'A') !Recovering X-Matrix and dimension of X matrix
