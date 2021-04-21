@@ -4,13 +4,15 @@ module module_w_assembly
 
 contains
 
-subroutine w_assembly(                              &
+subroutine w_assembly(                            &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
+    iuts, iute, kuts, kute, juts, jute,           &
+    iums, iume, kums, kume, jums, jume,           &
     lambda,u0, v0, w0,                            & !Input from femwind, u0, v0, w0
-    A,  X, Y, Z,                                      & !Spatial Grid Data     
+    A,  X, Y, Z,                                  & !Spatial Grid Data     
     U,V,W)                                          !U,V,W  
 !Purpose: Create Arrays of Wind Vector Component Values at Center Points of Spatial Grid
 !In:
@@ -26,11 +28,13 @@ implicit none
 
 !*** arguments
 
-integer, intent(in)::                     &
+integer, intent(in)::                             &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte           
+    ifts, ifte, kfts, kfte, jfts,jfte,            &
+    iuts, iute, kuts, kute, juts, jute,           &
+    iums, iume, kums, kume, jums, jume            &           
      
 
 
@@ -41,9 +45,10 @@ real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: lambda
 
 
 real, intent(in) :: A(3,3)
-real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::X,Y,Z, u0, v0, w0
+real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::X,Y,Z 
+real, intent(in), dimension(iums:iume, kums:kume, jums:jume)::u0, v0, w0
 
-real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::U,V,W
+real, intent(out), dimension(iums:iume, kums:kume, jums:jume)::U,V,W
 !*** local
 
 integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, i, &
