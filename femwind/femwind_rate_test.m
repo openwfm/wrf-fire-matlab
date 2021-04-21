@@ -1,6 +1,7 @@
-function p=femwind_rate_test
+function p=femwind_rate_test(pin)
+
 disp('basic convergence speed test')
-p=femwind_main
+p=femwind_main;
 p.graphics=-2;
 p.sc_all = 1;
 p.sc2_all = 1;
@@ -9,6 +10,18 @@ p.sc2_all = 1;
 p.coarse_K=1; % 'variational';  
 p.coarse_K=2; % 'assembly';
 p.levels=15;
+if exist('pin','var')
+    f=fieldnames(pin);;
+else
+    f={};
+end
+for i=1:length(f)
+    ff=f{i};
+    fprintf('overiding p.%s=',ff)
+    disp(pin.(ff))
+    p.(ff)=pin.(ff);
+end
+p
 p=femwind_main(p);
 rates(3,1) =  0.066948270621534;  % 3 levels, coarse P variational
 rates(8,1) =  0.066931756926231;  % 8 levels, coarse P variational
