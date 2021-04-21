@@ -20,9 +20,9 @@ if ~exist('params','var') | isempty(params)
     params.graphics=2;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.mesh_top=1000; % if given, ignore params_expand 
-    params.sc_all=[1]; % mesh refinements for tests at multiple scales 
-    params.sc2_all=[1];  % additional factors for horizonal mesh extent 
-    params.nelem3=[5,4,3]; % base size in elements, horizontal=2*odd 
+    params.sc_all=[1,2]; % mesh refinements for tests at multiple scales 
+    params.sc2_all=[1,2,4];  % additional factors for horizonal mesh extent 
+    params.nelem3=[50,50,10]; % base size in elements, horizontal=2*odd 
     params.h=[30,30,2]; % base mesh spacing before scaling
     params.a=[1 1 1]; % penalty factors in x y z directions
     params.initial_wind='log'; % or uniform
