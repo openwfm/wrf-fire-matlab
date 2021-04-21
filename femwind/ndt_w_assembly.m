@@ -53,12 +53,14 @@ for i3=1:m(3)
                 u0loc=[];
             end
             [~,~,Jg]=hexa(A,Xloc,u0loc); % create local matrix and rhs
+            disp('Jg is')
+            disp(Jg)
             % instead, accumulate contributions to the global matrix
             if ~isempty(lambda)
                 grad = lambda(kglo)'*Jg;  % grad lambda
                %disp('Local lambda is')
                %lambda(kglo)
-               % disp(' Grad prior to multiplication by A_inv is')
+                %disp(' Grad prior to multiplication by A_inv is')
                %disp(grad) 
                 grad = grad/A;
                 %disp('Grad after to multiplication by A_inv is')

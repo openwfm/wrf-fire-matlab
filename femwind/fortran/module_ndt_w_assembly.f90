@@ -65,7 +65,6 @@ Floc = 0.
 grad = 0.
 u0loc =0.
 
-print *, 'lambda array', lambda
         
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !** executable
@@ -87,12 +86,17 @@ do ie2=jfts,jfte-1
                     enddo
                 enddo
             enddo
-            !print *, 'local lambda is', lambda_loc 
-            
+            u0loc(1) = u0(ie1,ie3,ie2)
+            u0loc(2) = v0(ie1, ie3,ie2)
+            u0loc(3) = w0(ie1, ie3,ie2)
+            !lambda is fine print *, 'local lambda is', lambda_loc 
+            !print* , 'Xloc is', Xloc
+            !print* , 'u0loc is', u0loc  
             call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,3)
-
+            print*, 'Jg is', Jg
+            print*, shape(jg)
             grad = matmul(transpose(Jg),lambda_loc)
-            !print *,'Grad before multiplication by A_inv is', grad
+           ! print *,'Grad before multiplication by A_inv is', grad
   
             call Inv3(A, A_inv)
             grad = matmul(transpose(A_inv),grad)
