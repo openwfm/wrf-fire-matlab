@@ -162,22 +162,6 @@ for sc2 = params.sc2_all
             hold off
         end
         diary; diary
-        % assemble sparse system matrix
-        [K,~,~] = sparse_assembly(A,X,U0,lambda,params);
-        F = ndt_f_assembly_fortran(A,X,U0,lambda,params);
-
-        % dirichlet boundary conditions
-        [K,~]=apply_boundary_conditions(K,[],X);   % to K - once
-        [~,F]=apply_boundary_conditions([],F,X);   % to F - every time
-
-        % solve the equations
-        % [lambda,it] = sparse_solve(K,F,X,'s');
-        [lambda,it,rate(sc,sc2),XC] = sparse_solve(K,F,X,params);
-        format long
-        rate
-
-        % assemble final wind
-        [~,~,W] = sparse_assembly(A,X,U0,lambda,params);
 
         % solve
         [W,rate(sc,sc2)]=femwind_solve_fortran(A,X,U0,params);
