@@ -21,6 +21,6 @@ disp('running ndt_f_assembly.m')
 
 y= ndt_f_assembly(A,X,u0);
 
-err= norm(y(:)-y_f(:),inf);
+err= norm(y(:)-y_f(:),inf)/norm(y(:),inf);
 
 end

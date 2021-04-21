@@ -24,10 +24,11 @@ X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1);
 if exist('fortran/ndt_f_test.exe')
     disp('testing if same result in fortran')
     err=ndt_f_fortran(A,X,u0,iflags);
-    if abs(err)<1e-6
-    fprintf('error %g OK\n',err)
+    tol = 10*eps(single(1.));
+    if err < tol
+        fprintf('error %g OK, tol = %g\n',err,tol)
     else
-    error(sprintf('error %g too large',err))
+        error(sprintf('error %g too large, tol=%g',err,tol))
     end
 else
     warning('fortran/ndt_f_test.exe not available')
