@@ -22,11 +22,13 @@ if 1==1
         F_fort=swap23(read_array_nd('Fvec'));
         err= norm(F(:)-F_fort(:),inf)
         
-        if abs(err)>1e-6
-            F_fort;
-            error('sprase assembly of F different')
+        tol = 10*eps(single(1.));
+        if err < tol
+            fprintf('error %g OK, tol = %g\n',err,tol)
+        else
+            error(sprintf('error %g too large, tol=%g',err,tol))
         end
-        disp('sprase assembly of F result in fortran OK')
+
     else
         warning(['file ',exe,' does not exist'])
     end
