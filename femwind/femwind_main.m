@@ -14,6 +14,8 @@ function params=femwind_main(params)
 
 
 if ~exist('params','var') | isempty(params)
+    params.run_fortran=1;
+    params.run_matlab=1;
     params.test_fortran=0;
     params.graphics=2;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
@@ -84,6 +86,9 @@ params
 for sc2 = params.sc2_all
     for sc = params.sc_all
         sc,sc2
+        
+        disp('setting up test case')
+
         nel = sc*params.nelem3;  % elements in the 3 directions
         nel(1:2)=nel(1:2)*sc2
         h = params.h/sc;
@@ -91,7 +96,6 @@ for sc2 = params.sc2_all
         params.id=sprintf('%ix%ix%i',nel); % to pass around 
         string_diag_A=sprintf('%g %g %g',params.a); % for figure titles
         A = diag(params.a.^2);
-        lambda = zeros(prod(nel+1),1); % placeholder solution
 
         % creating the grid
         expand=params.expand;
@@ -175,11 +179,14 @@ for sc2 = params.sc2_all
         % assemble final wind
         [~,~,W] = sparse_assembly(A,X,U0,lambda,params);
 
+        % solve
+        [W,rate(sc,sc2)]=femwind_solve_fortran(A,X,U0,params);
+        
         if params.graphics>1
             disp('graphics: solution')
 
             % plot resulting wind
-            figure(5),clf
+            figure(5),crate(sc,sc2)
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,W)
             hold off

@@ -1,6 +1,7 @@
 program ndt_f_test
 
 use module_ndt_f_assembly
+use module_hexa
 use module_io_matlab
 
 implicit none
@@ -18,11 +19,12 @@ integer :: F_dim, x_dim(3),u_dim(3),                          &
 
 real, pointer:: A(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:), &
                 Xu0(:,:,:), Yu0(:,:,:), Zu0(:,:,:),   &
-                Fm(:,:,:)    ! fortran is not case sensitive
-integer:: i, j, k
+                aflags(:,:,:), Fm(:,:,:)    ! fortran is not case sensitive
+integer:: iflags, i, j, k
 integer:: fsize(3)
 
 call read_array(A,'A')
+call read_array(aflags,'iflags')
 call read_array(X,'X')
 call read_array(Y,'Y')
 call read_array(Z,'Z')
@@ -30,6 +32,7 @@ call read_array(Xu0, 'Xu0')
 call read_array(Yu0, 'Yu0')
 call read_array(Zu0, 'Zu0')
 
+iflags = aflags(1,1,1) 
 x_dim = shape(X)
 u_dim = shape(Xu0)
 
@@ -102,7 +105,7 @@ call ndt_f_assembly(  &
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   iums, iume, kums, kume, jums, jume,                       &
   A, Xmat , Ymat, Zmat, Xu0mat, Yu0mat, Zu0mat,             &
-  F)
+  iflags, F)
 
 !F_m = reshape(F,(/F_dim,1,1/))
 allocate(Fm(ifts:ifte,kfts:kfte,jfts:jfte))

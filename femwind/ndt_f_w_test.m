@@ -1,4 +1,5 @@
 format compact
+addpath ../netcdf
 % test for ndt_f_assembly
 nel=[5,4,3]
 %nel=[1 1 1]
@@ -22,7 +23,19 @@ X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1);
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/ndt_f_test.exe')
     disp('testing if same result in fortran')
+<<<<<<< HEAD
     F=ndt_f_assembly_fortran(A,X,u0,[],params);
+=======
+    err=ndt_f_fortran(A,X,u0,iflags);
+    tol = 10*eps(single(1.));
+    if err < tol
+        fprintf('error %g OK, tol = %g\n',err,tol)
+    else
+        error(sprintf('error %g too large, tol=%g',err,tol))
+    end
+else
+    warning('fortran/ndt_f_test.exe not available')
+>>>>>>> femwind
 end
 %     if abs(err)<1e-6
 %     fprintf('error %g OK\n',err)
