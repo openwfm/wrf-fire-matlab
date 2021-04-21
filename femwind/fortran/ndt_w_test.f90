@@ -16,7 +16,7 @@ use module_io_matlab
 
 implicit none
 
-real, pointer:: Amat(:,:), u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
+real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:),         &
                 U(:,:,:), V(:,:,:),W(:,:,:),lambda(:,:,:), lambdamat(:,:,:),       &  ! Calculated final windFinal 
                 Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:)
@@ -24,12 +24,14 @@ real, pointer:: Amat(:,:), u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),
 
 real, pointer :: a1(:), a2(:)
 integer :: n1(2),lambda_dim(3),u_dim(3), x_dim(3)
-
+real :: Amat(3,3)
 integer :: &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte                         ! fire tile bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+    iuts, iute, kuts, kute, juts, jute,                       &
+    iums, iume, kums, kume, jums, jume
                               
   
 
@@ -85,17 +87,31 @@ jfme = jfte + 1
 kfms = kfts - 1
 kfme = kfte + 1 
 
+iuts = 1
+iute = u_dim(1)
+juts = 1
+jute = u_dim(3)
+kuts = 1
+kute = u_dim(2)
+iums = iuts - 1
+iume = iute + 1
+jums = juts - 1
+jume = jute + 1
+kums = kuts - 1
+kume = kute + 1
 
-allocate(lambdamat(ifms:ifme, kfms:kfme, jfms:jfme))
+
+
+allocate(lambdamat(ifts:ifte, kfts:kfte, jfts:jfte))
 
 
 allocate(Xmat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Ymat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Zmat(ifms:ifme,kfms:kfme,jfms:jfme))
 
-allocate(u0mat(ifms:ifme,kfms:kfme,jfms:jfme))
-allocate(v0mat(ifms:ifme,kfms:kfme,jfms:jfme))
-allocate(w0mat(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(u0mat(iums:iume,kums:kume,jums:jume))
+allocate(v0mat(iums:iume,kums:kume,jums:jume))
+allocate(w0mat(iums:iume,kums:kume,jums:jume))
 
 
 
@@ -112,9 +128,9 @@ do j=jfts,jfte
 enddo
 
 ! copy the input data to tile sized bounds
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+do j=juts,jute
+  do k=kuts,kute
+    do i=iuts,iute
     u0mat(i,k,j) = u0(i,k,j)
 	v0mat(i,k,j) = v0(i,k,j)
 	w0mat(i,k,j) = w0(i,k,j)	
@@ -122,8 +138,13 @@ do j=jfts,jfte
   enddo
 enddo
 
+allocate(U(iums:iume,kums:kume,jums:jume))
+allocate(V(iums:iume,kums:kume,jums:jume))
+allocate(W(iums:iume,kums:kume,jums:jume))
 
-
+U = 0.
+V = 0.
+W = 0.
 
 !write(*,'(a)')'calling w_assembly'
 call w_assembly(  &
@@ -131,19 +152,21 @@ call w_assembly(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  lambda,u0, v0, w0,                            & !Input from femwind, u0, v0, w0
-  Amat, X, Y, Z,                                      & !Spatial Grid Data     
+  iuts, iute, kuts, kute, juts, jute,                       &
+  iums, iume, kums, kume, jums, jume,                       &
+  lambdamat,u0, v0, w0,                                        & !Input from femwind, u0, v0, w0
+  Amat, X, Y, Z,                                            & !Spatial Grid Data     
   U,V,W)                                    
 
 !write(*,'(a,3i8)')'copying the output data to array size ',n2,msize
 
-allocate(Umat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
-allocate(Vmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
-allocate(Wmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
+allocate(Umat(iuts:iute,kuts:kute,juts:jute))
+allocate(Vmat(iuts:iute,kuts:kute,juts:jute))
+allocate(Wmat(iuts:iute,kuts:kute,juts:jute))
 !keep track of indexing
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+do j=juts,jute
+  do k=kuts,kute
+    do i=iuts,iute
       	    Umat(i,k,j)=U(i,k,j)
             Vmat(i,k,j)=V(i,k,j)
             Wmat(i,k,j)=W(i,k,j)
@@ -152,10 +175,10 @@ do j=jfts,jfte
 enddo
 
 
-usize = (/ifte-ifts+1,kfte-kfts+1,jfte-jfts+1/)
-call write_array_nd(reshape(U,(/product(usize)/)),usize,'U')
-call write_array_nd(reshape(V,(/product(usize)/)),usize,'V')
-call write_array_nd(reshape(W,(/product(usize)/)),usize,'W')
+usize = (/iute-iuts+1,kute-kuts+1,jute-juts+1/)
+call write_array_nd(reshape(Umat,(/product(usize)/)),usize,'U')
+call write_array_nd(reshape(Vmat,(/product(usize)/)),usize,'V')
+call write_array_nd(reshape(Wmat,(/product(usize)/)),usize,'W')
 
 
 end program w_assembly_test
