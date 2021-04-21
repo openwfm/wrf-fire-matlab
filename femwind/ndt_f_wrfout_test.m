@@ -10,7 +10,7 @@ iflags=iflags(:);
 
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/ndt_f_test.exe')
-    disp('testing if same result in fortran')
+    disp('testing if same result as fortran')
     err=ndt_f_fortran(A,X,u0,iflags);
     if abs(err)<1e-6
     fprintf('error %g OK\n',err)

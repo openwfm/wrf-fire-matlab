@@ -1,4 +1,5 @@
 format compact
+addpath ../netcdf
 % test for ndt_f_assembly
 nel=[5,4,3]
 %nel=[1 1 1]
