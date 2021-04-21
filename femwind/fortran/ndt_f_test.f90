@@ -1,7 +1,6 @@
 program ndt_f_test
 
 use module_ndt_f_assembly
-use module_hexa
 use module_io_matlab
 
 implicit none
