@@ -24,7 +24,7 @@ real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),           
 
 real, pointer :: a1(:), a2(:)
 integer :: n1(2),lambda_dim(3),u_dim(3), x_dim(3)
-
+real :: Amat(3,3)
 integer :: &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
@@ -34,7 +34,7 @@ integer :: &
     iums, iume, kums, kume, jums, jume
                               
   
-real ::Amat(3,3)
+
 integer :: i,j,k,jx
 integer :: aflags(2) = (/3,1/)                 !Set iflags=1 to construct K in hexa module, iflags = 3 to construct Jg
 !integer :: iflags2 = 1
@@ -102,7 +102,7 @@ kume = kute + 1
 
 
 
-allocate(lambdamat(ifms:ifme, kfms:kfme, jfms:jfme))
+allocate(lambdamat(ifts:ifte, kfts:kfte, jfts:jfte))
 
 
 allocate(Xmat(ifms:ifme,kfms:kfme,jfms:jfme))
@@ -138,8 +138,13 @@ do j=juts,jute
   enddo
 enddo
 
+allocate(U(iums:iume,kums:kume,jums:jume))
+allocate(V(iums:iume,kums:kume,jums:jume))
+allocate(W(iums:iume,kums:kume,jums:jume))
 
-
+U = 0.
+V = 0.
+W = 0.
 
 !write(*,'(a)')'calling w_assembly'
 call w_assembly(  &
@@ -147,15 +152,17 @@ call w_assembly(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  lambda,u0, v0, w0,                            & !Input from femwind, u0, v0, w0
-  Amat, X, Y, Z,                                      & !Spatial Grid Data     
+  iuts, iute, kuts, kute, juts, jute,                       &
+  iums, iume, kums, kume, jums, jume,                       &
+  lambdamat,u0, v0, w0,                                        & !Input from femwind, u0, v0, w0
+  Amat, X, Y, Z,                                            & !Spatial Grid Data     
   U,V,W)                                    
 
 !write(*,'(a,3i8)')'copying the output data to array size ',n2,msize
 
-allocate(Umat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
-allocate(Vmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
-allocate(Wmat(1:u_dim(1),1:u_dim(3),1:u_dim(2)))
+allocate(Umat(iuts:iute,kuts:kute,juts:jute))
+allocate(Vmat(iuts:iute,kuts:kute,juts:jute))
+allocate(Wmat(iuts:iute,kuts:kute,juts:jute))
 !keep track of indexing
 do j=juts,jute
   do k=kuts,kute
@@ -168,7 +175,7 @@ do j=juts,jute
 enddo
 
 
-usize = (/ifte-ifts+1,kfte-kfts+1,jfte-jfts+1/)
+usize = (/iute-iuts+1,kute-kuts+1,jute-juts+1/)
 call write_array_nd(reshape(Umat,(/product(usize)/)),usize,'U')
 call write_array_nd(reshape(Vmat,(/product(usize)/)),usize,'V')
 call write_array_nd(reshape(Wmat,(/product(usize)/)),usize,'W')

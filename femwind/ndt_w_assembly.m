@@ -26,6 +26,9 @@ kglo=zeros(1,8);
 m = n-1;
 done_last=0;
 disp('Constructing W')
+disp('lambda array is')
+disp(lambda)
+
 for i3=1:m(3)
     for i2=1:m(2)
         for i1=1:m(1)  % loop over elements
@@ -53,7 +56,13 @@ for i3=1:m(3)
             % instead, accumulate contributions to the global matrix
             if ~isempty(lambda)
                 grad = lambda(kglo)'*Jg;  % grad lambda
+               %disp('Local lambda is')
+               %lambda(kglo)
+               % disp(' Grad prior to multiplication by A_inv is')
+               %disp(grad) 
                 grad = grad/A;
+                %disp('Grad after to multiplication by A_inv is')
+                 %disp(grad)
                 for i=1:3
                     W{i}(i1,i2,i3)=grad(i);
                 end

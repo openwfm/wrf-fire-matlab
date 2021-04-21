@@ -34,13 +34,13 @@ integer, intent(in)::                             &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     iuts, iute, kuts, kute, juts, jute,           &
-    iums, iume, kums, kume, jums, jume            &           
+    iums, iume, kums, kume, jums, jume                       
      
 
 
 
 
-real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms: jfme):: lambda
+real, intent(in), dimension(ifts:ifte, kfts:kfte, jfts: jfte):: lambda
 !Input for hexa
 
 
@@ -65,6 +65,7 @@ Floc = 0.
 grad = 0.
 u0loc =0.
 
+print *, 'lambda array', lambda
         
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !** executable
@@ -86,18 +87,23 @@ do ie2=jfts,jfte-1
                     enddo
                 enddo
             enddo
-
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,3)
-            grad = matmul(transpose(Jg),lambda_loc)
+            !print *, 'local lambda is', lambda_loc 
             
+            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,3)
+
+            grad = matmul(transpose(Jg),lambda_loc)
+            !print *,'Grad before multiplication by A_inv is', grad
+  
             call Inv3(A, A_inv)
             grad = matmul(transpose(A_inv),grad)
-
+            !print *,'Grad after multiplication by A_inv is', grad
+            
             U(ie1, ie2, ie3)=grad(1)+ u0(ie1, ie2, ie3)
             V(ie1, ie2, ie3)=grad(2)+ v0(ie1, ie2, ie3)
             W(ie1, ie2, ie3)=grad(3)+ w0(ie1, ie2, ie3)
             
         enddo
+       !print *, 'lambda array', lambda
     enddo
 enddo
 
