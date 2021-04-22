@@ -1,13 +1,12 @@
-module module_ndt_f_assembly
+module module_f_assembly
        use module_hexa
+       
 contains
-subroutine ndt_f_assembly(                        &
+subroutine f_assembly(                        &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
-    !iude, jude, kude,                             & !domain bounds for u0
-    iums, iume, kums, kume, jums, jume,           &
     A, X, Y, Z, Xu0, Yu0, Zu0,                    & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
     F)                                             !Global load vector output  
 
@@ -20,16 +19,14 @@ integer, intent(in)::                             &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,            &
-    iums, iume, kums, kume, jums, jume
-    !iude, jude, kude            
+    ifts, ifte, kfts, kfte, jfts,jfte            
 
 
 
 
 real, intent(in), dimension(3,3):: A
-real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms:jfme):: X,Y,Z!spatial grid
-real, intent(in), dimension(iums:iume, kums:kume, jums:jume):: Xu0, Yu0, Zu0
+real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms:jfme):: X,Y,Z, &     !spatial grid at cornersw
+                                                               Xu0,Yu0,Zu0  !wind vector at midpoint
 !Input for hexa
 
 !integer,intent(in)::F_dim
@@ -51,9 +48,9 @@ u0loc = 0.
 F = 0.
 
 !** executable
-do ie2=jfts,jfte -1
-    do ie3=kfts,kfte -1
-        do ie1=ifts,ifte -1
+do ie2=jfts,jfte
+    do ie3=kfts,kfte
+        do ie1=ifts,ifte
             do ic2=0,1
                 do ic3=0,1
                     do ic1=0,1
@@ -61,7 +58,6 @@ do ie2=jfts,jfte -1
                         Xloc(1,iloc)=X(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                         Xloc(2,iloc)=Y(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                         Xloc(3,iloc)=Z(ie1 + ic1, ie3 + ic3, ie2 + ic2)
-
                     enddo
                 enddo
             enddo
@@ -85,5 +81,5 @@ do ie2=jfts,jfte -1
     enddo
 enddo
 
-end subroutine ndt_f_assembly
-end module  module_ndt_f_assembly
+end subroutine f_assembly
+end module  module_f_assembly

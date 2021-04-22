@@ -1,4 +1,4 @@
-function F=ndt_f_assembly(A,X,u0,params);
+function F=f_assembly(A,X,u0,params);
 
 % d = size(X,2);    % dimensions
 n = size(X{1});   % mesh size in nodes
