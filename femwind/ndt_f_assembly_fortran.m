@@ -19,7 +19,7 @@ if 1==1
         
         system(exe)
         
-        F_fort=swap23(read_array_nd('Fvec'));
+        F_fort=swap23(read_array_nd('F'));
         err= norm(F(:)-F_fort(:),inf)
         
         tol = 10*eps(single(1.));

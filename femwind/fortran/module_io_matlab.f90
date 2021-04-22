@@ -2,6 +2,17 @@ module module_io_matlab
 
 contains
 
+! function to go beyond domain boundary if tile is next to it
+integer function snode(t,d,i)
+implicit none
+integer, intent(in)::t,d,i
+if(t.ne.d)then
+    snode=t
+else
+    snode=t+i
+endif
+end function snode
+
 subroutine crash(msg)
 ! terminate with error
 character(len=*),intent(in)::msg
