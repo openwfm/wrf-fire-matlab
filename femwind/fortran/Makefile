@@ -9,7 +9,7 @@ FFLAGS = -g -C
 default: hexa_test.exe\
  ndt_mult_test.exe\
  sweeps_test.exe\
- ndt_f_test.exe\
+ f_assembly_test.exe\
  prolongation_test.exe\
  restriction_test.exe\
  ndt_k_test.exe\
@@ -54,14 +54,11 @@ ndt_k_test.o: ndt_k_test.f90 module_hexa.o module_io_matlab.o module_ndt_k_assem
 module_ndt_k_assembly.o: module_ndt_k_assembly.f90 module_hexa.o Makefile
 	$(FC) $(FFLAGS) -c module_ndt_k_assembly.f90  
 
-ndt_f_test.exe: ndt_f_test.o module_ndt_f_assembly.o module_io_matlab.o module_hexa.o  Makefile
-	$(FC) $(FFLAGS) -o ndt_f_test.exe ndt_f_test.o  module_ndt_f_assembly.o module_io_matlab.o module_hexa.o
+f_assembly_test.exe: f_assembly_test.f90 module_f_assembly.o module_io_matlab.o module_hexa.o  Makefile
+	$(FC) $(FFLAGS) -o f_assembly_test.exe f_assembly_test.f90  module_f_assembly.o module_io_matlab.o module_hexa.o
 
-module_ndt_f_assembly.o: module_ndt_f_assembly.f90 module_hexa.o Makefile
-	$(FC) $(FFLAGS) -c module_ndt_f_assembly.f90
-
-ndt_f_test.o: ndt_f_test.f90 module_ndt_f_assembly.o module_io_matlab.o module_hexa.o Makefile
-	$(FC) $(FFLAGS) -c ndt_f_test.f90
+module_f_assembly.o: module_f_assembly.f90 module_hexa.o Makefile
+	$(FC) $(FFLAGS) -c module_f_assembly.f90
 
 module_coarsening.o: module_coarsening.f90 module_hexa.o Makefile
 	$(FC) $(FFLAGS) -c module_coarsening.f90  

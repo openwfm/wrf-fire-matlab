@@ -1,8 +1,8 @@
-module module_ndt_f_assembly
+module module_f_assembly
        use module_hexa
        
 contains
-subroutine ndt_f_assembly(                        &
+subroutine f_assembly(                        &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
@@ -81,5 +81,5 @@ do ie2=jfts,jfte
     enddo
 enddo
 
-end subroutine ndt_f_assembly
-end module  module_ndt_f_assembly
+end subroutine f_assembly
+end module  module_f_assembly

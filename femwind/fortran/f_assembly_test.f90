@@ -1,6 +1,6 @@
-program ndt_f_test
+program f_assembly_test
 
-use module_ndt_f_assembly
+use module_f_assembly
 use module_io_matlab
 
 implicit none
@@ -89,7 +89,7 @@ allocate(F(ifms:ifme, kfms:kfme, jfms:jfme))
 F = 0.
 
 write(*,'(a)')'calling ndt_f_assembly'
-call ndt_f_assembly(  &
+call f_assembly(  &
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
@@ -100,4 +100,4 @@ call ndt_f_assembly(  &
 ! write output as is in 3D but with tight dimensions
 call write_array(F(ifts:ifte+1,kfts:kfte+1,jfts:jfte+1),'F')  
 
-end program ndt_f_test
+end program f_assembly_test

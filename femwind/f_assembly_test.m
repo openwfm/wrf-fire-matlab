@@ -18,9 +18,5 @@ X = add_terrain_to_mesh(X, 'hill', 'squash', 0.1);
 
 
 % test same results for ndt_mult from matlab and fortran
-if exist('fortran/ndt_f_test.exe')
-    disp('testing if same result in fortran')
-    F=ndt_f_assembly_fortran(A,X,u0,[],params);
-else
-    warning('fortran/ndt_f_test.exe not available')
-end
+
+F=f_assembly_fortran(A,X,u0,[],params);

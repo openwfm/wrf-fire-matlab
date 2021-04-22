@@ -9,14 +9,14 @@ iflags=[2 1 1];
 iflags=iflags(:);
 
 % test same results for ndt_mult from matlab and fortran
-if exist('fortran/ndt_f_test.exe')
+if exist('fortran/f_assembly_test.exe')
     disp('testing if same result as fortran')
-    err=ndt_f_fortran(A,X,u0,iflags);
+    err=f_assembly_fortran(A,X,u0,[],[]);
     if abs(err)<1e-6
     fprintf('error %g OK\n',err)
     else
     error(sprintf('error %g too large',err))
     end
 else
-    warning('fortran/ndt_f_test.exe not available')
+    warning('fortran/f_assembly_test.exe not available')
 end
