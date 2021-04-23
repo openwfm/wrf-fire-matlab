@@ -3,8 +3,8 @@
 #FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow -tracebackA -fpe0
 FFLAGS = -O3 -r8  # intel
 FFLAGS = -O3 
-FFLAGS = -g -C
 FFLAGS = -O3 -fdefault-real-8  # gnu
+FFLAGS = -g -C
 
 default: hexa_test.exe\
  ndt_mult_test.exe\
@@ -16,7 +16,8 @@ default: hexa_test.exe\
  ndt_w_test.exe\
  coarsening_icl_test.exe\
  ndt_boundary_conditions_test.exe\
- vec_boundary_conditions_test.exe
+ vec_boundary_conditions_test.exe\
+ femwind_solve_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
@@ -98,5 +99,12 @@ module_ndt_w_assembly.o:  module_ndt_w_assembly.f90 module_hexa.o module_lin_alg
 module_lin_alg.o:  module_lin_alg.f90 Makefile
 	$(FC) $(FFLAGS) -c module_lin_alg.f90 
 
+module_femwind_solve.o: module_femwind_solve.f90 module_f_assembly.o Makefile
+	$(FC) $(FFLAGS) -c  module_femwind_solve.f90
+
+FEMWIND_SOLVE = femwind_solve_test.f90  module_femwind_solve.o module_f_assembly.o module_hexa.o module_io_matlab.o
+femwind_solve_test.exe: $(FEMWIND_SOLVE)
+	$(FC) $(FFLAGS) -o $@ $(FEMWIND_SOLVE)
+
 clean:
-	rm -rf *.mod *.o *.exe
+	rm -rf *.mod *.o *.exe *.dSYM

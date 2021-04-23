@@ -1,4 +1,4 @@
-function [w,rate]=femwind_solve_fortran(A,X,u0,params)
+function [W,rate]=femwind_solve_fortran(A,X,u0,params)
 
 exe  = './fortran/femwind_solve_test.exe';
 if exist(exe,'file') & params.run_fortran
@@ -10,27 +10,26 @@ if exist(exe,'file') & params.run_fortran
     write_array_nd(swap23(u0{3}),'Zu0');
 
     write_array(A,'A')
-    write_array(iflags,'iflags')
-
+    
     % defaults
-    Xw =zeros(nel);
-    Yw =zeros(nel);
-    Zw =zeros(nel);
-    rate=0;
+    nel = size(X{1})-1;
+    u =zeros(nel);
+    v =zeros(nel);
+    w =zeros(nel);
+    rate=0;   % placeholder
 
     try
         disp(['running ',exe])
         system(exe);
-        Xw=swap23(read_array_nd('Xw'));
-        Yw=swap23(read_array_nd('Yw'));
-        Zw=swap23(read_array_nd('Zw'));
+        u=swap23(read_array_nd('u'));
+        v=swap23(read_array_nd('v'));
+        w=swap23(read_array_nd('w'));
         rate=read_array_nd('rate');
     catch
         disp([exe,' failed'])
     end
 
-    wf = {Xw,Yw,Zw};
-    w = wf;
+    W = {u,v,w};
 end
 
 if params.run_matlab
