@@ -20,6 +20,7 @@ real, pointer:: A(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:), &
                 u(:,:,:), v(:,:,:), w(:,:,:)
 
 integer:: i, j, k, n(3)
+real:: rate
 
 call read_array(A,'A')  ! matrices read from Matlab are _m
 call read_array(X_m,'X')
@@ -92,11 +93,13 @@ call femwind_solve(  &
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   A, X , Y, Z, u0, v0, w0,                                  & ! input arrays
-  u, v, w )                                                   ! output arrays
+  u, v, w,                                                  & ! output arrays
+  rate)
 
 ! write output as is in 3D but with tight dimensions
 call write_array(u(ifts:ifte,kfts:kfte,jfts:jfte),'u')  
 call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')  
 call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
+call write_array_nd((/rate/),(/1/),'rate')
 
 end program femwind_solve_test
