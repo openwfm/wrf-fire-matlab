@@ -17,7 +17,7 @@ default: hexa_test.exe\
  coarsening_icl_test.exe\
  ndt_boundary_conditions_test.exe\
  vec_boundary_conditions_test.exe\
- femwind_solve_test.exe
+ femwind_test.exe
 
 hexa_test.exe: hexa_test.o module_hexa.o module_io_matlab.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_io_matlab.o
@@ -99,11 +99,16 @@ module_ndt_w_assembly.o:  module_ndt_w_assembly.f90 module_hexa.o module_lin_alg
 module_lin_alg.o:  module_lin_alg.f90 Makefile
 	$(FC) $(FFLAGS) -c module_lin_alg.f90 
 
-module_femwind_solve.o: module_femwind_solve.f90 module_f_assembly.o Makefile
-	$(FC) $(FFLAGS) -c  module_femwind_solve.f90
+module_femwind.o: module_femwind.f90 module_f_assembly.o Makefile
+	$(FC) $(FFLAGS) -c  module_femwind.f90
 
-FEMWIND_SOLVE = femwind_solve_test.f90  module_femwind_solve.o module_f_assembly.o module_hexa.o module_io_matlab.o
-femwind_solve_test.exe: $(FEMWIND_SOLVE)
+FEMWIND_SOLVE = femwind_test.f90\
+  module_femwind.o\
+  module_ndt_k_assembly.o\
+  module_f_assembly.o\
+  module_hexa.o\
+  module_io_matlab.o
+femwind_test.exe: $(FEMWIND_SOLVE)
 	$(FC) $(FFLAGS) -o $@ $(FEMWIND_SOLVE)
 
 clean:

@@ -1,6 +1,6 @@
-program femwind_solve_test
+program femwind_test
 
-use module_femwind_solve
+use module_femwind
 use module_io_matlab
 
 implicit none
@@ -17,8 +17,9 @@ integer ::                          &
 
 real, pointer:: A(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:), &
                 u0(:,:,:), v0(:,:,:), w0(:,:,:),   &
-                u(:,:,:), v(:,:,:), w(:,:,:)
+                u(:,:,:), v(:,:,:), w(:,:,:),Kmat(:,:,:,:)
 
+integer, parameter::msize=14
 integer:: i, j, k, n(3)
 real:: rate
 
@@ -61,6 +62,7 @@ allocate(w0(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(u(ifms:ifme,kfms:kfme,jfms:jfme)) ! vector components called u v W
 allocate(v(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(w(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(Kmat(ifms:ifme,kfms:kfme,jfms:jfme,msize)) ! stifness matrix
 
 ! copy the input data to tile sized bounds
 ! X Y Z are corner based, upper bound larger by one
@@ -73,6 +75,15 @@ do j=jfts,jfte+1
     enddo
   enddo
 enddo
+
+call femwind_setup(                         &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,            &
+    A, X, Y, Z,                                   & !  inputs
+    Kmat)                                              ! outputs
+
 
 ! u is midpoint based
 do j=jfts,jfte
@@ -102,4 +113,4 @@ call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')
 call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
 call write_array_nd((/rate/),(/1/),'rate')
 
-end program femwind_solve_test
+end program femwind_test
