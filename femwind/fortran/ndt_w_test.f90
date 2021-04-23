@@ -29,15 +29,11 @@ integer :: &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-    iuts, iute, kuts, kute, juts, jute,                       &
-    iums, iume, kums, kume, jums, jume
+    ifts, ifte, kfts, kfte, jfts,jfte                           ! fire tile bounds
                               
   
 
 integer :: i,j,k,jx
-integer :: aflags(2) = (/3,1/)                 !Set iflags=1 to construct K in hexa module, iflags = 3 to construct Jg
-!integer :: iflags2 = 1
 integer :: usize(3)
 
 call read_array_nd(a1,n1,'A') !Recovering X-Matrix and dimension of X matrix
@@ -48,13 +44,11 @@ endif
 
 Amat = reshape(a1,n1)
 
-!call read_array_nd(a,n,'u')
-!allocate(u_m(n(1),n(2),n(3)))
-!u_m = reshape(a,n)
 
 call read_array(lambda, 'lambda')
 lambda_dim = shape(lambda)
 
+print *, 'lambda array has shape', shape(lambda)
 
 ! read input arrays in ikj index ordering and tight bounds
 call read_array(X,'X')
@@ -75,50 +69,41 @@ if (x_dim(1).ne.lambda_dim(1).or.x_dim(2).ne.lambda_dim(2).or.x_dim(3).ne.lambda
 endif
 
 ifts = 1
-ifte = x_dim(1)
+ifte = x_dim(1)-1
 jfts = 1
-jfte = x_dim(3)
+jfte = x_dim(3)-1
 kfts = 1
-kfte = x_dim(2)
-ifms = ifts - 1
-ifme = ifte + 1
-jfms = jfts - 1 
-jfme = jfte + 1
-kfms = kfts - 1
-kfme = kfte + 1 
+kfte = x_dim(2)-1
+ifms = ifts-1
+ifme = ifte+2
+jfms = jfts-1
+jfme = jfte+2
+kfms = kfts-1
+kfme = kfte+2
+ifds = ifts
+ifde = ifte
+jfds = jfts
+jfde = jfte
+kfds = kfts
+kfde = kfte
 
-iuts = 1
-iute = u_dim(1)
-juts = 1
-jute = u_dim(3)
-kuts = 1
-kute = u_dim(2)
-iums = iuts - 1
-iume = iute + 1
-jums = juts - 1
-jume = jute + 1
-kums = kuts - 1
-kume = kute + 1
+allocate(lambdamat(ifts:ifte+1, kfts:kfte+1, jfts:jfte+1))
 
-
-
-allocate(lambdamat(ifts:ifte, kfts:kfte, jfts:jfte))
 
 
 allocate(Xmat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Ymat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Zmat(ifms:ifme,kfms:kfme,jfms:jfme))
 
-allocate(u0mat(iums:iume,kums:kume,jums:jume))
-allocate(v0mat(iums:iume,kums:kume,jums:jume))
-allocate(w0mat(iums:iume,kums:kume,jums:jume))
+allocate(u0mat(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(v0mat(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(w0mat(ifms:ifme,kfms:kfme,jfms:jfme))
 
-
-
-
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+! copy the input data to tile sized bounds
+! X Y Z are corner based, upper bound larger by one
+do j=jfts,jfte+1
+  do k=kfts,kfte+1
+    do i=ifts,ifte+1
         Xmat(i,k,j) = X(i,k,j)
         Ymat(i,k,j) = Y(i,k,j)
         Zmat(i,k,j) = Z(i,k,j)
@@ -127,20 +112,22 @@ do j=jfts,jfte
   enddo
 enddo
 
-! copy the input data to tile sized bounds
-do j=juts,jute
-  do k=kuts,kute
-    do i=iuts,iute
-    u0mat(i,k,j) = u0(i,k,j)
-	v0mat(i,k,j) = v0(i,k,j)
-	w0mat(i,k,j) = w0(i,k,j)	
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
+        u0mat(i,k,j) = u0(i,k,j)
+        v0mat(i,k,j) = v0(i,k,j)
+        w0mat(i,k,j) = w0(i,k,j)
     enddo
   enddo
 enddo
 
-allocate(U(iums:iume,kums:kume,jums:jume))
-allocate(V(iums:iume,kums:kume,jums:jume))
-allocate(W(iums:iume,kums:kume,jums:jume))
+print *, 'u0 is', u0
+
+
+allocate(U(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(V(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(W(ifms:ifme,kfms:kfme,jfms:jfme))
 
 U = 0.
 V = 0.
@@ -152,33 +139,30 @@ call w_assembly(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  iuts, iute, kuts, kute, juts, jute,                       &
-  iums, iume, kums, kume, jums, jume,                       &
-  lambdamat,u0, v0, w0,                                        & !Input from femwind, u0, v0, w0
-  Amat, X, Y, Z,                                            & !Spatial Grid Data     
+  lambdamat,u0mat, v0mat, w0mat, Amat,                      & !Input from femwind, u0, v0, w0,Spatial Grid Data
+  Xmat, Ymat, Zmat,                                         &
   U,V,W)                                    
 
 !write(*,'(a,3i8)')'copying the output data to array size ',n2,msize
 
-allocate(Umat(iuts:iute,kuts:kute,juts:jute))
-allocate(Vmat(iuts:iute,kuts:kute,juts:jute))
-allocate(Wmat(iuts:iute,kuts:kute,juts:jute))
+allocate(Umat(ifts:ifte,kfts:kfte,jfts:jfte))
+allocate(Vmat(ifts:ifte,kfts:kfte,jfts:jfte))
+allocate(Wmat(ifts:ifte,kfts:kfte,jfts:jfte))
 !keep track of indexing
-do j=juts,jute
-  do k=kuts,kute
-    do i=iuts,iute
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
       	    Umat(i,k,j)=U(i,k,j)
             Vmat(i,k,j)=V(i,k,j)
             Wmat(i,k,j)=W(i,k,j)
     enddo
   enddo
 enddo
+!print *, 'Shape of Umat is', shape(Umat)
 
-
-usize = (/iute-iuts+1,kute-kuts+1,jute-juts+1/)
-call write_array_nd(reshape(Umat,(/product(usize)/)),usize,'U')
-call write_array_nd(reshape(Vmat,(/product(usize)/)),usize,'V')
-call write_array_nd(reshape(Wmat,(/product(usize)/)),usize,'W')
+call write_array(Umat,'U')
+call write_array(Vmat,'V')
+call write_array(Wmat,'W')
 
 
 end program w_assembly_test

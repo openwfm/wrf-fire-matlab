@@ -25,10 +25,11 @@ Xloc = zeros(3,8);
 kglo=zeros(1,8);
 m = n-1;
 done_last=0;
-disp('Constructing W')
-disp('lambda array is')
-disp(lambda)
-
+%disp('Constructing W')
+%disp('lambda array is')
+%disp(lambda)
+disp('u0 from matlab is')
+disp(u0{1})
 for i3=1:m(3)
     for i2=1:m(2)
         for i1=1:m(1)  % loop over elements
@@ -47,14 +48,18 @@ for i3=1:m(3)
                     end
                 end
             end
+            %disp('Xloc is')
+            %disp(Xloc)
             if ~isempty(u0)
                 u0loc=[u0{1}(i1,i2,i3),u0{2}(i1,i2,i3),u0{3}(i1,i2,i3)]';
             else
                 u0loc=[];
             end
+           %disp('u0loc is')
+          % disp(u0loc(1))
             [~,~,Jg]=hexa(A,Xloc,u0loc); % create local matrix and rhs
-            disp('Jg is')
-            disp(Jg)
+           %disp('Jg is')
+           %disp(Jg)
             % instead, accumulate contributions to the global matrix
             if ~isempty(lambda)
                 grad = lambda(kglo)'*Jg;  % grad lambda
