@@ -1,6 +1,6 @@
 function [w,rate]=femwind_solve_fortran(A,X,u0,params)
 
-exe  = './fortran/femwind_solve.exe';
+exe  = './fortran/femwind_solve_test.exe';
 if exist(exe,'file') & params.run_fortran
     write_array_nd(swap23(X{1}),'X');
     write_array_nd(swap23(X{2}),'Y');
