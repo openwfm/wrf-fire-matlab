@@ -5,7 +5,9 @@ hexa_test
 nd_test
 ndt_assembly_test
 f_assembly_test
+ndt_w_test
 vec_boundary_conditions_test
 vertical_test
-p.test_fortan=1;
+p=[];
+p.test_fortran=1;
 femwind_rate_test(p)
