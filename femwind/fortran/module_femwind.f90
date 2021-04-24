@@ -49,11 +49,33 @@ integer, intent(out)::  &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte              ! tile dimensions
  
-    ifds = mg%ifds
-    ifde = mg%ifde
-    jfds = mg%jfds
-    jfde = mg%jfde
-    call crash('get_mg_dims not finished')
+    ifds = 1
+    ifde = mg%nx-1  ! dimension in elements
+    jfds = 1
+    jfde = mg%ny-1 
+    kfds = 1
+    kfde = mg%nz-1
+
+    ifts = ifds
+    ifte = ifde
+    jfts = jfds
+    jfte = jfde
+    kfts = kfds
+    kfte = kfde
+
+    ifps = ifds
+    ifpe = ifde
+    jfps = jfds
+    jfpe = jfde
+    kfps = kfds
+    kfpe = kfde
+
+    ifms = ifps - 1
+    ifme = ifpe + 2  ! need +1 for vertex grid, and +1 for zero strip 
+    jfms = jfps - 1
+    jfme = jfpe + 2
+    kfms = kfps - 1
+    kfme = kfpe + 2
 
 end subroutine get_mg_dims
 
