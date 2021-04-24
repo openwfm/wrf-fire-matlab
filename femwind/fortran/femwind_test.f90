@@ -15,15 +15,15 @@ integer ::                          &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte                          ! fire tile bounds
 
-real, pointer:: A(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:), &
+! A, msize included from module femwind
+real, pointer:: X(:,:,:),Y(:,:,:),Z(:,:,:), &
                 u0(:,:,:), v0(:,:,:), w0(:,:,:),   &
-                u(:,:,:), v(:,:,:), w(:,:,:),Kmat(:,:,:,:)
+                u(:,:,:), v(:,:,:), w(:,:,:),Kmat(:,:,:,:),A_m(:,:,:)
 
-integer, parameter::msize=14
 integer:: i, j, k, n(3)
 real:: rate
 
-call read_array(A,'A')  ! matrices read from Matlab are _m
+call read_array(A_m,'A')  ! matrices read from Matlab are _m
 call read_array(X_m,'X')
 call read_array(Y_m,'Y')
 call read_array(Z_m,'Z')
@@ -31,7 +31,9 @@ call read_array(u0_m, 'u0')
 call read_array(v0_m, 'v0')
 call read_array(w0_m, 'w0')
 
-n = shape(X)
+A = reshape(A_m,(/3,3/))
+
+n = shape(X_m)
 
 ifts = 1        ! tile is defined in cells not vertices
 ifte = n(1)-1
@@ -76,13 +78,10 @@ do j=jfts,jfte+1
   enddo
 enddo
 
-call femwind_setup(                         &
-    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
-    ifms, ifme, kfms, kfme, jfms, jfme,           &
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,            &
-    A, X, Y, Z,                                   & !  inputs
-    Kmat)                                              ! outputs
+mg(1)%X=X
+mg(1)%Y=Y
+mg(1)%Y=Y
+call femwind_setup(mg)    
 
 
 ! u is midpoint based
@@ -98,12 +97,12 @@ enddo
 
 
 write(*,'(a)')'calling femwind_solve'
-call femwind_solve(  &
+call femwind_solve(  mg,&
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  A, X , Y, Z, u0, v0, w0,                                  & ! input arrays
+  u0, v0, w0,                                  & ! input arrays
   u, v, w,                                                  & ! output arrays
   rate)
 

@@ -1,4 +1,4 @@
-function err=ndt_assembly_fortran(A,X,u0,lambda,params); 
+function err=ndt_w_test_fortran(A,X,u0,lambda,params); 
 % call fortran version and compare resultso
 
 lambda2 = lambda(:);

@@ -102,14 +102,15 @@ module_lin_alg.o:  module_lin_alg.f90 Makefile
 module_femwind.o: module_femwind.f90 module_f_assembly.o Makefile
 	$(FC) $(FFLAGS) -c  module_femwind.f90
 
-FEMWIND_SOLVE = femwind_test.f90\
+FEMWIND_TEST = femwind_test.f90\
   module_femwind.o\
   module_ndt_k_assembly.o\
   module_f_assembly.o\
   module_hexa.o\
+  module_coarsening.o\
   module_io_matlab.o
-femwind_test.exe: $(FEMWIND_SOLVE)
-	$(FC) $(FFLAGS) -o $@ $(FEMWIND_SOLVE)
+femwind_test.exe: $(FEMWIND_TEST)
+	$(FC) $(FFLAGS) -o $@ $(FEMWIND_TEST)
 
 clean:
 	rm -rf *.mod *.o *.exe *.dSYM

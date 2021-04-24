@@ -1,6 +1,6 @@
-function [W,rate]=femwind_solve_fortran(A,X,u0,params)
+function [W,rate]=femwind_fortran(A,X,u0,params)
 
-exe  = './fortran/femwind_solve_test.exe';
+exe  = './fortran/femwind_test.exe';
 if exist(exe,'file') & params.run_fortran
     write_array_nd(swap23(X{1}),'X');
     write_array_nd(swap23(X{2}),'Y');
@@ -29,20 +29,19 @@ if exist(exe,'file') & params.run_fortran
         disp([exe,' failed'])
     end
 
-    W = {u,v,w};
+    wf = {u,v,w};
 end
 
 if params.run_matlab
     
     [wm,rate]=femwind_solve(A,X,u0,params)
-    w = wm;
 end
 
 if exist('wf','var') & exist('wm','var')
 
     tol = 10*eps(single(1.));
     
-    wwf=cell2mat(uf);
+    wwwf=cell2mat(uf);
     wwm=cell2mat(um);
  
     err= norm(wwf(:)-wwm(:),inf)/norm(wwm(:));
@@ -53,3 +52,11 @@ if exist('wf','var') & exist('wm','var')
     end
 
 end
+
+if exist('wm','var')
+    W = wm;
+end
+
+end
+
+

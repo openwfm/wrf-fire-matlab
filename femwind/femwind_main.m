@@ -164,7 +164,7 @@ for sc2 = params.sc2_all
         diary; diary
 
         % solve
-        [W,rate(sc,sc2)]=femwind_solve_fortran(A,X,U0,params);
+        [W,rate(sc,sc2)]=femwind_fortran(A,X,U0,params);
         
         if params.graphics>1
             disp('graphics: solution')

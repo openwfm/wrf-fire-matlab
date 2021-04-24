@@ -251,8 +251,8 @@ subroutine coarsening_icl(cr_x,cr_y,icl_z,dx,dy,dz,A,minaspect,maxaspect)
 !   dz          verticl element size, vector
 !   A           matrix size (3,3), only diagonal used
 ! out:
-!   cr_x,cr_y   horizontal coarsening factors in directions 1 and 2
-!   icl_z       coarse indices in direction 3
+!   cr_x,cr_y   horizontal coarsening factors in directions x and y
+!   icl_z       coarse indices in direction z, allocated here
 implicit none
 
 !*** arguments
@@ -350,6 +350,10 @@ enddo
 icl_y(nc_y)=n_y ! last coarse is last fine
 
 end subroutine hzc2icl
+
+subroutine coarsening_grid
+call crash('coarsening_grid not done yet')
+end subroutine coarsening_grid
 
 end module module_coarsening
 
