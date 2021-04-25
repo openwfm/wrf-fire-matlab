@@ -7,7 +7,7 @@
 
 
 module module_femwind
-       use module_io_matlab
+       use module_utils
        use module_f_assembly
        use module_ndt_assembly
        use module_w_assembly

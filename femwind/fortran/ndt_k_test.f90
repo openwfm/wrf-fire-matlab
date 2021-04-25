@@ -2,7 +2,7 @@ program ndt_assembly_test
 
 use module_ndt_assembly
 use module_hexa
-use module_io_matlab
+use module_utils
 
 implicit none
 

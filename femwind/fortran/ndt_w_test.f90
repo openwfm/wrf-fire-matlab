@@ -2,7 +2,7 @@ program w_assembly_test
 
 use module_w_assembly
 use module_hexa
-use module_io_matlab
+use module_utils
 
 !Purpose: Create Arrays of Wind Vector Component Values at Center Points of Spatial Grid
 !In:

@@ -1,4 +1,4 @@
-module module_io_matlab
+module module_utils
 
 contains
 
@@ -180,4 +180,4 @@ jfme=jfte + nwrap
 
 end subroutine set_indices
 
-end module module_io_matlab
+end module module_utils

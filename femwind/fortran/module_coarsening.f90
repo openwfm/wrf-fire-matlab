@@ -1,6 +1,6 @@
 module module_coarsening
 
-use module_io_matlab, only: crash
+use module_utils, only: crash
 
 contains
 

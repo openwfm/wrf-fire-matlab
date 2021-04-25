@@ -1,7 +1,7 @@
 program coarsening_icl_test
 
 use module_coarsening   
-use module_io_matlab ! to read and write matrices as text files from matlab
+use module_utils ! to read and write matrices as text files from matlab
 
 implicit none
 

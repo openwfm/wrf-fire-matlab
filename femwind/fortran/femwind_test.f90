@@ -1,7 +1,7 @@
 program femwind_test
 
 use module_femwind
-use module_io_matlab
+use module_utils
 
 implicit none
 

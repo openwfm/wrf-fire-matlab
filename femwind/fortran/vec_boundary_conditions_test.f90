@@ -1,7 +1,7 @@
 program vec_boundary_conditions_test
 
 use module_boundary_conditions   ! testing only
-use module_io_matlab ! to read and write matrices as text files from matlab
+use module_utils ! to read and write matrices as text files from matlab
 
 implicit none
 

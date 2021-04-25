@@ -1,7 +1,7 @@
 program sweeps_test
 
 use module_sweeps
-use module_io_matlab
+use module_utils
 
 implicit none
 

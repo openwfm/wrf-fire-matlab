@@ -1,7 +1,7 @@
 program f_assembly_test
 
 use module_f_assembly
-use module_io_matlab
+use module_utils
 
 implicit none
 
