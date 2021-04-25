@@ -2,6 +2,7 @@
 ! called from femwind_test.f90 compiled as femwind_test.exe
 ! femwind_test.exe is executed from femwind_fortran.m if params.run_fortran
 ! femwind_fortran.m is called from femwind_main.m   
+! run femwind_main from e.g. femwind_rate_test or femwind_wrfout_test
 
 
 

@@ -78,9 +78,9 @@ do j=jfts,jfte+1
   enddo
 enddo
 
-mg(1)%X=X
-mg(1)%Y=Y
-mg(1)%Y=Y
+mg(1)%X=>X
+mg(1)%Y=>Y
+mg(1)%Y=>Y
 call femwind_setup(mg)    
 
 

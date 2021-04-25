@@ -12,7 +12,7 @@ end
 filename=[name,'.txt'];
 s = size(a);
 n = length(s);
-fprintf('writing matrix size %g %g %g %g %g %g %g',n) 
+fprintf('writing matrix size %g %g %g %g %g %g %g',s) 
 fprintf('to file %s\n',filename)
 h=fopen(filename,'w');
 fprintf(h,'%i\n',456,n,s);

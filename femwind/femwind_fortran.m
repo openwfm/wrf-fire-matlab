@@ -1,7 +1,7 @@
 function [W,rate]=femwind_fortran(A,X,u0,params)
 
 exe  = './fortran/femwind_test.exe';
-if exist(exe,'file') & params.run_fortran
+if isfield(params,'run_fortran') && params.run_fortran && exist(exe,'file') 
     write_array_nd(swap23(X{1}),'X');
     write_array_nd(swap23(X{2}),'Y');
     write_array_nd(swap23(X{3}),'Z');
@@ -32,7 +32,7 @@ if exist(exe,'file') & params.run_fortran
     wf = {u,v,w};
 end
 
-if params.run_matlab
+if isfield(params,'run_matlab') && params.run_matlab
     
     [wm,rate]=femwind_solve(A,X,u0,params)
 end
