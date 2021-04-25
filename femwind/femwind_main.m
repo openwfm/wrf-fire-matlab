@@ -16,6 +16,7 @@ function params=femwind_main(params)
 if ~exist('params','var') | isempty(params)
     params.run_fortran=1;
     params.run_matlab=1;
+    params.femwind_fortran_test=0;
     params.test_fortran=0;
     params.graphics=2;  % 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical

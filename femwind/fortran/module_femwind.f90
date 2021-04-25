@@ -7,6 +7,7 @@
 
 
 module module_femwind
+       use module_io_matlab
        use module_f_assembly
        use module_ndt_assembly
        use module_w_assembly
@@ -176,6 +177,7 @@ call f_assembly(                        &
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     A, mg(1)%X, mg(1)%Y, mg(1)%Z, u0, v0, w0,                       & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
     f)                                             !Global load vector output  
+call write_array(f,'F_f')
 
 ! initialize for now
 u=0.

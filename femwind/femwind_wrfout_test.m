@@ -13,6 +13,8 @@ addpath ../netcdf
 if exist('fortran/f_assembly_test.exe')
     disp('testing if same result as fortran')
     p.run_fortran=1;
+    p.run_matlab=1;
+    p.femwind_fortran_test=1
     err=femwind_fortran(A,X,u0,p);
     if abs(err)<1e-6
     fprintf('error %g OK\n',err)

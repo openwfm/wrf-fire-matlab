@@ -2,8 +2,12 @@ function [W,rate]=femwind_solve(A,X,U0,params)
     % assemble sparse system matrix
     nel=size(X{1})-1;
     lambda = zeros(prod(nel+1),1); % placeholder solution
-    F = f_assembly_fortran(A,X,U0,lambda,params);
+    % F = f_assembly_fortran(A,X,U0,lambda,params);
     [K,F,~] = sparse_assembly(A,X,U0,lambda,params);
+    if isfield(params,'femwind_fortran_test') && params.femwind_fortran_test
+        F_f=read_array('F_f');
+        err_f = big(F(:)-F_f(:))
+    end
     
 
     % dirichlet boundary conditions
