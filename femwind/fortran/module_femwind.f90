@@ -26,8 +26,8 @@ type mg_type
     real, pointer, dimension(:,:,:):: X, Y, Z       ! grid vertices
     real, pointer, dimension(:,:,:,:):: Kglo        ! global stiffness matrix
     
-    real:: dx,dy  
-    real, pointer, dimension(:)::dz                  ! spacing of the layers
+    real:: dx,dy                                    ! horizontal spacing, scalar 
+    real, pointer, dimension(:)::dz                 ! vertical spacing of the layers
     integer::nx,ny,nz,nn                            ! mesh size in vertices
 
     integer:: cr_x, cr_y                            ! coarsening factors
@@ -40,18 +40,16 @@ type mg_type
     ifts, ifte, kfts, kfte, jfts, jfte              ! tile dimensions
  
 end type
-
-type(mg_type):: mg(max_levels)
        
 contains
 
-subroutine get_mg_dims(mg, &
+subroutine get_mg_dims(mg_level, &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte)              ! tile dimensions
 implicit none
-type(mg_type),intent(in)::mg
+type(mg_type),intent(in)::mg_level
 integer, intent(out)::  &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
@@ -59,11 +57,11 @@ integer, intent(out)::  &
     ifts, ifte, kfts, kfte, jfts, jfte              ! tile dimensions
  
     ifds = 1
-    ifde = mg%nx-1  ! dimension in elements
+    ifde = mg_level%nx-1  ! dimension in elements
     jfds = 1
-    jfde = mg%ny-1 
+    jfde = mg_level%ny-1 
     kfds = 1
-    kfde = mg%nz-1
+    kfde = mg_level%nz-1
 
     ifts = ifds
     ifte = ifde
@@ -99,10 +97,16 @@ type(mg_type),intent(inout)::mg(max_levels)  ! multigrid level
 
 integer::k,l,m,nzc
 real::s
-integer::   ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
-            ifms, ifme, kfms,kfme, jfms, jfme,            &
-            ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
-            ifts, ifte, kfts,kfte, jfts,jfte            
+integer::   &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
+    ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+    ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
+
 
 !*** executable
 
@@ -158,9 +162,37 @@ integer::   ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensio
 
     enddo
     print *,nlevels,' levels'
-    call crash('allocate and compute coarse X Y Z dz here')
 
-    ! assemble the matrices 
+    ! get coarse grid coordinates 
+    do l=1,nlevels-1 
+        call get_mg_dims(mg(l), &
+            ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
+            ifms, ifme, kfms,kfme, jfms, jfme,            &
+            ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
+            ifts, ifte, kfts,kfte, jfts,jfte)            
+        call get_mg_dims(mg(l+1), &
+            ifcds, ifcde, kfcds,kfcde, jfcds, jfcde,            & ! fire grid dimensions
+            ifcms, ifcme, kfcms,kfcme, jfcms, jfcme,            &
+            ifcps, ifcpe, kfcps,kfcpe, jfcps, jfcpe,           & ! fire patch bounds
+            ifcts, ifcte, kfcts,kfcte, jfcts,jfcte)            
+        allocate(mg(l+1)%X(ifms: ifme, kfms: kfme, jfms: jfme))
+        allocate(mg(l+1)%Y(ifms: ifme, kfms: kfme, jfms: jfme))
+        allocate(mg(l+1)%Z(ifms: ifme, kfms: kfme, jfms: jfme))
+        call coarsening_grid(l, &
+            ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+            ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+            ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+            ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
+            ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+            ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+            ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+            ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile
+            mg(l)%icl_x, mg(l)%icl_y, mg(l)%icl_z,        & ! indices of coarse grid
+            mg(l)%X, mg(l)%Y, mg(l)%Z,                    & ! fine grid coordinates
+            mg(l+1)%X, mg(l+1)%Y, mg(l+1)%Z)                ! coarse grid coordinates
+    enddo
+
+    ! assemble the stiffness matrices 
     do l=1,nlevels 
         call get_mg_dims(mg(l), &
             ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions

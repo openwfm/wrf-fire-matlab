@@ -1,6 +1,6 @@
 module module_coarsening
 
-use module_utils, only: crash
+use module_utils, only: crash, snode
 
 contains
 
@@ -352,8 +352,49 @@ icl_y(nc_y)=n_y ! last coarse is last fine
 
 end subroutine coarsening_hzc2icl
 
-subroutine coarsening_grid
-call crash('coarsening_grid not done yet')
+subroutine coarsening_grid(l, &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
+    ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+    ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile 
+    icl_x, icl_y, icl_z, X, Y, Z, X_coarse, Y_coarse, Z_coarse)
+implicit none
+! compute coarse grid coordinates arrays on one tile 
+
+!*** arguments
+integer,intent(in)::l                               ! fine level, coarse is l+1
+integer, intent(in):: &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
+    ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+    ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile 
+
+integer, intent(in):: icl_x(ifcts:),icl_y(jfcts:),icl_z(kfcts:)  ! leaving upper bound to be passed on
+real, dimension(ifms:ifme,kfms:kfme,jfms:jfme), intent(in):: X,Y,Z !spatial grid
+real, intent(out), dimension(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme):: X_coarse, Y_coarse, Z_coarse ! coarse vector
+
+!*** local
+integer::ic,jc,kc
+
+!*** executable
+do jc=ifcts,snode(jfcte,jfcde,+1)
+    do kc=kfcts,snode(kfcte,kfcde,+1)
+        do ic=ifcts,snode(ifcte,ifcde,+1)
+            X_coarse(ic,kc,jc) = X(icl_x(ic),icl_z(kc),icl_y(jc))
+            Y_coarse(ic,kc,jc) = Y(icl_x(ic),icl_z(kc),icl_y(jc))
+            Z_coarse(ic,kc,jc) = Z(icl_x(ic),icl_z(kc),icl_y(jc))
+        enddo
+    enddo
+enddo
+
 end subroutine coarsening_grid
 
 end module module_coarsening

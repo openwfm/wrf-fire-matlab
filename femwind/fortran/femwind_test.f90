@@ -5,6 +5,8 @@ use module_utils
 
 implicit none
 
+type(mg_type):: mg(max_levels)  ! the main multigrid structure
+
 real, pointer:: X_m(:,:,:),Y_m(:,:,:),Z_m(:,:,:), &
                 u0_m(:,:,:), v0_m(:,:,:), w0_m(:,:,:),   &
                 u_m(:,:,:), v_m(:,:,:), w_m(:,:,:)
@@ -34,9 +36,9 @@ call read_array(w0_m, 'w0')
 A = reshape(A_m,(/3,3/))
 
 n = shape(X_m)
-mg(1).nx = n(1)
-mg(1).ny = n(3)
-mg(1).nz = n(2)
+mg(1)%nx = n(1)
+mg(1)%ny = n(3)
+mg(1)%nz = n(2)
 
 call get_mg_dims(mg(1), &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
