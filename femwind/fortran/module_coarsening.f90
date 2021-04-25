@@ -315,24 +315,23 @@ integer:: nc3,newlcl,lcl,i,n3
 
 end subroutine coarsening_icl
 
-subroutine hzc2icl(nc_x, nc_y, icl_x, icl_y, cr_x, cr_y, n_x, n_y)
-! compute horizontal coarse index vectors 
+subroutine coarsening_hzc2icl(icl_x, icl_y, cr_x, cr_y, n_x, n_y)
+! translate horizontal coarsening factors to index vectors 
 !
 ! In:
 !   cr_x, cr_y coarsening factors in x and y
 !   n_x, n_y   fine mesh size in x and y
 ! Out:
-!   nc_x, nc_y      coarse mesh size
 !   icl_x, icl_y    fine indices of coarse grid lines
 
 implicit none
 
 !*** arguments
 integer, intent(in)::cr_x, cr_y, n_x, n_y
-integer, intent(out):: nc_x, nc_y
 integer, intent(out), pointer, dimension(:) :: icl_x, icl_y
 
 !*** local
+integer :: nc_x, nc_y
 integer::i
 
 nc_x = (n_x + 2)/2
@@ -351,7 +350,7 @@ do i=1,n_y,2
 enddo
 icl_y(nc_y)=n_y ! last coarse is last fine
 
-end subroutine hzc2icl
+end subroutine coarsening_hzc2icl
 
 subroutine coarsening_grid
 call crash('coarsening_grid not done yet')

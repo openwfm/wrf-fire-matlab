@@ -31,7 +31,7 @@ type mg_type
     integer::nx,ny,nz,nn                            ! mesh size in vertices
 
     integer:: cr_x, cr_y                            ! coarsening factors
-    integer, pointer:: icl_z(:)                     ! coarsening indices in z
+    integer, pointer, dimension(:):: icl_x, icl_y, icl_z  ! coarsening indices
 
     integer:: &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
@@ -90,36 +90,74 @@ end subroutine get_mg_dims
 
 
 subroutine femwind_setup(mg)
+implicit none
 ! set up the mg_level structure
 ! input: mg(1)%X,Y,Z,dx,dy,dz already set
-
+!*** arguments
 type(mg_type),intent(inout)::mg(max_levels)  ! multigrid level
-integer ::l,                                      & ! level
-    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte            
+!*** local
 
-!*** decide on the grid coarsening
+integer::k,l,m
+real::s
+integer::   ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
+            ifms, ifme, kfms,kfme, jfms, jfme,            &
+            ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
+            ifts, ifte, kfts,kfte, jfts,jfte            
+
+!*** executable
+
+! decide on the grid coarsening and compute scalars and 1D index arrays
+
     mg(1)%nx=size(mg(1)%X,1)
     mg(1)%ny=size(mg(1)%X,3)
     mg(1)%nz=size(mg(1)%X,2)
     mg(1)%nn =  mg(1)%nx *  mg(1)%ny *  mg(1)%nz
     nlevels = max_levels-1
+
     do l=1,nlevels
+
         ! get horizontal coarsening ratios and vertical coarse list
+
         print *,'multigrid level ',l,' grid size ', mg(l)%nx, mg(l)%ny, mg(l)%nz
         ! decide about the next level
         call coarsening_icl(mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z, &
                             mg(l)%dx,mg(l)%dy,mg(l)%dz,A,minaspect,maxaspect)
-        if (mg(l+1)%nn >= mg(l)%nn) then
-            levels = l 
+        if (mg(l+1)%nn >= mg(l)%nn .or. l == max_levels) then
+            nlevels = l 
             exit ! the loop
         endif
-        call crash('allocate and compute coarse X Y Z dz here')
-        call coarsening_grid   ! set mg(l+1)%X,Y,Z,dx,dy,dz,nx,ny,nz,nn
+
+        ! get horizontal coarsening lists
+
+        call coarsening_hzc2icl(mg(l)%icl_x, mg(l)%icl_y, &
+                                mg(l)%cr_x,mg(l)%cr_y,&
+                                mg(l)%nx, mg(l)%ny)
+
+        ! update coarse mesh scalars
+
+        mg(l+1).nx = size(mg(l)%icl_x)
+        mg(l+1).ny = size(mg(l)%icl_y)
+        mg(l+1).nz = size(mg(l)%icl_z)
+        mg(l+1).dx = mg(l)%dx/mg(l)%cr_x
+        mg(l+1).dy = mg(l)%dy/mg(l)%cr_y
+
+        ! coarsen dz
+
+	do k=1,mg(l+1)%nz - 1 
+            print *,'computing coarse dz ',k
+            s = 0.
+            do m=mg(l)%icl_z(k-1),mg(l)%icl_z(k)-1
+                print *,'adding fine dz ',m,' equal ',mg(l)%dz(m)
+                s = s + mg(l)%dz(m)
+            enddo
+            mg(l+1)%dz(k)=s
+            print *,'total coarse dz ',k,' is ',mg(l)%dz(m)
+        enddo
+			
+
     enddo
     print *,nlevels,' levels'
+    call crash('allocate and compute coarse X Y Z dz here')
 
     ! assemble the matrices 
     do l=1,nlevels 
