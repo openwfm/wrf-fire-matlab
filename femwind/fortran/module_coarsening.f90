@@ -334,19 +334,19 @@ integer, intent(out), pointer, dimension(:) :: icl_x, icl_y
 integer :: nc_x, nc_y
 integer::i
 
-nc_x = (n_x + 2)/2
-nc_y = (n_y + 2)/2
+nc_x = n_x/cr_x + 1
+nc_y = n_y/cr_y + 1
 
 allocate(icl_x(nc_x))
 allocate(icl_y(nc_y))
 
-do i=1,n_x,2
-    icl_x(i)=1+2*(i-1)  ! every second node
+do i=1,nc_x-1
+    icl_x(i)=1+cr_x*(i-1)  ! every second node
 enddo
 icl_x(nc_x)=n_x ! last coarse is last fine
 
-do i=1,n_y,2
-    icl_y(i)=1+2*(i-1)  ! every second node
+do i=1,nc_y-1
+    icl_y(i)=1+cr_y*(i-1)  ! every second node
 enddo
 icl_y(nc_y)=n_y ! last coarse is last fine
 

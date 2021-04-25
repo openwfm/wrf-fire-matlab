@@ -97,7 +97,7 @@ implicit none
 type(mg_type),intent(inout)::mg(max_levels)  ! multigrid level
 !*** local
 
-integer::k,l,m
+integer::k,l,m,nzc
 real::s
 integer::   ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
             ifms, ifme, kfms,kfme, jfms, jfme,            &
@@ -143,10 +143,11 @@ integer::   ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensio
 
         ! coarsen dz
 
+        allocate(mg(l+1)%dz(mg(l+1)%nz-1))
 	do k=1,mg(l+1)%nz - 1 
             print *,'computing coarse dz ',k
             s = 0.
-            do m=mg(l)%icl_z(k-1),mg(l)%icl_z(k)-1
+            do m=mg(l)%icl_z(k),mg(l)%icl_z(k+1)-1
                 print *,'adding fine dz ',m,' equal ',mg(l)%dz(m)
                 s = s + mg(l)%dz(m)
             enddo
