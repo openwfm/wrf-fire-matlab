@@ -145,14 +145,14 @@ integer::   ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensio
 
         allocate(mg(l+1)%dz(mg(l+1)%nz-1))
 	do k=1,mg(l+1)%nz - 1 
-            print *,'computing coarse dz ',k
+            print *,'computing coarse dz of layer ',k
             s = 0.
             do m=mg(l)%icl_z(k),mg(l)%icl_z(k+1)-1
                 print *,'adding fine dz ',m,' equal ',mg(l)%dz(m)
                 s = s + mg(l)%dz(m)
             enddo
             mg(l+1)%dz(k)=s
-            print *,'total coarse dz ',k,' is ',mg(l)%dz(m)
+            print *,'total height dz of coarse layer',k,' is ',s
         enddo
 			
 
