@@ -34,30 +34,19 @@ call read_array(w0_m, 'w0')
 A = reshape(A_m,(/3,3/))
 
 n = shape(X_m)
+mg(1).nx = n(1)
+mg(1).ny = n(3)
+mg(1).nz = n(2)
 
-ifts = 1        ! tile is defined in cells not vertices
-ifte = n(1)-1
-jfts = 1
-jfte = n(3)-1
-kfts = 1
-kfte = n(2)-1
-ifms = ifts-1  ! at least one larger
-ifme = ifte+2
-jfms = jfts-1
-jfme = jfte+2
-kfms = kfts-1
-kfme = kfte+2
-ifds = ifts
-ifde = ifte
-jfds = jfts
-jfde = jfte
-kfds = kfts
-kfde = kfte
+call get_mg_dims(mg(1), &
+    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
+    ifms, ifme, kfms,kfme, jfms, jfme,            &
+    ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts,kfte, jfts,jfte)
 
-
-allocate(X(ifms:ifme,kfms:kfme,jfms:jfme))
-allocate(Y(ifms:ifme,kfms:kfme,jfms:jfme))
-allocate(Z(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(mg(1)%X(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(mg(1)%Y(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(mg(1)%Z(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(u0(ifms:ifme,kfms:kfme,jfms:jfme)) ! vector components called u v W
 allocate(v0(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(w0(ifms:ifme,kfms:kfme,jfms:jfme))
@@ -71,16 +60,20 @@ allocate(Kmat(ifms:ifme,kfms:kfme,jfms:jfme,msize)) ! stifness matrix
 do j=jfts,jfte+1
   do k=kfts,kfte+1
     do i=ifts,ifte+1
-        X(i,k,j) = X_m(i,k,j)
-        Y(i,k,j) = Y_m(i,k,j)
-        Z(i,k,j) = Z_m(i,k,j)
+        mg(1)%X(i,k,j) = X_m(i,k,j)
+        mg(1)%Y(i,k,j) = Y_m(i,k,j)
+        mg(1)%Z(i,k,j) = Z_m(i,k,j)
     enddo
   enddo
 enddo
 
-mg(1)%X=>X
-mg(1)%Y=>Y
-mg(1)%Y=>Y
+mg(1)%dx = mg(1)%X(2,1,1)-mg(1)%X(1,1,1)
+mg(1)%dy = mg(1)%Y(1,1,2)-mg(1)%Y(1,1,1)
+allocate(mg(1)%dz(mg(1)%nz-1))
+do k=kfds,kfte
+    mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,1,1)
+enddo
+
 call femwind_setup(mg)    
 
 

@@ -108,7 +108,6 @@ integer ::l,                                      & ! level
     do l=1,nlevels
         ! get horizontal coarsening ratios and vertical coarse list
         print *,'multigrid level ',l,' grid size ', mg(l)%nx, mg(l)%ny, mg(l)%nz
-        allocate(mg(l)%Kglo(ifms:ifme, kfms:kfme, jfms:jfme, msize))
         ! decide about the next level
         call coarsening_icl(mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z, &
                             mg(l)%dx,mg(l)%dy,mg(l)%dz,A,minaspect,maxaspect)
@@ -128,6 +127,7 @@ integer ::l,                                      & ! level
             ifms, ifme, kfms,kfme, jfms, jfme,            &
             ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
             ifts, ifte, kfts,kfte, jfts,jfte)            
+        allocate(mg(l)%Kglo(ifms:ifme, kfms:kfme, jfms:jfme, msize))
         call ndt_assembly(                              &
             ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
             ifms, ifme, kfms,kfme, jfms, jfme,            &

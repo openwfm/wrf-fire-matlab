@@ -7,6 +7,7 @@ lambda=[];
 params=[];
 iflags=[2 1 1];
 iflags=iflags(:);
+addpath ../netcdf
 
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/f_assembly_test.exe')
