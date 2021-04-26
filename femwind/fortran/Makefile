@@ -58,7 +58,7 @@ module_ndt_k_assembly.o: module_ndt_k_assembly.f90 module_hexa.o Makefile
 f_assembly_test.exe: f_assembly_test.f90 module_f_assembly.o module_utils.o module_hexa.o  Makefile
 	$(FC) $(FFLAGS) -o f_assembly_test.exe f_assembly_test.f90  module_f_assembly.o module_utils.o module_hexa.o
 
-module_f_assembly.o: module_f_assembly.f90 module_hexa.o Makefile
+module_f_assembly.o: module_f_assembly.f90 module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_f_assembly.f90
 
 module_coarsening.o: module_coarsening.f90 module_hexa.o Makefile

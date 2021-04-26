@@ -1,5 +1,6 @@
 module module_f_assembly
        use module_hexa
+       use module_utils
        
 contains
 subroutine f_assembly(                        &
@@ -42,6 +43,13 @@ integer :: kglo(8)
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !*** integer, dimension(3,1,1), save ::iflags = reshape((/1,0,1/),(/3,1,1/)) !define iflags to construct JG and Kloc in hexa
 
+call  write_array(reshape(A,(/3,3,1/)),'A_in')
+call  write_array(X,'X_in')
+call  write_array(Y,'Y_in')
+call  write_array(Z,'Z_in')
+call  write_array(Xu0,'Xu0_in')
+call  write_array(Yu0,'Yu0_in')
+call  write_array(Zu0,'Zu0_in')
 
 Xloc = 9999.
 u0loc = 0.
