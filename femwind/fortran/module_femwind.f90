@@ -112,9 +112,14 @@ integer::   &
 
 ! decide on the grid coarsening and compute scalars and 1D index arrays
 
-    mg(1)%nx=size(mg(1)%X,1)
-    mg(1)%ny=size(mg(1)%X,3)
-    mg(1)%nz=size(mg(1)%X,2)
+    print *,'femwind_setup received'
+    print *,'X memory shape ',shape(mg(1)%X)
+    print *,'Y memory shape ',shape(mg(1)%Y)
+    print *,'Z memory shape ',shape(mg(1)%Z)
+    print *,'dx=',mg(1)%dx,' dy=',mg(1)%dy
+    print *,'dz=',mg(1)%dz,' shape ',shape(mg(1)%dz)
+    print *,'grid size nx=',mg(1)%nx,' ny=',mg(1)%ny,' nz=',mg(1)%nz
+
     mg(1)%nn =  mg(1)%nx *  mg(1)%ny *  mg(1)%nz
     nlevels = max_levels-1
 
