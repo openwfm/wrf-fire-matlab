@@ -7,6 +7,9 @@ function [W,rate]=femwind_solve(A,X,U0,params)
     if isfield(params,'femwind_fortran_test') && params.femwind_fortran_test
         F_f=read_array('F_f');
         err_f = big(F(:)-F_f(:))
+        if err_f > 1e-4
+             error('err_f too large')
+        end
     end
     
 

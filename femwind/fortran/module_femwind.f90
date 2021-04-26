@@ -241,6 +241,7 @@ real,intent(out):: rate
 
 !*** local
 real, dimension(ifms:ifme, kfms:kfme, jfms:jfme):: f  
+real, dimension(ifts:ifte+1, kfts:kfte+1, jfts:jfte+1):: f_f ! testing only
 
 !*** executable
 
@@ -253,7 +254,8 @@ call f_assembly(                        &
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     A, mg(1)%X, mg(1)%Y, mg(1)%Z, u0, v0, w0,                       & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
     f)                                             !Global load vector output  
-call write_array(f,'F_f')
+f_f=f(ifts:ifte+1, kfts:kfte+1, jfts:jfte+1) ! testing only
+call write_array(f_f,'F_f') ! testing only
 
 ! initialize for now
 u=0.
