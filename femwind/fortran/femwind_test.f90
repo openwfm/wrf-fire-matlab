@@ -76,8 +76,9 @@ do k=kfds,kfte
     mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,1,1)
 enddo
 
+write(*,'(a)')'calling femwind_setup'
 call femwind_setup(mg)    
-
+write(*,'(a)')'femwind_setup returned OK'
 
 ! u is midpoint based
 do j=jfts,jfte
@@ -100,11 +101,12 @@ call femwind_solve(  mg,&
   u0, v0, w0,                                  & ! input arrays
   u, v, w,                                                  & ! output arrays
   rate)
+write(*,'(a)')'femwind_solve returned OK'
 
 ! write output as is in 3D but with tight dimensions
 call write_array(u(ifts:ifte,kfts:kfte,jfts:jfte),'u')  
 call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')  
 call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
-call write_array_nd((/rate/),(/1/),'rate')
+call write_scalar(rate,'rate')
 
 end program femwind_test

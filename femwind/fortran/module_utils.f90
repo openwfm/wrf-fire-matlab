@@ -46,6 +46,15 @@ read(iu,*)a
 close(iu)
 end subroutine read_array
 
+
+subroutine write_scalar(a,name)
+real, intent(in):: a  
+character(len=*),intent(in)::name! file name root, .txt will be added
+call write_array_nd((/a/),(/1/),name)
+end subroutine write_scalar
+
+
+
 subroutine write_array(a,name)
 !*** purpose write array to text file
 !*** arguments

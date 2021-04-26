@@ -18,16 +18,16 @@ if isfield(params,'run_fortran') && params.run_fortran && exist(exe,'file')
     w =zeros(nel);
     rate=0;   % placeholder
 
-    try
+%    try
         disp(['running ',exe])
         system(exe);
-        u=swap23(read_array_nd('u'));
-        v=swap23(read_array_nd('v'));
-        w=swap23(read_array_nd('w'));
+        u=swap23(read_array('u'));
+        v=swap23(read_array('v'));
+        w=swap23(read_array('w'));
         rate=read_array_nd('rate');
-    catch
-        disp([exe,' failed'])
-    end
+%    catch
+%        disp([exe,' failed'])
+%    end
 
     wf = {u,v,w};
 end

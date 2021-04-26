@@ -16,6 +16,9 @@ fprintf('\n')
 if length(d)~=prod(s) + es
     error('wrong number of terms in the file')
 end
-a=reshape(d(es+1:end),s');
+a=d(es+1:end);
+if length(a)>1
+    a=reshape(d(es+1:end),s');
+end
 end
 
