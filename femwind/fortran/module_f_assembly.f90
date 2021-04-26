@@ -89,5 +89,7 @@ do ie2=jfts,jfte
     enddo
 enddo
 
+call  write_array(F,'F_out')
+
 end subroutine f_assembly
 end module  module_f_assembly
