@@ -12,6 +12,7 @@ module module_femwind
        use module_ndt_assembly
        use module_w_assembly
        use module_coarsening
+       use module_boundary_conditions
 
 ! parameters
 integer, parameter::max_levels=20
@@ -253,7 +254,16 @@ call f_assembly(                        &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,            &
     A, mg(1)%X, mg(1)%Y, mg(1)%Z, u0, v0, w0,                       & !Input from femwind, U0, V0, W0 not used in hexa to construct Kloc or JG
-    f)                                             !Global load vector output  
+    F)                                             !Global load vector output  
+
+call vec_boundary_conditions(                              &
+    ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
+    ifms, ifme, kfms,kfme, jfms, jfme,            &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,             &
+    F)
+
+
 f_f=f(ifts:ifte+1, kfts:kfte+1, jfts:jfte+1) ! testing only
 call write_array(f_f,'F_f') ! testing only
 

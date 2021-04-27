@@ -76,7 +76,7 @@ ICL = coarsening_icl_test.f90  module_coarsening.o module_utils.o
 coarsening_icl_test.exe: $(ICL) Makefile
 	$(FC) $(FFLAGS) -o $@ $(ICL) 
 
-module_boundary_conditions.o: module_boundary_conditions.f90 Makefile
+module_boundary_conditions.o: module_boundary_conditions.f90 module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_boundary_conditions.f90  
 
 NDT_BOUNDARY_CONDITIONS = ndt_boundary_conditions_test.f90  module_boundary_conditions.o module_utils.o
@@ -99,7 +99,7 @@ module_ndt_w_assembly.o:  module_ndt_w_assembly.f90 module_hexa.o module_lin_alg
 module_lin_alg.o:  module_lin_alg.f90 Makefile
 	$(FC) $(FFLAGS) -c module_lin_alg.f90 
 
-module_femwind.o: module_femwind.f90 module_f_assembly.o Makefile
+module_femwind.o: module_femwind.f90 module_f_assembly.o module_boundary_conditions.o Makefile
 	$(FC) $(FFLAGS) -c  module_femwind.f90
 
 FEMWIND_TEST = femwind_test.f90\
@@ -108,6 +108,7 @@ FEMWIND_TEST = femwind_test.f90\
   module_f_assembly.o\
   module_hexa.o\
   module_coarsening.o\
+  module_boundary_conditions.o\
   module_utils.o
 femwind_test.exe: $(FEMWIND_TEST)
 	$(FC) $(FFLAGS) -o $@ $(FEMWIND_TEST)

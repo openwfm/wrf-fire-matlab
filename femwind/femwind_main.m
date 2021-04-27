@@ -14,7 +14,8 @@ function params=femwind_main(params)
 
 
 if ~exist('params','var') | isempty(params)
-    params.run_fortran=1;
+%   defaults
+    params.run_fortran=0;
     params.run_matlab=1;
     params.femwind_fortran_test=0;
     params.test_fortran=0;

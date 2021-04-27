@@ -12,6 +12,7 @@ integer :: n(3)
 integer ::  &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire memory bounds
     ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
 integer :: i,j,k,jx
 
@@ -48,6 +49,7 @@ write(*,'(a)')'calling vec_boundary_conditions'
 call vec_boundary_conditions(  &
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+  ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire memory bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   F)
 

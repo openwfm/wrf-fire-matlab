@@ -10,7 +10,6 @@ p.sc2_all = 1;
 p.coarse_K=1; % 'variational';  
 p.coarse_K=2; % 'assembly';
 p.levels=15;
-p.femwind_fortran_test=1
 if exist('pin','var')
     f=fieldnames(pin);;
 else

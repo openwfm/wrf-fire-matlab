@@ -1,5 +1,7 @@
 function [W,rate]=femwind_fortran(A,X,u0,params)
 
+W=[];
+
 exe  = './fortran/femwind_test.exe';
 if isfield(params,'run_fortran') && params.run_fortran && exist(exe,'file') 
     write_array_nd(swap23(X{1}),'X');

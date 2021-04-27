@@ -1,5 +1,7 @@
 module module_boundary_conditions
 
+use module_utils
+
 contains
 
 subroutine ndt_boundary_conditions(                              &
@@ -23,24 +25,29 @@ real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: kmat  ! gl
 !*** local
 
 real:: s
-integer:: i,j,k  
+integer:: i,j,k,ie,je,ke
 
 !** executable
+
+! loop upper bounds
+ie = snode(ifte,ifde,+1)
+je = snode(jfte,jfde,+1)
+ke = snode(kfte,kfde,+1)
 
 ! scale
 s=0.
 
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+do j=jfts,je
+  do k=kfts,ke
+    do i=ifts,ie
        s=max(s,abs(kmat(i  ,k  ,j  , 1)))
     enddo
   enddo
 enddo
 
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+do j=jfts,je
+  do k=kfts,ke
+    do i=ifts,ie
       ! not efficient but will be executed only once
       if(i.eq.ifds.or.i.eq.ifde.or.j.eq.jfds.or.j.eq.jfde.or.k.eq.kfde)then
         ! replace the row/col (i,k,j) by scaled identity
@@ -81,6 +88,7 @@ end subroutine ndt_boundary_conditions
 subroutine vec_boundary_conditions(                              &
     ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,             &
     F)
 
@@ -91,6 +99,7 @@ implicit none
 integer, intent(in)::                             &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
 
 integer, parameter:: msize = 14
@@ -98,13 +107,18 @@ real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: F  ! corner-base
 
 !*** local
 
-integer:: i,j,k  
+integer:: i,j,k,ie,je,ke
 
 !** executable
 
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+! loop upper bounds
+ie = snode(ifte,ifde,+1)
+je = snode(jfte,jfde,+1)
+ke = snode(kfte,kfde,+1)
+
+do j=jfts,je
+  do k=kfts,ke
+    do i=ifts,ie
       ! not efficient, change later 
       if(i.eq.ifds.or.i.eq.ifde.or.j.eq.jfds.or.j.eq.jfde.or.k.eq.kfde)then
         F(i,k,j)=0.
