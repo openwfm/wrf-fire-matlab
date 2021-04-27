@@ -3,8 +3,7 @@ function F=f_assembly_fortran(A,X,u0, lambda, params)
 
 F= f_assembly(A,X,u0);
 
-%if params.test_fortran
-if 1==1
+if params.test_fortran
     disp('testing if sparse assembly of F same result in fortran')
     exe = './fortran/f_assembly_test.exe';
     if exist(exe,'file') 

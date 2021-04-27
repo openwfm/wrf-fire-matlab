@@ -1,6 +1,6 @@
 module module_coarsening
 
-use module_utils, only: crash, snode
+use module_utils
 
 contains
 
@@ -382,18 +382,29 @@ real, dimension(ifms:ifme,kfms:kfme,jfms:jfme), intent(in):: X,Y,Z !spatial grid
 real, intent(out), dimension(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme):: X_coarse, Y_coarse, Z_coarse ! coarse vector
 
 !*** local
-integer::ic,jc,kc
+integer::ic,jc,kc,ie,je,ke
+character(len=2)::lc
 
 !*** executable
-do jc=ifcts,snode(jfcte,jfcde,+1)
-    do kc=kfcts,snode(kfcte,kfcde,+1)
-        do ic=ifcts,snode(ifcte,ifcde,+1)
+ie = snode(ifcte,ifcde,+1)
+je = snode(jfcte,jfcde,+1)
+ke = snode(kfcte,kfcde,+1)
+
+do jc=ifcts,je
+    do kc=kfcts,ke
+        do ic=ifcts,ie
             X_coarse(ic,kc,jc) = X(icl_x(ic),icl_z(kc),icl_y(jc))
             Y_coarse(ic,kc,jc) = Y(icl_x(ic),icl_z(kc),icl_y(jc))
             Z_coarse(ic,kc,jc) = Z(icl_x(ic),icl_z(kc),icl_y(jc))
         enddo
     enddo
 enddo
+
+write(lc,'(i2.2)')l
+
+call write_array(X_coarse(ifts:ie,kfts:ke,jfts:je),'X_coarse'//lc)
+call write_array(Y_coarse(ifts:ie,kfts:ke,jfts:je),'Y_coarse'//lc)
+call write_array(Z_coarse(ifts:ie,kfts:ke,jfts:je),'Z_coarse'//lc)
 
 end subroutine coarsening_grid
 
