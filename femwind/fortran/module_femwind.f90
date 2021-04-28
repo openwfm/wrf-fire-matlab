@@ -30,6 +30,8 @@ type mg_type
     real:: dx,dy                                    ! horizontal spacing, scalar 
     real, pointer, dimension(:)::dz                 ! vertical spacing of the layers
     integer::nx,ny,nz,nn                            ! mesh size in vertices
+  
+    integer::level
 
     integer:: cr_x, cr_y                            ! coarsening factors
     integer, pointer, dimension(:):: icl_x, icl_y, icl_z  ! coarsening indices
@@ -87,13 +89,78 @@ integer, intent(out)::  &
 
 end subroutine get_mg_dims
 
+subroutine write_3d(mg,l,var,name,v)
+! write array in text file for debugging 
+implicit none
+
+!*** arguments
+type(mg_type),intent(in)::mg(:)    !multigrid structure
+integer,intent(in)::l              !level
+real, intent(in)::var(:,:,:)       !the array
+character(len=*),intent(in)::name  
+character(len=1),intent(in)::v     !'v' or 'e'
+
+!*** local
+integer:: &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte              ! tile dimensions
+integer::ie,ke,je
+character(len=2)::lc
+
+!*** executable
+
+call get_mg_dims(mg(l), &
+    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
+    ifms, ifme, kfms,kfme, jfms, jfme,            &
+    ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts,kfte, jfts,jfte)            
+
+write(lc,'(i2.2)')l
+
+if(v.eq.'v')then
+    ie = snode(ifte,ifde,+1)  ! vertex based
+    je = snode(jfte,jfde,+1)
+    ke = snode(kfte,kfde,+1)
+elseif(v.eq.'e')then
+    ie=ifte
+    je=jfte
+    ke=kfte
+else
+    call crash('write_3d: bad v')
+endif
+ 
+call write_tight(var) ! write dereferenced
+
+contains
+
+subroutine write_tight(varr)
+    real, intent(in)::varr(ifms:ifme,kfms:kfme,jfms:jfme)
+    call write_array(varr(ifms:ie,kfms:ke,jfms:je),name//lc)
+end subroutine write_tight
+
+end subroutine write_3d
+
+subroutine print_mg_dims(mg,l)
+type(mg_type),intent(in)::mg(:)  ! multigrid level
+    print *,'level ',mg(l)%level
+    if(associated(mg(l)%X))print *,'X memory shape ',shape(mg(l)%X)
+    if(associated(mg(l)%Y))print *,'Y memory shape ',shape(mg(l)%Y)
+    if(associated(mg(l)%Z))print *,'Z memory shape ',shape(mg(l)%Z)
+    print *,'dx=',mg(l)%dx,' dy=',mg(l)%dy
+    if(associated(mg(l)%dz))print *,'dz=',mg(l)%dz,' shape ',shape(mg(l)%dz)
+    print *,'grid size nx=',mg(l)%nx,' ny=',mg(l)%ny,' nz=',mg(l)%nz, &
+       ' total ndof=',mg(l)%nn
+end subroutine print_mg_dims
+
 
 subroutine femwind_setup(mg)
 implicit none
 ! set up the mg_level structure
 ! input: mg(1)%X,Y,Z,dx,dy,dz already set
 !*** arguments
-type(mg_type),intent(inout)::mg(max_levels)  ! multigrid level
+type(mg_type),intent(inout)::mg(:)  ! multigrid level
 !*** local
 
 integer::k,l,m,nzc
@@ -113,16 +180,14 @@ integer::   &
 
 ! decide on the grid coarsening and compute scalars and 1D index arrays
 
-    print *,'femwind_setup received'
-    print *,'X memory shape ',shape(mg(1)%X)
-    print *,'Y memory shape ',shape(mg(1)%Y)
-    print *,'Z memory shape ',shape(mg(1)%Z)
-    print *,'dx=',mg(1)%dx,' dy=',mg(1)%dy
-    print *,'dz=',mg(1)%dz,' shape ',shape(mg(1)%dz)
-    print *,'grid size nx=',mg(1)%nx,' ny=',mg(1)%ny,' nz=',mg(1)%nz
+    mg(1)%nn = mg(1)%nx *  mg(1)%ny * mg(1)%nz
+    mg(1)%level = 1
 
-    mg(1)%nn =  mg(1)%nx *  mg(1)%ny *  mg(1)%nz
+    print *,'femwind_setup received'
+    call print_mg_dims(mg,1)
+    
     nlevels = max_levels-1
+
 
     do l=1,nlevels
 
@@ -132,10 +197,6 @@ integer::   &
         ! decide about the next level
         call coarsening_icl(mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z, &
                             mg(l)%dx,mg(l)%dy,mg(l)%dz,A,minaspect,maxaspect)
-        if (mg(l+1)%nn >= mg(l)%nn .or. l == max_levels) then
-            nlevels = l 
-            exit ! the loop
-        endif
 
         ! get horizontal coarsening lists
 
@@ -145,24 +206,35 @@ integer::   &
 
         ! update coarse mesh scalars
 
-        mg(l+1).nx = size(mg(l)%icl_x)
-        mg(l+1).ny = size(mg(l)%icl_y)
-        mg(l+1).nz = size(mg(l)%icl_z)
-        mg(l+1).dx = mg(l)%dx/mg(l)%cr_x
-        mg(l+1).dy = mg(l)%dy/mg(l)%cr_y
+        mg(l+1)%nx = size(mg(l)%icl_x)
+        mg(l+1)%ny = size(mg(l)%icl_y)
+        mg(l+1)%nz = size(mg(l)%icl_z)
+        mg(l+1)%nn = mg(l+1)%nx *  mg(l+1)%ny * mg(l+1)%nz
+        mg(l+1)%dx = mg(l)%dx/mg(l)%cr_x
+        mg(l+1)%dy = mg(l)%dy/mg(l)%cr_y
+        mg(l+1)%level = l+1
+
+        call print_mg_dims(mg,l+1)
+
+        if (mg(l+1)%nn >= mg(l)%nn .or. l == max_levels) then
+            print *,'stopping at ',l,' levels because coarse ndof ',mg(l+1)%nn, &
+                '>= fine ', mg(l)%nn,' or l= ',l,' = ',max_levels 
+            nlevels = l 
+            exit ! the loop
+        endif
 
         ! coarsen dz
 
         allocate(mg(l+1)%dz(mg(l+1)%nz-1))
 	do k=1,mg(l+1)%nz - 1 
-            print *,'computing coarse dz of layer ',k
+            ! print *,'computing coarse dz of layer ',k
             s = 0.
             do m=mg(l)%icl_z(k),mg(l)%icl_z(k+1)-1
-                print *,'adding fine dz ',m,' equal ',mg(l)%dz(m)
+                ! print *,'adding fine dz ',m,' equal ',mg(l)%dz(m)
                 s = s + mg(l)%dz(m)
             enddo
             mg(l+1)%dz(k)=s
-            print *,'total height dz of coarse layer',k,' is ',s
+            ! print *,'height dz of coarse layer',k,' is ',s
         enddo
 			
 
@@ -197,6 +269,13 @@ integer::   &
             mg(l)%X, mg(l)%Y, mg(l)%Z,                    & ! fine grid coordinates
             mg(l+1)%X, mg(l+1)%Y, mg(l+1)%Z)                ! coarse grid coordinates
     enddo
+ 
+    do l=1,nlevels
+        call write_3d(mg,l,mg(l)%X,'X','v')
+        call write_3d(mg,l,mg(l)%Y,'Y','v')
+        call write_3d(mg,l,mg(l)%Z,'Z','v')
+    enddo
+
 
     ! assemble the stiffness matrices 
     do l=1,nlevels 

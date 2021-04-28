@@ -361,7 +361,8 @@ subroutine coarsening_grid(l, &
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
     ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile 
-    icl_x, icl_y, icl_z, X, Y, Z, X_coarse, Y_coarse, Z_coarse)
+    icl_x, icl_y, icl_z,                          &
+    X, Y, Z, X_coarse, Y_coarse, Z_coarse)
 implicit none
 ! compute coarse grid coordinates arrays on one tile 
 
@@ -399,12 +400,6 @@ do jc=ifcts,je
         enddo
     enddo
 enddo
-
-write(lc,'(i2.2)')l
-
-call write_array(X_coarse(ifts:ie,kfts:ke,jfts:je),'X_coarse'//lc)
-call write_array(Y_coarse(ifts:ie,kfts:ke,jfts:je),'Y_coarse'//lc)
-call write_array(Z_coarse(ifts:ie,kfts:ke,jfts:je),'Z_coarse'//lc)
 
 end subroutine coarsening_grid
 
