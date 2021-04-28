@@ -169,7 +169,7 @@ for sc2 = params.sc2_all
         if params.run_fortran
             [W,rate(sc,sc2)]=femwind_fortran(A,X,U0,params);
         else
-            [W,rate(sc,sc2)]=femwind_main(A,X,U0,params);
+            [W,rate(sc,sc2)]=femwind_solve(A,X,U0,params);
         end
         
         if params.graphics>1
