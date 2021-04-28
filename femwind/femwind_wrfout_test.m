@@ -12,6 +12,7 @@ addpath ../netcdf
 % test same results for ndt_mult from matlab and fortran
 % if exist('fortran/f_assembly_test.exe')
     disp('testing if same result as fortran')
+    p=params_defaults;
     p.run_fortran=0;
     p.run_matlab=1;
     p.femwind_fortran_test=0
