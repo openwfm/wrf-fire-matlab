@@ -137,7 +137,11 @@ contains
 
 subroutine write_tight(varr)
     real, intent(in)::varr(ifms:ifme,kfms:kfme,jfms:jfme)
-    call write_array(varr(ifms:ie,kfms:ke,jfms:je),name//lc)
+    ! for element/cell/midpoint based arrays, like fmw winds
+    ! open(iu,file='varr.dat',form='unformatted',status='unknown')
+    ! write(iu)varr(ifts:ifte,kfts:kfte,jfts:jfte)
+    ! close(iu)
+    call write_array(varr(ifts:ie,kfts:ke,jfts:je),name//lc)
 end subroutine write_tight
 
 end subroutine write_3d
