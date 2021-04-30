@@ -47,7 +47,6 @@ integer::   &
     ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
 
-
 !*** executable
 
 ! decide on the grid coarsening and compute scalars and 1D index arrays
@@ -63,7 +62,7 @@ integer::   &
 
     do l=1,nlevels
 
-        ! get horizontal coarsening ratios and vertical coarse list
+        ! decide on coarsening
 
         print *,'multigrid level ',l,' grid size ', mg(l)%nx, mg(l)%ny, mg(l)%nz
         ! decide about the next level
@@ -152,17 +151,23 @@ integer::   &
     ! assemble the stiffness matrices 
     do l=1,nlevels 
         call get_mg_dims(mg(l), &
-            ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
-            ifms, ifme, kfms,kfme, jfms, jfme,            &
-            ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
-            ifts, ifte, kfts,kfte, jfts,jfte)            
+            ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+            ifms, ifme, kfms, kfme, jfms, jfme,         &
+            ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+            ifts, ifte, kfts, kfte, jfts, jfte)            
         allocate(mg(l)%Kglo(ifms:ifme, kfms:kfme, jfms:jfme, msize))
         call ndt_assembly(                              &
-            ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
-            ifms, ifme, kfms,kfme, jfms, jfme,            &
-            ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-            ifts, ifte, kfts, kfte, jfts,jfte,            &
-            A, mg(l)%X,mg(l)%Y,mg(l)%Z, 1,                & 
+            ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+            ifms, ifme, kfms, kfme, jfms, jfme,         &
+            ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+            ifts, ifte, kfts, kfte, jfts, jfte,         &      
+            A, mg(l)%X,mg(l)%Y,mg(l)%Z, 1,              & 
+            mg(l)%Kglo)        
+        call ndt_boundary_conditions(                   &
+            ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+            ifms, ifme, kfms, kfme, jfms, jfme,         &
+            ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+            ifts, ifte, kfts, kfte, jfts, jfte,         &      
             mg(l)%Kglo)        
     enddo
 

@@ -5,9 +5,10 @@ use module_utils
 contains
 
 subroutine ndt_boundary_conditions(                              &
-    ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifts, ifte, kfts, kfte, jfts,jfte,             &
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,         &    
     kmat)
 
 implicit none
@@ -15,10 +16,10 @@ implicit none
 !*** arguments
 
 integer, intent(in)::                             &
-    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-    ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
-
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte             
 integer, parameter:: msize = 14
 real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: kmat  ! global stiffness matrix
 
@@ -85,11 +86,11 @@ enddo
           
 end subroutine ndt_boundary_conditions
 
-subroutine vec_boundary_conditions(                              &
-    ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,             &
+subroutine vec_boundary_conditions(               &
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,         &    
     F)
 
 implicit none
@@ -97,11 +98,10 @@ implicit none
 !*** arguments
 
 integer, intent(in)::                             &
-    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
-
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte    
 integer, parameter:: msize = 14
 real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: F  ! corner-based scalar field
 

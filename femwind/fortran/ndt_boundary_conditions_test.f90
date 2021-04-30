@@ -10,9 +10,10 @@ real, pointer:: Kmat(:,:,:,:), &  ! fortran is not case sensitive
 integer :: s(4)
 
 integer :: msize, &
-    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-    ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte
 integer :: i,j,k,jx
 
 ! read input arrays in ikj index ordering and tight bounds
@@ -58,10 +59,11 @@ enddo
            
 write(*,'(a)')'calling ntd_boundary_conditions'
 call ndt_boundary_conditions(  &
-  ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-  ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-  ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  Kmat)
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,         &    
+    Kmat)
 
 ! copy the output data 
 do j=jfts,jfte
