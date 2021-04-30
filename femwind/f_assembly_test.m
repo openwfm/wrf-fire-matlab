@@ -8,7 +8,7 @@ h = [1,1,1];
 expand=1.3 ;
 A = diag([1 1 1]);
 lambda=[];
-params=[];
+params.test_fortran=1;
 u0={rand(nel), rand(nel), rand(nel)};
 
 
