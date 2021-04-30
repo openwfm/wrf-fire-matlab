@@ -96,6 +96,7 @@ for it=1:params.maxit
         x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params);
         it_type=sprintf('level %g coarse correction',params.levels);
     else
+        it_type='smoothing';
         fprintf('iteration %g level %g smoothing by %s\n',it,params.levels,params.smoothing)
         x=smoothing(K,F,X,x,params);
     end

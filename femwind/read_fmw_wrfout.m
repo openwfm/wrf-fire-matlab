@@ -25,10 +25,11 @@ end
 X={Cx,Cy,Cz};
 check_mesh(X);
 % compute initial wind at the corners from midpoints
-Xu0=midpoints2corners(p.u0_fmw);
-Yu0=midpoints2corners(p.v0_fmw);
-Zu0=midpoints2corners(p.w0_fmw);
+%Xu0=midpoints2corners(p.u0_fmw);
+%Yu0=midpoints2corners(p.v0_fmw);
+%Zu0=midpoints2corners(p.w0_fmw);
 % generate initial wind at corners of the cells
-u0={Xu0,Yu0,Zu0};
+%u0={Xu0,Yu0,Zu0};
+u0={p.u0_fmw,p.v0_fmw,p.w0_fmw};
 
 end

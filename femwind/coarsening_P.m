@@ -81,9 +81,6 @@ function P=coarsening_P(hzc,icl3,X,params)
         end
     end
     P = sparse(ia(1:k),ja(1:k),aa(1:k),nn,nnc);
-    if params.graphics>=2
-        check_P(P,X,X_coarse)
-    end
 end
 
 
