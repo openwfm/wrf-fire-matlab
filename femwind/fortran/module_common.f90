@@ -165,10 +165,16 @@ type(mg_type),intent(in)::mg(:)  ! multigrid level
     if(associated(mg(l)%X))print *,'X memory shape ',shape(mg(l)%X)
     if(associated(mg(l)%Y))print *,'Y memory shape ',shape(mg(l)%Y)
     if(associated(mg(l)%Z))print *,'Z memory shape ',shape(mg(l)%Z)
-    print *,'dx=',mg(l)%dx,' dy=',mg(l)%dy
-    if(associated(mg(l)%dz))print *,'dz=',mg(l)%dz,' shape ',shape(mg(l)%dz)
     print *,'grid size nx=',mg(l)%nx,' ny=',mg(l)%ny,' nz=',mg(l)%nz, &
        ' total ndof=',mg(l)%nn
+    print *,'dx=',mg(l)%dx,' dy=',mg(l)%dy
+    if(associated(mg(l)%dz))then
+        print *,'dz shape',shape(mg(l)%dz)
+        if(product(shape(mg(l)%dz))>0) then
+            print *,'size ',size(mg(l)%dz)
+            print *,'dz=',mg(l)%dz
+        endif   
+    endif
 end subroutine print_mg_dims
 
 end module module_common 
