@@ -2,10 +2,9 @@ program femwind_test
 
 use module_femwind
 use module_utils
+use module_common
 
 implicit none
-
-type(mg_type):: mg(max_levels)  ! the main multigrid structure
 
 real, pointer:: X_m(:,:,:),Y_m(:,:,:),Z_m(:,:,:), &
                 u0_m(:,:,:), v0_m(:,:,:), w0_m(:,:,:),   &
@@ -33,7 +32,7 @@ call read_array(u0_m, 'u0')
 call read_array(v0_m, 'v0')
 call read_array(w0_m, 'w0')
 
-A = reshape(A_m,(/3,3/))
+params%A = reshape(A_m,(/3,3/))
 
 n = shape(X_m)
 mg(1)%nx = n(1)

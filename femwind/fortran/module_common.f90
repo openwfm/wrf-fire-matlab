@@ -2,10 +2,18 @@ module module_common
 
 use module_utils
 
-! declarations of multigrid structure
+! method parameters
+type params_type
+    real:: minaspect=1./3.,maxaspect=3.
+    real::A(3,3)=reshape((/1., 0., 0.,  0., 1., 0.,  0., 0., 1./),(/3, 3/))
+end type
+
+type(params_type)::params
+
+! multigrid structure
+
 integer, parameter::msize=14
-
-
+integer, parameter::max_levels=20
 
 type mg_type
     real, dimension(3,3):: A                        ! penalty weight matrix
@@ -31,6 +39,8 @@ type mg_type
     ifts, ifte, kfts, kfte, jfts, jfte              ! tile dimensions
  
 end type
+
+type(mg_type):: mg(max_levels)  ! the main multigrid structure
 
 contains
 

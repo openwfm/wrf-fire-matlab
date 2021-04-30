@@ -19,9 +19,8 @@ module module_femwind
    use module_common
 
 ! parameters
-integer, parameter::max_levels=20
-real:: minaspect=1./3.,maxaspect=3.
-real::A(3,3)=reshape((/1., 0., 0.,  0., 1., 0.,  0., 0., 1./),(/3, 3/))
+
+
 
 integer::nlevels                                ! number of levels
        
@@ -57,17 +56,17 @@ integer::   &
     print *,'femwind_setup received'
     call print_mg_dims(mg,1)
     
-    nlevels = max_levels-1
 
 
-    do l=1,nlevels
+    do l=1,max_levels
 
         ! decide on coarsening
 
         print *,'multigrid level ',l,' grid size ', mg(l)%nx, mg(l)%ny, mg(l)%nz
         ! decide about the next level
-        call coarsening_icl(mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z, &
-                            mg(l)%dx,mg(l)%dy,mg(l)%dz,A,minaspect,maxaspect)
+        call coarsening_icl(mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z,  &
+                            mg(l)%dx,mg(l)%dy,mg(l)%dz,         &
+                            params%A,params%minaspect,params%maxaspect)
 
         ! get horizontal coarsening lists
 
@@ -150,7 +149,7 @@ integer::   &
 
     ! assemble the stiffness matrices 
     do l=1,nlevels 
-        call get_mg_dims(mg(l), &
+        call get_mg_dims(mg(l),                         &
             ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
             ifms, ifme, kfms, kfme, jfms, jfme,         &
             ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
@@ -161,7 +160,7 @@ integer::   &
             ifms, ifme, kfms, kfme, jfms, jfme,         &
             ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
             ifts, ifte, kfts, kfte, jfts, jfte,         &      
-            A, mg(l)%X,mg(l)%Y,mg(l)%Z, 1,              & 
+            params%A, mg(l)%X,mg(l)%Y,mg(l)%Z, 1,              & 
             mg(l)%Kglo)        
         call ndt_boundary_conditions(                   &
             ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
@@ -186,14 +185,14 @@ implicit none
 
 type(mg_type),intent(in)::mg(:)  ! multigrid levels
 
-integer, intent(inout)::                             &
+integer, intent(in)::                             &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte            
 
 real, intent(in), dimension(ifms:ifme, kfms:kfme, jfms:jfme):: u0, v0, w0   !initial wind vector at midpoints
-real,intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::u, v, w       !mass consistent wind at midpoints
+real,intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme):: u, v, w      !mass consistent wind at midpoints
 real,intent(out):: rate
 
 !*** local
@@ -203,12 +202,13 @@ real,intent(out):: rate
 ! F = div(u0)
 ! F = f_assembly_fortran(A,X,U0,lambda,params);
 
-call f_assembly(                        &
+call f_assembly(                                  &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte,           &
-    A, mg(1)%X, mg(1)%Y, mg(1)%Z, u0, v0, w0,     &                    	
+    params%A, mg(1)%X, mg(1)%Y, mg(1)%Z,          &
+    u0, v0, w0,                                   &                    	
     mg(1)%F)                                        !Global load vector output  
 
 call vec_boundary_conditions(                              &
@@ -218,6 +218,8 @@ call vec_boundary_conditions(                              &
     ifts, ifte, kfts, kfte, jfts, jfte,           &
     mg(1)%F)
 
+
+
 ! initialize for now
 u=0.
 v=0.
@@ -225,4 +227,23 @@ w=0.
 rate =0.
 
 end subroutine femwind_solve
+
+recursive subroutine multigrid_solve(mg)  
+ 
+!*** arguments
+
+type(mg_type),intent(in)::mg(:)  ! multigrid levels
+
+integer::   &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
+    ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+    ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
+
+end subroutine multigrid_solve
+
 end module  module_femwind
