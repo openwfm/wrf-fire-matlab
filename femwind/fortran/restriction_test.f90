@@ -6,15 +6,15 @@ use module_utils ! to read and write matrices as text files from matlab
 implicit none
 
 integer::                                         &
-    ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms,jfme,             &
-    ifts, ifte, kfts,kfte, jfts,jfte
-
-integer::                             &
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
-
+ 
 real, pointer, dimension(:,:,:):: u_m, uc_m, X_m, Y_m, Z_m, cl_z_m, hcz_m ! to read from files
 real, pointer, dimension(:,:,:):: u, uc, X, Y, Z  ! to pass on
 integer, pointer:: cl_z(:)  
@@ -65,11 +65,13 @@ allocate(uc(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme))
 
 write(*,*)'calling restriction'
 call restriction(   &
-    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifts, ifte, kfts, kfte, jfts,jfte,            &
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile
     uc,u,cr_x,cr_y,cl_z,X,Y,Z)
 

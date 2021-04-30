@@ -62,7 +62,7 @@ do j=jfts,jfte
   enddo
 enddo
            
-write(*,'(a)')'calling ntd_mult'
+write(*,'(a)')'ntd_mult now computing y = y - Kmat*u, calling with y=0'
 call ndt_mult(  &
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
@@ -70,12 +70,12 @@ call ndt_mult(  &
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   kmat, u, y)
 
-write(*,'(a,3i8)')'copying the output data to array size ',n
+write(*,'(a,3i8)')'copying -y to array size ',n
 allocate(y_m(1:n(1),1:n(2),1:n(3)))
 do j=jfts,jfte
   do k=kfts,kfte
     do i=ifts,ifte
-      y_m(i,j,k)=y(i,k,j)
+      y_m(i,j,k)=-y(i,k,j)
     enddo
   enddo
 enddo

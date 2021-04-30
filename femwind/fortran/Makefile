@@ -110,9 +110,13 @@ module_femwind.o: module_femwind.f90 module_f_assembly.o module_boundary_conditi
 FEMWIND_TEST = femwind_test.f90\
   module_femwind.o\
   module_ndt_k_assembly.o\
+  module_ndt_w_assembly.o\
+  module_ndt_mult.o\
+  module_lin_alg.o\
   module_f_assembly.o\
   module_hexa.o\
   module_coarsening.o\
+  module_sweeps.o\
   module_boundary_conditions.o\
   module_utils.o \
   module_common.o

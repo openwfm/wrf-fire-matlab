@@ -10,17 +10,15 @@
 
 
 module module_femwind
+   use module_common
    use module_utils
    use module_f_assembly
    use module_ndt_assembly
    use module_w_assembly
+   use module_ndt_mult
    use module_coarsening
    use module_boundary_conditions
-   use module_common
-
-! parameters
-
-
+   use module_sweeps
 
 integer::nlevels                                ! number of levels
        
@@ -56,8 +54,6 @@ integer::   &
     print *,'femwind_setup received'
     call print_mg_dims(mg,1)
     
-
-
     do l=1,max_levels
 
         ! decide on coarsening
@@ -177,7 +173,8 @@ subroutine femwind_solve(mg,      &
      ifms, ifme, kfms,kfme, jfms, jfme,            &
      ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
      ifts, ifte, kfts, kfte, jfts,jfte,            &
-     u0, v0, w0, u, v, w, rate)                  ! outputs 
+     u0, v0, w0,                                   & ! input 
+     u, v, w, rate)                                  ! output 
 
 implicit none
 
@@ -199,8 +196,8 @@ real,intent(out):: rate
 
 !*** executable
 
-! F = div(u0)
-! F = f_assembly_fortran(A,X,U0,lambda,params);
+! f = div(u0)
+! f = f_assembly_fortran(A,X,U0,lambda,params);
 
 call f_assembly(                                  &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
@@ -209,30 +206,37 @@ call f_assembly(                                  &
     ifts, ifte, kfts, kfte, jfts, jfte,           &
     params%A, mg(1)%X, mg(1)%Y, mg(1)%Z,          &
     u0, v0, w0,                                   &                    	
-    mg(1)%F)                                        !Global load vector output  
+    mg(1)%f)                                        !Global load vector output  
 
 call vec_boundary_conditions(                              &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte,           &
-    mg(1)%F)
+    mg(1)%f)
 
+call multigrid_cycle(mg,1)                        ! start multigrid from level 1
 
-
-! initialize for now
-u=0.
-v=0.
-w=0.
-rate =0.
+call w_assembly(                                  &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & 
+    mg(1)%lambda, u0, v0, w0,                     &
+    params%A, mg(1)%X, mg(1)%Y, mg(1)%Z,          & !Input from femwind, u0, v0, w0, Spatial Grid Data
+    u, v, w)                                        ! final output  
 
 end subroutine femwind_solve
 
-recursive subroutine multigrid_solve(mg)  
+recursive subroutine multigrid_cycle(mg,l)  
+implicit none
  
 !*** arguments
 
 type(mg_type),intent(in)::mg(:)  ! multigrid levels
+integer, intent(in)::l           ! level
+
+!*** local
 
 integer::   &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
@@ -244,6 +248,92 @@ integer::   &
     ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
 
-end subroutine multigrid_solve
+integer::it, maxit
+logical::coarse
+
+!*** executable
+
+call get_mg_dims(mg(l),                         &
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte)
+if(l.eq.nlevels)then
+    ! coarsest level
+    mg(l)%lambda=0.                             ! initial solution 0
+    do it=1,params%coarsest_iter
+        call sweeps( &
+            ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+            ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+            ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+            ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions                  
+            mg(l)%Kglo, mg(l)%f, mg(l)%lambda) 
+    enddo
+    return
+else
+    call get_mg_dims(mg(l+1),                         &
+        ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+        ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+        ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+        ifcts, ifcte, kfcts,kfcte, jfcts,jfcte)         ! coarse grid tile
+    if(l > 1)then
+        maxit = params%maxit_coarse
+    else
+        maxit = params%maxit
+    endif
+    do it=1,maxit
+        coarse = mod(it,params%nsmooth+1)==0
+        if(coarse)then                                      ! coarse correction
+            ! compute residual f = f - Kglo*lambda
+            call ndt_mult(  &
+                ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+                ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+                ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+                ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+                mg(l)%Kglo, mg(l)%lambda, mg(l)%f)
+            ! restriction       
+            call restriction(   &
+                ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+                ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+                ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+                ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile boundss                ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+                ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+                ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+                ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+                ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile                
+                mg(l+1)%f,mg(l)%f,                            &
+                mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z,            &
+                mg(l)%X,mg(l)%Y,mg(l)%Z)
+            ! call self on level l+1
+            call multigrid_cycle(mg,l+1)
+
+            ! prolongation lambda = lambda + P*lambda_coarse
+
+            call prolongation(   &
+                ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+                ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+                ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+                ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
+                ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+                ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+                ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+                ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile
+                mg(l)%lambda,mg(l+1)%lambda,                  &
+                mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z,            &
+                mg(l)%X,mg(l)%Y,mg(l)%Z)
+        else
+            call sweeps( &
+                ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+                ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+                ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+                ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions                  
+                mg(l)%Kglo, mg(l)%F, mg(l)%lambda) 
+        endif
+    enddo
+endif
+
+            
+
+end subroutine multigrid_cycle
 
 end module  module_femwind

@@ -2,18 +2,22 @@ module module_common
 
 use module_utils
 
+integer, parameter::msize=14
+integer, parameter::max_levels=20
+
 ! method parameters
 type params_type
     real:: minaspect=1./3.,maxaspect=3.
-    real::A(3,3)=reshape((/1., 0., 0.,  0., 1., 0.,  0., 0., 1./),(/3, 3/))
+    real:: A(3,3)=reshape((/1., 0., 0.,  0., 1., 0.,  0., 0., 1./),(/3, 3/))
+    integer:: coarsest_iter=100 ! to solve the coarse problem 
+    integer:: maxit=50     ! total iterations
+    integer:: nsmooth=3    ! smoothing iterations before correction
+    integer:: maxit_coarse=8 ! on levels>1: 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
 end type
 
 type(params_type)::params
 
 ! multigrid structure
-
-integer, parameter::msize=14
-integer, parameter::max_levels=20
 
 type mg_type
     real, dimension(3,3):: A                        ! penalty weight matrix
