@@ -215,7 +215,7 @@ call vec_boundary_conditions(                              &
     ifts, ifte, kfts, kfte, jfts, jfte,           &
     mg(1)%f)
 
-call multigrid_cycle(mg,1)                        ! start multigrid from level 1
+call multigrid_cycle(mg,1,rate)                        ! start multigrid from level 1
 
 call w_assembly(                                  &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
@@ -228,13 +228,14 @@ call w_assembly(                                  &
 
 end subroutine femwind_solve
 
-recursive subroutine multigrid_cycle(mg,l)  
+recursive subroutine multigrid_cycle(mg,l,rate)  
 implicit none
  
 !*** arguments
 
 type(mg_type),intent(in)::mg(:)  ! multigrid levels
 integer, intent(in)::l           ! level
+real, intent(out)::rate
 
 !*** local
 
@@ -305,7 +306,7 @@ else
                 mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z,            &
                 mg(l)%X,mg(l)%Y,mg(l)%Z)
             ! call self on level l+1
-            call multigrid_cycle(mg,l+1)
+            call multigrid_cycle(mg,l+1,rate)
 
             ! prolongation lambda = lambda + P*lambda_coarse
 
@@ -332,7 +333,7 @@ else
     enddo
 endif
 
-            
+rate = -1.  ! for now
 
 end subroutine multigrid_cycle
 
