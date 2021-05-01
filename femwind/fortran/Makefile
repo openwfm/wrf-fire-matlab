@@ -12,7 +12,7 @@ default: hexa_test.exe\
  f_assembly_test.exe\
  prolongation_test.exe\
  restriction_test.exe\
- ndt_k_test.exe\
+ ndt_assembly_test.exe\
  ndt_w_test.exe\
  coarsening_icl_test.exe\
  ndt_boundary_conditions_test.exe\
@@ -51,14 +51,14 @@ module_sweeps.o: module_sweeps.f90 Makefile
 sweeps_test.o: sweeps_test.f90 module_sweeps.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c sweeps_test.f90
 
-ndt_k_test.exe: ndt_k_test.o module_ndt_k_assembly.o module_utils.o module_hexa.o  Makefile
-	$(FC) $(FFLAGS) -o ndt_k_test.exe ndt_k_test.o  module_ndt_k_assembly.o module_utils.o module_hexa.o 
+ndt_assembly_test.exe: ndt_assembly_test.o module_ndt_assembly.o module_utils.o module_hexa.o  Makefile
+	$(FC) $(FFLAGS) -o ndt_assembly_test.exe ndt_assembly_test.o  module_ndt_assembly.o module_utils.o module_hexa.o 
 
-ndt_k_test.o: ndt_k_test.f90 module_hexa.o module_utils.o module_ndt_k_assembly.o Makefile
-	$(FC) $(FFLAGS) -c ndt_k_test.f90 
+ndt_assembly_test.o: ndt_assembly_test.f90 module_hexa.o module_utils.o module_ndt_assembly.o Makefile
+	$(FC) $(FFLAGS) -c ndt_assembly_test.f90 
 
-module_ndt_k_assembly.o: module_ndt_k_assembly.f90 module_hexa.o Makefile
-	$(FC) $(FFLAGS) -c module_ndt_k_assembly.f90  
+module_ndt_assembly.o: module_ndt_assembly.f90 module_hexa.o Makefile
+	$(FC) $(FFLAGS) -c module_ndt_assembly.f90  
 
 f_assembly_test.exe: f_assembly_test.f90 module_f_assembly.o module_utils.o module_hexa.o  Makefile
 	$(FC) $(FFLAGS) -o f_assembly_test.exe f_assembly_test.f90  module_f_assembly.o module_utils.o module_hexa.o
@@ -109,7 +109,7 @@ module_femwind.o: module_femwind.f90 module_f_assembly.o module_boundary_conditi
 
 FEMWIND_TEST = femwind_test.f90\
   module_femwind.o\
-  module_ndt_k_assembly.o\
+  module_ndt_assembly.o\
   module_ndt_w_assembly.o\
   module_ndt_mult.o\
   module_lin_alg.o\

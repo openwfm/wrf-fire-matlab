@@ -39,19 +39,19 @@ call read_array(Z,'Z')        !Recovering X-Matrix and dimension of X matrix
 n2 = shape(X)
 
 ifts = 1
-ifte = n2(1)
+ifte = n2(1)-1
 jfts = 1 
-jfte = n2(3)
+jfte = n2(3)-1
 kfts = 1
-kfte = n2(2)
+kfte = n2(2)-1
 msize = 14
 
 ifms = ifts
-ifme = ifte
+ifme = ifte+2
 jfms = jfts
-jfme = jfte
+jfme = jfte+2
 kfms = kfts
-kfme = kfte
+kfme = kfte+2
 
 
 allocate(Kmat(ifms:ifme,kfms:kfme,jfms:jfme, 1:msize))
@@ -61,9 +61,9 @@ allocate(Ymat(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(Zmat(ifms:ifme,kfms:kfme,jfms:jfme))
 
 ! copy the input data to tile sized bounds
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+do j=jfts,jfte+1
+  do k=kfts,kfte+1
+    do i=ifts,ifte+1
         Xmat(i,k,j) = X(i,k,j)
 	Ymat(i,k,j) = Y(i,k,j)
 	Zmat(i,k,j) = Z(i,k,j)	
@@ -80,10 +80,10 @@ call ndt_assembly(  &
   Amat,Xmat,Ymat,Zmat, iflags, Kmat)
 
 !write(*,'(a,3i8)')'copying the output data to array size ',n2,msize
-allocate(Km(ifts:ifte,kfts:kfte,jfts:jfte, 1:msize))
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+allocate(Km(ifts:ifte+1,kfts:kfte+1,jfts:jfte+1, 1:msize))
+do j=jfts,jfte+1
+  do k=kfts,kfte+1
+    do i=ifts,ifte+1
         do jx = 1,msize
       	    Km(i,k,j,jx)=Kmat(i,k,j,jx)
         enddo
@@ -92,7 +92,7 @@ do j=jfts,jfte
 enddo
 
 
-ksize = (/ifte-ifts+1,kfte-kfts+1,jfte-jfts+1,msize/)
+ksize = (/ifte-ifts+2,kfte-kfts+2,jfte-jfts+2,msize/)
 call write_array_nd(reshape(Km,(/product(ksize)/)),ksize,'K')
 !***print *,(/product(ksize)/)
 

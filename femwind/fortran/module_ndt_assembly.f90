@@ -17,7 +17,7 @@ implicit none
 !*** arguments
 
 integer, intent(in)::                     &
-    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
+    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions in elements
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte            
@@ -53,9 +53,9 @@ K = 0.
 !print *, 'X=(:,2,:)', X(:,2,:)
 !print *, 'X=(:,3,:)', X(:,3,:)
 
-do ie2=jfts,jfte -1
-    do ie3=kfts, kfte -1
-        do ie1=ifts, ifte -1
+do ie2=jfts,jfte 
+    do ie3=kfts, kfte 
+        do ie1=ifts, ifte 
             do ic2=0,1
                 do ic3=0,1
                     do ic1=0,1
