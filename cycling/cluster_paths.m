@@ -212,7 +212,7 @@ clst_pts =  fixpoints2grid(red,n_points);
 % just use the index numbers, maintain the l2 data coords
 clst_pts(:,3:4) = n_points(:,1:2);
 %ig_pt = [mean(clst_pts(:,3)),mean(clst_pts(:,4))];
-ig_pt = [clst_pts(1,3),clst_pts(1,4)];
+   ig_pt = [clst_pts(1,3),clst_pts(1,4)];
 for i = 1:length(clst_pts)
    pt_1 = [ig_pt(1,1),clst_pts(i,4)];
    pt_2 = [clst_pts(i,3),clst_pts(i,4)];

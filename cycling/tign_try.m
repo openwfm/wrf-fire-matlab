@@ -64,7 +64,7 @@ for k = 1 : 1
     for i = 1:m
         for j = 1:n
             if red.tign(i,j) < red.end_datenum - rm
-                if rand < 1/100
+                if rand < cpd/100
                     %pts = [pts;[lats',lons',times',confs',frps',gran']];
                     pts = [pts;[red.fxlat(i,j),red.fxlong(i,j),red.tign(i,j),100,100,2*round(red.tign(i,j)-red.start_datenum)]];
                     idx = [idx;[i,j]];
@@ -125,7 +125,8 @@ t1 = red.min_tign;
 t2 = red.max_tign;
 %clusters = round((t2-t1)*cpd);
 %clusters = round(length(pts)/20);
-clusters = min(cpd,length(pts(:,3)));
+%clusters = min(cpd,length(pts(:,3)));
+clusters = 20;
 [s_idx,s_c] = kmeans(pts(:,1:2),clusters);
 %scatter the clusters with coloring
 figure,scatter3(pts(s_idx==1,2),pts(s_idx==1,1),pts(s_idx==1,3)-red.start_datenum);

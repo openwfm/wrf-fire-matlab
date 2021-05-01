@@ -19,7 +19,7 @@ hold on
 
 points_set = ps.points(:,3)<=tmax;
 scatter(ps.points(points_set,2),ps.points(points_set,1),'*r')
-xlabel('Lon'),ylabel('Lat')
+xlabel('Lon [degree]'),ylabel('Lat [degre]')
 title('Forecast and active fire detections')
 %title('"Ground Truth" and artificial fire detections')
 hold off
@@ -29,7 +29,7 @@ hold off
 figure(191),contourf(ps.red.fxlong,ps.red.fxlat,an,'k')
 hold on
 scatter(ps.points(:,2),ps.points(:,1),'*r')
-xlabel('Lon'),ylabel('Lat')
+xlabel('Lon [degree]'),ylabel('Lat [degre]')
 title('Analysis and active fire detections')
 %title('Estimate and artificial fire detections')
 hold off

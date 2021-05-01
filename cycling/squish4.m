@@ -136,7 +136,7 @@ if gq
 %         scatter(pts(1:10:end,2),pts(1:10:end,1),'*r'),hold off
 %         t_str = sprintf('Perimeter Shrinking \n Iteration %d',i);
 %         save_str = sprintf('perim_shrink_%d',i);
-%         xlabel('Lon'),ylabel('Lat'),title(t_str)
+%        xlabel('Lon [degree]'),ylabel('Lat [degre]'),title(t_str)
 %         savefig(save_str);
 %         saveas(gcf,[save_str '.png']);
         %figure(160),mesh(ps.red.fxlong,ps.red.fxlat,tign_ground);
@@ -156,7 +156,7 @@ tign_new = tign_ground;
 % contourf(ps.red.fxlong,ps.red.fxlat,ps.red.tign,20,'k'),hold off
 % t_str = sprintf('Perimeter Shrinking \n Iteration %d',0);
 % save_str = sprintf('perim_shrink_%d',0);
-% xlabel('Lon'),ylabel('Lat'),title(t_str)
+% xlabel('Lon [degree]'),ylabel('Lat [degre]'),title(t_str)
 % xlim(xl);
 % ylim(yl);
 % savefig(save_str);
@@ -305,14 +305,14 @@ for k = 1:smoothings
 
     
     %only do norm for times before final detection time
-    time_mask = tign_new < pts(end,3);  %max(max(pts(:,3)));
+    time_mask = tign_new < max(tign_new(:)); %max(pts(end,3));  %max(max(pts(:,3)));
     norms(k,2) = norm(tign_new(time_mask)-tign_old(time_mask))/norm(tign_old(time_mask)-min(tign_old(:)));
-    figure(fig_num+3);plot(norms(1:k,1));
+    figure(fig_num+3);plot(norms(1:k,2));
     xlabel('Iterations of Interpolation')
     ylabel('Relative of difference')
     tstr = sprintf('Relative difference between successive \n TIGN after each interpolation');
     title(tstr)
-    figure(fig_num+4);plot(1:k,norms(1:k,2))
+    figure(fig_num+4);plot(1:k,norms(1:k,1))
     tstr = sprintf('Norm of difference between times of \n detections and TIGN at detection locations');
     title(tstr);
     xlabel('Iterations of Interpolation')
@@ -333,7 +333,7 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 1;
+ground_steps = 3;
 tign_ground = tign_new;
 if gq
     data_area = sum(infire(:));
@@ -375,7 +375,7 @@ if gq
 %         scatter(pts(1:5:end,2),pts(1:5:end,1),'*r'),hold off
 %         t_str = sprintf('Perimeter Shrinking \n Iteration %d',i);
 %         save_str = sprintf('perim_shrink_%d',i);
-%         xlabel('Lon'),ylabel('Lat'),title(t_str)
+%         xlabel('Lon [degree]'),ylabel('Lat [degre]'),title(t_str)
 %         close 159
 %         savefig(save_str);
 %         saveas(gcf,[save_str '.png']);
