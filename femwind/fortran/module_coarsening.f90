@@ -273,11 +273,12 @@ integer:: nc3,newlcl,lcl,i,n3
 
 !*** executable
     dxy=min(dx,dy)  ! horizontal step
-    n3 = size(dz)+1 !
+    n3 = size(dz)+1 ! 
+    print *,'coarsening_icl in: dx=',dx,' dy=',dy,' n3=',n3,' dz=',dz
+    print *,'coarsening_icl in: A=',A,' minaspect=',minaspect,' maxaspect=',maxaspect
     arat = A(3,3)/min(A(1,1),A(2,2))  ! scaled vertical penalty
     ! decide on horizontal coarsening factors
     crit=(dz(1)/dxy)/arat
-    print *,'coarsening_icl: dx=',dx,' dy=',dy,' dz=',dz,' arat=',arat,' crit=',crit
 
     if (crit > minaspect) then
         cr_x = 2 
