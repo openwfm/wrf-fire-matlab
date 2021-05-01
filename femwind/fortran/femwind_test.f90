@@ -72,7 +72,7 @@ mg(1)%dx = mg(1)%X(2,1,1)-mg(1)%X(1,1,1)
 mg(1)%dy = mg(1)%Y(1,1,2)-mg(1)%Y(1,1,1)
 allocate(mg(1)%dz(mg(1)%nz-1))
 do k=kfds,kfte
-    mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,1,1)
+    mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,k,1)
 enddo
 
 write(*,'(a)')'calling femwind_setup'
