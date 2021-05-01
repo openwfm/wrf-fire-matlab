@@ -23,24 +23,18 @@ type mg_type
     real, dimension(3,3):: A                        ! penalty weight matrix
     real, pointer, dimension(:,:,:):: X, Y, Z       ! grid vertices
     real, pointer, dimension(:,:,:)::        &      !
-         F, lambda, res                             ! multigrid variables                                       
+         f, lambda, res                             ! multigrid variables                                       
     
     real, pointer, dimension(:,:,:,:):: Kglo        ! global stiffness matrix
     
     real:: dx,dy                                    ! horizontal spacing, scalar 
     real, pointer, dimension(:)::dz                 ! vertical spacing of the layers
-    integer::nx,ny,nz,nn                            ! mesh size in vertices
+    integer::nx,ny,nz,nn                            ! mesh size in terms of vertices
   
     integer::level
 
     integer:: cr_x, cr_y                            ! coarsening factors
     integer, pointer, dimension(:):: icl_x, icl_y, icl_z  ! coarsening indices
-
-    integer:: &
-    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
-    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts, jfte              ! tile dimensions
  
 end type
 

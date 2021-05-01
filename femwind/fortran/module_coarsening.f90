@@ -130,7 +130,7 @@ subroutine restriction(   &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile boundss                ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
     ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions

@@ -6,7 +6,7 @@ use module_utils ! to read and write matrices as text files from matlab
 implicit none
 
 real, pointer:: kmat(:,:,:,:), u(:,:,:), y(:,:,:), &  ! fortran is not case sensitive
-                kmat_m(:,:,:,:), u_m(:,:,:), y_m(:,:,:)   
+                kmat_m(:,:,:,:), u_m(:,:,:), y_m(:,:,:),  r(:,:,:)
 real, pointer::a(:)
 integer :: s(4),n(3)
 
@@ -16,6 +16,8 @@ integer :: msize, &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
 integer :: i,j,k,jx
+
+real:: norm2
 
 ! read input arrays in ikj index ordering and tight bounds
 call read_array_nd(a,s,'kmat')
@@ -46,6 +48,7 @@ kfme = kfte+1
 allocate(kmat(ifms:ifme,kfms:kfme,jfms:jfme,1:msize))
 allocate(   u(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(   y(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(   r(ifms:ifme,kfms:kfme,jfms:jfme))
 kmat = 0.
 u = 0.
 y = 0.
@@ -62,20 +65,20 @@ do j=jfts,jfte
   enddo
 enddo
            
-write(*,'(a)')'ntd_mult now computing y = y - Kmat*u, calling with y=0'
+write(*,'(a)')'ntd_mult now computing r = y - Kmat*u, calling with y=0'
 call ndt_mult(  &
   ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  kmat, u, y)
+  kmat, u, y, r , norm2)
 
 write(*,'(a,3i8)')'copying -y to array size ',n
 allocate(y_m(1:n(1),1:n(2),1:n(3)))
 do j=jfts,jfte
   do k=kfts,kfte
     do i=ifts,ifte
-      y_m(i,j,k)=-y(i,k,j)
+      y_m(i,j,k)=-r(i,k,j)
     enddo
   enddo
 enddo
