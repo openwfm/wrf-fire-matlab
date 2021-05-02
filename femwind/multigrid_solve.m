@@ -36,8 +36,8 @@ switch params.coarsening
         end
     case '2 linear'
         % [P,X_coarse]=coarsening_2_linear(X,params);
-        dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
-        dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
+        dx=(X{1}(2,1,1)-X{1}(1,1,1));
+        dy=(X{2}(1,2,1)-X{1}(1,1,1));
         dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
         fprintf('layers: '),disp(X{3}(1,1,:)),fprintf('dz='),disp(dz)
         [hzc,icl3]=coarsening_icl_fortran(dx,dy,dz,params);
