@@ -1,4 +1,5 @@
 module module_sweeps
+use module_utils
 
 contains
 
@@ -24,7 +25,13 @@ real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: Kmat  ! globa
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: F           ! global load vector
 real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: x           ! output vector
 
+!*** local
+
 integer:: i, j, k, r1, r2 
+
+!*** executable
+ 
+call write_array(F(ifts: ifte, kfts: kfte, jfts:jfte),'F_sweeps_in')
 
 do r1 = 1,2
     do r2 = 1,2
