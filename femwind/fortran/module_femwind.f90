@@ -296,7 +296,7 @@ endif
 mg(l)%lambda=0.                             ! initial solution 0
 
 do it=1,maxit
-    coarse = mod(it,params%nsmooth+1)==0
+    coarse = mod(it,params%nsmooth+1)==0 .and. l < nlevels
     if(coarse)then                                      ! coarse correction
         it_kind='coarse correction'
         ! compute residual residual = f - Kglo*lambda
@@ -311,7 +311,7 @@ do it=1,maxit
             ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
             ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
             ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-            ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile boundss                ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
+            ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile boundss                
             ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
             ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
             ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
@@ -352,9 +352,14 @@ do it=1,maxit
         ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
         ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
         mg(l)%Kglo, mg(l)%lambda, mg(l)%f, mg(l)%res, norm2)
-    if (it == 1) res_err_1 = norm2
-    rate = (norm2/res_err_1)**(1./it)
+    if (it == 1) then 
+         res_err_1 = norm2
+         rate = 1
+    else
+         rate = (norm2/res_err_1)**(1./it)
+    endif
     print *,'level ',l,' iteration ',it,' ',it_kind,' residual ',norm2,' rate ',rate
+    if(norm2 < 10.0*tiny(norm2))exit
 enddo
 
 end subroutine multigrid_cycle
