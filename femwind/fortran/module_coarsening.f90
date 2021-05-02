@@ -339,8 +339,8 @@ integer, intent(out), pointer, dimension(:) :: icl_x, icl_y
 integer :: nc_x, nc_y
 integer::i
 
-nc_x = n_x/cr_x + 1
-nc_y = n_y/cr_y + 1
+nc_x = min(n_x,n_x/cr_x + 1)
+nc_y = min(n_y,n_y/cr_y + 1)
 
 allocate(icl_x(nc_x))
 allocate(icl_y(nc_y))

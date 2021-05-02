@@ -261,20 +261,24 @@ call get_mg_dims(mg(l),                         &
     ifms, ifme, kfms, kfme, jfms, jfme,         &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte)
-if(l<nlevels) call get_mg_dims(mg(l+1),                         &
+if(l<nlevels) then 
+    call get_mg_dims(mg(l+1),                         &
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
     ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte)         ! coarse grid tile
+!*** temporary fix, meshes are in vertices not elements here.
+!*** should be fixed using snode in all subroutines called from here 
+    ifcte = ifcte + 1
+    jfcte = jfcte + 1
+    kfcte = kfcte + 1
+endif
 
 !*** temporary fix, meshes are in vertices not elements here.
 !*** should be fixed using snode in all subroutines called from here 
 ifte = ifte + 1
 jfte = jfte + 1
 kfte = kfte + 1
-ifcte = ifcte + 1
-jfcte = jfcte + 1
-kfcte = kfcte + 1
 
 
 ! decide on number of iterations

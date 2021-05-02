@@ -81,6 +81,11 @@ if (iflag .eq.  3) then
              Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
              Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
     
+    if(abs(detJx).lt.tiny(detJx))then
+        print *,'detJx=',detJx
+        call crash('The Jacobian is (numerically) singular')
+    endif
+
     Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
     Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
     Jx_inv(3,1) = +(1/detJx) * (Jx(2,1)*Jx(3,2) - Jx(2,2)*Jx(3,1))
@@ -121,6 +126,11 @@ Jx = matmul(X,gradf)
 detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
          Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
          Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
+
+    if(abs(detJx).lt.tiny(detJx))then
+        print *,'detJx=',detJx
+        call crash('The Jacobian is (numerically) singular')
+    endif
 
 Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
 Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
@@ -175,10 +185,10 @@ detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
          Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
          Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
 
-if(abs(detJx).lt.tiny(detJx))then
-    print *,'Jg=',Jg
-    call crash('The Jacobian is (numerical) zero')
-endif
+    if(abs(detJx).lt.tiny(detJx))then
+        print *,'detJx=',detJx
+        call crash('The Jacobian is (numerically) singular')
+    endif
 
 Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
 Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
