@@ -50,7 +50,7 @@ do j=jfts,je
   do k=kfts,ke
     do i=ifts,ie
       ! not efficient but will be executed only once
-      if(i.eq.ifds.or.i.eq.ifde.or.j.eq.jfds.or.j.eq.jfde.or.k.eq.kfde)then
+      if(i.eq.ifds.or.i.eq.ifde+1.or.j.eq.jfds.or.j.eq.jfde+1.or.k.eq.kfde+1)then
         ! replace the row/col (i,k,j) by scaled identity
         kmat(i-1,k-1,j-1,14)=0.
         kmat(i  ,k-1,j-1,13)=0.
@@ -120,7 +120,7 @@ do j=jfts,je
   do k=kfts,ke
     do i=ifts,ie
       ! not efficient, change later 
-      if(i.eq.ifds.or.i.eq.ifde.or.j.eq.jfds.or.j.eq.jfde.or.k.eq.kfde)then
+      if(i.eq.ifds.or.i.eq.ifde+1.or.j.eq.jfds.or.j.eq.jfde+1.or.k.eq.kfde+1)then
         F(i,k,j)=0.
       endif
     enddo
