@@ -76,8 +76,8 @@ integer::   &
         mg(l+1)%ny = size(mg(l)%icl_y)
         mg(l+1)%nz = size(mg(l)%icl_z)
         mg(l+1)%nn = mg(l+1)%nx *  mg(l+1)%ny * mg(l+1)%nz
-        mg(l+1)%dx = mg(l)%dx/mg(l)%cr_x
-        mg(l+1)%dy = mg(l)%dy/mg(l)%cr_y
+        mg(l+1)%dx = mg(l)%dx * mg(l)%cr_x
+        mg(l+1)%dy = mg(l)%dy * mg(l)%cr_y
         mg(l+1)%level = l+1
 
         call print_mg_dims(mg,l+1)
