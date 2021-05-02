@@ -267,6 +267,16 @@ if(l<nlevels) call get_mg_dims(mg(l+1),                         &
     ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte)         ! coarse grid tile
 
+!*** temporary fix, meshes are in vertices not elements here.
+!*** should be fixed using snode in all subroutines called from here 
+ifte = ifte + 1
+jfte = jfte + 1
+kfte = kfte + 1
+ifcte = ifcte + 1
+jfcte = jfcte + 1
+kfcte = kfcte + 1
+
+
 ! decide on number of iterations
 if(l.eq.nlevels)then
     ! coarsest level
