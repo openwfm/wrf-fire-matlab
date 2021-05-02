@@ -24,7 +24,7 @@ default: hexa_test.exe\
 hexa_test.exe: hexa_test.o module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_utils.o
 
-module_hexa.o: module_hexa.f90 Makefile
+module_hexa.o: module_hexa.f90 module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_hexa.f90
 
 hexa_test.o: hexa_test.f90 module_hexa.o module_utils.o Makefile
