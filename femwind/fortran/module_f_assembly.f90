@@ -44,12 +44,12 @@ integer :: kglo(8)
 !*** integer, dimension(3,1,1), save ::iflags = reshape((/1,0,1/),(/3,1,1/)) !define iflags to construct JG and Kloc in hexa
 
 call  write_array(reshape(A,(/3,3,1/)),'A_in')
-call  write_array(X,'X_in')
-call  write_array(Y,'Y_in')
-call  write_array(Z,'Z_in')
-call  write_array(Xu0,'Xu0_in')
-call  write_array(Yu0,'Yu0_in')
-call  write_array(Zu0,'Zu0_in')
+call  write_array(X(ifts: ifte+1, kfts: kfte+1, jfts:jfte+1),'X_in')
+call  write_array(Y(ifts: ifte+1, kfts: kfte+1, jfts:jfte+1),'Y_in')
+call  write_array(Z(ifts: ifte+1, kfts: kfte+1, jfts:jfte+1),'Z_in')
+call  write_array(Xu0(ifts: ifte, kfts: kfte, jfts:jfte),'u0_in')
+call  write_array(Yu0(ifts: ifte, kfts: kfte, jfts:jfte),'v0_in')
+call  write_array(Zu0(ifts: ifte, kfts: kfte, jfts:jfte),'w0_in')
 
 Xloc = 9999.
 u0loc = 0.
@@ -89,7 +89,7 @@ do ie2=jfts,jfte
     enddo
 enddo
 
-call  write_array(F,'F_out')
+call  write_array(F(ifts: ifte+1, kfts: kfte+1, jfts:jfte+1),'F_out')
 
 end subroutine f_assembly
 end module  module_f_assembly

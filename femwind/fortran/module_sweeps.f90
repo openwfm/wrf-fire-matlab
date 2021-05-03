@@ -32,6 +32,7 @@ integer:: i, j, k, r1, r2
 !*** executable
  
 call write_array(F(ifts: ifte, kfts: kfte, jfts:jfte),'F_sweeps_in')
+call write_array(x(ifts: ifte, kfts: kfte, jfts:jfte),'x_sweeps_in')
 
 do r1 = 1,2
     do r2 = 1,2
@@ -76,6 +77,8 @@ do r1 = 1,2
     end do
 end do
 
+call write_array(x(ifts: ifte, kfts: kfte, jfts:jfte),'x_sweeps_out')
+stop
 end subroutine sweeps
 
 end module module_sweeps
