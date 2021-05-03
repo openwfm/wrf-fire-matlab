@@ -298,6 +298,7 @@ mg(l)%lambda=0.                             ! initial solution 0
 do it=1,maxit
     coarse = mod(it,params%nsmooth+1)==0 .and. l < nlevels
     if(coarse)then                                      ! coarse correction
+        call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'cc_lambda_in')
         it_kind='coarse correction'
         ! compute residual residual = f - Kglo*lambda
         call ndt_mult(  &
@@ -306,6 +307,7 @@ do it=1,maxit
             ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
             ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
             mg(l)%Kglo, mg(l)%lambda, mg(l)%f, mg(l)%res, norm2)
+        call  write_array(mg(l)%res(ifts: ifte, kfts: kfte, jfts:jfte),'cc_res')
         ! restriction: f_coarse = R*residual      
         call restriction(   &
             ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -319,11 +321,14 @@ do it=1,maxit
             mg(l+1)%f,mg(l)%res,                          &
             mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z,            &
             mg(l)%X,mg(l)%Y,mg(l)%Z)
+        call  write_array(mg(l+1)%res(ifcts: ifcte, kfcts: kfcte, jfcts:jfcte),'cc_f_c')
+        call crash('stopping here')
         ! call self on level l+1
         call multigrid_cycle(mg,l+1,rate)
 
         ! prolongation lambda = lambda + P*lambda_coarse
 
+        call  write_array(mg(l+1)%lambda(ifcts: ifcte+1, kfcts: kfcte+1, jfcts:jfcte+1),'cc_lambda_c')
         call prolongation(   &
             ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
             ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
