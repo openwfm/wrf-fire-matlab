@@ -2,6 +2,8 @@ function x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params)
     n = size(X{1});
     res = reshape(F-K*x,n);
     F_c = restriction(res,hzc,icl3,X,params);
+    F_c_f = restriction_fortran(res,hzc,icl3,X,params);
+    err_fort=big(F_c-F_c_f)
     F_coarse = F_c(:);
     if params.apply_coarse_boundary_conditions
         [K_coarse,F_coarse]=apply_boundary_conditions(K_coarse,F_coarse,X_coarse);
