@@ -4,14 +4,14 @@ W=[];
 
 exe  = './fortran/femwind_test.exe';
 if isfield(params,'run_fortran') && params.run_fortran && exist(exe,'file') 
-    write_array_nd(swap23(X{1}),'X');
-    write_array_nd(swap23(X{2}),'Y');
-    write_array_nd(swap23(X{3}),'Z');
-    write_array_nd(swap23(u0{1}),'u0');
-    write_array_nd(swap23(u0{2}),'v0');
-    write_array_nd(swap23(u0{3}),'w0');
+    write_array_nd(swap23(X{1}),'X_input');
+    write_array_nd(swap23(X{2}),'Y_input');
+    write_array_nd(swap23(X{3}),'Z_input');
+    write_array_nd(swap23(u0{1}),'u0_input');
+    write_array_nd(swap23(u0{2}),'v0_input');
+    write_array_nd(swap23(u0{3}),'w0_input');
 
-    write_array(A,'A')
+    write_array(A,'A_input')
     
     % defaults
     nel = size(X{1})-1;

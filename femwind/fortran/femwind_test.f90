@@ -24,13 +24,13 @@ real, pointer:: X(:,:,:),Y(:,:,:),Z(:,:,:), &
 integer:: i, j, k, n(3)
 real:: rate
 
-call read_array(A_m,'A')  ! matrices read from Matlab are _m
-call read_array(X_m,'X')
-call read_array(Y_m,'Y')
-call read_array(Z_m,'Z')
-call read_array(u0_m, 'u0')
-call read_array(v0_m, 'v0')
-call read_array(w0_m, 'w0')
+call read_array(A_m,'A_input')  ! matrices read from Matlab are _m
+call read_array(X_m,'X_input')
+call read_array(Y_m,'Y_input')
+call read_array(Z_m,'Z_input')
+call read_array(u0_m, 'u0_input')
+call read_array(v0_m, 'v0_input')
+call read_array(w0_m, 'w0_input')
 
 params%A = reshape(A_m,(/3,3/))
 
