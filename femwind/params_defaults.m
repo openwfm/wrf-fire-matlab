@@ -3,6 +3,7 @@ function params=params_defaults
     params.run_matlab=1;
     params.femwind_fortran_test=0;
     params.test_fortran=0;
+    params.level=1;  % starting from 1
     params.graphics=2;  % -1: none 1=basic, 2=all
     params.expand=1.2;  % exponential grid expansion in the vertical
     params.mesh_top=1000; % if given, ignore params_expand 

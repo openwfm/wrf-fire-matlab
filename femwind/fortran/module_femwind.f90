@@ -321,8 +321,10 @@ do it=1,maxit
             mg(l+1)%f,mg(l)%res,                          &
             mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z,            &
             mg(l)%X,mg(l)%Y,mg(l)%Z)
-        call  write_array(mg(l+1)%res(ifcts: ifcte, kfcts: kfcte, jfcts:jfcte),'cc_f_c')
-        call crash('stopping here')
+        call  write_array(mg(l+1)%f(ifcts: ifcte, kfcts: kfcte, jfcts:jfcte),'cc_f_c')
+        print *,'level=',l
+        pause
+        if (l.eq.2) call crash('stopping here')
         ! call self on level l+1
         call multigrid_cycle(mg,l+1,rate)
 

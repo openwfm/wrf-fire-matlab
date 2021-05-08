@@ -9,6 +9,7 @@ function x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params)
         [K_coarse,F_coarse]=apply_boundary_conditions(K_coarse,F_coarse,X_coarse);
     end
     params_coarse=params;  % copy all params 
+    params_coarse.level=params.level+1;
     params_coarse.levels=params.levels-1;
     params_coarse.nsmooth=params.nsmooth_coarse;
     params_coarse.maxit=params.maxit_coarse;
