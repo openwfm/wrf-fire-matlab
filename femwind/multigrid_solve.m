@@ -1,6 +1,7 @@
 function [x,it,rate,X_coarse]=multigrid_solve(K,F,X,params)
 % x=multigrid_solve(K,F,X)
 
+level=params.level;  % debug
 n = size(X{1});
 fprintf('multigrid level %i grid size %i %i %i rhs %g\n',params.levels,n,big(F))
 
@@ -99,7 +100,8 @@ for it=1:params.maxit
     else
         it_type='smoothing';
         fprintf('iteration %g level %g smoothing by %s\n',it,params.levels,params.smoothing)
-        x=smoothing(K,F,X,x,params);
+        xout=smoothing(K,F,X,x,params);
+        x=xout;
     end
     r=F-K*x;  % residual for diagnostics only
     if params.exact

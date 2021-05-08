@@ -18,10 +18,5 @@ nd=X(2);
 n1=X(3);
 n2=X(4);
 n3=X(5);
-global read_array_msg
-if ~isempty(read_array_msg)
-    if read_array_msg,
-        fprintf('reading matrix size %g %g %g from file %s\n',n1,n2,n3,filename)
-    end
-end
+fprintf('reading matrix size %g %g %g from file %s\n',n1,n2,n3,filename)
 a=reshape(X(6:m),n1,n2,n3);

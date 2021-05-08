@@ -297,6 +297,7 @@ mg(l)%lambda=0.                             ! initial solution 0
 
 do it=1,maxit
     coarse = mod(it,params%nsmooth+1)==0 .and. l < nlevels
+    print *,'level=',l,' it=',it,' coarse=',coarse
     if(coarse)then                                      ! coarse correction
         call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'cc_lambda_in')
         it_kind='coarse correction'
@@ -322,9 +323,8 @@ do it=1,maxit
             mg(l)%cr_x,mg(l)%cr_y,mg(l)%icl_z,            &
             mg(l)%X,mg(l)%Y,mg(l)%Z)
         call  write_array(mg(l+1)%f(ifcts: ifcte, kfcts: kfcte, jfcts:jfcte),'cc_f_c')
-        print *,'level=',l
-        pause
-        if (l.eq.2) call crash('stopping here')
+        call pause
+        !if (l.eq.2) call crash('stopping here')
         ! call self on level l+1
         call multigrid_cycle(mg,l+1,rate)
 
@@ -346,12 +346,16 @@ do it=1,maxit
     else
         it_kind = 'smoothing'
         if(l.eq.nlevels)it_kind='coarsest solve'
+        call  write_array(mg(l)%f(ifts: ifte, kfts: kfte, jfts:jfte),'sweep_f_in')
+        call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'sweep_lambda_in')
         call sweeps( &
             ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
             ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
             ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
             ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions                  
             mg(l)%Kglo, mg(l)%f, mg(l)%lambda) 
+        call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'sweep_lambda_out')
+        call pause
     endif
     call ndt_mult(  &
         ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds

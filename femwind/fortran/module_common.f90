@@ -3,7 +3,7 @@ module module_common
 use module_utils
 
 integer, parameter::msize=14
-integer, parameter::max_levels=20
+integer, parameter::max_levels=3
 
 ! method parameters
 type params_type
