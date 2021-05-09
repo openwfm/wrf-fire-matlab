@@ -249,7 +249,7 @@ integer::   &
     ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
 
-integer::it, maxit, nit
+integer::it, maxit, nit, nsmooth
 logical::coarse
 real::norm2, res_err_1
 character(len=10)::it_kind
@@ -285,18 +285,21 @@ kfte = kfte + 1
 if(l.eq.nlevels)then
     ! coarsest level
     maxit = params%coarsest_iter
+    nsmooth = 0
 elseif(l == 1)then
     ! top level
     maxit = params%maxit
+    nsmooth = params%nsmooth
 else  
     ! some coarse level in between
     maxit = params%maxit_coarse
+    nsmooth = params%nsmooth_coarse
 endif
 
 mg(l)%lambda=0.                             ! initial solution 0
 
 do it=1,maxit
-    coarse = mod(it,params%nsmooth+1)==0 .and. l < nlevels
+    coarse = mod(it,nsmooth+1)==0 .and. l < nlevels
     print *,'level=',l,' it=',it,' coarse=',coarse
     if(coarse)then                                      ! coarse correction
         call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'cc_lambda_in')

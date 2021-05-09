@@ -12,6 +12,7 @@ type params_type
     integer:: coarsest_iter=100 ! to solve the coarse problem 
     integer:: maxit=50     ! total iterations
     integer:: nsmooth=3    ! smoothing iterations before correction
+    integer:: nsmooth_coarse=2 ! smoothing iterations on coarse levels
     integer:: maxit_coarse=8 ! on levels>1: 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
 end type
 

@@ -94,12 +94,12 @@ for it=1:params.maxit
     params.it(params.levels)=it;  % where we are, for prints and filenames
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
-        fprintf('iteration %g level %g coarse correction\n',it,params.levels)
+        fprintf('iteration %g level %g coarse correction\n',it,params.level)
         x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params);
         it_type=sprintf('level %g coarse correction',params.levels);
     else
         it_type='smoothing';
-        fprintf('iteration %g level %g smoothing by %s\n',it,params.levels,params.smoothing)
+        fprintf('iteration %g level %g smoothing by %s\n',it,params.level,params.smoothing)
         xout=smoothing(K,F,X,x,params);
         x=xout;
     end
