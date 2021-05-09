@@ -82,7 +82,9 @@ if params.levels<=1 || nn == nnc % coarsest level
         x =zeros(size(F));       % iterative
         fprintf('multigrid coarsest level %i solving by %i iterations\n',params.levels,params.coarsest_iter)
         for it=1:params.coarsest_iter
-            x=smoothing(K,F,X,x,params);
+            fprintf('level %g iteration %g coarsest solve\n',params.level,it)
+            xout=smoothing(K,F,X,x,params);
+            x = xout;
         end
         res=big(K*x-F);relres=res/big(F);rate=relres^(1/params.coarsest_iter);
         fprintf('multigrid coarsest residual %g relative %g rate %g\n',res,relres,rate);
@@ -94,12 +96,12 @@ for it=1:params.maxit
     params.it(params.levels)=it;  % where we are, for prints and filenames
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
-        fprintf('iteration %g level %g coarse correction\n',it,params.level)
+        fprintf('level %g iteration %g coarse correction\n',params.level,it)
         x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params);
         it_type=sprintf('level %g coarse correction',params.levels);
     else
         it_type='smoothing';
-        fprintf('iteration %g level %g smoothing by %s\n',it,params.level,params.smoothing)
+        fprintf('level %g iteration %g smoothing by %s\n',params.level,it,params.smoothing)
         xout=smoothing(K,F,X,x,params);
         x=xout;
     end
