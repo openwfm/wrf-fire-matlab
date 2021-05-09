@@ -104,6 +104,9 @@ for it=1:params.maxit
         fprintf('level %g iteration %g smoothing by %s\n',params.level,it,params.smoothing)
         xout=smoothing(K,F,X,x,params);
         x=xout;
+        if params.debug_level >= params.level
+            stop_here=true
+        end
     end
     r=F-K*x;  % residual for diagnostics only
     if params.exact
@@ -139,6 +142,8 @@ for it=1:params.maxit
     end
     fprintf('iteration %i residual %g tolerance %g\n',it,res(it),tol)
     if res(it)<tol,
+        fprintf('exiting level %i in iteration %i because residual %g < tolerance %g\n',...
+            params.level,it,res(it),tol)
         break
     end
 end

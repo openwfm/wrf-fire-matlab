@@ -14,6 +14,8 @@ type params_type
     integer:: nsmooth=3    ! smoothing iterations before correction
     integer:: nsmooth_coarse=2 ! smoothing iterations on coarse levels
     integer:: maxit_coarse=8 ! on levels>1: 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
+    integer:: debug_level=1 ! multigrid level to debug up to
+    real:: restol=1e-6 ! residual tolerance, if >= 1 not checked
 end type
 
 type(params_type)::params
