@@ -98,7 +98,7 @@ beta_vect = 1-exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 1;
+ground_steps = 3;
 if gq
     data_area = sum(infire(:));
     for i = 1:ground_steps
@@ -223,6 +223,9 @@ rt = 0;
 %alpha_2 = 0.7; %smaller alph_2 ==> smoother
 %number of loops to run
 smoothings = 20;
+if da ==1
+    smoothings = 20;
+end
 for k = 1:smoothings
 %     figure(fig_num),mesh(ps.red.fxlong,ps.red.fxlat,tign_new)
 %     title(title_str)
@@ -325,7 +328,7 @@ for k = 1:smoothings
         fprintf('graph norm increase \n')
         rm = 0;
         rt = 0;
-        break
+        %break
     end
 end
 %tign_new = [];
@@ -333,7 +336,7 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 3;
+ground_steps = 6;
 tign_ground = tign_new;
 if gq
     data_area = sum(infire(:));

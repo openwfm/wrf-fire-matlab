@@ -10,7 +10,7 @@ function [ detect_prob ] = detection_probability(tign)
 detect_prob = zeros(size(tign));
 
 % use exponential increase in heat
-heat_up = 1;
+heat_up = 0;
 
 %for new burn model, set to zero for old model
 % length of time heat is maximum, constant
