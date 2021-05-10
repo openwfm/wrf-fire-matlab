@@ -10,7 +10,7 @@ p.sc2_all = 1;
 p.coarse_K=1; % 'variational';  
 p.coarse_K=2; % 'assembly';
 p.levels=15;
-p.levels=3; fprintf('levels=%i for debugging only!',p.levels)
+%p.levels=3; fprintf('levels=%i for debugging only!',p.levels)
 p.debug_level=0;
 p.test_fortran=0;
 if exist('pin','var')
