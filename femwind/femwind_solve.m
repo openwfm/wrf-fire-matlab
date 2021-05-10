@@ -21,8 +21,8 @@ function [W,rate]=femwind_solve(A,X,U0,params)
     % [lambda,it] = sparse_solve(K,F,X,'s');
     [lambda,it,rate,XC] = sparse_solve(K,F,X,params);
     format long
-    rate
+
 
     % assemble final wind
-    [~,~,W] = sparse_assembly(A,X,U0,lambda,params);
+   [~,~,W] = sparse_assembly(A,X,U0,lambda,params);
 end
