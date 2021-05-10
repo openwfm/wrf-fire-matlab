@@ -9,22 +9,24 @@ W_m = W_m{3};
 
 
 %Writing all arrays to text files for use by fortran tester
-write_array_nd(A,'A');
+write_array(A,'A_test');
 
-write_array_nd(swap23(lambda), 'lambda');
+n = size(X{1});
+lambda=reshape(lambda,n);
+write_array(swap23(lambda), 'lambda_test');
 
-write_array_nd(swap23(X{1}),'X');
-write_array_nd(swap23(X{2}),'Y');
-write_array_nd(swap23(X{3}),'Z');
+write_array(swap23(X{1}),'X_test');
+write_array(swap23(X{2}),'Y_test');
+write_array(swap23(X{3}),'Z_test');
 
-write_array_nd(swap23(u0{1}),'u0');
-write_array_nd(swap23(u0{2}),'v0');
-write_array_nd(swap23(u0{3}),'w0');
+write_array(swap23(u0{1}),'u0_test');
+write_array(swap23(u0{2}),'v0_test');
+write_array(swap23(u0{3}),'w0_test');
 
 system('./fortran/ndt_w_test.exe');
-U = swap23(read_array_nd('U'));
-V = swap23(read_array_nd('V'));
-W = swap23(read_array_nd('W'));
+U = swap23(read_array('U_test'));
+V = swap23(read_array('V_test'));
+W = swap23(read_array('W_test'));
 
 
 

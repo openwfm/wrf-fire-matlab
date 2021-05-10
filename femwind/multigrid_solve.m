@@ -149,8 +149,8 @@ for it=1:params.maxit
     if res(it)<tol,
         fprintf('exiting level %i in iteration %i because residual %g < tolerance %g\n',...
             params.level,it,res(it),tol)
-        if params.debug_level >= params.level
-            stop_here=true
+        if params.debug_level >= 0
+            stop_here=true;
         end
         break
     end
