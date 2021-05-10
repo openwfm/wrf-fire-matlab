@@ -87,7 +87,7 @@ jfde = jfte
 kfds = kfts
 kfde = kfte
 
-allocate(lambdamat(ifts:ifte+1, kfts:kfte+1, jfts:jfte+1))
+allocate(lambdamat(ifms:ifme,kfms:kfme,jfms:jfme))
 
 
 

@@ -35,7 +35,7 @@ integer, intent(in)::                             &
 
 
 
-real, intent(in), dimension(ifts:ifte+1, kfts:kfte+1, jfts: jfte+1):: lambda
+real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: lambda
 !Input for hexa
 
 
