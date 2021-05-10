@@ -80,11 +80,11 @@ cycles=0;
 t_cycle='first cycle not complete yet';
 if params.levels<=1 || nn == nnc % coarsest level
     if params.coarsest_iter==0   % direct 
-        fprintf('multigrid coarsest level %i solving directly\n',params.levels)
+        fprintf('multigrid coarsest level %i solving directly\n',params.level)
         x = K\F;
     else
         x =zeros(size(F));       % iterative
-        fprintf('multigrid coarsest level %i solving by %i iterations\n',params.levels,params.coarsest_iter)
+        fprintf('multigrid coarsest level %i solving by %i iterations\n',params.level,params.coarsest_iter)
         for it=1:params.coarsest_iter
             % fprintf('level %g iteration %g coarsest solve\n',params.level,it)
             xout=smoothing(K,F,X,x,params);

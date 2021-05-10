@@ -319,6 +319,8 @@ do it=1,maxit
             ' norm_f ',norm_f,' rate ',rate
         if(norm_res < tol)exit
     endif
+    if(params%debug_level >=l)call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'lambda_out')
+
         
 enddo
 
