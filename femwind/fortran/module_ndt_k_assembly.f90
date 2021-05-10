@@ -48,10 +48,6 @@ real ::  Xloc(3,8), u0loc(3)
 !** executable
 Xloc = 99999.
 K = 0.
-!print *, 'A=', A(:,:)
-!print *, 'X=(:,1,:)', X(:,1,:)
-!print *, 'X=(:,2,:)', X(:,2,:)
-!print *, 'X=(:,3,:)', X(:,3,:)
 
 do ie2=jfts,jfte -1
     do ie3=kfts, kfte -1
@@ -66,7 +62,6 @@ do ie2=jfts,jfte -1
                     enddo
                 enddo
             enddo
-            !print *,'ie1=',ie1,' ie2=',ie2,' ie3=',ie3
             !write(*,*)'Xloc='
             !write(*,'((8f9.4))')((Xloc(i,iloc),iloc=1,8),i=1,3)
 

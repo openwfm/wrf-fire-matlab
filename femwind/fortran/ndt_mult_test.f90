@@ -33,6 +33,14 @@ jfts = 1
 jfte = n(2)
 kfts = 1
 kfte = n(3)
+
+ifds = ifts
+ifde = ifte
+jfds = jfts
+jfde = jfte
+kfds = kfts
+kfde = kfte
+
 msize = s(4)
 if(msize.ne.14)call crash('msize must be 14')
 ifms = ifts-1
