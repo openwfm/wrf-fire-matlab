@@ -312,9 +312,9 @@ do it=1,maxit
         norm_res = norm2( mg(l)%res(ifts: ifte, kfts: kfte, jfts: jfte))   ! residual norm
         if (mod(it,params%nsmooth+1)==params%nsmooth)then
             cycles=cycles+1;
-            rate = (norm_res/norm_f)**(1d0/cycles);
-            print *,'cycle ',cycles,' level ',l, 'avg rate ',rate
         endif
+        print *,'cycle ',cycles,' level ',l, 'avg rate ',rate
+        rate = (norm_res/norm_f)**(1d0/cycles);
         print *,'level ',l,' iteration ',it,' ',it_kind,' residual ',norm_res, &
             ' norm_f ',norm_f,' rate ',rate
         if(norm_res < tol)exit

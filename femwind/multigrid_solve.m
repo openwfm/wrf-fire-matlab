@@ -86,7 +86,7 @@ if params.levels<=1 || nn == nnc % coarsest level
         x =zeros(size(F));       % iterative
         fprintf('multigrid coarsest level %i solving by %i iterations\n',params.levels,params.coarsest_iter)
         for it=1:params.coarsest_iter
-            fprintf('level %g iteration %g coarsest solve\n',params.level,it)
+            % fprintf('level %g iteration %g coarsest solve\n',params.level,it)
             xout=smoothing(K,F,X,x,params);
             x = xout;
         end
@@ -108,9 +108,6 @@ for it=1:params.maxit
         fprintf('level %g iteration %g smoothing by %s\n',params.level,it,params.smoothing)
         xout=smoothing(K,F,X,x,params);
         x=xout;
-        if params.debug_level >= params.level
-            stop_here=true
-        end
     end
     r=F-K*x;  % residual for diagnostics only
     if params.exact
@@ -124,6 +121,10 @@ for it=1:params.maxit
         rate = (res(it)/norm(F))^(1/cycles);
         t_cycle=sprintf('cycle %g level %g avg rate %g',cycles,params.levels,rate);
         disp(t_cycle)
+    end
+    % if params.debug_level >= params.level 
+    if  params.level == 1 && it == 20 
+        stop_here=true
     end
     if params.graphics > -1
         tstring=sprintf('it=%g %s %s %s',it,it_type,t_cycle);
