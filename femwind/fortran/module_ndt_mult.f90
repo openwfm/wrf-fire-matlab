@@ -7,7 +7,7 @@ subroutine ndt_mult(                              &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,             &
-    kmat, lambda, y, r, norm2)
+    kmat, lambda, y, r)
 
 implicit none
 
@@ -25,7 +25,6 @@ integer, parameter:: msize = 14
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: kmat  ! global stiffness matrix
 real,intent(in),  dimension(ifms:ifme,kfms:kfme,jfms:jfme):: lambda, y          ! input vectors 
 real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: r          ! output vector 
-real,intent(out) :: norm2          ! output scalar 
 !*** local
 
 integer:: i,j,k  
@@ -33,7 +32,6 @@ real:: t
 
 !** executable
 
-norm2 = 0.
 do j=jfts,jfte
   do k=kfts,kfte
     do i=ifts,ifte
@@ -66,13 +64,10 @@ do j=jfts,jfte
         kmat(i  ,k  ,j  ,13)*lambda(i  ,k+1,j+1) +  &
         kmat(i  ,k  ,j  ,14)*lambda(i+1,k+1,j+1) )
       r(i,k,j) = t
-      norm2 = norm2 + t*t
     enddo
   enddo
 enddo
-
-norm2 = sqrt(norm2)
-          
+         
 end subroutine ndt_mult
 
 end module module_ndt_mult

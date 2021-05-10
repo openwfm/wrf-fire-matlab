@@ -17,8 +17,6 @@ integer :: msize, &
     ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
 integer :: i,j,k,jx
 
-real:: norm2
-
 ! read input arrays in ikj index ordering and tight bounds
 call read_array_nd(a,s,'kmat')
 allocate(kmat_m(s(1),s(2),s(3),s(4)))
@@ -71,7 +69,7 @@ call ndt_mult(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  kmat, u, y, r , norm2)
+  kmat, u, y, r )
 
 write(*,'(a,3i8)')'copying -y to array size ',n
 allocate(y_m(1:n(1),1:n(2),1:n(3)))

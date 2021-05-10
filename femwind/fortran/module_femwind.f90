@@ -49,7 +49,7 @@ implicit none
 
 !*** arguments
 
-type(mg_type),intent(in)::mg(:)  ! multigrid levels
+type(mg_type),intent(inout)::mg(:)  ! multigrid levels
 
 integer, intent(in)::                             &
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
