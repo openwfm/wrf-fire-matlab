@@ -116,7 +116,7 @@ ie = snode(ifte,ifde,+1)
 je = snode(jfte,jfde,+1)
 ke = snode(kfte,kfde,+1)
 
-call write_array(F(ifts:ie,kfts:ke,jfts:je),'F_bc_in')
+!call write_array(F(ifts:ie,kfts:ke,jfts:je),'F_bc_in')
 
 do j=jfts,je
   do k=kfts,ke
@@ -129,7 +129,7 @@ do j=jfts,je
   enddo
 enddo
 
-call write_array(F(ifts:ie,kfts:ke,jfts:je),'F_bc_out')
+!call write_array(F(ifts:ie,kfts:ke,jfts:je),'F_bc_out')
           
 end subroutine vec_boundary_conditions
 end module module_boundary_conditions

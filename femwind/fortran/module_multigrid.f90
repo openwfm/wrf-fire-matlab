@@ -1,9 +1,9 @@
 module module_multigrid
    use module_common
    use module_utils
-   use module_f_assembly
+   ! use module_f_assembly
    use module_ndt_assembly
-   use module_w_assembly
+   ! use module_w_assembly
    use module_ndt_mult
    use module_coarsening
    use module_boundary_conditions
@@ -181,7 +181,7 @@ integer::   &
 
 integer::it, maxit, nit, nsmooth, cycles
 logical::coarse,coarsest
-real:: tol, norm_f, norm_res
+real:: restol, norm_f, norm_res, diftol, reldif
 character(len=10)::it_kind
 
 !*** executable
@@ -215,32 +215,36 @@ cycles = 0
 
 ! decide on number of iterations
 coarsest = l.eq.nlevels
+diftol = 0. ! default if params%check_reldif is false
 if(coarsest)then
     ! coarsest level
     maxit = params%coarsest_iter
     nsmooth = 0
+    if(params%check_reldif)diftol = params%diftol_coarsest
 elseif(l == 1)then
     ! top level
     maxit = params%maxit
     nsmooth = params%nsmooth
+    if(params%check_reldif)diftol = params%diftol_finest
 else  
     ! some coarse level in between
     maxit = params%maxit_coarse
     nsmooth = params%nsmooth_coarse
+    if(params%check_reldif)diftol = params%diftol_coarse
 endif
 
 mg(l)%lambda=0.                             ! initial solution 0
 
 if(params%check_relres)then
     norm_f = norm2( mg(l)%f(ifts: ifte, kfts: kfte, jfts: jfte))  !
-    tol = norm_f * params%restol
-    print *,'starting mg cycle level ',l,' norm_f ',norm_f,' residual tolerance ',tol
+    restol = norm_f * params%restol
+    print *,'starting mg cycle level ',l,' norm_f ',norm_f,' residual tolerance ',restol
 endif
 
 
 do it=1,maxit
     coarse = mod(it,nsmooth+1)==0 .and. l < nlevels
-    print *,'level=',l,' it=',it,' coarse=',coarse
+    if(params%print_level>=l)print *,'level=',l,' it=',it,' coarse=',coarse
     if(coarse)then                                      ! coarse correction
         if(params%debug_level >=l)call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'cc_lambda_in')
         it_kind='coarse correction'
@@ -296,7 +300,11 @@ do it=1,maxit
             ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
             ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
             ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions                  
-            mg(l)%Kglo, mg(l)%f, mg(l)%lambda) 
+            mg(l)%Kglo, mg(l)%f, mg(l)%lambda, reldif) 
+        if(reldif < diftol)then
+            if(params%print_level>=l)print *,'level ',l,' iteration ',it,' rel diff=',reldif,'< diftol=',diftol,' exiting'
+            exit
+        endif
         if(params%debug_level >=l)call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'sweep_lambda_out')
         if((.not.coarsest.or.it==maxit).and.(params%debug_level >=l))call pause
     endif
@@ -313,11 +321,11 @@ do it=1,maxit
         if (mod(it,params%nsmooth+1)==params%nsmooth)then
             cycles=cycles+1;
         endif
-        print *,'cycle ',cycles,' level ',l, 'avg rate ',rate
+        if(params%print_level>=l)print *,'cycle ',cycles,' level ',l, 'avg rate ',rate
         rate = (norm_res/norm_f)**(1d0/cycles);
-        print *,'level ',l,' iteration ',it,' ',it_kind,' residual ',norm_res, &
+        if(params%print_level>=l)print *,'level ',l,' iteration ',it,' ',it_kind,' residual ',norm_res, &
             ' norm_f ',norm_f,' rate ',rate
-        if(norm_res < tol)exit
+        if(norm_res < restol)exit
     endif
     if(params%debug_level >=l)call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'lambda_out')
 

@@ -16,10 +16,10 @@ module module_femwind
    use module_f_assembly
    use module_ndt_assembly
    use module_w_assembly
-   use module_ndt_mult
-   use module_coarsening
+   ! use module_ndt_mult
+   ! use module_coarsening
    use module_boundary_conditions
-   use module_sweeps
+   ! use module_sweeps
 
 contains
 

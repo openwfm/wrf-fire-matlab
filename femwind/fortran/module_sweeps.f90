@@ -7,7 +7,7 @@ subroutine sweeps(ifds, ifde, kfds,kfde, jfds, jfde,               &     ! fire 
                   ifms, ifme, kfms,kfme, jfms, jfme,               &
                   ifps, ifpe, kfps, kfpe, jfps, jfpe,              &     ! fire patch bounds
                   ifts, ifte, kfts, kfte, jfts,jfte,               &
-                  Kmat, F, x)                                            !input and output matrices/vectors
+                  Kmat, F, x, reldif)                             !input and output matrices/vectors
 
 implicit none
 
@@ -24,23 +24,28 @@ integer, parameter:: msize = 14
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: Kmat  ! global stiffness matrix
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: F           ! global load vector
 real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: x           ! output vector
+real, intent(out):: reldif    ! relative difference betweet input and output, in max norm
 
 !*** local
 
 integer:: i, j, k, r1, r2 
+real:: t, dif, siz, old, new
 
 !*** executable
  
 !call write_array(F(ifts: ifte, kfts: kfte, jfts:jfte),'F_sweeps_in')
 !call write_array(x(ifts: ifte, kfts: kfte, jfts:jfte),'x_sweeps_in')
 
+dif = 0.
+siz = 0.
+
 do r1 = 1,2
     do r2 = 1,2
         do i = r1,ifte,2
            do j =r2,jfte,2 
               do k = 1,kfte
-                  x(i,k,j)=                                         &
-                            (1/Kmat(i  ,k  ,j  , 1))*               &
+                  old = x(i,k,j)
+                  new =     (1/Kmat(i  ,k  ,j  , 1))*               &
                             ( F(i,k,j) -                            &
                             (                                       &
                              Kmat(i-1,k-1,j-1,14)*x(i-1,k-1,j-1) +  &
@@ -71,11 +76,18 @@ do r1 = 1,2
                              Kmat(i  ,k  ,j  ,14)*x(i+1,k+1,j+1)    &
                             )                                       &
                             )
+                  x(i,k,j) = new
+                  ! accumulate squared differeces and size
+                  t = new - old               
+                  dif = max(dif,abs(t))  
+                  siz = max(siz,abs(old),abs(new))  
               end do
            end do  
         end do   
     end do
 end do
+
+reldif = dif/max(tiny(siz),siz)
 
 !call write_array(x(ifts: ifte, kfts: kfte, jfts:jfte),'x_sweeps_out')
 
