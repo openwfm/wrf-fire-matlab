@@ -15,10 +15,13 @@ type params_type
     integer:: nsmooth_coarse=2 ! smoothing iterations on coarse levels
     integer:: maxit_coarse=8 ! on levels>1: 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     integer:: debug_level=-1 ! multigrid level to debug up to
-    integer:: verbose = 1    ! 0 = nothing
-    logical:: check_relres=.true.  ! check residual after every base iteration if to continue
+    integer:: msglevel=1 ! type of messages to print  
+    integer:: print_level=-1 ! multigrid level to print messages up to
+    !logical:: check_relres=.true.  ! check residual after every base iteration if to continue
+    logical:: check_relres=.false.
     real:: restol=1e-6 ! residual tolerance to stop iterating
-    logical:: check_reldif=.false.  ! check difference after every base iteration if to continue
+    !logical:: check_reldif=.false.  ! check difference after every base iteration if to continue
+    logical:: check_reldif=.true.  ! check difference after every base iteration if to continue
     real:: diftol_finest=1e-6 ! keep iterating while iterates change by this
     real:: diftol_coarse=1e-1 ! keep iterating while iterates change by this on corse levels
     real:: diftol_coarsest=1e-2 ! keep iterating while iterates change by this on corsest level

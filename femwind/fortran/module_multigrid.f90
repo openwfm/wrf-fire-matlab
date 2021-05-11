@@ -244,7 +244,7 @@ endif
 
 do it=1,maxit
     coarse = mod(it,nsmooth+1)==0 .and. l < nlevels
-    print *,'level=',l,' it=',it,' coarse=',coarse
+    if(params%print_level>=l)print *,'level=',l,' it=',it,' coarse=',coarse
     if(coarse)then                                      ! coarse correction
         if(params%debug_level >=l)call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'cc_lambda_in')
         it_kind='coarse correction'
@@ -302,7 +302,7 @@ do it=1,maxit
             ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions                  
             mg(l)%Kglo, mg(l)%f, mg(l)%lambda, reldif) 
         if(reldif < diftol)then
-            if(params%verbose>=l)print *,'level ',l,' iteration ',it,' rel diff=',reldif,'< diftol=',diftol,' exiting'
+            if(params%print_level>=l)print *,'level ',l,' iteration ',it,' rel diff=',reldif,'< diftol=',diftol,' exiting'
             exit
         endif
         if(params%debug_level >=l)call  write_array(mg(l)%lambda(ifts: ifte, kfts: kfte, jfts:jfte),'sweep_lambda_out')
@@ -321,9 +321,9 @@ do it=1,maxit
         if (mod(it,params%nsmooth+1)==params%nsmooth)then
             cycles=cycles+1;
         endif
-        print *,'cycle ',cycles,' level ',l, 'avg rate ',rate
+        if(params%print_level>=l)print *,'cycle ',cycles,' level ',l, 'avg rate ',rate
         rate = (norm_res/norm_f)**(1d0/cycles);
-        print *,'level ',l,' iteration ',it,' ',it_kind,' residual ',norm_res, &
+        if(params%print_level>=l)print *,'level ',l,' iteration ',it,' ',it_kind,' residual ',norm_res, &
             ' norm_f ',norm_f,' rate ',rate
         if(norm_res < restol)exit
     endif
