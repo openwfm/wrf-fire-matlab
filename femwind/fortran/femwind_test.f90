@@ -2,10 +2,9 @@ program femwind_test
 
 use module_femwind
 use module_utils
+use module_common
 
 implicit none
-
-type(mg_type):: mg(max_levels)  ! the main multigrid structure
 
 real, pointer:: X_m(:,:,:),Y_m(:,:,:),Z_m(:,:,:), &
                 u0_m(:,:,:), v0_m(:,:,:), w0_m(:,:,:),   &
@@ -25,15 +24,15 @@ real, pointer:: X(:,:,:),Y(:,:,:),Z(:,:,:), &
 integer:: i, j, k, n(3)
 real:: rate
 
-call read_array(A_m,'A')  ! matrices read from Matlab are _m
-call read_array(X_m,'X')
-call read_array(Y_m,'Y')
-call read_array(Z_m,'Z')
-call read_array(u0_m, 'u0')
-call read_array(v0_m, 'v0')
-call read_array(w0_m, 'w0')
+call read_array(A_m,'A_input')  ! matrices read from Matlab are _m
+call read_array(X_m,'X_input')
+call read_array(Y_m,'Y_input')
+call read_array(Z_m,'Z_input')
+call read_array(u0_m, 'u0_input')
+call read_array(v0_m, 'v0_input')
+call read_array(w0_m, 'w0_input')
 
-A = reshape(A_m,(/3,3/))
+params%A = reshape(A_m,(/3,3/))
 
 n = shape(X_m)
 mg(1)%nx = n(1)
@@ -73,7 +72,7 @@ mg(1)%dx = mg(1)%X(2,1,1)-mg(1)%X(1,1,1)
 mg(1)%dy = mg(1)%Y(1,1,2)-mg(1)%Y(1,1,1)
 allocate(mg(1)%dz(mg(1)%nz-1))
 do k=kfds,kfte
-    mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,1,1)
+    mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,k,1)
 enddo
 
 write(*,'(a)')'calling femwind_setup'

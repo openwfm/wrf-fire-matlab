@@ -28,8 +28,8 @@ done_last=0;
 %disp('Constructing W')
 %disp('lambda array is')
 %disp(lambda)
-disp('u0 from matlab is')
-disp(u0{1})
+%disp('u0 from matlab is')
+%disp(u0{1})
 for i3=1:m(3)
     for i2=1:m(2)
         for i1=1:m(1)  % loop over elements

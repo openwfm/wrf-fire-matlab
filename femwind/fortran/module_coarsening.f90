@@ -5,15 +5,17 @@ use module_utils
 contains
 
 subroutine prolongation(   &
-    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifts, ifte, kfts, kfte, jfts,jfte,            &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
-    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile 
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile
     u,uc,cr_x,cr_y,icl_z,X,Y,Z)
 
-! Multiply by the prolongation matrix
+! Multiply by the prolongation matrix: u = u + P*uc
 ! In:
 !   uc      coarse grid vector
 !   cr_x, cr_y  coarsening factor in horizontal directions x and y
@@ -26,14 +28,14 @@ implicit none
 !*** arguments
 
 integer, intent(in)::                             & 
-    ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms,jfme,             &
-    ifts, ifte, kfts, kfte, jfts,jfte
-
-integer, intent(in)::                             &  
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
-    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile 
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
 
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: X,Y,Z !spatial grid
 real, intent(in), dimension(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme):: uc ! coarse vector
@@ -41,7 +43,7 @@ real, intent(in), dimension(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme):: uc ! coarse v
 integer, intent(in):: cr_x, cr_y, &       ! coarsening factors in the horizonal directions
     icl_z(kfcts:kfcte)                      ! indices of coarse grid in the vertical direction
 
-real, intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: u ! fine grid interpolant
+real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: u ! fine grid interpolant
 
 !*** local
 integer :: i,j,k,ic,jc,kc,ifc,jfc,kfc,ifs,ife,jfs,jfe,kfs,kfe
@@ -50,7 +52,7 @@ real:: qi,qj,qk
 !*** executable
 
 ! zero the output to ready for contributions
-u(ifts:ifte,kfts:kfte,jfts:jfte) = 0.
+! u(ifts:ifte,kfts:kfte,jfts:jfte) = 0.
 
 if ((icl_z(kfcts) .ne. kfts) .or. (icl_z(kfcte) .ne. kfte)) then
     call crash('vertical corsening must include all domain')
@@ -125,12 +127,14 @@ enddo
 end subroutine prolongation
 
 subroutine restriction(   &
-    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifts, ifte, kfts, kfte, jfts,jfte,            &
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
-    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile 
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile
     uc,u,cr_x,cr_y,icl_z,X,Y,Z)
 
 ! Multiply by the prolongation matrix transpose
@@ -146,14 +150,14 @@ implicit none
 !*** arguments
 
 integer, intent(in)::                             & 
-    ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms,jfme,             &
-    ifts, ifte, kfts, kfte, jfts,jfte
-
-integer, intent(in)::                             &  
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile boundss                ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
-    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile 
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
+    ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
 
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: X,Y,Z !spatial grid
 real, intent(out), dimension(ifcms:ifcme,kfcms:kfcme,jfcms:jfcme):: uc ! coarse vector
@@ -269,11 +273,12 @@ integer:: nc3,newlcl,lcl,i,n3
 
 !*** executable
     dxy=min(dx,dy)  ! horizontal step
-    n3 = size(dz)+1 !
+    n3 = size(dz)+1 ! 
+    print *,'coarsening_icl in: dx=',dx,' dy=',dy,' n3=',n3,' dz=',dz
+    print *,'coarsening_icl in: A=',A,' minaspect=',minaspect,' maxaspect=',maxaspect
     arat = A(3,3)/min(A(1,1),A(2,2))  ! scaled vertical penalty
     ! decide on horizontal coarsening factors
     crit=(dz(1)/dxy)/arat
-    print *,'coarsening_icl: dx=',dx,' dy=',dy,' dz=',dz,' arat=',arat,' crit=',crit
 
     if (crit > minaspect) then
         cr_x = 2 
@@ -334,8 +339,8 @@ integer, intent(out), pointer, dimension(:) :: icl_x, icl_y
 integer :: nc_x, nc_y
 integer::i
 
-nc_x = n_x/cr_x + 1
-nc_y = n_y/cr_y + 1
+nc_x = min(n_x,n_x/cr_x + 1)
+nc_y = min(n_y,n_y/cr_y + 1)
 
 allocate(icl_x(nc_x))
 allocate(icl_y(nc_y))
@@ -361,7 +366,8 @@ subroutine coarsening_grid(l, &
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
     ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile 
-    icl_x, icl_y, icl_z, X, Y, Z, X_coarse, Y_coarse, Z_coarse)
+    icl_x, icl_y, icl_z,                          &
+    X, Y, Z, X_coarse, Y_coarse, Z_coarse)
 implicit none
 ! compute coarse grid coordinates arrays on one tile 
 
@@ -399,12 +405,6 @@ do jc=ifcts,je
         enddo
     enddo
 enddo
-
-write(lc,'(i2.2)')l
-
-call write_array(X_coarse(ifts:ie,kfts:ke,jfts:je),'X_coarse'//lc)
-call write_array(Y_coarse(ifts:ie,kfts:ke,jfts:je),'Y_coarse'//lc)
-call write_array(Z_coarse(ifts:ie,kfts:ke,jfts:je),'Z_coarse'//lc)
 
 end subroutine coarsening_grid
 

@@ -19,7 +19,7 @@ implicit none
 real, pointer:: u0mat(:,:,:),v0mat(:,:,:), w0mat(:,:,:), Umat(:,:,:),              &
                 Vmat(:,:,:), Wmat(:,:,:), u0(:,:,:), v0(:,:,:), w0(:,:,:),         &
                 U(:,:,:), V(:,:,:),W(:,:,:),lambda(:,:,:), lambdamat(:,:,:),       &  ! Calculated final windFinal 
-                Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:)
+                Xmat(:,:,:),Ymat(:,:,:),Zmat(:,:,:), X(:,:,:),Y(:,:,:),Z(:,:,:),A_m(:,:,:)
                
 
 real, pointer :: a1(:), a2(:)
@@ -36,28 +36,22 @@ integer :: &
 integer :: i,j,k,jx
 integer :: usize(3)
 
-call read_array_nd(a1,n1,'A') !Recovering X-Matrix and dimension of X matrix
-if (n1(1).ne.3.or.n1(2).ne.3)then
-    call crash('A must be 3 by 3')
-    stop
-endif
+call read_array(A_m,'A_test')
+Amat = reshape(A_m,(/3,3/)) 
 
-Amat = reshape(a1,n1)
-
-
-call read_array(lambda, 'lambda')
+call read_array(lambda, 'lambda_test')
 lambda_dim = shape(lambda)
 
 print *, 'lambda array has shape', shape(lambda)
 
 ! read input arrays in ikj index ordering and tight bounds
-call read_array(X,'X')
-call read_array(Y,'Y')
-call read_array(Z,'Z')
+call read_array(X,'X_test')
+call read_array(Y,'Y_test')
+call read_array(Z,'Z_test')
 
-call read_array(u0,'u0')        !Recovering Inital Wind Arrays
-call read_array(v0,'v0')        
-call read_array(w0,'w0')        
+call read_array(u0,'u0_test')        !Recovering Inital Wind Arrays
+call read_array(v0,'v0_test')        
+call read_array(w0,'w0_test')        
 
 x_dim = shape(X)
 u_dim = shape(u0)
@@ -160,9 +154,9 @@ do j=jfts,jfte
 enddo
 !print *, 'Shape of Umat is', shape(Umat)
 
-call write_array(Umat,'U')
-call write_array(Vmat,'V')
-call write_array(Wmat,'W')
+call write_array(Umat,'U_test')
+call write_array(Vmat,'V_test')
+call write_array(Wmat,'W_test')
 
 
 end program w_assembly_test

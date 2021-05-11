@@ -6,14 +6,15 @@ use module_utils ! to read and write matrices as text files from matlab
 implicit none
 
 integer::                                         &
-    ifds, ifde, kfds,kfde, jfds,jfde,             & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms,jfme,             &
-    ifts, ifte, kfts,kfte, jfts,jfte
-
-integer::                             &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte          ! coarse grid tile
+
 
 real, pointer, dimension(:,:,:):: u_m, uc_m, X_m, Y_m, Z_m, cl_z_m, hcz_m ! to read from files
 real, pointer, dimension(:,:,:):: u, uc, X, Y, Z  ! to pass on
@@ -63,13 +64,16 @@ Z(ifts:ifte,kfts:kfte,jfts:jfte)=Z_m
 ! allocate output
 allocate(u(ifms:ifme,kfms:kfme,jfms:jfme))
 
+u(ifts:ifte,kfts:kfte,jfts:jfte) = 0.
 write(*,*)'calling prolongation'
 call prolongation(   &
-    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifts, ifte, kfts, kfte, jfts,jfte,            &
+    ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions
     ifcds, ifcde, kfcds,kfcde, jfcds,jfcde,       & ! coarse grid domain
     ifcms, ifcme, kfcms,kfcme, jfcms,jfcme,       & ! coarse grid dimensions
+    ifcps, ifcpe, kfcps,kfcpe, jfcps,jfcpe,       & ! coarse grid dimensions
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte,       & ! coarse grid tile
     u,uc,cr_x,cr_y,cl_z,X,Y,Z)
 

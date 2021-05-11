@@ -1,6 +1,7 @@
 function [x,it,rate,X_coarse]=multigrid_solve(K,F,X,params)
 % x=multigrid_solve(K,F,X)
 
+level=params.level;  % debug
 n = size(X{1});
 fprintf('multigrid level %i grid size %i %i %i rhs %g\n',params.levels,n,big(F))
 
@@ -15,6 +16,10 @@ rate = 0;
 
 % settings
 tol = params.restol*norm(F);
+if params.debug_level >= params.level
+    stop_here=true
+end
+
 
 % constant arrays
 x = zeros(nn,1);
@@ -36,9 +41,10 @@ switch params.coarsening
         end
     case '2 linear'
         % [P,X_coarse]=coarsening_2_linear(X,params);
-        dx=min(X{1}(2:end,1,1)-X{1}(1:end-1,1,1));
-        dy=min(X{2}(1,2:end,1)-X{1}(1,1:end-1,1));
+        dx=(X{1}(2,1,1)-X{1}(1,1,1));
+        dy=(X{2}(1,2,1)-X{1}(1,1,1));
         dz = squeeze(X{3}(1,1,2:end)-X{3}(1,1,1:end-1)); % ref z spacing
+        fprintf('layers: '),disp(X{3}(1,1,:)),fprintf('dz='),disp(dz)
         [hzc,icl3]=coarsening_icl_fortran(dx,dy,dz,params);
         X_coarse=coarsening_X(hzc,icl3,X,params);
         nnc=prod(size(X_coarse{1}));
@@ -74,13 +80,15 @@ cycles=0;
 t_cycle='first cycle not complete yet';
 if params.levels<=1 || nn == nnc % coarsest level
     if params.coarsest_iter==0   % direct 
-        fprintf('multigrid coarsest level %i solving directly\n',params.levels)
+        fprintf('multigrid coarsest level %i solving directly\n',params.level)
         x = K\F;
     else
         x =zeros(size(F));       % iterative
-        fprintf('multigrid coarsest level %i solving by %i iterations\n',params.levels,params.coarsest_iter)
+        fprintf('multigrid coarsest level %i solving by %i iterations\n',params.level,params.coarsest_iter)
         for it=1:params.coarsest_iter
-            x=smoothing(K,F,X,x,params);
+            % fprintf('level %g iteration %g coarsest solve\n',params.level,it)
+            xout=smoothing(K,F,X,x,params);
+            x = xout;
         end
         res=big(K*x-F);relres=res/big(F);rate=relres^(1/params.coarsest_iter);
         fprintf('multigrid coarsest residual %g relative %g rate %g\n',res,relres,rate);
@@ -92,13 +100,14 @@ for it=1:params.maxit
     params.it(params.levels)=it;  % where we are, for prints and filenames
     coarse = mod(it,params.nsmooth+1)==0;
     if coarse
-        fprintf('iteration %g level %g coarse correction\n',it,params.levels)
+        fprintf('level %g iteration %g coarse correction\n',params.level,it)
         x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params);
         it_type=sprintf('level %g coarse correction',params.levels);
     else
         it_type='smoothing';
-        fprintf('iteration %g level %g smoothing by %s\n',it,params.levels,params.smoothing)
-        x=smoothing(K,F,X,x,params);
+        fprintf('level %g iteration %g smoothing by %s\n',params.level,it,params.smoothing)
+        xout=smoothing(K,F,X,x,params);
+        x=xout;
     end
     r=F-K*x;  % residual for diagnostics only
     if params.exact
@@ -112,6 +121,10 @@ for it=1:params.maxit
         rate = (res(it)/norm(F))^(1/cycles);
         t_cycle=sprintf('cycle %g level %g avg rate %g',cycles,params.levels,rate);
         disp(t_cycle)
+    end
+    % if params.debug_level >= params.level 
+    if  params.level == 1 && it == 20 
+        stop_here=true
     end
     if params.graphics > -1
         tstring=sprintf('it=%g %s %s %s',it,it_type,t_cycle);
@@ -134,6 +147,11 @@ for it=1:params.maxit
     end
     fprintf('iteration %i residual %g tolerance %g\n',it,res(it),tol)
     if res(it)<tol,
+        fprintf('exiting level %i in iteration %i because residual %g < tolerance %g\n',...
+            params.level,it,res(it),tol)
+        if params.debug_level >= 0
+            stop_here=true;
+        end
         break
     end
 end

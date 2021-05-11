@@ -87,7 +87,7 @@ do ie2=jfts,jfte
             u0loc(3) = w0(ie1, ie3,ie2)
             !fine print *, 'local lambda is', lambda_loc 
             !print* , 'Xloc is', Xloc
-            print* , 'u0loc is', u0loc(1)  
+            !print* , 'u0loc is', u0loc(1)  
             call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,3)
             !print*, 'Jg is', Jg
             !print*, shape(jg)

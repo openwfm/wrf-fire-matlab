@@ -9,6 +9,7 @@ real, pointer:: Kmat(:,:,:,:), x(:,:,:),F(:,:,:), &  ! fortran is not case sensi
                 Kmat_m(:,:,:,:), x_m(:,:,:), F_m(:,:,:)
 real, pointer::a(:)
 integer :: s(4),n(3)
+real::reldif
 
 integer :: msize, &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -73,7 +74,7 @@ call sweeps(  &
   ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
   ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  Kmat, F, x)
+  Kmat, F, x, reldif)
 
 write(*,'(a,3i8)')'copying the output data to array size ',n
 allocate(x_m(1:n(1),1:n(2),1:n(3)))

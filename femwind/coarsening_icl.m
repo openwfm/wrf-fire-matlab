@@ -12,6 +12,7 @@ function [hzc,icl3]=coarsening_icl(dx,dy,dz,params)
           error('dz must be a vector')
     end
     dz = dz(:)';  % make sure dz is a row
+    disp(['coarsening_icl: input dx,dy,dz=',num2str([dx,dy,dz])])
     dxy=min(dx,dy);  % horizontal step
     n3 = length(dz)+1;
     % decide on horizontal coarsening factor

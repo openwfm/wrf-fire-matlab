@@ -118,7 +118,20 @@ for sc2 = params.sc2_all
         diary; diary
 
         % solve
-        [W,rate(sc,sc2)]=femwind_fortran(A,X,U0,params);
+        if params.run_fortran && params.run_matlab
+                [W,rate(sc,sc2)]=femwind_fortran(A,X,U0,params);
+                [Wm,rate(sc,sc2)]=femwind_solve(A,X,U0,params);
+                for i=1:3, err_compare(i)=big(W{i}-Wm{i})/big(W{i});end
+                err=max(err_compare);
+                fprintf('relative max error matlab vs fortran %g\n',err)
+                if err>1e-4,
+                    warning('error too large')
+                end
+        elseif params.run_fortran
+                [W,rate(sc,sc2)]=femwind_fortran(A,X,U0,params);
+        else
+                [W,rate(sc,sc2)]=femwind_solve(A,X,U0,params);
+        end
         
         if params.graphics>1
             disp('graphics: solution')

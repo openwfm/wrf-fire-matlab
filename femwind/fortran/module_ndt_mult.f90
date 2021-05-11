@@ -9,9 +9,11 @@ subroutine ndt_mult(                              &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,             &
-    kmat, lambda, y)
+    kmat, lambda, y, r)
 
 implicit none
+
+!*** purpose: compute r = y - Kglo*lambda and 2-norm of r
 
 !*** arguments
 
@@ -23,12 +25,12 @@ integer, intent(in)::                             &
 
 integer, parameter:: msize = 14
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: kmat  ! global stiffness matrix
-real,intent(in),  dimension(ifms:ifme,kfms:kfme,jfms:jfme):: lambda          ! input vector 
-real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: y          ! output vector 
-
+real,intent(in),  dimension(ifms:ifme,kfms:kfme,jfms:jfme):: lambda, y          ! input vectors 
+real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: r          ! output vector 
 !*** local
 
 integer:: i,j,k,ie, je, ke
+real :: t
 
 ie = snode(ifte, ifde, +1)
 je = snode(jfte, jfde, +1)
@@ -39,8 +41,8 @@ ke = snode(kfte, kfde, +1)
 do j=jfts,je
   do k=kfts,ke
     do i=ifts,ie
-      y(i,k,j)= &
-        kmat(i-1,k-1,j-1,14)*lambda(i-1,k-1,j-1) +  &
+      t = y(i,k,j) -( &
+       kmat(i-1,k-1,j-1,14)*lambda(i-1,k-1,j-1) +  &
         kmat(i  ,k-1,j-1,13)*lambda(i  ,k-1,j-1) +  &
         kmat(i+1,k-1,j-1,12)*lambda(i+1,k-1,j-1) +  &
         kmat(i-1,k-1,j  ,11)*lambda(i-1,k-1,j  ) +  &
@@ -66,11 +68,12 @@ do j=jfts,je
         kmat(i  ,k  ,j  ,11)*lambda(i+1,k+1,j  ) +  &
         kmat(i  ,k  ,j  ,12)*lambda(i-1,k+1,j+1) +  &
         kmat(i  ,k  ,j  ,13)*lambda(i  ,k+1,j+1) +  &
-        kmat(i  ,k  ,j  ,14)*lambda(i+1,k+1,j+1) 
+        kmat(i  ,k  ,j  ,14)*lambda(i+1,k+1,j+1) )
+      r(i,k,j) = t
     enddo
   enddo
 enddo
-          
+         
 end subroutine ndt_mult
 
 end module module_ndt_mult

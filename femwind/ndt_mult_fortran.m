@@ -11,7 +11,7 @@ system('./fortran/ndt_mult_test.exe');
 
 y_f=read_array_nd('y');
 
-err=norm(y(:)-y_f(:),inf);
+err=norm(y(:)-y_f(:),inf)
 
 
 end

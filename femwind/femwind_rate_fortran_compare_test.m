@@ -1,4 +1,4 @@
-function p=femwind_rate_test(pin)
+function p=femwind_rate_fortran_compare_test(pin)
 
 disp('basic convergence speed test')
 p=femwind_main;
@@ -13,6 +13,8 @@ p.levels=15;
 %p.levels=3; fprintf('levels=%i for debugging only!',p.levels)
 p.debug_level=0;
 p.test_fortran=0;
+p.run_fortran=1;
+p.run_matlab=1;
 if exist('pin','var')
     f=fieldnames(pin);;
 else

@@ -5,9 +5,10 @@ use module_utils
 contains
 
 subroutine ndt_boundary_conditions(                              &
-    ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifts, ifte, kfts, kfte, jfts,jfte,             &
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,         &    
     kmat)
 
 implicit none
@@ -15,10 +16,10 @@ implicit none
 !*** arguments
 
 integer, intent(in)::                             &
-    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-    ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
-
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte             
 integer, parameter:: msize = 14
 real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: kmat  ! global stiffness matrix
 
@@ -49,7 +50,7 @@ do j=jfts,je
   do k=kfts,ke
     do i=ifts,ie
       ! not efficient but will be executed only once
-      if(i.eq.ifds.or.i.eq.ifde.or.j.eq.jfds.or.j.eq.jfde.or.k.eq.kfde)then
+      if(i.eq.ifds.or.i.eq.ifde+1.or.j.eq.jfds.or.j.eq.jfde+1.or.k.eq.kfde+1)then
         ! replace the row/col (i,k,j) by scaled identity
         kmat(i-1,k-1,j-1,14)=0.
         kmat(i  ,k-1,j-1,13)=0.
@@ -85,11 +86,11 @@ enddo
           
 end subroutine ndt_boundary_conditions
 
-subroutine vec_boundary_conditions(                              &
-    ifds, ifde, kfds,kfde, jfds, jfde,                       & ! fire grid dimensions
-    ifms, ifme, kfms,kfme, jfms, jfme,            &
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,             &
+subroutine vec_boundary_conditions(               &
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte,         &    
     F)
 
 implicit none
@@ -97,11 +98,10 @@ implicit none
 !*** arguments
 
 integer, intent(in)::                             &
-    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte                            ! fire tile bounds
-
+    ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
+    ifms, ifme, kfms, kfme, jfms, jfme,         &
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,         & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte    
 integer, parameter:: msize = 14
 real, intent(inout), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: F  ! corner-based scalar field
 
@@ -116,16 +116,20 @@ ie = snode(ifte,ifde,+1)
 je = snode(jfte,jfde,+1)
 ke = snode(kfte,kfde,+1)
 
+!call write_array(F(ifts:ie,kfts:ke,jfts:je),'F_bc_in')
+
 do j=jfts,je
   do k=kfts,ke
     do i=ifts,ie
       ! not efficient, change later 
-      if(i.eq.ifds.or.i.eq.ifde.or.j.eq.jfds.or.j.eq.jfde.or.k.eq.kfde)then
+      if(i.eq.ifds.or.i.eq.ifde+1.or.j.eq.jfds.or.j.eq.jfde+1.or.k.eq.kfde+1)then
         F(i,k,j)=0.
       endif
     enddo
   enddo
 enddo
+
+!call write_array(F(ifts:ie,kfts:ke,jfts:je),'F_bc_out')
           
 end subroutine vec_boundary_conditions
 end module module_boundary_conditions

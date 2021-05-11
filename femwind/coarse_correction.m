@@ -1,11 +1,15 @@
 function x=coarse_correction(x,F,K,K_coarse,X_coarse,hzc,icl3,X,params)
     n = size(X{1});
-    F_coarse3d = restriction(reshape(F-K*x,n),hzc,icl3,X,params);
-    F_coarse = F_coarse3d(:);
+    res = reshape(F-K*x,n);
+    F_c = restriction(res,hzc,icl3,X,params);
+    % F_c_f = restriction_fortran(res,hzc,icl3,X,params);
+    % err_fort=big(F_c-F_c_f)
+    F_coarse = F_c(:);
     if params.apply_coarse_boundary_conditions
         [K_coarse,F_coarse]=apply_boundary_conditions(K_coarse,F_coarse,X_coarse);
     end
     params_coarse=params;  % copy all params 
+    params_coarse.level=params.level+1;
     params_coarse.levels=params.levels-1;
     params_coarse.nsmooth=params.nsmooth_coarse;
     params_coarse.maxit=params.maxit_coarse;

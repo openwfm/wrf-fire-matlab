@@ -13,6 +13,11 @@ else
 endif
 end function snode
 
+subroutine pause
+print *,'press enter to continue'
+read(*,*)
+end subroutine pause
+
 subroutine crash(msg)
 ! terminate with error
 character(len=*),intent(in)::msg
