@@ -50,7 +50,7 @@ type mg_type
  
 end type
 
-type(mg_type):: mg(max_levels)  ! the main multigrid structure
+type(mg_type):: mg(max_levels+1)  ! the main multigrid structure
 
 contains
 
