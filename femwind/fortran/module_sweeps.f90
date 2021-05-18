@@ -28,7 +28,7 @@ real, intent(out):: reldif    ! relative difference betweet input and output, in
 
 !*** local
 
-integer:: i, j, k, r1, r2 
+integer:: i, j, k, r1, r2, ie,je, ke 
 real:: t, dif, siz, old, new
 
 !*** executable
@@ -38,12 +38,15 @@ real:: t, dif, siz, old, new
 
 dif = 0.
 siz = 0.
+ie = snode(ifte, ifde, +1)
+je = snode(jfte, jfde, +1)
+ke = snode(kfte, kfde, +1)
 
 do r1 = 1,2
     do r2 = 1,2
-        do i = r1,ifte,2
-           do j =r2,jfte,2 
-              do k = 1,kfte
+        do i = r1,ie,2
+           do j =r2,je,2 
+              do k = 1,ke
                   old = x(i,k,j)
                   new =     (1/Kmat(i  ,k  ,j  , 1))*               &
                             ( F(i,k,j) -                            &
