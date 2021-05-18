@@ -28,11 +28,11 @@ u_m = reshape(a,n)
 if (s(1).ne.n(1).or.s(2).ne.n(2).or.s(3).ne.n(3))call crash('ndt_mult_test: inconsistent size kmat and u')
 
 ifts = 1
-ifte = n(1)
+ifte = n(1) - 1
 jfts = 1
-jfte = n(2)
+jfte = n(2) - 1
 kfts = 1
-kfte = n(3)
+kfte = n(3) - 1
 
 ifds = ifts
 ifde = ifte
