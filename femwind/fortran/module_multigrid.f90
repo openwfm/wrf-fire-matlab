@@ -199,16 +199,16 @@ if(l<nlevels) then
     ifcts, ifcte, kfcts,kfcte, jfcts,jfcte)         ! coarse grid tile
 !*** temporary fix, meshes are in vertices not elements here.
 !*** should be fixed using snode in all subroutines called from here 
-    ifcte = ifcte + 1
-    jfcte = jfcte + 1
-    kfcte = kfcte + 1
+!    ifcte = ifcte + 1
+!    jfcte = jfcte + 1
+!    kfcte = kfcte + 1
 endif
 
 !*** temporary fix, meshes are in vertices not elements here.
 !*** should be fixed using snode in all subroutines called from here 
-ifte = ifte + 1
-jfte = jfte + 1
-kfte = kfte + 1
+!ifte = ifte + 1
+!jfte = jfte + 1
+!kfte = kfte + 1
 
 ! initialize
 cycles = 0
