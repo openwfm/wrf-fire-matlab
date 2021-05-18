@@ -1,5 +1,7 @@
 module module_ndt_mult
 
+use module_utils
+
 contains
 
 subroutine ndt_mult(                              &
@@ -27,14 +29,19 @@ real,intent(in),  dimension(ifms:ifme,kfms:kfme,jfms:jfme):: lambda, y          
 real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: r          ! output vector 
 !*** local
 
-integer:: i,j,k  
+integer:: i,j,k,ie,je,ke  
 real:: t
 
 !** executable
+ie = snode(ifte,ifde,+1)
+je = snode(jfte,jfde,+1)
+ke = snode(kfte,kfde,+1)
 
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
+
+
+do j=jfts,je
+  do k=kfts,ke
+    do i=ifts,ie
       t = y(i,k,j) - ( &
         kmat(i-1,k-1,j-1,14)*lambda(i-1,k-1,j-1) +  &
         kmat(i  ,k-1,j-1,13)*lambda(i  ,k-1,j-1) +  &

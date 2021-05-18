@@ -13,7 +13,7 @@ write_array_nd(swap23(X{1}),'X');
 write_array_nd(swap23(X{2}),'Y');
 write_array_nd(swap23(X{3}),'Z');
 
-system('./fortran/ndt_assembly_test.exe');
+system('./fortran/ndt_k_test.exe');
 K = swap23(read_array_nd('K'));
 
 err = norm(K_m(:) - K(:),inf)
