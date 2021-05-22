@@ -95,7 +95,7 @@ vec_boundary_conditions_test.exe: $(VEC_BOUNDARY_CONDITIONS) Makefile
 ndt_w_test.exe: ndt_w_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o Makefile
 	$(FC) $(FFLAGS) -o ndt_w_test.exe ndt_w_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o
 
-ndt_w_test.o: ndt_w_test.f90  module_hexa.o module_utils.o  module_ndt_w_assembly.o Makefile
+ndt_w_test.o: ndt_w_test.f90  module_hexa.o module_utils.o  module_w_assembly.o Makefile
 	$(FC) $(FFLAGS) -c ndt_w_test.f90
 
 module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
