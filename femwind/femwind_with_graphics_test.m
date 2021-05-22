@@ -1,7 +1,7 @@
 function p=femwind_with_graphics_test
 disp('femwind_with_graphics_test')
 p=femwind_main
-p.graphics=2; 
+p.graphics=3; 
 p.st_contour=1
 p.sc_all = 1;
 p.sc2_all =  [1 2];

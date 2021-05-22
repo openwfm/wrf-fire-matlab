@@ -1,19 +1,23 @@
 function wind_speed = wind_streamline(X, CX, W, params)
 
+%Function to plot streamlines of current wind field
+%X: Cell Array Containing Grids with Spatial Coordinates at Cell Vertices
+%CX: Cell Array Containing Grids with Spatial Coordinates at Cell Centers
+%W: Cell Array Containing Grids with Wind Vector Values at Cell Centers
 %disp('wind_streamlines not done yet')
-%Extracting min and max values from mesh grid to create a valid n-d grid 
-%for streamlines function
-% Most work goes into creating a grid space with
+
 %Constructing the wind field interpolant
-%FX, 
+ 
 
 [F1, F2, F3] = wind_interp(W,CX);
- [n(1),n(2),n(3)]=size(X{1});
-F1.Method = 'natural';
-F2.Method = 'natural';
-F3.Method = 'natural';
+[n(1),n(2),n(3)]=size(X{1});
+F1.Method = 'linear';
+F2.Method = 'linear';
+F3.Method = 'linear';
 level = 1:n(3);
 
+%Extracting min and max values from mesh grid to create a valid n-d grid 
+%for streamlines function
 if params.st_contour == 1
     xmin = min(X{1}(:));
     xmax = max(X{1}(:));
@@ -50,8 +54,8 @@ if params.st_contour == 1
     %Creating contour surfaces and colormaps of the magnitude of the
     %wind-field at 3 different locations
     hsurfaces = slice(CXG_X,CXG_Y,CXG_Z,wind_speed, [ymin, (ymax-ymin)/2, ymax], xmax,zmin);
-    set(hsurfaces,'FaceColor','interp','EdgeColor','interp');
-    colormap(turbo)
+    set(hsurfaces,'FaceColor','interp','EdgeColor','none');
+    colormap default
 %     shading interp
 %     view(3); axis vis3d; camlight;
     %else
@@ -99,8 +103,6 @@ end
 for i = 1:length(y0)
     for j = 1:length(z0)
         [t,y] = ode45(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
-        % Using stiff ODE23 solver
-        % [t,y] = ode23s(@(t,y) odefun(t,y, F1, F2, F3), tspan, [x0,y0(i),z0(j)]);
         % Find indices that constrain the streamline to stay inside the
         % domain of the mesh domain.
         count = 2;
@@ -110,7 +112,7 @@ for i = 1:length(y0)
 %             tf = count*scale_t*max(X{1}(:))/mean(W{1}(:));
 %             t = [t0, tf];
             L = length(y(:,1));
-            [t,y_new] = ode23s(@(t,y_new) odefun(t,y_new, F1, F2, F3), tspan, [y(L,1),y(L,2),y(L,3)]);
+            [t,y_new] = ode45(@(t,y_new) odefun(t,y_new, F1, F2, F3), tspan, [y(L,1),y(L,2),y(L,3)]);
             
             y = cat(1,y,y_new);
             

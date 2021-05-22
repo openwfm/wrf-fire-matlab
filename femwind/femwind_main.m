@@ -137,7 +137,7 @@ for sc2 = params.sc2_all
             disp('graphics: solution')
 
             % plot resulting wind
-            figure(5),crate(sc,sc2)
+            figure(5),rate(sc,sc2)
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,1,1]), hold on, 
             plot_wind_3d(CX,W)
             hold off
@@ -176,7 +176,7 @@ for sc2 = params.sc2_all
             axis equal
             title(['Final wind with a=',string_diag_A,' at ',num2str(height),' above terrain'])
         end
-        if params.graphics > 2
+        if params.graphics > 1
             figure(9),clf
             plot_mesh_3d(X,[1,nel(1)+1,1,nel(2)+1,2,2])
             hold on
