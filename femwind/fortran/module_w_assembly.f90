@@ -49,9 +49,11 @@ integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, i, &
           k1, k2, k3
 real ::  Kloc(8,8), Floc(8), Jg(8,3)
 real ::  Xloc(3,8), u0loc(3)
-real :: grad(3)
+real :: grad(3), grad_test(3)
 real :: lambda_loc(8)
 real :: A_inv(3,3)
+real,dimension(8,3),save :: bf = reshape((/-1,-1,-1,1,-1,-1,-1,1,-1,1,1,-1,-1,-1,1,1,-1,1,-1,1,1,1,1,1/),(/8,3/))
+
 lambda_loc = 0.
 Xloc = 99999.
 Jg = 0.
@@ -92,6 +94,7 @@ do ie2=jfts,jfte
             !print*, 'Jg is', Jg
             !print*, shape(jg)
             grad = matmul(transpose(Jg),lambda_loc)
+            grad_test = 
             !not ok print *,'Grad before multiplication by A_inv is', grad
   
             call Inv3(A, A_inv)
