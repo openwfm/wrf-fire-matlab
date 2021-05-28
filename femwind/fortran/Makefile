@@ -1,10 +1,10 @@
-FC = ifort
 FC = gfortran
+FC = ifort
 FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow -traceback -fpe0 # intel debug
 FFLAGS = -O3 -fdefault-real-8  # gnu
-FFLAGS = -g -C -fpe0 -r8  # intel debug 
 FFLAGS = -g -C  -fdefault-real-8
 FFLAGS = -O3 
+FFLAGS = -g -C -fpe0 -r8  # intel debug 
 
 default: hexa_test.exe\
  ndt_mult_test.exe\

@@ -9,9 +9,9 @@ y=vertical_sweeps(K,F,X,x);
 x_r = reshape(x,n1,n2,n3);
 F_r = reshape(F,n1,n2,n3);
 
-write_array_nd(K14,'Kmat');
-write_array_nd(F_r,'Fmat');
-write_array_nd(x_r,'x_sweeps');
+write_array_nd(swap23(K14),'Kmat');
+write_array_nd(swap23(F_r),'Fmat');
+write_array_nd(swap23(x_r),'x_sweeps');
 
 system('./fortran/sweeps_test.exe');
 

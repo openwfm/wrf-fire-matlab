@@ -173,11 +173,11 @@ integer, intent(out)::                            &
 
 ! tile dimensions from matrix size
 ifts=1
-ifte=n(1)
+ifte=n(1)-1
 kfts=1
-kfte=n(2)
+kfte=n(2)-1
 jfts=1
-jfte=n(3)
+jfte=n(3)-1
 ! domain = tile
 ifds=ifts
 ifde=ifte

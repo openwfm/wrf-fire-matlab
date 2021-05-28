@@ -32,19 +32,27 @@ x_m = reshape(a,n)
 if (s(1).ne.n(1).or.s(2).ne.n(2).or.s(3).ne.n(3))call crash('sweeps_test: inconsistent size Kmat and x')
 
 ifts = 1
-ifte = n(1)
+ifte = n(1)-1
 jfts = 1
-jfte = n(2)
+jfte = n(2)-1
 kfts = 1
-kfte = n(3)
+kfte = n(3)-1
+
+ifds = ifts
+ifde = ifte
+jfds = jfts
+jfde = jfte
+kfds = kfts
+kfde = kfte
+
 msize = s(4)
 if(msize.ne.14)call crash('msize must be 14')
 ifms = ifts-1
-ifme = ifte+1
+ifme = ifte+2
 jfms = jfts-1
-jfme = jfte+1
+jfme = jfte+2
 kfms = kfts-1
-kfme = kfte+1
+kfme = kfte+2
 
 ! allocate a little bigger with zeros in extra areas
 allocate(Kmat(ifms:ifme,kfms:kfme,jfms:jfme,1:msize))
@@ -56,17 +64,24 @@ x = 0.
 
 
 ! copy the input data
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
-      do jx = 1,msize
-        Kmat(i,k,j,jx) = Kmat_m(i,j,k,jx)
-      enddo
-      x(i,k,j)=x_m(i,j,k)
-      F(i,k,j)=F_m(i,j,k)
-    enddo
-  enddo
-enddo
+!do j=jfts,s(2)
+!  do k=kfts,s(3)
+!    do i=ifts,s(1)
+!      do jx = 1,msize
+!        Kmat(i,k,j,jx) = Kmat_m(i,j,k,jx)
+!      enddo
+!    enddo
+!  enddo
+!enddo
+
+!do j = jfts,jfte
+!  do k = kfts,kfte
+!    do i = ifts,ifte
+!      x(i,k,j)=x_m(i,j,k)
+!      F(i,k,j)=F_m(i,j,k)
+!    end do
+!  end do
+!end do
 
 write(*,'(a)')'calling sweeps'
 call sweeps(  &
