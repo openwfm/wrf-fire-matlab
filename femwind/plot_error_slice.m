@@ -45,4 +45,18 @@ if ~isempty(e)
     end
     
 end
+if params.graphics > 2
+    zoom_center = false;
+    figure(100)
+    residual=zeros(n);
+    if zoom_center
+        cx = (max(max(xx))-min(min(xx)))/2;
+        mesh(xx,zz,squeeze(residual(:,s,:))); view(2); xlim([min(min(xx)),max(max(xx)),cx-500,cx+500]);
+    else
+        mesh(xx,zz,squeeze(residual(:,s,:))); view(2); xlim([min(min(xx)),max(max(xx))]);
+    end
+    nslices=size(dir('./slice_l*.png'),1);
+    saveas(gcf,sprintf('slice_l%02d.png',nslices+1))
+end
 drawnow
+end

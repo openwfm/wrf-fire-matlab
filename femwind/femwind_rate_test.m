@@ -11,7 +11,7 @@ p.coarse_K=1; % 'variational';
 p.coarse_K=2; % 'assembly';
 p.levels=15;
 if exist('pin','var')
-    f=fieldnames(pin);;
+    f=fieldnames(pin);
 else
     f={};
 end
