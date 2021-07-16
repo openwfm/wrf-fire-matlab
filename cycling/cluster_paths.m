@@ -376,8 +376,8 @@ end
 raw_dist = a;
 fprintf('matrices done\n')
 
-%start filtering distance
-cluster_mult = 0.15;
+%start filtering distances and change those within same cluster
+cluster_mult = 0.25;
 for i = 1:n
     for j = 1:n
 %         % make points in same cluster close
