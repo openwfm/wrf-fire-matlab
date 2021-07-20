@@ -10,7 +10,7 @@ function [ detect_prob ] = detection_probability(tign)
 detect_prob = zeros(size(tign));
 
 % use exponential increase in heat
-heat_up = 1;
+heat_up = 0;
 
 %for new burn model, set to zero for old model
 % length of time heat is maximum, constant
@@ -41,7 +41,7 @@ end
 %b = 2.2; %controls false positive rate  2.2 for patch
 
 %can comput false pos rate as 
-false_rate = 0.02;
+false_rate = 0.1;
 b = log(false_rate/(1-false_rate));
 
 %can compute a as

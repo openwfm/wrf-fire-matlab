@@ -65,7 +65,7 @@ p = sort_rsac_files(prefix);
 g_str = 'g_cluster.mat';
 if ~exist(g_str,'file')
     %loading L2 data
-    g = subset_l2_detections(prefix,p,red,time_bounds,fig);
+    classify   time_bounds,fig);
     save(g_str, 'g', '-v7.3');
 else
     g = [];
