@@ -1,3 +1,5 @@
+Matlab prototype
+================
 
 This is femwind, the 3rd generation mass consistent downscaling.
 The code is at https://github.com/openwfm/wrf-fire-matlab/tree/quicwind/femwind
@@ -18,3 +20,16 @@ femwind_test(p)   % run with params settings from p
 p=femwind_test(p)   % run with params settings from p
 
 Jan Mandel, February 2021
+
+Fortran implementation
+======================
+
+cd fortran
+edit Makefile to set flags
+make
+cd ..
+in Matlab:
+femwind_run_fortran_rate_test  ! regression test
+
+Jan Mandel, Angela Morrison, Evan Shapiro, May 2021
+
