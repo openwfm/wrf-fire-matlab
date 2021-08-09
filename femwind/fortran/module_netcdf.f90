@@ -5,31 +5,24 @@ use module_utils
 
 contains
 
-subroutine pnetcdf_read_int(ncid,ia,varname)
+subroutine netcdf_read_int(ncid,ia,varname)
 implicit none
 !*** arguments
     integer, intent(in)::ncid                      ! open pnetcdf file
     integer, intent(inout)::ia                     ! variable to store
     character(LEN=*),intent(in)::varname           ! variable name
 !*** local
-    integer::comm,myproc,ierr,varid
+    integer::ierr,varid
     character(len=256)::msg
 !*** executable
-    call wrf_get_dm_communicator(comm)
-    call mpi_comm_rank(comm,myproc,ierr)
-    call check(ierr,'mpi_comm_rank')
-    call check(nf90mpi_begin_indep_data(ncid),"pnetcdf_write_int/nf90mpi_begin_indep_data")
-    if(myproc.eq.0)then
-        call check(nf90mpi_inq_varid(ncid, trim(varname), varid), &
-            "nf90mpi_inq_varid:"//trim(varname))
-        call check(nf90mpi_get_var(ncid, varid, ia), &
-            "pnetcdf_read_int/nf90mpi_get_var:"//trim(varname))
-        write(msg,*)'pnetcdf_read_int: myproc=',myproc,' varname=',varname,' value=',ia
-    endif
-    call check(nf90mpi_end_indep_data(ncid),"pnetcdf_write_int/nf90mpi_end_indep_data")
-end subroutine pnetcdf_read_int
+        call check(nf90_inq_varid(ncid, trim(varname), varid), &
+            "netcdf_read_int/nf90_inq_varid:"//trim(varname))
+        call check(nf90_get_var(ncid, varid, ia), &
+            "netcdf_read_int/nf90_get_var:"//trim(varname))
+        write(msg,*)'netcdf_read_int: varname=',varname,' value=',ia
+end subroutine netcdf_read_int
 
-subroutine pnetcdf_write_int(ncid,ia,varname)
+subroutine netcdf_write_int(ncid,ia,varname)
 implicit none
 !*** arguments
     integer, intent(in)::                         &
@@ -37,24 +30,17 @@ implicit none
     ia                                              ! variable to write
     character(LEN=*),intent(in):: varname
 !*** local
-    integer::comm,myproc,ierr,varid,ival
+    integer::varid,ival
     character(len=256)::msg
 !*** executable
-    call wrf_get_dm_communicator(comm)
-    call mpi_comm_rank(comm,myproc,ierr)
-    call check(ierr,'mpi_comm_rank')
-    write(msg,*)'pnetcdf_write_int: myproc=',myproc,' varname=',varname,' value=',ia
+    write(msg,*)'netcdf_write_int: varname=',varname,' value=',ia
     call message(msg,level=0)
-    call check(nf90mpi_begin_indep_data(ncid),"pnetcdf_write_int/nf90mpi_begin_indep_data")
-    if(myproc.eq.0)then
-        call check(nf90mpi_inq_varid(ncid, trim(varname), varid), &
-            "nf90mpi_inq_varid:"//trim(varname))
+        call check(nf90_inq_varid(ncid, trim(varname), varid), &
+            "netcdf_write_int/nf90_inq_varid:"//trim(varname))
         ival = ia
-        call check(nf90mpi_put_var(ncid, varid, ival), &
-            "pnetcdf_write_int/nf90mpi_put_var:"//trim(varname))
-    endif
-    call check(nf90mpi_end_indep_data(ncid),"pnetcdf_write_int/nf90mpi_end_indep_data")
-end subroutine pnetcdf_write_int
+        call check(nf90_put_var(ncid, varid, ival), &
+            "netcdf_write_int/nf90mpi_put_var:"//trim(varname))
+end subroutine netcdf_write_int
 
 subroutine pnetcdf_write_arr(ncid,                &
     ids,ide, kds,kde, jds,jde,                    & ! atm grid dimensions
