@@ -194,4 +194,29 @@ jfme=jfte + nwrap
 
 end subroutine set_indices
 
+integer function get_chsum(a)
+! xor check sum of 3D real array
+implicit none
+!*** arguments
+real, intent(in)::a(:,:,:)
+!*** local
+integer::n(3),i,j,k,lsum,iel
+real::rel
+equivalence(rel,iel)
+!*** executable
+
+lsum=0
+do j=1,n(3)
+  do k=1,n(2)
+    do i=1,n(1)
+      rel=a(i,k,j)
+      lsum=ieor(lsum,iel)
+    enddo
+  enddo
+enddo
+
+get_chsum = lsum
+
+end function get_chsum
+
 end module module_utils
