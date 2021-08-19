@@ -18,6 +18,12 @@ print *,'press enter to continue'
 read(*,*)
 end subroutine pause
 
+subroutine message(s)
+character(len=*)::s
+print *,trim(s)
+end subroutine message
+
+
 subroutine crash(msg)
 ! terminate with error
 character(len=*),intent(in)::msg

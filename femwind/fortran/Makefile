@@ -6,6 +6,7 @@ FFLAGS = -g -C -fpe0 -r8  # intel debug
 FFLAGS = -g -C  -fdefault-real-8
 FFLAGS = -O3 -pg
 FFLAGS = -g -I /opt/local/include
+LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 
 default: hexa_test.exe\
  ndt_mult_test.exe\
@@ -18,7 +19,8 @@ default: hexa_test.exe\
  coarsening_icl_test.exe\
  ndt_boundary_conditions_test.exe\
  vec_boundary_conditions_test.exe\
- femwind_test.exe
+ femwind_test.exe\
+ netcdf_test.exe
 
 
 
@@ -128,8 +130,16 @@ FEMWIND_TEST = femwind_test.f90\
   module_boundary_conditions.o\
   module_utils.o \
   module_common.o
+
 femwind_test.exe: $(FEMWIND_TEST)
 	$(FC) $(FFLAGS) -o $@ $(FEMWIND_TEST)
+
+NETCDF_TEST = netcdf_test.f90\
+  module_utils.o \
+  module_netcdf.o
+
+netcdf_test.exe: $(NETCDF_TEST)
+	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
 
 clean:
 	rm -rf *.mod *.o *.exe *.dSYM
