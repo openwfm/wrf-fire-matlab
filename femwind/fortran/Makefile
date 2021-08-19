@@ -5,6 +5,7 @@ FFLAGS = -O3 -fdefault-real-8  # gnu
 FFLAGS = -g -C -fpe0 -r8  # intel debug 
 FFLAGS = -g -C  -fdefault-real-8
 FFLAGS = -O3 -pg
+FFLAGS = -g -I /opt/local/include
 
 default: hexa_test.exe\
  ndt_mult_test.exe\
@@ -32,6 +33,9 @@ hexa_test.o: hexa_test.f90 module_hexa.o module_utils.o Makefile
 
 module_utils.o: module_utils.f90  Makefile
 	$(FC) $(FFLAGS) -c module_utils.f90
+
+module_netcdf.o: module_utils.o module_netcdf.f90 Makefile
+	$(FC) $(FFLAGS) -c module_netcdf.f90
 
 module_common.o: module_common.f90  module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_common.f90
