@@ -27,13 +27,13 @@ print *,"Closing netcdf file ",ncid
 call check(nf90_close(ncid),"Cannot close netcdf file ")
 end subroutine ncclose
 
-subroutine netcdf_read_int(ncid,ia,varname)
+integer function netcdf_read_int(ncid,varname)
 implicit none
 !*** arguments
     integer, intent(in)::ncid                      ! open netcdf file
-    integer, intent(inout)::ia                     ! variable to store
     character(LEN=*),intent(in)::varname           ! variable name
 !*** local
+    integer::ia                     ! variable to store
     integer::ierr,varid
     character(len=256)::msg
 !*** executable
@@ -42,7 +42,8 @@ implicit none
         call check(nf90_get_var(ncid, varid, ia), &
             "netcdf_read_int/nf90_get_var:"//trim(varname))
         write(msg,*)'netcdf_read_int: varname=',varname,' value=',ia
-end subroutine netcdf_read_int
+        netcdf_read_int = ia
+end function netcdf_read_int
 
 subroutine netcdf_write_int(ncid,ia,varname)
 implicit none
@@ -106,13 +107,14 @@ subroutine netcdf_write_array(ncid,a,name)
     
 end subroutine netcdf_write_array
 
-subroutine netcdf_read_array(ncid,a,name)
+subroutine netcdf_read_array_wrf(ncid,a,name,istep)
     implicit none
 
 !*** arguments
     integer, intent(in)::                ncid ! open netcdf file
     real, pointer, intent(out):: a(:,:,:)  ! the array pointer; remember to deallocate when done with it
     character(LEN=*),intent(in):: name
+    integer, intent(in)::                istep ! time step in the file
 
 !*** local
     integer,dimension(4)::star,cnts
@@ -120,32 +122,36 @@ subroutine netcdf_read_array(ncid,a,name)
     real,dimension(:,:,:,:),allocatable::at
     character(len=256) msg
 
+    print *,"netcdf_read_array_wrf reading variable ",trim(name)," time step ",istep
+
     ! get idx
     call netcdf_var_info(ncid,name,dims,varid,1)
-    star   = (/1,1,1,1/)
-    ends   = (/dims(1),dims(2),dims(3),1/)
+    star   = (/1,1,1,istep/)
+    ends   = (/dims(1),dims(2),dims(3),istep/)
+    star   = min(star,dims)
     ends   = min(ends,dims)
     cnts = ends - star + 1
 
-    write(msg,*)"reading ",trim(name),star(1),ends(1),star(2),ends(2),star(3),ends(3)
+    write(msg,*)"reading ",trim(name),star,ends
     call message(msg)
  
     ! read from file
-    allocate(at(star(1):ends(1),star(2):ends(2),star(3):ends(3),1))
+    allocate(at(star(1):ends(1),star(2):ends(2),star(3):ends(3),star(4):ends(4)))
     call check(nf90_get_var(ncid, varid, at, start = star, count = cnts),"nf90_get_var:"//trim(name))
     
     ! transpose at -> a
     do k=star(3),ends(3)
         do j=star(2),ends(2)
             do i=star(1),ends(1)
-                a(i,k,j) = at(i,j,k,1)
+                a(i,k,j) = at(i,j,k,istep)
             enddo
         enddo
     enddo
 
     deallocate(at)
-    
-end subroutine netcdf_read_array
+    print *,"returning array ikj shape ",shape(a)
+
+end subroutine netcdf_read_array_wrf
 
 subroutine netcdf_var_info(ncid,varname,dims,varid,prints)
     implicit none
