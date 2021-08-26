@@ -5,7 +5,7 @@ use module_netcdf
 
 !*** local
 character(len=128)::filename
-integer::ncid,chsum0,istep
+integer::ncid,chsum0,istep,chsum1
 real, pointer, dimension(:,:,:)::u0,v0,w0
 integer::sr(2)
 
@@ -24,5 +24,12 @@ call netcdf_read_array_wrf(ncid,v0,"V0_FMW",1,sr)
 call netcdf_read_array_wrf(ncid,w0,"W0_FMW",1,sr)
 
 call ncclose(ncid)
+
+chsum1 = get_chsum(u0)
+chsum1 = ieor(chsum1,get_chsum(v0))
+chsum1 = ieor(chsum1,get_chsum(w0))
+
+print *,"CHSUM0 computed=",chsum1," difference ",chsum1-chsum0
+
 
 end program netcdf_test
