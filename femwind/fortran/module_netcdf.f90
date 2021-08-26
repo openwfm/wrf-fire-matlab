@@ -5,6 +5,28 @@ use module_utils
 
 contains
 
+! from https://github.com/openwfm/wrf-fire/blob/master/standalone/wrf_netcdf.F
+subroutine ncopen(filename,mode,ncid)
+!*** purpose: open netcdf file wrapper with an informative error message
+implicit none
+!*** arguments
+character(len=*), intent(in):: filename
+integer, intent(in)::mode
+integer, intent(out):: ncid
+!*** executable
+call check(nf90_open(trim(filename),mode,ncid),"Cannot open file "//trim(filename))
+print *,"Opened netcdf file ",trim(filename)," as ",ncid," mode ",mode
+end subroutine ncopen
+
+subroutine ncclose(ncid)
+!*** purpose: open netcdf file wrapper with informative error message
+implicit none
+!*** arguments
+integer, intent(in):: ncid
+print *,"Closing netcdf file ",ncid
+call check(nf90_close(ncid),"Cannot close netcdf file ")
+end subroutine ncclose
+
 subroutine netcdf_read_int(ncid,ia,varname)
 implicit none
 !*** arguments
