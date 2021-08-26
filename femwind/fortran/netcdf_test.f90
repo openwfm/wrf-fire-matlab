@@ -20,8 +20,8 @@ print *,"CHSUM0=",chsum0
 sr=(/10,10/)  ! to strip at i j ends
 
 call netcdf_read_array_wrf(ncid,u0,"U0_FMW",1,sr)
-
-print *,"got array ikj shape ",shape(u0)
+call netcdf_read_array_wrf(ncid,v0,"V0_FMW",1,sr)
+call netcdf_read_array_wrf(ncid,w0,"W0_FMW",1,sr)
 
 call ncclose(ncid)
 
