@@ -17,7 +17,7 @@ call ncopen(filename,nf90_nowrite,ncid)
 chsum0 = netcdf_read_int(ncid,"CHSUM0_FMW")
 print *,"CHSUM0=",chsum0
 
-call netcdf_read_array_wrf(ncid,u0,"U0_FMW",1)
+call netcdf_read_array_wrf(ncid,u0,"U0_FMW",1,(/10,10/))
 print *,"got array ikj shape ",shape(u0)
 
 call ncclose(ncid)
