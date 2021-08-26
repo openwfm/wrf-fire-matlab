@@ -107,7 +107,7 @@ subroutine netcdf_write_array(ncid,a,name)
     
 end subroutine netcdf_write_array
 
-subroutine netcdf_read_array_wrf(ncid,a,name,istep)
+subroutine netcdf_read_array_wrf(ncid,a,name,istep,sr)
     implicit none
 
 !*** arguments
@@ -115,6 +115,7 @@ subroutine netcdf_read_array_wrf(ncid,a,name,istep)
     real, pointer, intent(out):: a(:,:,:)  ! the array pointer; remember to deallocate when done with it
     character(LEN=*),intent(in):: name
     integer, intent(in)::                istep ! time step in the file
+    integer, intent(in), dimension(2)::  sr ! strip to remove in i and j dimension
 
 !*** local
     integer,dimension(4)::star,cnts
@@ -122,7 +123,7 @@ subroutine netcdf_read_array_wrf(ncid,a,name,istep)
     real,dimension(:,:,:,:),allocatable::at
     character(len=256) msg
 
-    print *,"netcdf_read_array_wrf reading variable ",trim(name)," time step ",istep
+    print *,"netcdf_read_array_wrf reading variable ",trim(name)," time step ",istep," stripping ",sr," at ij ends"
 
     ! get idx
     call netcdf_var_info(ncid,name,dims,varid,1)
@@ -140,10 +141,10 @@ subroutine netcdf_read_array_wrf(ncid,a,name,istep)
     call check(nf90_get_var(ncid, varid, at, start = star, count = cnts),"nf90_get_var:"//trim(name))
     
     ! transpose at -> a
-    allocate(a(star(1):ends(1),star(3):ends(3),star(2):ends(2)))
+    allocate(a(star(1):ends(1)-sr(1),star(3):ends(3),star(2):ends(2)-sr(2)))
     do k=star(3),ends(3)
-        do j=star(2),ends(2)
-            do i=star(1),ends(1)
+        do j=star(2),ends(2)-sr(2)
+            do i=star(1),ends(1)-sr(1)
                 a(i,k,j) = at(i,j,k,istep)
             enddo
         enddo
