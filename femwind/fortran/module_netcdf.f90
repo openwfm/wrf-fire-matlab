@@ -140,6 +140,7 @@ subroutine netcdf_read_array_wrf(ncid,a,name,istep)
     call check(nf90_get_var(ncid, varid, at, start = star, count = cnts),"nf90_get_var:"//trim(name))
     
     ! transpose at -> a
+    allocate(a(star(1):ends(1),star(3):ends(3),star(2):ends(2)))
     do k=star(3),ends(3)
         do j=star(2),ends(2)
             do i=star(1),ends(1)

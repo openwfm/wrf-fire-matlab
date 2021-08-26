@@ -5,7 +5,7 @@ FFLAGS = -O3 -fdefault-real-8  # gnu
 FFLAGS = -g -C -fpe0 -r8  # intel debug 
 FFLAGS = -g -C  -fdefault-real-8
 FFLAGS = -O3 -pg
-FFLAGS = -g -I /opt/local/include
+FFLAGS = -g -C -I /opt/local/include
 LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 
 default: hexa_test.exe\
