@@ -1,5 +1,5 @@
-FC = gfortran
-FC = ifort
+#FC = gfortran
+#FC = ifort
 FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow -traceback -fpe0 # intel debug
 FFLAGS = -O3 -fdefault-real-8  # gnu
 FFLAGS = -g -C -fpe0 -r8  # intel debug 
@@ -8,7 +8,7 @@ FFLAGS = -O3 -pg
 FFLAGS = -g -C -I /opt/local/include
 LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -g -C -I $(NETCDF)/include 
-LFLAGS = -L$(NETCDF)/lib -lnetcdf -l netcdff
+LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
 
 default: hexa_test.exe\
