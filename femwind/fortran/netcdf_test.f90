@@ -11,17 +11,18 @@ integer::sr(2)
 
 !*** executable
 filename = "wrf.nc"
+istep = 1
 
 call ncopen(filename,nf90_nowrite,ncid)
 
-chsum0 = netcdf_read_int(ncid,"CHSUM0_FMW")
+chsum0 = netcdf_read_int_wrf(ncid,"CHSUM0_FMW",istep)
 print *,"CHSUM0=",chsum0
 
 sr=(/10,10/)  ! to strip at i j ends
 
-call netcdf_read_array_wrf(ncid,u0,"U0_FMW",1,sr)
-call netcdf_read_array_wrf(ncid,v0,"V0_FMW",1,sr)
-call netcdf_read_array_wrf(ncid,w0,"W0_FMW",1,sr)
+call netcdf_read_array_wrf(ncid,u0,"U0_FMW",istep,sr)
+call netcdf_read_array_wrf(ncid,v0,"V0_FMW",istep,sr)
+call netcdf_read_array_wrf(ncid,w0,"W0_FMW",istep,sr)
 
 call ncclose(ncid)
 

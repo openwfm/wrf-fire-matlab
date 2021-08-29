@@ -27,23 +27,25 @@ print *,"Closing netcdf file ",ncid
 call check(nf90_close(ncid),"Cannot close netcdf file ")
 end subroutine ncclose
 
-integer function netcdf_read_int(ncid,varname)
+integer function netcdf_read_int_wrf(ncid,name,istep)
 implicit none
+!*** Read one integer 
 !*** arguments
     integer, intent(in)::ncid                      ! open netcdf file
-    character(LEN=*),intent(in)::varname           ! variable name
+    character(LEN=*),intent(in)::name              ! variable name
+    integer, intent(in)::istep                     ! index in unlimited dimension (timestep number)
 !*** local
-    integer::ia                     ! variable to store
+    integer::ia(1)                     ! variable to store
     integer::ierr,varid
-    character(len=256)::msg
 !*** executable
-        call check(nf90_inq_varid(ncid, trim(varname), varid), &
-            "netcdf_read_int/nf90_inq_varid:"//trim(varname))
-        call check(nf90_get_var(ncid, varid, ia), &
-            "netcdf_read_int/nf90_get_var:"//trim(varname))
-        write(msg,*)'netcdf_read_int: varname=',varname,' value=',ia
-        netcdf_read_int = ia
-end function netcdf_read_int
+        print *,"netcdf_read_int_wrf reading variable ",trim(name)," time step ",istep
+        call check(nf90_inq_varid(ncid, trim(name), varid), &
+            "netcdf_read_int_wrf/nf90_inq_varid:"//trim(name))
+        call check(nf90_get_var(ncid, varid, ia, start = (/1,istep/), count = (/1,1/)), &
+             "netcdf_read_int_wrf/nf90_get_var:"//trim(name))
+        print *,"netcdf_read_int_wrf:", trim(name), " = ",ia
+        netcdf_read_int_wrf = ia(1)
+end function netcdf_read_int_wrf
 
 subroutine netcdf_write_int(ncid,ia,varname)
 implicit none
