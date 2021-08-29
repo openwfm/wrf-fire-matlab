@@ -41,7 +41,7 @@ implicit none
         print *,"netcdf_read_int_wrf reading variable ",trim(name)," time step ",istep
         call check(nf90_inq_varid(ncid, trim(name), varid), &
             "netcdf_read_int_wrf/nf90_inq_varid:"//trim(name))
-        call check(nf90_get_var(ncid, varid, ia, start = (/1,istep/), count = (/1,1/)), &
+        call check(nf90_get_var(ncid, varid, ia, start = (/istep/), count = (/1/)), &
              "netcdf_read_int_wrf/nf90_get_var:"//trim(name))
         print *,"netcdf_read_int_wrf:", trim(name), " = ",ia
         netcdf_read_int_wrf = ia(1)

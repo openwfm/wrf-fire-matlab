@@ -11,7 +11,7 @@ integer::sr(2)
 
 !*** executable
 filename = "wrf.nc"
-istep = 1
+istep = 2
 
 call ncopen(filename,nf90_nowrite,ncid)
 
