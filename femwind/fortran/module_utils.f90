@@ -218,6 +218,7 @@ do j=lb(3),ub(3)
     do i=lb(1),ub(1)
       rel=a(i,k,j)
       lsum=ieor(lsum,iel)
+      !print *,i,k,j,rel,iel,lsum
     enddo
   enddo
 enddo
