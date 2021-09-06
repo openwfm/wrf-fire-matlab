@@ -3,7 +3,7 @@ module module_netcdf
 use netcdf
 use module_utils
 
-integer::netcdf_msglevel = 1
+integer::netcdf_msglevel = 0
 
 contains
 
