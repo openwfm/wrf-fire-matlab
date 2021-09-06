@@ -20,7 +20,8 @@ print *,"step ",istep
 chsum0 = netcdf_read_int_wrf(ncid,"CHSUM0_FMW",istep)
 print *,"CHSUM0=",chsum0
 
-sr=(/10,10/)  ! to strip at i j ends
+!sr=(/10,10/)  ! to strip at i j ends
+call get_sr(ncid,sr)
 
 call netcdf_read_array_wrf(ncid,u0_fmw,"U0_FMW",istep,sr)
 call netcdf_read_array_wrf(ncid,v0_fmw,"V0_FMW",istep,sr)

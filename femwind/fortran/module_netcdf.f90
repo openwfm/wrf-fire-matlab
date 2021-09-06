@@ -3,6 +3,8 @@ module module_netcdf
 use netcdf
 use module_utils
 
+integer::netcdf_msglevel = 1
+
 contains
 
 ! from https://github.com/openwfm/wrf-fire/blob/master/standalone/wrf_netcdf.F
@@ -83,7 +85,7 @@ subroutine netcdf_write_array(ncid,a,name)
 
     ! get idx
     n=shape(a)
-    call netcdf_var_info(ncid,name,dims,varid,1)
+    call netcdf_var_info(ncid,name,dims,varid,netcdf_msglevel)
     star   = (/1,1,1,1/)
     ends   = (/dims(1),dims(2),dims(3),1/)
     ends   = min(ends,dims)
@@ -99,7 +101,8 @@ subroutine netcdf_write_array(ncid,a,name)
         enddo
     enddo
 
-    write(msg,*)"writing ",trim(name),n(1),star(1),ends(1),n(2),star(2),ends(2),n(3),star(3),ends(3)
+    if(netcdf_msglevel>=0) &
+      write(msg,*)"writing ",trim(name),n(1),star(1),ends(1),n(2),star(2),ends(2),n(3),star(3),ends(3)
     call message(msg)
  
     ! write to file
@@ -125,10 +128,11 @@ subroutine netcdf_read_array_wrf(ncid,a,name,istep,sr)
     real,dimension(:,:,:,:),allocatable::at
     character(len=256) msg
 
-    print *,"netcdf_read_array_wrf reading variable ",trim(name)," time step ",istep," stripping ",sr," at ij ends"
+    if(netcdf_msglevel>=0) &
+       print *,"netcdf_read_array_wrf reading variable ",trim(name)," time step ",istep," stripping ",sr," at ij ends"
 
     ! get idx
-    call netcdf_var_info(ncid,name,dims,varid,1)
+    call netcdf_var_info(ncid,name,dims,varid,netcdf_msglevel)
     star   = (/1,1,1,istep/)
     ends   = (/dims(1),dims(2),dims(3),istep/)
     star   = min(star,dims)
@@ -153,9 +157,28 @@ subroutine netcdf_read_array_wrf(ncid,a,name,istep,sr)
     enddo
 
     deallocate(at)
-    print *,"returning array ikj shape ",shape(a)
+    if(netcdf_msglevel>=0) &
+       print *,"returning array ikj shape ",shape(a)
 
 end subroutine netcdf_read_array_wrf
+
+subroutine get_sr(ncid,sr)
+    implicit none
+!*** arguments
+    integer, intent(in)::ncid    ! open wrfout dataset
+    integer, intent(out), dimension(2):: sr  ! fire "subgrid" refinement factors in x and y directions
+!*** local
+    integer, dimension(3) :: dims_atm, dims_fire   ! 2D + allow time dimension
+    integer::varid, prints
+!*** executable
+    prints = netcdf_msglevel
+    dims_atm = 0
+    dims_fire = 0
+    call netcdf_var_info(ncid,"XLAT",dims_atm,varid,prints=prints)
+    call netcdf_var_info(ncid,"FXLAT",dims_fire,varid,prints=prints)
+    sr = dims_fire(1:2)/(dims_atm(1:2) + 1)
+    if(prints >= 0) print *,"get_sr: fire subgrid refinement factors are ",sr
+end subroutine get_sr
 
 subroutine netcdf_var_info(ncid,varname,dims,varid,prints)
     implicit none
@@ -176,7 +199,6 @@ subroutine netcdf_var_info(ncid,varname,dims,varid,prints)
     logical::verbose=.true.
 
     if(present(prints)) verbose = prints>0
-     
 
     call check(nf90_inq_varid(ncid,trim(varname),varid),"nf90_inq_varid"//trim(varname))
     call check(nf90_inquire_variable(ncid, varid, name, xtype, ndims, dimids, natts),"nf90_inquire_variable")
