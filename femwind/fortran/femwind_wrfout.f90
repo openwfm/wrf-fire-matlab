@@ -20,18 +20,18 @@ real, pointer:: X(:,:,:),Y(:,:,:),Z(:,:,:), &
                 u(:,:,:), v(:,:,:), w(:,:,:),Kmat(:,:,:,:),A_m(:,:,:)
 
 integer:: i, j, k, n(3)
-integer:: ncid,frame=1
-real:: rate
+integer::ncid,frame,sr(2)
+real:: rate,A(3,3)
 character(len=128)::filename 
 
 !*** executable
 filename = "wrf.nc"
+frame = 1
 call ncopen(filename,nf90_nowrite,ncid)
 
-if(read_initial_wind(ncid,u0,v0,w0,frame=frame).ne.0)then
-    print *,'check sum does not agree'
-    stop 1
-endif
+if(read_initial_wind(ncid,u0,v0,w0,frame=frame).ne.0)call crash('check sum does not agree')
+
+call get_sr(ncid,sr)   ! subgrid refinement ratios
 
 return
 
