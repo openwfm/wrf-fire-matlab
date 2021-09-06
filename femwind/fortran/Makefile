@@ -122,7 +122,7 @@ module_multigrid.o: module_multigrid.f90 module_ndt_assembly.o module_boundary_c
 module_femwind.o: module_femwind.f90 module_multigrid.o module_f_assembly.o module_ndt_w_assembly.o module_boundary_conditions.o module_common.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c  module_femwind.f90
 
-FEMWIND_TEST = femwind_test.f90\
+FEMWIND_MODULES = \
   module_femwind.o\
   module_multigrid.o\
   module_ndt_assembly.o\
@@ -137,8 +137,8 @@ FEMWIND_TEST = femwind_test.f90\
   module_utils.o \
   module_common.o
 
-femwind_test.exe: $(FEMWIND_TEST)
-	$(FC) $(FFLAGS) -o $@ $(FEMWIND_TEST)
+femwind_test.exe: femwind_test.f90 $(FEMWIND_MODULES) Makefile
+	$(FC) $(FFLAGS) -o $@ femwind_test.f90 $(FEMWIND_MODULES) 
 
 NETCDF_TEST = netcdf_test.f90\
   module_utils.o \
