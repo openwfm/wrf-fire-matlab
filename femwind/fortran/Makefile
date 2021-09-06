@@ -42,6 +42,9 @@ module_utils.o: module_utils.f90  Makefile
 module_netcdf.o: module_utils.o module_netcdf.f90 Makefile
 	$(FC) $(FFLAGS) -c module_netcdf.f90
 
+module_wrfout.o: module_netcdf.o Makefile
+	$(FC) $(FFLAGS) -c module_wrfout.f90
+
 module_common.o: module_common.f90  module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_common.f90
 
@@ -139,7 +142,8 @@ femwind_test.exe: $(FEMWIND_TEST)
 
 NETCDF_TEST = netcdf_test.f90\
   module_utils.o \
-  module_netcdf.o
+  module_netcdf.o \
+  module_wrfout.o
 
 netcdf_test.exe: $(NETCDF_TEST)
 	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
