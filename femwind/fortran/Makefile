@@ -49,7 +49,7 @@ module_common.o: module_common.f90  module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_common.f90
 
 module_ndt_mult.o: module_ndt_mult.f90  module_utils.o Makefile
-	$(FC) $(FFLAGS) -c module_ndt_mult.f90  module_utils.o
+	$(FC) $(FFLAGS) -c module_ndt_mult.f90
 
 ndt_mult_test.exe: ndt_mult_test.f90 module_ndt_mult.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o ndt_mult_test.exe ndt_mult_test.f90 module_ndt_mult.o module_utils.o
