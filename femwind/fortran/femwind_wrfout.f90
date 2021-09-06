@@ -17,7 +17,7 @@ integer ::                          &
 ! declaratins of A, msize included from module femwind
 
 ! variables read from wrfout
-real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:), zsf(:,:) 
+real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:), zsf(:,:), ht(:)
 
 ! variables computed here
 real, pointer:: X(:,:,:),Y(:,:,:),Z(:,:,:), &
@@ -35,9 +35,9 @@ call ncopen(filename,nf90_nowrite,ncid)
 
 if(read_initial_wind(ncid,u0,v0,w0,frame=frame).ne.0)call crash('check sum does not agree')
 
-call get_sr(ncid,sr)   ! subgrid refinement ratios
-
 call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf)
+
+call netcdf_read_array_wrf(ncid,"HT_FMW",frame=frame,a1d=ht)
 
 return
 
