@@ -6,9 +6,8 @@ use module_wrfout
 
 !*** local
 character(len=128)::filename
-integer::ncid,chsum0,frame,chsum0_fmw
+integer::ncid,frame
 real, pointer, dimension(:,:,:)::u0_fmw,v0_fmw,w0_fmw
-integer::sr(2)
 
 !*** executable
 filename = "wrf.nc"
