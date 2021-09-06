@@ -29,6 +29,27 @@ print *,"Closing netcdf file ",ncid
 call check(nf90_close(ncid),"Cannot close netcdf file ")
 end subroutine ncclose
 
+real function netcdf_read_att(ncid,name)
+! read real global scalar attribute
+!*** arguments
+integer, intent(in)::ncid
+character(len=*), intent(in)::name
+!*** local
+real::value
+integer::xtype,len,attnum
+character(len=256)::msg
+!*** executable
+call check(nf90_inquire_attribute(ncid, nf90_global, trim(name), xtype, len, attnum),"nf90_inquire_attribute")
+if(xtype.ne.nf90_float.or.len.ne.1)then
+   write(msg,*)"netcdf_read_att can read only float scalar but ",trim(name)," has xtype=",xtype," len=",len
+   call crash(trim(msg))
+endif
+call check(nf90_get_att(ncid,nf90_global, trim(name), value),"nf90_get_att")
+write(msg,*)"netcdf_read_att returning ",trim(name),"=",value
+call message(msg)
+netcdf_read_att = value
+end function netcdf_read_att
+
 integer function netcdf_read_int_wrf(ncid,name,istep)
 implicit none
 !*** Read one integer 

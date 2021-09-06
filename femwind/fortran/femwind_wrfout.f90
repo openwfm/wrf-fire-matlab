@@ -25,7 +25,7 @@ real, pointer:: X(:,:,:),Y(:,:,:),Z(:,:,:), &
 
 integer:: i, j, k, n(3)
 integer::ncid,frame,sr(2)
-real:: rate,A(3,3)
+real:: rate,A(3,3),dx,dy
 character(len=128)::filename 
 
 !*** executable
@@ -33,11 +33,18 @@ filename = "wrf.nc"
 frame = 1
 call ncopen(filename,nf90_nowrite,ncid)
 
+! initial velocity field
 if(read_initial_wind(ncid,u0,v0,w0,frame=frame).ne.0)call crash('check sum does not agree')
 
-call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf)
+! horizontal height at cell centers
+call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf) 
 
+! thickness of vertical layers
 call netcdf_read_array_wrf(ncid,"HT_FMW",frame=frame,a1d=ht)
+
+! horizontal mesh spacing
+dx = netcdf_read_att(ncid,"DX")
+dy = netcdf_read_att(ncid,"DY")
 
 return
 
