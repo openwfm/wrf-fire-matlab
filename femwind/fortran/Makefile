@@ -10,7 +10,7 @@ LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -g -C -I $(NETCDF)/include 
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
-default: femwind_netcdf.exe
+default: femwind_wrfout.exe
 
 tests: hexa_test.exe\
  ndt_mult_test.exe\
@@ -55,7 +55,7 @@ module_ndt_mult.o: module_ndt_mult.f90  module_utils.o Makefile
 ndt_mult_test.exe: ndt_mult_test.f90 module_ndt_mult.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o ndt_mult_test.exe ndt_mult_test.f90 module_ndt_mult.o module_utils.o
 
-sweeps_test.exe: sweeps_test.o module_sweeps.o module_utils.o Makefile
+sweeps_test.exe: sweeps_test.o outmodule_sweeps.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o sweeps_test.exe sweeps_test.f90 module_sweeps.o module_utils.o
 
 module_sweeps.o: module_sweeps.f90 module_utils.o Makefile
@@ -145,10 +145,10 @@ WRFOUT_MODULES = \
   module_netcdf.o \
   module_wrfout.o
 
-FEMWIND_NETCDF = femwind_netcdf.f90 $(WRFOUT_MODULES) $(FEMWIND_MODULES)
+FEMWIND_WRFOUT = femwind_wrfout.f90 $(WRFOUT_MODULES) $(FEMWIND_MODULES)
 
-femwind_netcdf.exe: $(FEMWIND_NETCDF) Makefile
-	$(FC) $(FFLAGS) -o $@ $(FEMWIND_NETCDF) $(LFLAGS)
+femwind_wrfout.exe: $(FEMWIND_WRFOUT) Makefile
+	$(FC) $(FFLAGS) -o $@ $(FEMWIND_WRFOUT) $(LFLAGS)
 
 NETCDF_TEST = netcdf_test.f90 $(WRFOUT_MODULES) module_utils.o 
 
