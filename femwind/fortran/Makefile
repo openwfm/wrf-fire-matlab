@@ -55,7 +55,7 @@ module_ndt_mult.o: module_ndt_mult.f90  module_utils.o Makefile
 ndt_mult_test.exe: ndt_mult_test.f90 module_ndt_mult.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o ndt_mult_test.exe ndt_mult_test.f90 module_ndt_mult.o module_utils.o
 
-sweeps_test.exe: sweeps_test.o outmodule_sweeps.o module_utils.o Makefile
+sweeps_test.exe: sweeps_test.o module_sweeps.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o sweeps_test.exe sweeps_test.f90 module_sweeps.o module_utils.o
 
 module_sweeps.o: module_sweeps.f90 module_utils.o Makefile
