@@ -1,52 +1,111 @@
-program netcdf_test
+program femwind_test
 
+use module_femwind
 use module_utils
-use module_netcdf
+use module_common
 
-!*** local
-character(len=128)::filename
-integer::ncid,chsum0,istep,chsum0_fmw
-real, pointer, dimension(:,:,:)::u0_fmw,v0_fmw,w0_fmw
-integer::sr(2)
+implicit none
 
-!*** executable
-filename = "wrf.nc"
+real, pointer:: X_m(:,:,:),Y_m(:,:,:),Z_m(:,:,:), &
+                u0_m(:,:,:), v0_m(:,:,:), w0_m(:,:,:),   &
+                u_m(:,:,:), v_m(:,:,:), w_m(:,:,:)
 
-call ncopen(filename,nf90_nowrite,ncid)
+integer ::                          &
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts, jfte                          ! fire tile bounds
 
-do istep = 1,9999
+! A, msize included from module femwind
+real, pointer:: X(:,:,:),Y(:,:,:),Z(:,:,:), &
+                u0(:,:,:), v0(:,:,:), w0(:,:,:),   &
+                u(:,:,:), v(:,:,:), w(:,:,:),Kmat(:,:,:,:),A_m(:,:,:)
 
-print *,"step ",istep
-chsum0 = netcdf_read_int_wrf(ncid,"CHSUM0_FMW",istep)
-print *,"CHSUM0=",chsum0
+integer:: i, j, k, n(3)
+real:: rate
 
-!sr=(/10,10/)  ! to strip at i j ends
-call get_sr(ncid,sr)
+call read_array(A_m,'A_input')  ! matrices read from Matlab are _m
+call read_array(X_m,'X_input')
+call read_array(Y_m,'Y_input')
+call read_array(Z_m,'Z_input')
+call read_array(u0_m, 'u0_input')
+call read_array(v0_m, 'v0_input')
+call read_array(w0_m, 'w0_input')
 
-call netcdf_read_array_wrf(ncid,u0_fmw,"U0_FMW",istep,sr)
-call netcdf_read_array_wrf(ncid,v0_fmw,"V0_FMW",istep,sr)
-call netcdf_read_array_wrf(ncid,w0_fmw,"W0_FMW",istep,sr)
+params%A = reshape(A_m,(/3,3/))
 
+n = shape(X_m)
+mg(1)%nx = n(1)
+mg(1)%ny = n(3)
+mg(1)%nz = n(2)
 
-chsum0_fmw = get_chsum(u0_fmw)
-print *,"chsum0_fmw ", chsum0_fmw
-chsum0_fmw = ieor(chsum0_fmw,get_chsum(v0_fmw))
-print *,"chsum0_fmw ", chsum0_fmw
-chsum0_fmw = ieor(chsum0_fmw,get_chsum(w0_fmw))
-print *,"chsum0_fmw ", chsum0_fmw
-!print *,"bound u0_fmw",lbound(u0_fmw),ubound(u0_fmw)
-!print *,"bound v0_fmw",lbound(v0_fmw),ubound(v0_fmw)
-!print *,"bound w0_fmw",lbound(w0_fmw),ubound(w0_fmw)
-!print *,"corner values",u0_fmw(1,1,1),v0_fmw(1,1,1),w0_fmw(1,1,1)
+call get_mg_dims(mg(1), &
+    ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
+    ifms, ifme, kfms,kfme, jfms, jfme,            &
+    ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
+    ifts, ifte, kfts,kfte, jfts,jfte)
 
-print *,"CHSUM0 computed=",chsum0_fmw," difference ",chsum0_fmw-chsum0
-if (chsum0_fmw.ne.chsum0)then
-   print *,'chsum does not agree'
-   stop 1
-endif
+allocate(mg(1)%X(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(mg(1)%Y(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(mg(1)%Z(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(u0(ifms:ifme,kfms:kfme,jfms:jfme)) ! vector components called u v W
+allocate(v0(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(w0(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(u(ifms:ifme,kfms:kfme,jfms:jfme)) ! vector components called u v W
+allocate(v(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(w(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(Kmat(ifms:ifme,kfms:kfme,jfms:jfme,msize)) ! stifness matrix
 
+! copy the input data to tile sized bounds
+! X Y Z are corner based, upper bound larger by one
+do j=jfts,jfte+1
+  do k=kfts,kfte+1
+    do i=ifts,ifte+1
+        mg(1)%X(i,k,j) = X_m(i,k,j)
+        mg(1)%Y(i,k,j) = Y_m(i,k,j)
+        mg(1)%Z(i,k,j) = Z_m(i,k,j)
+    enddo
+  enddo
 enddo
 
-call ncclose(ncid)
+mg(1)%dx = mg(1)%X(2,1,1)-mg(1)%X(1,1,1)
+mg(1)%dy = mg(1)%Y(1,1,2)-mg(1)%Y(1,1,1)
+allocate(mg(1)%dz(mg(1)%nz-1))
+do k=kfds,kfte
+    mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,k,1)
+enddo
 
-end program netcdf_test
+write(*,'(a)')'calling femwind_setup'
+call femwind_setup(mg)    
+write(*,'(a)')'femwind_setup returned OK'
+
+! u is midpoint based
+do j=jfts,jfte
+  do k=kfts,kfte
+    do i=ifts,ifte
+        u0(i,k,j) = u0_m(i,k,j)
+        v0(i,k,j) = v0_m(i,k,j)
+        w0(i,k,j) = w0_m(i,k,j)
+    enddo
+  enddo
+enddo
+
+
+write(*,'(a)')'calling femwind_solve'
+call femwind_solve(  mg,&
+  ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+  ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+  ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+  ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+  u0, v0, w0,                                  & ! input arrays
+  u, v, w,                                                  & ! output arrays
+  rate)
+write(*,'(a)')'femwind_solve returned OK'
+
+! write output as is in 3D but with tight dimensions
+call write_array(u(ifts:ifte,kfts:kfte,jfts:jfte),'u')  
+call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')  
+call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
+call write_scalar(rate,'rate')
+
+end program femwind_test
