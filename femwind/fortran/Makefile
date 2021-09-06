@@ -10,8 +10,9 @@ LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -g -C -I $(NETCDF)/include 
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
+default: femwind_netcdf.exe
 
-default: hexa_test.exe\
+tests: hexa_test.exe\
  ndt_mult_test.exe\
  sweeps_test.exe\
  f_assembly_test.exe\
@@ -25,7 +26,7 @@ default: hexa_test.exe\
  femwind_test.exe\
  netcdf_test.exe
 
-
+all: default tests
 
 hexa_test.exe: hexa_test.o module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_utils.o
@@ -42,7 +43,7 @@ module_utils.o: module_utils.f90  Makefile
 module_netcdf.o: module_utils.o module_netcdf.f90 Makefile
 	$(FC) $(FFLAGS) -c module_netcdf.f90
 
-module_wrfout.o: module_netcdf.o Makefile
+module_wrfout.o: module_wrfout.f90 module_netcdf.o Makefile
 	$(FC) $(FFLAGS) -c module_wrfout.f90
 
 module_common.o: module_common.f90  module_utils.o Makefile
@@ -57,7 +58,7 @@ ndt_mult_test.exe: ndt_mult_test.f90 module_ndt_mult.o module_utils.o Makefile
 sweeps_test.exe: sweeps_test.o module_sweeps.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o sweeps_test.exe sweeps_test.f90 module_sweeps.o module_utils.o
 
-module_sweeps.o: module_sweeps.f90 Makefile
+module_sweeps.o: module_sweeps.f90 module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_sweeps.f90
 
 sweeps_test.o: sweeps_test.f90 module_sweeps.o module_utils.o Makefile
@@ -116,7 +117,7 @@ module_ndt_w_assembly.o:  module_ndt_w_assembly.f90 module_hexa.o module_lin_alg
 module_lin_alg.o:  module_lin_alg.f90 Makefile
 	$(FC) $(FFLAGS) -c module_lin_alg.f90 
 
-module_multigrid.o: module_multigrid.f90 module_ndt_assembly.o module_boundary_conditions.o module_common.o module_utils.o Makefile
+module_multigrid.o: module_sweeps.o module_multigrid.f90 module_coarsening.o module_ndt_mult.o module_ndt_assembly.o module_boundary_conditions.o module_common.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c  module_multigrid.f90
 
 module_femwind.o: module_femwind.f90 module_multigrid.o module_f_assembly.o module_ndt_w_assembly.o module_boundary_conditions.o module_common.o module_utils.o Makefile
@@ -140,10 +141,16 @@ FEMWIND_MODULES = \
 femwind_test.exe: femwind_test.f90 $(FEMWIND_MODULES) Makefile
 	$(FC) $(FFLAGS) -o $@ femwind_test.f90 $(FEMWIND_MODULES) 
 
-NETCDF_TEST = netcdf_test.f90\
-  module_utils.o \
+WRFOUT_MODULES = \
   module_netcdf.o \
   module_wrfout.o
+
+FEMWIND_NETCDF = femwind_netcdf.f90 $(WRFOUT_MODULES) $(FEMWIND_MODULES)
+
+femwind_netcdf.exe: $(FEMWIND_NETCDF) Makefile
+	$(FC) $(FFLAGS) -o $@ $(FEMWIND_NETCDF) $(LFLAGS)
+
+NETCDF_TEST = netcdf_test.f90 $(WRFOUT_MODULES) module_utils.o 
 
 netcdf_test.exe: $(NETCDF_TEST)
 	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
