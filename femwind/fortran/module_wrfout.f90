@@ -24,9 +24,9 @@ if(netcdf_msglevel>=0)print *,"CHSUM0=",chsum0
 !sr=(/10,10/)  ! to strip at i j ends
 call get_sr(ncid,sr)
 
-call netcdf_read_array_wrf(ncid,u0_fmw,"U0_FMW",istep,sr)
-call netcdf_read_array_wrf(ncid,v0_fmw,"V0_FMW",istep,sr)
-call netcdf_read_array_wrf(ncid,w0_fmw,"W0_FMW",istep,sr)
+call netcdf_read_array_wrf(ncid,"U0_FMW",istep,sr,a3d=u0_fmw)
+call netcdf_read_array_wrf(ncid,"V0_FMW",istep,sr,a3d=v0_fmw)
+call netcdf_read_array_wrf(ncid,"W0_FMW",istep,sr,a3d=w0_fmw)
 
 chsum0_fmw = get_chsum(u0_fmw)
 if(netcdf_msglevel>=0)print *,"chsum0_fmw ", chsum0_fmw

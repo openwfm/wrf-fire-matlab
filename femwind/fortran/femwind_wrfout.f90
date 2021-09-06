@@ -14,9 +14,13 @@ integer ::                          &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte                          ! fire tile bounds
 
-! A, msize included from module femwind
+! declaratins of A, msize included from module femwind
+
+! variables read from wrfout
+real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:), zsf(:,:) 
+
+! variables computed here
 real, pointer:: X(:,:,:),Y(:,:,:),Z(:,:,:), &
-                u0(:,:,:), v0(:,:,:), w0(:,:,:),   &
                 u(:,:,:), v(:,:,:), w(:,:,:),Kmat(:,:,:,:),A_m(:,:,:)
 
 integer:: i, j, k, n(3)
@@ -32,6 +36,8 @@ call ncopen(filename,nf90_nowrite,ncid)
 if(read_initial_wind(ncid,u0,v0,w0,frame=frame).ne.0)call crash('check sum does not agree')
 
 call get_sr(ncid,sr)   ! subgrid refinement ratios
+
+call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf)
 
 return
 

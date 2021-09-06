@@ -112,53 +112,123 @@ subroutine netcdf_write_array(ncid,a,name)
     
 end subroutine netcdf_write_array
 
-subroutine netcdf_read_array_wrf(ncid,a,name,istep,sr)
+integer function l2i(l)
+    implicit none
+    logical, intent(in)::l
+    if(l)then
+        l2i = 1
+    else
+        l2i = 0
+    endif
+end function l2i
+
+subroutine netcdf_read_array_wrf(ncid,name,frame,sr,a1d,a2d,a3d)
     implicit none
 
 !*** arguments
     integer, intent(in)::                ncid ! open netcdf file
-    real, pointer, intent(out):: a(:,:,:)  ! the array pointer; remember to deallocate when done with it
+    real, pointer, intent(out),optional:: a1d(:)  ! the array pointer; remember to deallocate when done with it
+    real, pointer, intent(out),optional:: a2d(:,:)  ! the array pointer; remember to deallocate when done with it
+    real, pointer, intent(out),optional:: a3d(:,:,:)  ! the array pointer; remember to deallocate when done with it
     character(LEN=*),intent(in):: name
-    integer, intent(in)::                istep ! time step in the file
-    integer, intent(in), dimension(2)::  sr ! strip to remove in i and j dimension
+    integer, intent(in), optional::                frame ! time step in the file
+    integer, intent(in), dimension(2), optional::  sr ! strip to remove in i and j dimension
 
 !*** local
-    integer,dimension(4)::star,cnts
-    integer::i,j,k,varid,ends(4),dims(4)
-    real,dimension(:,:,:,:),allocatable::at
+    integer d1,d2,d3
+    integer,dimension(:),allocatable::star,cnts,dims,ends
+    integer::i,j,k,varid,ndims
+    real,dimension(:,:),allocatable::a1
+    real,dimension(:,:,:),allocatable::a2
+    real,dimension(:,:,:,:),allocatable::a3
+    integer:: istep=1, srf(2)
     character(len=256) msg
 
-    if(netcdf_msglevel>=0) &
-       print *,"netcdf_read_array_wrf reading variable ",trim(name)," time step ",istep," stripping ",sr," at ij ends"
+!*** executable
+    if(present(frame))istep=frame
+
+    d1 = l2i(present(a1d))
+    d2 = l2i(present(a2d))
+    d3 = l2i(present(a3d))
+
+    if(d1+d2+d3.ne.1)call crash('netcdf_read_array_wrf: must have exactly one of a1d a2d a3d arguments')
+    ndims = d1+2*d2+3*d3
+
+    if(ndims.eq.1)then
+        srf = 0
+    elseif(present(sr))then
+        srf = sr
+    else
+        call get_sr(ncid,srf)
+    endif
+
+    allocate(star(ndims+1))
+    allocate(cnts(ndims+1))
+    allocate(dims(ndims+1))
+    allocate(ends(ndims+1))
+
+    write(msg,*)"netcdf_read_array_wrf reading variable ",trim(name), &
+          " dimension ",ndims," time step ",istep
+    call message(msg)
 
     ! get idx
     call netcdf_var_info(ncid,name,dims,varid,netcdf_msglevel)
-    star   = (/1,1,1,istep/)
-    ends   = (/dims(1),dims(2),dims(3),istep/)
-    star   = min(star,dims)
-    ends   = min(ends,dims)
+    write(msg,*)"got dimensions ",trim(name),dims
+    call message(msg)
+    if(dims(ndims+1).eq.0)then
+       write(msg,*)'netcdf_read_array_wrf: wrong dimension ndims=',ndims, ' 1dims=',dims
+       call crash(msg)
+    endif
+     
+    star   = 1
+    star(ndims+1) = istep
+    ends(1:ndims) = dims(1:ndims)
+    ends(ndims+1) = istep
     cnts = ends - star + 1
 
-    write(msg,*)"reading ",trim(name),star,ends
+    write(msg,*)"reading ",trim(name),star," to ",ends
     call message(msg)
  
     ! read from file
-    allocate(at(star(1):ends(1),star(2):ends(2),star(3):ends(3),star(4):ends(4)))
-    call check(nf90_get_var(ncid, varid, at, start = star, count = cnts),"nf90_get_var:"//trim(name))
-    
-    ! transpose at -> a
-    allocate(a(star(1):ends(1)-sr(1),star(3):ends(3),star(2):ends(2)-sr(2)))
-    do k=star(3),ends(3)
-        do j=star(2),ends(2)-sr(2)
-            do i=star(1),ends(1)-sr(1)
-                a(i,k,j) = at(i,j,k,istep)
+    select case (ndims)
+    case(1) 
+        allocate(a1(star(1):ends(1),star(2):ends(2)))
+        allocate(a1d(star(1):ends(1)))
+        call check(nf90_get_var(ncid, varid, a1d, start = star, count = cnts),"nf90_get_var:"//trim(name))
+        a1d = a1(:,istep)
+    case(2) 
+	allocate(a2(star(1):ends(1),star(2):ends(2),star(3):ends(3)))
+        call check(nf90_get_var(ncid, varid, a2, start = star, count = cnts),"nf90_get_var:"//trim(name))
+        ! postprocessing - strip
+        write(msg,*)" stripping ",srf," at ij ends"
+        call message(msg)
+        allocate(a2d(star(1):ends(1)-srf(1),star(2):ends(2)-srf(2)))
+        do j=star(2),ends(2)-srf(2)
+            do i=star(1),ends(1)-srf(1)
+                a2d(i,j) = a2(i,j,istep)
             enddo
         enddo
-    enddo
+        write(msg,*)"returning array ij shape ",shape(a2d)
+    case(3) 
+        allocate(a3(star(1):ends(1),star(2):ends(2),star(3):ends(3),star(4):ends(4)))
+        call check(nf90_get_var(ncid, varid, a3, start = star, count = cnts),"nf90_get_var:"//trim(name))
+        ! transpose at -> a and strip
+        write(msg,*)" stripping ",srf," at ij ends and transposing to ikj indexing order"
+        call message(msg)
+        allocate(a3d(star(1):ends(1)-srf(1),star(3):ends(3),star(2):ends(2)-srf(2)))
+        do k=star(3),ends(3)
+            do j=star(2),ends(2)-srf(2)
+                do i=star(1),ends(1)-srf(1)
+                    a3d(i,k,j) = a3(i,j,k,istep)
+                enddo
+            enddo
+        enddo
+        write(msg,*)"returning array ikj shape ",shape(a3d)
+    case default
+        call crash('wrong case ndims')
+    end select
 
-    deallocate(at)
-    if(netcdf_msglevel>=0) &
-       print *,"returning array ikj shape ",shape(a)
+    call message(msg)
 
 end subroutine netcdf_read_array_wrf
 

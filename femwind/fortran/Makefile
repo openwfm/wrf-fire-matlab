@@ -152,7 +152,7 @@ femwind_wrfout.exe: $(FEMWIND_WRFOUT) Makefile
 
 NETCDF_TEST = netcdf_test.f90 $(WRFOUT_MODULES) module_utils.o 
 
-netcdf_test.exe: $(NETCDF_TEST)
+netcdf_test.exe: $(NETCDF_TEST) Makefile
 	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
 
 clean:
