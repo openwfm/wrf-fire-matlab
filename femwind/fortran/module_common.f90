@@ -3,7 +3,7 @@ module module_common
 use module_utils
 
 integer, parameter::msize=14
-integer, parameter::max_levels=3
+integer, parameter::max_levels=5
 
 ! method parameters
 type params_type
@@ -16,7 +16,7 @@ type params_type
     integer:: maxit_coarse=8 ! on levels>1: 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
     integer:: debug_level=-1 ! multigrid level to debug up to
     integer:: msglevel=1 ! type of messages to print  
-    integer:: print_level=-1 ! multigrid level to print messages up to
+    integer:: print_level=2 ! multigrid level to print messages up to
     !logical:: check_relres=.true.  ! check residual after every base iteration if to continue
     logical:: check_relres=.false.
     real:: restol=1e-6 ! residual tolerance to stop iterating

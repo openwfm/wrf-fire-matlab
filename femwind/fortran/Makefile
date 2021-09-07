@@ -8,6 +8,7 @@ FFLAGS = -O3 -pg
 FFLAGS = -g -C -I /opt/local/include
 LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -g -C -I $(NETCDF)/include 
+FFLAGS = -O3 -I $(NETCDF)/include
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
 default: femwind_wrfout.exe
