@@ -2,6 +2,7 @@ function new_paths = interp_paths(ps,p_param)
 %function adds new points along paths
 new_paths = ps;
 
+pt_dist = 2000;
 %save easy named variables from struct
 pts = ps.grid_pts;
 pts(:,3) = ps.points(:,3);
@@ -40,7 +41,7 @@ for i = 1:n
             dist = ps.raw_dist(p(j-1),p(j));
             %ts_4 --> dist/2000
             %ts_5 --> dist/1000
-            np = round(dist/500)+1;
+            np = round(dist/pt_dist)+1;
             %fprintf('Segment %d distance: %f new points: %d \n',j-1,dist,np);
             %linear interpolation of new points along the line
             new_lats = linspace(pts(p(j-1),1),pts(p(j),1),np)' ...

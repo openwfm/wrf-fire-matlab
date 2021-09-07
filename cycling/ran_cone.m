@@ -8,8 +8,8 @@ tx = linspace(-10,10,p);
 ty = linspace(-10,10,q);
 [x,y] = meshgrid(tx,ty);
 
-x0 = randn;
-y0 = randn;
+x0 = 2*randn;
+y0 = 4*randn;
 z0 = 0;
 z_max = 20;
 radius = 9+2*rand;
@@ -57,14 +57,14 @@ for i = 1:n
     %z(z2>z0) = max(z(z2>z0),z2(z2>z0));
     z(z2>z) = alpha*z(z2>z)+(1-alpha)*z2(z2>z);
     %z = imgaussfilt(z,1/2);
-    %z = smooth_up(x,y,z);
+    %z = smooth_up(z);
     z(z>z_max) = z_max;
     
     %figure(234),contour(x,y,z,20,'k')
     
 end  %for loop    
 
-%z = smooth_up(x,y,z);
+%z = smooth_up(z);
 %figure,mesh(x,y,z);
 %quick_mesh(z)
 %figure,plot(c(:,1),c(:,2));

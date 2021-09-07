@@ -11,9 +11,9 @@ if real_data == 0
     d2 = [3 4 12];
     
     %reported
-    dist = sqrt((d2(1)-d1(1))^2+(d2(2)-d1(2))^2);
-    time = d2(3) - d1(3);
-    ros = dist/time;
+    dist_r = sqrt((d2(1)-d1(1))^2+(d2(2)-d1(2))^2);
+    time_r = d2(3) - d1(3);
+    ros = dist_r/time_r;
     fprintf('ROS = %f\n',ros)
     
     %statistics
@@ -28,11 +28,11 @@ else
     %clear p
     num_paths = length(ps.paths);
     path_num = max(2,round(num_paths*rand));
-    path = ps.paths(path_num);
-    path_length = length(path);
+    p = ps.paths(path_num);
+    path_length = length(p);
     path_end = max(2,round(path_length*rand));
-    p1 = path.p(path_end -1);
-    p2 = path.p(path_end);
+    p1 = p.p(path_end -1);
+    p2 = p.p(path_end);
     fprintf('Generating stats for path %d, points %d and %d \n',path_num,path_end-1,path_end);
     lon1 = ps.points(p1,2);
     lat1 = ps.points(p1,1);
@@ -42,18 +42,24 @@ else
     time2 = ps.points(p2,3);
     
     E = wgs84Ellipsoid;
-    dist = distance(lat1,lon1,lat2,lon2,E);
-    time = time2-time1;
-    ros = dist/(time*24*3600);
-    fprintf('ROS = %f\n',ros)
+    dist_r = distance(lat1,lon1,lat2,lon2,E);
+    time_r = time2-time1;
+    
+    %testing numbers
+    dist_r = 1500;
+    time_r = 0.9;
+    
+    ros = dist_r/(time_r*24*3600);
+    fprintf('Dist = %f m Time = %f s \n',dist_r,time_r*24*3600);
+    fprintf('ROS = %f m/s \n',ros)
     
     %coordinates of detections
     d1 = [0 0 0];
-    d2 = [0 dist time];
+    d2 = [0 dist_r time_r];
     
     %statistics
-    sig1 = 1000;
-    sig2 = 1000;
+    sig1 = 375;
+    sig2 = 375;
     time_diff = 0.25;
 end %if real_data == 0
 
@@ -93,11 +99,16 @@ if real_data == 0
     title('Histogram of ROS')
 else
     t_str = sprintf('Histogram of ROS \n Path: %d Points: %d and %d',path_num,path_end-1,path_end);
-    title(t_str)
+    t_str2 = sprintf('Distance: %f [m] Time: %f [h]',dist_r,time_r*24)
+    title({t_str,t_str2})
 end
 xlabel('ROS'),ylabel('Number')
 ros_mean = mean(ros_rand);
-fprintf('Mean random ROS: %f\n',mean(ros_rand))
+fprintf('Mean random ROS: %f m/s \n',ros_mean)
+ros_std = std(ros_rand);
+fprintf('Standard deviation of random ROS: %f m/s \n',ros_std)
 
+figure,qqplot(ros_rand)
+title('QQ-plot')
 
 end
