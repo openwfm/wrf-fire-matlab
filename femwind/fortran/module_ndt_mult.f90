@@ -9,7 +9,7 @@ subroutine ndt_mult(                              &
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts,jfte,             &
-    kmat, lambda, y, r)
+    kmat, lambda, y, r, siz, relres)
 
 implicit none
 
@@ -27,17 +27,19 @@ integer, parameter:: msize = 14
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: kmat  ! global stiffness matrix
 real,intent(in),  dimension(ifms:ifme,kfms:kfme,jfms:jfme):: lambda, y          ! input vectors 
 real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: r          ! output vector 
+real, intent(out):: siz, relres
 !*** local
 
 integer:: i,j,k,ie,je,ke  
-real:: t
+real:: t, res
 
 !** executable
 ie = snode(ifte,ifde,+1)
 je = snode(jfte,jfde,+1)
 ke = snode(kfte,kfde,+1)
 
-
+siz = 0.
+res = 0.
 
 do j=jfts,je
   do k=kfts,ke
@@ -71,9 +73,14 @@ do j=jfts,je
         kmat(i  ,k  ,j  ,13)*lambda(i  ,k+1,j+1) +  &
         kmat(i  ,k  ,j  ,14)*lambda(i+1,k+1,j+1) )
       r(i,k,j) = t
+      siz = max(siz,abs(y(i,k,j)))
+      res = max(res,abs(t))
     enddo
   enddo
 enddo
+
+relres = res/max(tiny(siz),siz)
+
          
 end subroutine ndt_mult
 

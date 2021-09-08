@@ -181,7 +181,7 @@ integer::   &
 
 integer::it, maxit, nit, nsmooth, cycles
 logical::coarse,coarsest
-real:: restol, norm_f, norm_res, diftol, reldif
+real:: restol, norm_f, norm_res, diftol, siz, reldif, relres, rhsiz
 character(len=10)::it_kind
 
 !*** executable
@@ -254,7 +254,8 @@ do it=1,maxit
             ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
             ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
             ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-            mg(l)%Kglo, mg(l)%lambda, mg(l)%f, mg(l)%res)
+            mg(l)%Kglo, mg(l)%lambda, mg(l)%f, mg(l)%res, rhsiz, relres)
+        if(params%print_level>=l)print *,'level=',l,' it=',it,'mult rhsiz=',siz,' rel res =',reldif
         if(params%debug_level >=l)call  write_array(mg(l)%res(ifts: ifte, kfts: kfte, jfts:jfte),'cc_res')
         ! restriction: f_coarse = R*residual      
         call restriction(   &
@@ -300,7 +301,8 @@ do it=1,maxit
             ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
             ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
             ifts, ifte, kfts, kfte, jfts, jfte,           & ! tile dimensions                  
-            mg(l)%Kglo, mg(l)%f, mg(l)%lambda, reldif) 
+            mg(l)%Kglo, mg(l)%f, mg(l)%lambda, siz, reldif) 
+        if(params%print_level>=l)print *,'level=',l,' it=',it,'sweeps siz=',siz,' rel diff=',reldif
         if(reldif < diftol)then
             if(params%print_level>=l)print *,'level ',l,' iteration ',it,' rel diff=',reldif,'< diftol=',diftol,' exiting'
             exit
@@ -315,7 +317,7 @@ do it=1,maxit
             ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
             ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
             ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-            mg(l)%Kglo, mg(l)%lambda, mg(l)%f, mg(l)%res)
+            mg(l)%Kglo, mg(l)%lambda, mg(l)%f, mg(l)%res, siz, relres)
         if(params%debug_level >=l)call  write_array(mg(l+1)%res(ifcts: ifcte, kfcts: kfcte, jfcts:jfcte),'it_res')
         norm_res = norm2( mg(l)%res(ifts: ifte, kfts: kfte, jfts: jfte))   ! residual norm
         if (mod(it,params%nsmooth+1)==params%nsmooth)then

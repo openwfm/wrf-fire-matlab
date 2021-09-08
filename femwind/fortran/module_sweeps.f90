@@ -7,7 +7,7 @@ subroutine sweeps(ifds, ifde, kfds,kfde, jfds, jfde,               &     ! fire 
                   ifms, ifme, kfms,kfme, jfms, jfme,               &
                   ifps, ifpe, kfps, kfpe, jfps, jfpe,              &     ! fire patch bounds
                   ifts, ifte, kfts, kfte, jfts,jfte,               &
-                  Kmat, F, x, reldif)                             !input and output matrices/vectors
+                  Kmat, F, x, siz, reldif)                             !input and output matrices/vectors
 
 implicit none
 
@@ -24,12 +24,12 @@ integer, parameter:: msize = 14
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme,msize):: Kmat  ! global stiffness matrix
 real, intent(in), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: F           ! global load vector
 real,intent(out), dimension(ifms:ifme,kfms:kfme,jfms:jfme):: x           ! output vector
-real, intent(out):: reldif    ! relative difference betweet input and output, in max norm
+real, intent(out):: siz, reldif    ! size of input, relative difference betweet input and output, in max norm
 
 !*** local
 
 integer:: i, j, k, r1, r2, ie,je, ke 
-real:: t, dif, siz, old, new
+real:: t, dif, old, new
 
 !*** executable
  
