@@ -44,9 +44,9 @@ ke = snode(kfte, kfde, +1)
 
 do r1 = 1,2
     do r2 = 1,2
-        do i = r1,ie,2
-           do j =r2,je,2 
-              do k = 1,ke
+        do j =r2,je,2 
+            do k = 1,ke
+               do i = r1,ie,2
                   old = x(i,k,j)
                   new =     (1/Kmat(i  ,k  ,j  , 1))*               &
                             ( F(i,k,j) -                            &
