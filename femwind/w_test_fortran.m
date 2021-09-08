@@ -1,8 +1,8 @@
-function err=ndt_w_test_fortran(A,X,u0,lambda,params) 
+function err=w_test_fortran(A,X,u0,lambda,params) 
 % call fortran version and compare resultso
 
 lambda2 = lambda(:);
-W_m=ndt_w_assembly(A,X,u0, lambda2,params);
+W_m=w_assembly(A,X,u0, lambda2,params);
 U_m = W_m{1};
 V_m = W_m{2};
 W_m = W_m{3};
@@ -23,7 +23,7 @@ write_array(swap23(u0{1}),'u0_test');
 write_array(swap23(u0{2}),'v0_test');
 write_array(swap23(u0{3}),'w0_test');
 
-system('./fortran/ndt_w_test.exe');
+system('./fortran/w_test.exe');
 U = swap23(read_array('U_test'));
 V = swap23(read_array('V_test'));
 W = swap23(read_array('W_test'));

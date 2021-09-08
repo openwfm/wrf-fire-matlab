@@ -1,4 +1,4 @@
-function W=ndt_w_assembly(A,X,u0,lambda,params)
+function W=w_assembly(A,X,u0,lambda,params)
 
 % in: 
 %  A  penalty coefficients matrix, size 3x3, s.p.d.

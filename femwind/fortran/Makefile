@@ -8,7 +8,7 @@ FFLAGS = -O3 -pg
 FFLAGS = -g -C -I /opt/local/include
 LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -g -C -I $(NETCDF)/include 
-FFLAGS = -O3 -I $(NETCDF)/include
+FFLAGS = -pg -O3 -I $(NETCDF)/include
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
 default: femwind_wrfout.exe
@@ -20,7 +20,7 @@ tests: hexa_test.exe\
  prolongation_test.exe\
  restriction_test.exe\
  ndt_assembly_test.exe\
- ndt_w_test.exe\
+ w_test.exe\
  coarsening_icl_test.exe\
  ndt_boundary_conditions_test.exe\
  vec_boundary_conditions_test.exe\
@@ -106,14 +106,14 @@ VEC_BOUNDARY_CONDITIONS = vec_boundary_conditions_test.f90  module_boundary_cond
 vec_boundary_conditions_test.exe: $(VEC_BOUNDARY_CONDITIONS) Makefile
 	$(FC) $(FFLAGS) -o $@ $(VEC_BOUNDARY_CONDITIONS)
 
-ndt_w_test.exe: ndt_w_test.o module_ndt_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o Makefile
-	$(FC) $(FFLAGS) -o ndt_w_test.exe ndt_w_test.o module_ndt_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o
+w_test.exe: w_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -o w_test.exe w_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o
 
-ndt_w_test.o: ndt_w_test.f90  module_hexa.o module_utils.o  module_ndt_w_assembly.o Makefile
-	$(FC) $(FFLAGS) -c ndt_w_test.f90
+w_test.o: w_test.f90  module_hexa.o module_utils.o  module_w_assembly.o Makefile
+	$(FC) $(FFLAGS) -c w_test.f90
 
-module_ndt_w_assembly.o:  module_ndt_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
-	$(FC) $(FFLAGS) -c module_ndt_w_assembly.f90
+module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -c module_w_assembly.f90
 
 module_lin_alg.o:  module_lin_alg.f90 Makefile
 	$(FC) $(FFLAGS) -c module_lin_alg.f90 
@@ -121,14 +121,14 @@ module_lin_alg.o:  module_lin_alg.f90 Makefile
 module_multigrid.o: module_sweeps.o module_multigrid.f90 module_coarsening.o module_ndt_mult.o module_ndt_assembly.o module_boundary_conditions.o module_common.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c  module_multigrid.f90
 
-module_femwind.o: module_femwind.f90 module_multigrid.o module_f_assembly.o module_ndt_w_assembly.o module_boundary_conditions.o module_common.o module_utils.o Makefile
+module_femwind.o: module_femwind.f90 module_multigrid.o module_f_assembly.o module_w_assembly.o module_boundary_conditions.o module_common.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c  module_femwind.f90
 
 FEMWIND_MODULES = \
   module_femwind.o\
   module_multigrid.o\
   module_ndt_assembly.o\
-  module_ndt_w_assembly.o\
+  module_w_assembly.o\
   module_ndt_mult.o\
   module_lin_alg.o\
   module_f_assembly.o\
