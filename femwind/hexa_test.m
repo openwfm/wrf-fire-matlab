@@ -44,7 +44,7 @@ if exist('vrrotvec2mat')
     [K1, ~, ~] = hexa(A,S*X,u);
     err_iso=norm(K0-K1,'fro')
 else
-    warning('no vrrotvec2mat, cannot test rotation invariance')
+    warning('No vrrotvec2mat, cannot test rotation invariance. Install Simulink 3D Animation.')
 end
 
 % test stretch
