@@ -24,7 +24,7 @@ real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:)
 real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:)
 
 integer:: i, j, k, n(3), nx, ny, nz
-integer::ncid,frame,sr(2),iframe,mframe=100
+integer::ncid,frame,sr(2),frame0_fmw,mframe=100
 real:: rate,A(3,3),dx,dy,zx,zy
 character(len=128)::filename 
 
@@ -141,9 +141,9 @@ call write_average_to_center(mg(1)%X,'X_c')
 call write_average_to_center(mg(1)%Y,'Y_c')
 call write_average_to_center(mg(1)%Z,'Z_c')
 
-do iframe=0,mframe
+do frame0_fmw=1,mframe
   ! initial velocity field
-  call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,iframe,frame=1)
+  call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,frame0_fmw,frame=1)
   
   ! copy the input data to tile sized bounds
   ! initial wind is at cell centers, indexing was already switched to ikj in reading
