@@ -24,7 +24,7 @@ real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:)
 real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:)
 
 integer:: i, j, k, n(3), nx, ny, nz
-integer::ncid,frame,sr(2)
+integer::ncid,frame,sr(2),iframe,mframe=100
 real:: rate,A(3,3),dx,dy,zx,zy
 character(len=128)::filename 
 
@@ -34,9 +34,6 @@ filename = "wrf.nc" ! where to read from
 frame = 1
 
 call ncopen(filename,nf90_nowrite,ncid)
-
-! initial velocity field
-if(read_initial_wind(ncid,u0_fmw,v0_fmw,w0_fmw,frame=frame).ne.0)call crash('check sum does not agree')
 
 ! horizontal height at cell centers
 call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf) 
@@ -77,11 +74,7 @@ allocate(u(ifms:ifme,kfms:kfme,jfms:jfme)) ! vector components called u v W
 allocate(v(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(w(ifms:ifme,kfms:kfme,jfms:jfme))
 
-! copy the input data to tile sized bounds
-! initial wind is at cell centers, indexing was already switched to ikj in reading
-u0(ifts:ifte,kfts:kfte,jfts:jfte) = u0_fmw
-v0(ifts:ifte,kfts:kfte,jfts:jfte) = v0_fmw
-w0(ifts:ifte,kfts:kfte,jfts:jfte) = w0_fmw
+call ncclose(ncid)
 
 ! X Y Z are corner based, upper bound larger by one
 ! first interpolate/extrapolate zsf to corners
@@ -133,34 +126,52 @@ do k=kfds,kfte
     mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,k,1)
 enddo
 
-! save memory while solver is running
-deallocate(u0_fmw,v0_fmw,w0_fmw,ht_fmw,zsf)
+deallocate(ht_fmw,zsf)  ! no longer needed
 
 write(*,'(a)')'calling femwind_setup'
 call femwind_setup(mg)    
 write(*,'(a)')'femwind_setup returned OK'
 
-write(*,'(a)')'calling femwind_solve'
-call femwind_solve(  mg,&
-  ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-  ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-  ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-  ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  u0, v0, w0,                                  & ! input arrays
-  u, v, w,                                                  & ! output arrays
-  rate)
-write(*,'(a)')'femwind_solve returned OK'
+! write coordinates for debug/display, even if the caller knows
+call write_average_to_center(mg(1)%X,'X_c')
+call write_average_to_center(mg(1)%Y,'Y_c')
+call write_average_to_center(mg(1)%Z,'Z_c')
+
+call write_average_to_center(mg(1)%X,'X_c')
+call write_average_to_center(mg(1)%Y,'Y_c')
+call write_average_to_center(mg(1)%Z,'Z_c')
+
+do iframe=0,mframe
+  ! initial velocity field
+  call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,iframe,frame=1)
+  
+  ! copy the input data to tile sized bounds
+  ! initial wind is at cell centers, indexing was already switched to ikj in reading
+  u0(ifts:ifte,kfts:kfte,jfts:jfte) = u0_fmw
+  v0(ifts:ifte,kfts:kfte,jfts:jfte) = v0_fmw
+  w0(ifts:ifte,kfts:kfte,jfts:jfte) = w0_fmw
+  
+  ! save memory while solver is running
+  deallocate(u0_fmw,v0_fmw,w0_fmw)
+  
+  write(*,'(a)')'calling femwind_solve'
+  call femwind_solve(  mg,&
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+    u0, v0, w0,                                  & ! input arrays
+    u, v, w,                                                  & ! output arrays
+    rate)
+  write(*,'(a)')'femwind_solve returned OK'
+
+enddo
 
 ! write output as is in 3D but with tight dimensions
 call write_array(u(ifts:ifte,kfts:kfte,jfts:jfte),'u')  
 call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')  
 call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
 call write_scalar(rate,'rate')
-
-! also coordinates for debug/display, even if the caller knows
-call write_average_to_center(mg(1)%X,'X_c')
-call write_average_to_center(mg(1)%Y,'Y_c')
-call write_average_to_center(mg(1)%Z,'Z_c')
 
 contains
 
