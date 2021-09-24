@@ -20,7 +20,7 @@ end subroutine pause
 
 subroutine message(s)
 character(len=*)::s
-print *,trim(s)
+write(*,'(a)')trim(s)
 end subroutine message
 
 
@@ -226,5 +226,30 @@ enddo
 get_chsum = lsum
 
 end function get_chsum
+
+integer function get_chsum_2d(a)
+! xor check sum of 2D real array
+implicit none
+!*** arguments
+real, intent(in)::a(:,:)
+!*** local
+integer::lb(2),ub(2),i,j,k,lsum,iel
+real::rel
+equivalence(rel,iel)
+!*** executable
+lb = lbound(a)
+ub = ubound(a)
+lsum=0
+  do k=lb(2),ub(2)
+    do i=lb(1),ub(1)
+      rel=a(i,j)
+      lsum=ieor(lsum,iel)
+      !print *,i,j,rel,iel,lsum
+    enddo
+  enddo
+
+get_chsum_2d = lsum
+
+end function get_chsum_2d
 
 end module module_utils

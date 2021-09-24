@@ -91,6 +91,7 @@ integer, intent(out)::  &
     ifms, ifme, kfms, kfme, jfms, jfme,           & ! memory dimensions
     ifps, ifpe, kfps, kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte              ! tile dimensions
+character(len=256)::msg
  
     ifds = 1
     ifde = mg_level%nx-1  ! dimension in elements
@@ -119,6 +120,14 @@ integer, intent(out)::  &
     jfme = jfpe + 2
     kfms = kfps - 1
     kfme = kfpe + 2
+write(msg,*)"get_mg_dims: domain",ifds, ifde, kfds, kfde, jfds, jfde
+call message(msg)
+write(msg,*)"get_mg_dims: memory",ifms, ifme, kfms, kfme, jfms, jfme
+call message(msg)
+write(msg,*)"get_mg_dims: patch ",ifps, ifde, kfps, kfpe, jfps, jfpe
+call message(msg)
+write(msg,*)"get_mg_dims: tile  ",ifts, ifte, kfts, kfte, jfts, jfte
+call message(msg)
 
 end subroutine get_mg_dims
 

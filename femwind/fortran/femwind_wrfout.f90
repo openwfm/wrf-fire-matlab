@@ -8,30 +8,36 @@ use module_wrfout
 
 implicit none
 
+integer::write_debug = 0,call_femwind = 0
+
 integer ::                          &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte                          ! fire tile bounds
 
-! declaratins of A, msize included from module femwind
+! declarations of A, msize included from module femwind
 
 ! variables read from wrfout
 real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsf(:,:), ht_fmw(:)
 
 ! variables allocated and computed here
 real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:)
-real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:)
+real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:), uf(:,:), vf(:,:)
 
 integer:: i, j, k, n(3), nx, ny, nz
-integer::ncid,frame,sr(2),frame0_fmw,mframe=100
+integer::ncid,frame,sr(2),frame0_fmw,mframe=100,dims(3)
 real:: rate,A(3,3),dx,dy,zx,zy
-character(len=128)::filename 
+character(len=256)::filename, msg
 
 !*** executable
 
-filename = "wrf.nc" ! where to read from
-frame = 1
+filename = "wrf.nc" ! file to read from and write to
+frame = 1           ! frame in the file 
+
+!************************************
+! read static data 
+!************************************
 
 call ncopen(filename,nf90_nowrite,ncid)
 
@@ -41,10 +47,17 @@ call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf)
 ! height of the vertical layers above the terrain
 call netcdf_read_array_wrf(ncid,"HT_FMW",frame=frame,a1d=ht_fmw)
 
+!  fire subgrid refinement ratio, 3d grid dimensions cell centered
+call get_wrf_dims(ncid,sr,dims)  
 ! horizontal mesh spacing
-call get_sr(ncid,sr)  !  fire subgrid refinement ratio
 dx = netcdf_read_att(ncid,"DX")/sr(1)
 dy = netcdf_read_att(ncid,"DY")/sr(2)
+
+call ncclose(ncid)
+
+!************************************
+! process static data 
+!************************************
 
 !construct mg data 
 
@@ -54,15 +67,17 @@ params%A = reshape((/1.0,0.0,0.0, &
                    (/3,3/))
 
 ! finest level 1
-mg(1)%nx = size(u0_fmw,1) + 1  ! dimensions are vertex centered
-mg(1)%ny = size(u0_fmw,3) + 1  ! dimensions are vertex centered
-mg(1)%nz = size(u0_fmw,2) + 1  ! dimensions are vertex centered
+mg(1)%nx = dims(1) + 1  ! dimensions are vertex centered
+mg(1)%ny = dims(2) + 1  ! dimensions are vertex centered
+mg(1)%nz = dims(3) + 1  ! dimensions are vertex centered
 
 call get_mg_dims(mg(1), &                 !  set bounds compatible with WRF
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts,kfte, jfts, jfte)
+
+! allocations persistent over the whole run
 
 allocate(mg(1)%X(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(mg(1)%Y(ifms:ifme,kfms:kfme,jfms:jfme))
@@ -73,8 +88,13 @@ allocate(w0(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(u(ifms:ifme,kfms:kfme,jfms:jfme)) ! vector components called u v W
 allocate(v(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(w(ifms:ifme,kfms:kfme,jfms:jfme))
+allocate(uf(ifts:ifte,jfts:jfte))
+allocate(vf(ifts:ifte,jfts:jfte))
+  write(msg,*)"shape(uf)=",shape(uf)
+  call message(msg)
+  write(msg,*)"shape(vf)=",shape(vf)
+  call message(msg)
 
-call ncclose(ncid)
 
 ! X Y Z are corner based, upper bound larger by one
 ! first interpolate/extrapolate zsf to corners
@@ -128,21 +148,26 @@ enddo
 
 deallocate(ht_fmw,zsf)  ! no longer needed
 
-write(*,'(a)')'calling femwind_setup'
+if(call_femwind.gt.0)then
+call message('calling femwind_setup')
 call femwind_setup(mg)    
-write(*,'(a)')'femwind_setup returned OK'
+call message('femwind_setup done')
+endif
 
-! write coordinates for debug/display, even if the caller knows
-call write_average_to_center(mg(1)%X,'X_c')
-call write_average_to_center(mg(1)%Y,'Y_c')
-call write_average_to_center(mg(1)%Z,'Z_c')
+if(write_debug.gt.0)then
+  ! write coordinates for debug/display, even if the caller knows
+  call write_average_to_center(mg(1)%X,'X_c')
+  call write_average_to_center(mg(1)%Y,'Y_c')
+  call write_average_to_center(mg(1)%Z,'Z_c')
+endif
 
-call write_average_to_center(mg(1)%X,'X_c')
-call write_average_to_center(mg(1)%Y,'Y_c')
-call write_average_to_center(mg(1)%Z,'Z_c')
+!************************************
+! loop over time steps 
+!************************************
 
 do frame0_fmw=1,mframe
-  ! initial velocity field
+
+  ! read initial velocity field, loop until delivered 
   call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,frame0_fmw,frame=1)
   
   ! copy the input data to tile sized bounds
@@ -153,7 +178,10 @@ do frame0_fmw=1,mframe
   
   ! save memory while solver is running
   deallocate(u0_fmw,v0_fmw,w0_fmw)
+
+  ! compute/update mass consistent flow
   
+if(call_femwind.gt.0)then
   write(*,'(a)')'calling femwind_solve'
   call femwind_solve(  mg,&
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -164,14 +192,27 @@ do frame0_fmw=1,mframe
     u, v, w,                                                  & ! output arrays
     rate)
   write(*,'(a)')'femwind_solve returned OK'
+else
+  ! interpolate to fire height
+  call message('TESTING ONLY: copying lowest level of input to uf vf')
+  write(msg,*)"shape(uf)=",shape(uf)
+  call message(msg)
+  write(msg,*)"shape(vf)=",shape(vf)
+  call message(msg)
+  uf = u0(ifts:ifte,1,jfts:jfte)
+  vf = v0(ifts:ifte,1,jfts:jfte)
+  call write_fire_wind(filename,uf,vf,frame0_fmw,frame=1)
+endif
+
+  if(write_debug.gt.0)then
+    ! write output as is in 3D but with tight dimensions
+    call write_array(u(ifts:ifte,kfts:kfte,jfts:jfte),'u')  
+    call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')  
+    call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
+    call write_scalar(rate,'rate')
+  endif
 
 enddo
-
-! write output as is in 3D but with tight dimensions
-call write_array(u(ifts:ifte,kfts:kfte,jfts:jfte),'u')  
-call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')  
-call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
-call write_scalar(rate,'rate')
 
 contains
 
