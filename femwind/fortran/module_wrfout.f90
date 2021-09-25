@@ -165,6 +165,7 @@ call ncopen(filename,nf90_write,ncid)
 call netcdf_write_2d(ncid,uf,"UF",istep)
 call netcdf_write_2d(ncid,vf,"VF",istep)
 chsum=ior(get_chsum_2d(uf),get_chsum_2d(vf))
+print *,'chsum=',chsum
 call netcdf_write_int(ncid,chsum,"CHSUM_FMW")
 call netcdf_write_int(ncid,frame0_fmw,"FRAME_FMW")
 call ncclose(ncid)  

@@ -239,6 +239,7 @@ equivalence(rel,iel)
 !*** executable
 lb = lbound(a)
 ub = ubound(a)
+print *,'shape ',shape(a),' bounds',lbound(a),ubound(a)
 lsum=0
   do j=lb(2),ub(2)
     do i=lb(1),ub(1)
@@ -247,6 +248,7 @@ lsum=0
       !print *,i,j,rel,iel,lsum
     enddo
   enddo
+print *,'lsum=',lsum
 
 get_chsum_2d = lsum
 
