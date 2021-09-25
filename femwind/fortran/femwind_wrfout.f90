@@ -19,13 +19,13 @@ integer ::                          &
 ! declarations of A, msize included from module femwind
 
 ! variables read from wrfout
-real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsf(:,:), ht_fmw(:)
+real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsfe(:,:), ht_fmw(:), zsf_fmw(:,:), zsfc(:,:)
 
 ! variables allocated and computed here
 real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:)
 real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:), uf(:,:), vf(:,:)
 
-integer:: i, j, k, n(3), nx, ny, nz
+integer:: i, j, k, n(3), nx, ny, nz, nfx, nfy, nfz
 integer::ncid,frame,sr(2),frame0_fmw,mframe=100,dims(3)
 real:: rate,A(3,3),dx,dy,zx,zy
 character(len=256)::filename, msg
@@ -41,17 +41,22 @@ frame = 1           ! frame in the file
 
 call ncopen(filename,nf90_nowrite,ncid)
 
-! horizontal height at cell centers
-call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf) 
-
-! height of the vertical layers above the terrain
-call netcdf_read_array_wrf(ncid,"HT_FMW",frame=frame,a1d=ht_fmw)
-
 !  fire subgrid refinement ratio, 3d grid dimensions cell centered
 call get_wrf_dims(ncid,sr,dims)  
 ! horizontal mesh spacing
 dx = netcdf_read_att(ncid,"DX")/sr(1)
 dy = netcdf_read_att(ncid,"DY")/sr(2)
+
+! height of the vertical layers above the terrain
+call netcdf_read_array_wrf(ncid,"HT_FMW",frame=frame,a1d=ht_fmw)
+
+! fire mesh size in cells
+nfx = dims(1)*sr(1)  
+nfy = dims(2)*sr(2)  
+nfz = size(ht_fmw,1)
+
+! horizontal height at cell centers
+call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf_fmw) 
 
 call ncclose(ncid)
 
@@ -67,9 +72,9 @@ params%A = reshape((/1.0,0.0,0.0, &
                    (/3,3/))
 
 ! finest level 1
-mg(1)%nx = dims(1) + 1  ! dimensions are vertex centered
-mg(1)%ny = dims(2) + 1  ! dimensions are vertex centered
-mg(1)%nz = dims(3) + 1  ! dimensions are vertex centered
+mg(1)%nx = nfx + 1  ! dimensions are vertex centered
+mg(1)%ny = nfy + 1  ! dimensions are vertex centered
+mg(1)%nz = nfz + 1  ! dimensions are vertex centered
 
 call get_mg_dims(mg(1), &                 !  set bounds compatible with WRF
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
@@ -90,33 +95,32 @@ allocate(v(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(w(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(uf(ifts:ifte,jfts:jfte))
 allocate(vf(ifts:ifte,jfts:jfte))
+allocate(zsfe(ifts-1:ifte+1,jfts-1:jfte+1))
   write(msg,*)"shape(uf)=",shape(uf)
   call message(msg)
   write(msg,*)"shape(vf)=",shape(vf)
   call message(msg)
 
-
 ! X Y Z are corner based, upper bound larger by one
-! first interpolate/extrapolate zsf to corners
-do j=jfts,jfte+1
-  do i=ifts,ifte+1
-    if(i.eq.ifts)then
-      zx = zsf(i,j) - 0.5*(zsf(i+1,j)-zsf(i,j))  ! extrapolate down
-    elseif(i.eq.ifte+1)then
-      zx = zsf(i,j) - 0.5*(zsf(i-1,j)-zsf(i,j))  ! extrapolate up 
-    else
-      zx = 0.5*(zsf(i,j) + zsf(i+1,j))           ! interpolate
-    endif
-    if(j.eq.jfts)then
-      zy = zsf(i,j) - 0.5*(zsf(i,j+1)-zsf(i,j))  ! extrapolate down
-    elseif(j.eq.jfte+1)then
-      zy = zsf(i,j) - 0.5*(zsf(i,j-1)-zsf(i,j))  ! extrapolate up 
-    else
-      zy = 0.5*(zsf(i,j) + zsf(i,j+1))           ! interpolate
-    endif
-    mg(1)%Z(i,kfts,j) = 0.5*(zx + zy)
-  enddo
-enddo
+
+! copy interior
+zsfe(ifts:ifte,jfts:jfte)=zsf_fmw
+! extrapolate on sides
+zsfe(ifts-1,jfts:jfte)=1.5*zsfe(ifts,jfts:jfte)-0.5*zsfe(ifts+1,jfts:jfte)
+zsfe(ifte+1,jfts:jfte)=1.5*zsfe(ifte,jfts:jfte)-0.5*zsfe(ifte-1,jfts:jfte)
+zsfe(ifts:ifte,jfts-1)=1.5*zsfe(ifts:ifte,jfts)-0.5*zsfe(ifts:ifte,jfts+1)
+zsfe(ifts:ifte,jfte+1)=1.5*zsfe(ifts:ifte,jfte)-0.5*zsfe(ifts:ifte,jfte-1)
+! extrapolate at domain corners
+zsfe(ifts-1,jfts-1)=1.5*zsfe(ifts,jfts)-0.5*zsfe(ifts+1,jfts+1)
+zsfe(ifte+1,jfts-1)=1.5*zsfe(ifte,jfts)-0.5*zsfe(ifte-1,jfts+1)
+zsfe(ifts-1,jfte+1)=1.5*zsfe(ifts,jfte)-0.5*zsfe(ifts+1,jfte-1)
+zsfe(ifte+1,jfte+1)=1.5*zsfe(ifte,jfte)-0.5*zsfe(ifte-1,jfte-1)
+! interpolate to cell corners
+mg(1)%Z(ifts:ifte+1,kfts,jfts:jfte+1) = 0.25 * (    &
+    zsfe(ifts:ifte+1,jfts:jfte+1) +         &
+    zsfe(ifts-1:ifte,jfts:jfte+1) +         &
+    zsfe(ifts:ifte+1,jfts-1:jfte) +         &
+    zsfe(ifts-1:ifte,jfts-1:jfte) )
 
 ! (X,Y) is the same uniform grid on all levels
 do j=jfts,jfte+1
@@ -146,7 +150,7 @@ do k=kfds,kfte
     mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,k,1)
 enddo
 
-deallocate(ht_fmw,zsf)  ! no longer needed
+deallocate(ht_fmw,zsfe)  ! no longer needed
 
 if(call_femwind.gt.0)then
 call message('calling femwind_setup')

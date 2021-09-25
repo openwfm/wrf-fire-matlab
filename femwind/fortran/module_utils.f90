@@ -233,14 +233,14 @@ implicit none
 !*** arguments
 real, intent(in)::a(:,:)
 !*** local
-integer::lb(2),ub(2),i,j,k,lsum,iel
+integer::lb(2),ub(2),i,j,lsum,iel
 real::rel
 equivalence(rel,iel)
 !*** executable
 lb = lbound(a)
 ub = ubound(a)
 lsum=0
-  do k=lb(2),ub(2)
+  do j=lb(2),ub(2)
     do i=lb(1),ub(1)
       rel=a(i,j)
       lsum=ieor(lsum,iel)
