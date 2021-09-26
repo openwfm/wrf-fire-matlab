@@ -239,13 +239,13 @@ equivalence(rel,iel)
 !*** executable
 lb = lbound(a)
 ub = ubound(a)
-print *,'shape ',shape(a),' bounds',lbound(a),ubound(a)
+print *,'shape a2d',shape(a),' bounds',lbound(a),ubound(a)
 lsum=0
   do j=lb(2),ub(2)
     do i=lb(1),ub(1)
       rel=a(i,j)
       lsum=ieor(lsum,iel)
-      !print *,i,j,rel,iel,lsum
+      print *,i,j,a(i,j),lsum
     enddo
   enddo
 print *,'lsum=',lsum
