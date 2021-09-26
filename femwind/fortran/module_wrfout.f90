@@ -164,7 +164,7 @@ call message(msg)
 call ncopen(filename,nf90_write,ncid)
 call netcdf_write_2d(ncid,uf,"UF",istep)
 call netcdf_write_2d(ncid,vf,"VF",istep)
-chsum=ior(get_chsum_2d(uf),get_chsum_2d(vf))
+chsum=ieor(get_chsum_2d(uf),get_chsum_2d(vf))
 print *,'chsum=',chsum
 call netcdf_write_int(ncid,chsum,"CHSUM_FMW")
 call netcdf_write_int(ncid,frame0_fmw,"FRAME_FMW")
@@ -184,7 +184,7 @@ integer, intent(in)::frame0_fmw   ! frame number to expect
 integer, intent(in), optional::frame ! the default frame in the file to read, default=1
 ! return: 0=OK, >0 timed out
 !*** local
-integer::istep=1,chsum0,sr(2),chsum0_fmw,ierr=0,maxtry=100,frame0_in,itry,ncid
+integer::istep=1,chsum0,sr(2),chsum0_fmw,ierr=0,maxtry=200,frame0_in,itry,ncid
 character(len=256)::msg
 
 !*** executable
@@ -231,6 +231,8 @@ call ncclose(ncid)
 write(msg,*)'timed out after ',maxtry,' tries waiting for correct check sum'
 call crash(trim(msg))
 2 continue
+write(msg,*)'success check sum match for time step ',frame0_fmw
+call message(msg)
 
 end subroutine read_initial_wind
 

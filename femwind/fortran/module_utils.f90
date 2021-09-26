@@ -245,7 +245,7 @@ lsum=0
     do i=lb(1),ub(1)
       rel=a(i,j)
       lsum=ieor(lsum,iel)
-      print *,i,j,a(i,j),lsum
+      ! print *,i,j,a(i,j),lsum
     enddo
   enddo
 print *,'lsum=',lsum
