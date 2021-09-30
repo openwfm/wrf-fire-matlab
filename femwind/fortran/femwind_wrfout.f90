@@ -8,46 +8,61 @@ use module_wrfout
 
 implicit none
 
+integer::write_debug = 0,call_femwind = 0
+
 integer ::                          &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
     ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
     ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
     ifts, ifte, kfts, kfte, jfts, jfte                          ! fire tile bounds
 
-! declaratins of A, msize included from module femwind
+! declarations of A, msize included from module femwind
 
 ! variables read from wrfout
-real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsf(:,:), ht_fmw(:)
+real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsfe(:,:), ht_fmw(:), zsf_fmw(:,:), zsfc(:,:)
 
 ! variables allocated and computed here
 real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:)
-real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:)
+real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:), uf(:,:), vf(:,:)
 
-integer:: i, j, k, n(3), nx, ny, nz
-integer::ncid,frame,sr(2)
+integer:: i, j, k, n(3), nx, ny, nz, nfx, nfy, nfz
+integer::ncid,frame,sr(2),frame0_fmw,mframe=100,dims(3)
 real:: rate,A(3,3),dx,dy,zx,zy
-character(len=128)::filename 
+character(len=256)::filename, msg
 
 !*** executable
 
-filename = "wrf.nc" ! where to read from
-frame = 1
+filename = "wrf.nc" ! file to read from and write to
+frame = 1           ! frame in the file 
+
+!************************************
+! read static data 
+!************************************
 
 call ncopen(filename,nf90_nowrite,ncid)
 
-! initial velocity field
-if(read_initial_wind(ncid,u0_fmw,v0_fmw,w0_fmw,frame=frame).ne.0)call crash('check sum does not agree')
-
-! horizontal height at cell centers
-call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf) 
+!  fire subgrid refinement ratio, 3d grid dimensions cell centered
+call get_wrf_dims(ncid,sr,dims)  
+! horizontal mesh spacing
+dx = netcdf_read_att(ncid,"DX")/sr(1)
+dy = netcdf_read_att(ncid,"DY")/sr(2)
 
 ! height of the vertical layers above the terrain
 call netcdf_read_array_wrf(ncid,"HT_FMW",frame=frame,a1d=ht_fmw)
 
-! horizontal mesh spacing
-call get_sr(ncid,sr)  !  fire subgrid refinement ratio
-dx = netcdf_read_att(ncid,"DX")/sr(1)
-dy = netcdf_read_att(ncid,"DY")/sr(2)
+! fire mesh size in cells
+nfx = dims(1)*sr(1)  
+nfy = dims(2)*sr(2)  
+nfz = size(ht_fmw,1)
+
+! horizontal height at cell centers
+call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf_fmw) 
+
+call ncclose(ncid)
+
+!************************************
+! process static data 
+!************************************
 
 !construct mg data 
 
@@ -57,15 +72,17 @@ params%A = reshape((/1.0,0.0,0.0, &
                    (/3,3/))
 
 ! finest level 1
-mg(1)%nx = size(u0_fmw,1) + 1  ! dimensions are vertex centered
-mg(1)%ny = size(u0_fmw,3) + 1  ! dimensions are vertex centered
-mg(1)%nz = size(u0_fmw,2) + 1  ! dimensions are vertex centered
+mg(1)%nx = nfx + 1  ! dimensions are vertex centered
+mg(1)%ny = nfy + 1  ! dimensions are vertex centered
+mg(1)%nz = nfz + 1  ! dimensions are vertex centered
 
 call get_mg_dims(mg(1), &                 !  set bounds compatible with WRF
     ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
     ifms, ifme, kfms,kfme, jfms, jfme,            &
     ifps, ifpe, kfps,kfpe, jfps, jfpe,           & ! fire patch bounds
     ifts, ifte, kfts,kfte, jfts, jfte)
+
+! allocations persistent over the whole run
 
 allocate(mg(1)%X(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(mg(1)%Y(ifms:ifme,kfms:kfme,jfms:jfme))
@@ -76,34 +93,34 @@ allocate(w0(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(u(ifms:ifme,kfms:kfme,jfms:jfme)) ! vector components called u v W
 allocate(v(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(w(ifms:ifme,kfms:kfme,jfms:jfme))
-
-! copy the input data to tile sized bounds
-! initial wind is at cell centers, indexing was already switched to ikj in reading
-u0(ifts:ifte,kfts:kfte,jfts:jfte) = u0_fmw
-v0(ifts:ifte,kfts:kfte,jfts:jfte) = v0_fmw
-w0(ifts:ifte,kfts:kfte,jfts:jfte) = w0_fmw
+allocate(uf(ifts:ifte,jfts:jfte))
+allocate(vf(ifts:ifte,jfts:jfte))
+allocate(zsfe(ifts-1:ifte+1,jfts-1:jfte+1))
+  write(msg,*)"shape(uf)=",shape(uf)
+  call message(msg)
+  write(msg,*)"shape(vf)=",shape(vf)
+  call message(msg)
 
 ! X Y Z are corner based, upper bound larger by one
-! first interpolate/extrapolate zsf to corners
-do j=jfts,jfte+1
-  do i=ifts,ifte+1
-    if(i.eq.ifts)then
-      zx = zsf(i,j) - 0.5*(zsf(i+1,j)-zsf(i,j))  ! extrapolate down
-    elseif(i.eq.ifte+1)then
-      zx = zsf(i,j) - 0.5*(zsf(i-1,j)-zsf(i,j))  ! extrapolate up 
-    else
-      zx = 0.5*(zsf(i,j) + zsf(i+1,j))           ! interpolate
-    endif
-    if(j.eq.jfts)then
-      zy = zsf(i,j) - 0.5*(zsf(i,j+1)-zsf(i,j))  ! extrapolate down
-    elseif(j.eq.jfte+1)then
-      zy = zsf(i,j) - 0.5*(zsf(i,j-1)-zsf(i,j))  ! extrapolate up 
-    else
-      zy = 0.5*(zsf(i,j) + zsf(i,j+1))           ! interpolate
-    endif
-    mg(1)%Z(i,kfts,j) = 0.5*(zx + zy)
-  enddo
-enddo
+
+! copy interior
+zsfe(ifts:ifte,jfts:jfte)=zsf_fmw
+! extrapolate on sides
+zsfe(ifts-1,jfts:jfte)=1.5*zsfe(ifts,jfts:jfte)-0.5*zsfe(ifts+1,jfts:jfte)
+zsfe(ifte+1,jfts:jfte)=1.5*zsfe(ifte,jfts:jfte)-0.5*zsfe(ifte-1,jfts:jfte)
+zsfe(ifts:ifte,jfts-1)=1.5*zsfe(ifts:ifte,jfts)-0.5*zsfe(ifts:ifte,jfts+1)
+zsfe(ifts:ifte,jfte+1)=1.5*zsfe(ifts:ifte,jfte)-0.5*zsfe(ifts:ifte,jfte-1)
+! extrapolate at domain corners
+zsfe(ifts-1,jfts-1)=1.5*zsfe(ifts,jfts)-0.5*zsfe(ifts+1,jfts+1)
+zsfe(ifte+1,jfts-1)=1.5*zsfe(ifte,jfts)-0.5*zsfe(ifte-1,jfts+1)
+zsfe(ifts-1,jfte+1)=1.5*zsfe(ifts,jfte)-0.5*zsfe(ifts+1,jfte-1)
+zsfe(ifte+1,jfte+1)=1.5*zsfe(ifte,jfte)-0.5*zsfe(ifte-1,jfte-1)
+! interpolate to cell corners
+mg(1)%Z(ifts:ifte+1,kfts,jfts:jfte+1) = 0.25 * (    &
+    zsfe(ifts:ifte+1,jfts:jfte+1) +         &
+    zsfe(ifts-1:ifte,jfts:jfte+1) +         &
+    zsfe(ifts:ifte+1,jfts-1:jfte) +         &
+    zsfe(ifts-1:ifte,jfts-1:jfte) )
 
 ! (X,Y) is the same uniform grid on all levels
 do j=jfts,jfte+1
@@ -133,34 +150,73 @@ do k=kfds,kfte
     mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,k,1)
 enddo
 
-! save memory while solver is running
-deallocate(u0_fmw,v0_fmw,w0_fmw,ht_fmw,zsf)
+deallocate(ht_fmw,zsfe)  ! no longer needed
 
-write(*,'(a)')'calling femwind_setup'
+if(call_femwind.gt.0)then
+call message('calling femwind_setup')
 call femwind_setup(mg)    
-write(*,'(a)')'femwind_setup returned OK'
+call message('femwind_setup done')
+endif
 
-write(*,'(a)')'calling femwind_solve'
-call femwind_solve(  mg,&
-  ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-  ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-  ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-  ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-  u0, v0, w0,                                  & ! input arrays
-  u, v, w,                                                  & ! output arrays
-  rate)
-write(*,'(a)')'femwind_solve returned OK'
+if(write_debug.gt.0)then
+  ! write coordinates for debug/display, even if the caller knows
+  call write_average_to_center(mg(1)%X,'X_c')
+  call write_average_to_center(mg(1)%Y,'Y_c')
+  call write_average_to_center(mg(1)%Z,'Z_c')
+endif
 
-! write output as is in 3D but with tight dimensions
-call write_array(u(ifts:ifte,kfts:kfte,jfts:jfte),'u')  
-call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')  
-call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
-call write_scalar(rate,'rate')
+!************************************
+! loop over time steps 
+!************************************
 
-! also coordinates for debug/display, even if the caller knows
-call write_average_to_center(mg(1)%X,'X_c')
-call write_average_to_center(mg(1)%Y,'Y_c')
-call write_average_to_center(mg(1)%Z,'Z_c')
+do frame0_fmw=1,mframe
+
+  ! read initial velocity field, loop until delivered 
+  call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,frame0_fmw,frame=1)
+  
+  ! copy the input data to tile sized bounds
+  ! initial wind is at cell centers, indexing was already switched to ikj in reading
+  u0(ifts:ifte,kfts:kfte,jfts:jfte) = u0_fmw
+  v0(ifts:ifte,kfts:kfte,jfts:jfte) = v0_fmw
+  w0(ifts:ifte,kfts:kfte,jfts:jfte) = w0_fmw
+  
+  ! save memory while solver is running
+  deallocate(u0_fmw,v0_fmw,w0_fmw)
+
+  ! compute/update mass consistent flow
+  
+if(call_femwind.gt.0)then
+  write(*,'(a)')'calling femwind_solve'
+  call femwind_solve(  mg,&
+    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+    u0, v0, w0,                                  & ! input arrays
+    u, v, w,                                                  & ! output arrays
+    rate)
+  write(*,'(a)')'femwind_solve returned OK'
+else
+  ! interpolate to fire height
+  call message('TESTING ONLY: copying lowest level of input to uf vf')
+  write(msg,*)"shape(uf)=",shape(uf)
+  call message(msg)
+  write(msg,*)"shape(vf)=",shape(vf)
+  call message(msg)
+  uf = u0(ifts:ifte,1,jfts:jfte)
+  vf = v0(ifts:ifte,1,jfts:jfte)
+  call write_fire_wind(filename,uf,vf,frame0_fmw,frame=1)
+endif
+
+  if(write_debug.gt.0)then
+    ! write output as is in 3D but with tight dimensions
+    call write_array(u(ifts:ifte,kfts:kfte,jfts:jfte),'u')  
+    call write_array(v(ifts:ifte,kfts:kfte,jfts:jfte),'v')  
+    call write_array(w(ifts:ifte,kfts:kfte,jfts:jfte),'w')  
+    call write_scalar(rate,'rate')
+  endif
+
+enddo
 
 contains
 

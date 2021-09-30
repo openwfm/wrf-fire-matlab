@@ -133,6 +133,43 @@ subroutine netcdf_write_array(ncid,a,name)
     
 end subroutine netcdf_write_array
 
+
+subroutine netcdf_write_2d(ncid,a,name,iframe)
+    implicit none
+!*** purpose
+!   write a 2d array to netcdf file
+
+!*** arguments
+    integer, intent(in)::ncid                    ! open netcdf file
+    real,intent(in),dimension(:,:)::a  
+    character(LEN=*),intent(in):: name
+    integer, intent(in)::iframe                  ! time frame to write in 
+
+!*** local
+    integer,dimension(3)::star,cnts
+    integer::i,j,k,varid,ends(3),dims(3),n(2)
+    character(len=256) msg
+
+    ! get idx
+    n=shape(a)
+    call netcdf_var_info(ncid,name,dims,varid,netcdf_msglevel)
+    write(msg,*)"array ",trim(name)," shape ",n," NetCDF dimensions ",dims
+    call message(msg)
+    
+    if(dims(1).lt.n(1).or.dims(2).lt.n(2))call crash("array shape too large")
+    star   = (/1,1,iframe/)
+    ends   = (/n(1),n(2),iframe/)
+    if(iframe.gt.dims(3))call crash('netcdf_write_2d: frame not in file')
+    cnts = ends - star + 1
+    
+    write(msg,*)"writing ",trim(name)," from ",star," to ",ends
+    call message(msg)
+ 
+    ! write to file
+    call check(nf90_put_var(ncid, varid, a, start = star, count = cnts),"nf90_put_var:"//trim(name))
+
+end subroutine netcdf_write_2d
+
 integer function l2i(l)
     implicit none
     logical, intent(in)::l
@@ -143,134 +180,6 @@ integer function l2i(l)
     endif
 end function l2i
 
-subroutine netcdf_read_array_wrf(ncid,name,frame,sr,a1d,a2d,a3d)
-    implicit none
-
-!*** arguments
-    integer, intent(in)::                ncid ! open netcdf file
-    real, pointer, intent(out),optional:: a1d(:)  ! the array pointer; remember to deallocate when done with it
-    real, pointer, intent(out),optional:: a2d(:,:)  ! the array pointer; remember to deallocate when done with it
-    real, pointer, intent(out),optional:: a3d(:,:,:)  ! the array pointer; remember to deallocate when done with it
-    character(LEN=*),intent(in):: name
-    integer, intent(in), optional::                frame ! time step in the file
-    integer, intent(in), dimension(2), optional::  sr ! strip to remove in i and j dimension
-
-!*** local
-    integer d1,d2,d3
-    integer,dimension(:),allocatable::star,cnts,dims,ends
-    integer::i,j,k,varid,ndims
-    real,dimension(:,:),allocatable::a1
-    real,dimension(:,:,:),allocatable::a2
-    real,dimension(:,:,:,:),allocatable::a3
-    integer:: istep=1, srf(2)
-    character(len=256) msg
-
-!*** executable
-    if(present(frame))istep=frame
-
-    d1 = l2i(present(a1d))
-    d2 = l2i(present(a2d))
-    d3 = l2i(present(a3d))
-
-    if(d1+d2+d3.ne.1)call crash('netcdf_read_array_wrf: must have exactly one of a1d a2d a3d arguments')
-    ndims = d1+2*d2+3*d3
-
-    if(ndims.eq.1)then
-        srf = 0
-    elseif(present(sr))then
-        srf = sr
-    else
-        call get_sr(ncid,srf)
-    endif
-
-    allocate(star(ndims+1))
-    allocate(cnts(ndims+1))
-    allocate(dims(ndims+1))
-    allocate(ends(ndims+1))
-
-    write(msg,*)"netcdf_read_array_wrf reading variable ",trim(name), &
-          " dimension ",ndims," time step ",istep
-    call message(msg)
-
-    ! get idx
-    call netcdf_var_info(ncid,name,dims,varid,netcdf_msglevel)
-    write(msg,*)"got dimensions ",trim(name),dims
-    call message(msg)
-    if(dims(ndims+1).eq.0)then
-       write(msg,*)'netcdf_read_array_wrf: wrong dimension ndims=',ndims, ' 1dims=',dims
-       call crash(msg)
-    endif
-     
-    star   = 1
-    star(ndims+1) = istep
-    ends(1:ndims) = dims(1:ndims)
-    ends(ndims+1) = istep
-    cnts = ends - star + 1
-
-    write(msg,*)"reading ",trim(name),star," to ",ends
-    call message(msg)
- 
-    ! read from file
-    select case (ndims)
-    case(1) 
-        allocate(a1(star(1):ends(1),star(2):ends(2)))
-        allocate(a1d(star(1):ends(1)))
-        call check(nf90_get_var(ncid, varid, a1, start = star, count = cnts),"nf90_get_var:"//trim(name))
-        a1d = a1(:,istep)
-        write(msg,*)"returning 1D array length ",shape(a1d)
-    case(2) 
-	allocate(a2(star(1):ends(1),star(2):ends(2),star(3):ends(3)))
-        call check(nf90_get_var(ncid, varid, a2, start = star, count = cnts),"nf90_get_var:"//trim(name))
-        ! postprocessing - strip
-        write(msg,*)" stripping ",srf," at ij ends"
-        call message(msg)
-        allocate(a2d(star(1):ends(1)-srf(1),star(2):ends(2)-srf(2)))
-        do j=star(2),ends(2)-srf(2)
-            do i=star(1),ends(1)-srf(1)
-                a2d(i,j) = a2(i,j,istep)
-            enddo
-        enddo
-        write(msg,*)"returning array ij shape ",shape(a2d)
-    case(3) 
-        allocate(a3(star(1):ends(1),star(2):ends(2),star(3):ends(3),star(4):ends(4)))
-        call check(nf90_get_var(ncid, varid, a3, start = star, count = cnts),"nf90_get_var:"//trim(name))
-        ! transpose at -> a and strip
-        write(msg,*)" stripping ",srf," at ij ends and transposing to ikj indexing order"
-        call message(msg)
-        allocate(a3d(star(1):ends(1)-srf(1),star(3):ends(3),star(2):ends(2)-srf(2)))
-        do k=star(3),ends(3)
-            do j=star(2),ends(2)-srf(2)
-                do i=star(1),ends(1)-srf(1)
-                    a3d(i,k,j) = a3(i,j,k,istep)
-                enddo
-            enddo
-        enddo
-        write(msg,*)"returning array ikj shape ",shape(a3d)
-    case default
-        call crash('wrong case ndims')
-    end select
-
-    call message(msg)
-
-end subroutine netcdf_read_array_wrf
-
-subroutine get_sr(ncid,sr)
-    implicit none
-!*** arguments
-    integer, intent(in)::ncid    ! open wrfout dataset
-    integer, intent(out), dimension(2):: sr  ! fire "subgrid" refinement factors in x and y directions
-!*** local
-    integer, dimension(3) :: dims_atm, dims_fire   ! 2D + allow time dimension
-    integer::varid, prints
-!*** executable
-    prints = netcdf_msglevel
-    dims_atm = 0
-    dims_fire = 0
-    call netcdf_var_info(ncid,"XLAT",dims_atm,varid,prints=prints)
-    call netcdf_var_info(ncid,"FXLAT",dims_fire,varid,prints=prints)
-    sr = dims_fire(1:2)/(dims_atm(1:2) + 1)
-    if(prints >= 0) print *,"get_sr: fire subgrid refinement factors are ",sr
-end subroutine get_sr
 
 subroutine netcdf_var_info(ncid,varname,dims,varid,prints)
     implicit none

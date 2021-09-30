@@ -6,23 +6,12 @@ use module_wrfout
 
 !*** local
 character(len=128)::filename
-integer::ncid,frame
+integer::ncid,frame=1,frame_fmw=1
 real, pointer, dimension(:,:,:)::u0_fmw,v0_fmw,w0_fmw
 
 !*** executable
 filename = "wrf.nc"
 
-call ncopen(filename,nf90_nowrite,ncid)
-
-do frame = 1,9999
-
-  if(read_initial_wind(ncid,u0_fmw,v0_fmw,w0_fmw,frame=frame).ne.0)then
-    print *,'check sum does not agree'
-    stop 1
-  endif
-
-enddo
-
-call ncclose(ncid)
+call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,1,frame=1)
 
 end program netcdf_test
