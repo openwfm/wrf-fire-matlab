@@ -66,10 +66,11 @@ for i=1:length({varnames{:}}),
             count(ndims)=1;
         end
         v = ncvar(filename,varname,start, count); 
-        p.(lower(varname))=double(v.var_value);
-        dims.(lower(varname))=v.dimlength;
+        field = strrep(lower(varname),'-','__'); 
+        p.(field)=double(v.var_value);
+        dims.(field)=v.dimlength;
     else 
-        p.(lower(varname))=[];
+        p.(field)=[];
     end
 end
 
