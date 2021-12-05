@@ -49,15 +49,6 @@ Kmat = 0.
 
 print *,'copying the input matrix'
 Kmat(1:s(1),1:s(2),1:s(3),1:s(4))=Kmat_m(1:s(1),1:s(2),1:s(3),1:s(4))
-!do j=1,s(1)
-!  do k=1,s(2)
-!    do i=1,s(3)
-!      do jx = 1,s(4)
-!        Kmat(i,k,j,jx) = Kmat_m(i,k,j,jx)
-!      enddo
-!    enddo
-!  enddo
-!enddo
            
 write(*,'(a)')'calling ntd_boundary_conditions'
 call ndt_boundary_conditions(  &
@@ -69,15 +60,6 @@ call ndt_boundary_conditions(  &
 
 print *,'copying the output matrix'
 Kmat_m(1:s(1),1:s(2),1:s(3),1:s(4))=Kmat(1:s(1),1:s(2),1:s(3),1:s(4))
-!do j=1,s(1)
-!  do k=1,s(2)
-!    do i=1,s(3)
-!      do jx = 1,s(4)
-!        Kmat_m(i,k,j,jx) = Kmat(i,k,j,jx)
-!      enddo
-!    enddo
-!  enddo
-!enddo
 
 call write_array_nd(reshape(Kmat_m,(/product(s)/)),s,'Kb')
 
