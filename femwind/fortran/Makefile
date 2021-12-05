@@ -28,7 +28,7 @@ tests: hexa_test.exe\
  femwind_test.exe\
  netcdf_test.exe
 
-all: default tests
+all: clean_exe default tests
 
 hexa_test.exe: hexa_test.o module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_utils.o
@@ -157,5 +157,9 @@ NETCDF_TEST = netcdf_test.f90 $(WRFOUT_MODULES) module_utils.o
 netcdf_test.exe: $(NETCDF_TEST) Makefile
 	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
 
-clean:
-	rm -rf *.mod *.o *.exe *.dSYM ../*.txt
+# to do when building any exe files
+clean_exe:
+	rm -f ../*.txt
+
+clean: clean_exe
+	rm -f *.mod *.o *.exe *.dSYM 
