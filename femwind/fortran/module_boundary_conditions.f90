@@ -51,7 +51,8 @@ do j=jfts,je
     do i=ifts,ie
       ! not efficient but will be executed only once
       if(i.eq.ifds.or.i.eq.ifde+1.or.j.eq.jfds.or.j.eq.jfde+1.or.k.eq.kfde+1)then
-        ! replace the row/col (i,k,j) by scaled identity
+        ! replace row/col (i,k,j) by scaled identity
+        print *,'replacing row/col ',i,j,k,' by ',s, '* identity'
         kmat(i-1,k-1,j-1,14)=0.
         kmat(i  ,k-1,j-1,13)=0.
         kmat(i+1,k-1,j-1,12)=0.
