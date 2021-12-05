@@ -1,1 +1,1 @@
-type readme.txt
+type readme.md
