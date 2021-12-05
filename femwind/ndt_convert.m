@@ -1,19 +1,36 @@
-function K2=ndt_convert(K,st2)
-% K2=K(K,st2)
+function K2=ndt_convert(K,n1,n2,n3,st)
+% K2=ndt_convert(K,st)
+% K2=ndt_convert(K,n1,n2,n3,st) 
 % convert ndt matrix from one storage format to another
 % st = storage type of output, 27 or 14 or 0=sparse
-switch st2
+% n1 n2 n3 = dimensions of output, if K is sparse
+if issparse(K) % storage type of input: 
+    st1 = 0;
+    [m,n]=size(K);
+    if n1*n2*n3 ~= n
+        n1,n2,n3,n
+        error('input must satisfy n1*n2*n3 == n')
+    end 
+    if(big(K-K'))
+        error('Sparse input matrix must be symmetric')
+    end
+    Kg=K;
+    t1=ndt_storage_table(27);  % need to loop over all output entries
+else
+    st = n1;
+    [n1,n2,n3,st1]=size(K);
+    t1=ndt_storage_table(st1);
+end
+switch st %  set storage type of output: 0 or 14 or 27
     case {27,'nons'}
         st2=27;
     case {14,'symm'}
-        st2=14
+        st2=14;
     case {0,'sparse'}
         st2=0;        
     otherwise
-        st2,error('allowable values of st: 27 or nons, 14 or symm, 0 or sparse')
+        st,error('allowable values of st: 27 or nons, 14 or symm, 0 or sparse')
 end
-[n1,n2,n3,st1]=size(K);
-t1=ndt_storage_table(st1);
 if st2, % ndt storage
     t2=ndt_storage_table(st2);
     K2=zeros(n1,n2,n3,st2);
@@ -49,8 +66,15 @@ for i3=1:n3
                         jx = t1(4,2+j1,2+j2,2+j3);
                         if ~(m1<1 || m1>n1 || m2<1 || m2>n2 || m3<1 || m3>n3 || ...
                              k1<1 || k1>n1 || k2<1 || k2>n2 || k3<1 || k3>n3 )   
-                           % j is within bounds
-                            v = K(m1,m2,m3,jx); % value of the entry
+                            % j is within bounds
+                            if st1   % ndt scheme
+                                v = K(m1,m2,m3,jx); % value of the entry in ndt
+                            else  % sparse
+                                ig=g(k1,k2,k3);
+                                jg=g(m1,m2,m3);
+                                v = K(ig,jg);
+                                Kg(ig,jg)=0;  % mark location used
+                            end
                             if st2  % ndt storage scheme
                                 % entry (i,k) is stored in K2(l,p)  
                                 l3=i3+t2(3,2+j1,2+j2,2+j3); % row + offset
@@ -74,6 +98,11 @@ for i3=1:n3
                 end
             end
         end
+    end
+end
+if st1==0
+    if(nnz(Kg))
+	error('K is not in the 3D grid form, nonzeros left')
     end
 end
 if st2==0
