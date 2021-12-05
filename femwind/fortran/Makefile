@@ -158,4 +158,4 @@ netcdf_test.exe: $(NETCDF_TEST) Makefile
 	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
 
 clean:
-	rm -rf *.mod *.o *.exe *.dSYM
+	rm -rf *.mod *.o *.exe *.dSYM ../*.txt
