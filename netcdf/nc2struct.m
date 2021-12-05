@@ -54,6 +54,7 @@ for i=1:length({varnames{:}}),
         warning(['variable ',varname,' does not exist in file ',filename])
         v=[];
     end
+    field = strrep(lower(varname),'-','__'); 
     if ~ isempty(v),
         ndims=length(v.dimlength);
         start=zeros(1,ndims);
@@ -66,7 +67,6 @@ for i=1:length({varnames{:}}),
             count(ndims)=1;
         end
         v = ncvar(filename,varname,start, count); 
-        field = strrep(lower(varname),'-','__'); 
         p.(field)=double(v.var_value);
         dims.(field)=v.dimlength;
     else 
