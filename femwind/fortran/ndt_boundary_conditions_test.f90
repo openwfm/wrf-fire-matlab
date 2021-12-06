@@ -43,14 +43,14 @@ kfms = kfts-1
 kfme = kfte+2
 
 ! allocate a little bigger with zeros in extra areas
-print *,'allocating Kmat size',ifms,ifme,kfms,kfme,jfms,jfme,1,msize
+! print *,'allocating Kmat size',ifms,ifme,kfms,kfme,jfms,jfme,1,msize
 allocate(Kmat(ifms:ifme,kfms:kfme,jfms:jfme,1:msize))
 Kmat = 0.
 
-print *,'copying the input matrix'
+!print *,'copying the input matrix'
 Kmat(1:s(1),1:s(2),1:s(3),1:s(4))=Kmat_m(1:s(1),1:s(2),1:s(3),1:s(4))
            
-write(*,'(a)')'calling ntd_boundary_conditions'
+!write(*,'(a)')'calling ntd_boundary_conditions'
 call ndt_boundary_conditions(  &
     ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,         &
@@ -58,7 +58,7 @@ call ndt_boundary_conditions(  &
     ifts, ifte, kfts, kfte, jfts, jfte,         &    
     Kmat)
 
-print *,'copying the output matrix'
+!print *,'copying the output matrix'
 Kmat_m(1:s(1),1:s(2),1:s(3),1:s(4))=Kmat(1:s(1),1:s(2),1:s(3),1:s(4))
 
 call write_array_nd(reshape(Kmat_m,(/product(s)/)),s,'Kb')
