@@ -12,9 +12,12 @@ FFLAGS = -O3 -I $(NETCDF)/include
 FFLAGS = -g -C -I $(NETCDF)/include 
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
-default: femwind_wrfout.exe
+default: all
 
-tests: hexa_test.exe\
+wrf: femwind_wrfout.exe
+
+tests: clean_txt\
+ hexa_test.exe\
  ndt_mult_test.exe\
  sweeps_test.exe\
  f_assembly_test.exe\
@@ -28,7 +31,7 @@ tests: hexa_test.exe\
  femwind_test.exe\
  netcdf_test.exe
 
-all: clean_exe default tests
+all: wrf tests
 
 hexa_test.exe: hexa_test.o module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_utils.o
@@ -157,9 +160,9 @@ NETCDF_TEST = netcdf_test.f90 $(WRFOUT_MODULES) module_utils.o
 netcdf_test.exe: $(NETCDF_TEST) Makefile
 	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
 
-# to do when building any exe files
-clean_exe:
+# delete test data files 
+clean_txt:
 	rm -f ../*.txt
 
-clean: clean_exe
+clean: clean_txt
 	rm -f *.mod *.o *.exe *.dSYM 
