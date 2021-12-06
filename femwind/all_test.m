@@ -5,7 +5,7 @@ hexa_test
 nd_test
 ndt_assembly_test
 f_assembly_test
-w_test
+w_assembly_test
 vec_boundary_conditions_test
 vertical_test
 p=[];

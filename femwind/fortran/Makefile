@@ -24,7 +24,7 @@ tests: clean_txt\
  prolongation_test.exe\
  restriction_test.exe\
  ndt_assembly_test.exe\
- w_test.exe\
+ w_assembly_test.exe\
  coarsening_icl_test.exe\
  ndt_boundary_conditions_test.exe\
  vec_boundary_conditions_test.exe\
@@ -110,11 +110,11 @@ VEC_BOUNDARY_CONDITIONS = vec_boundary_conditions_test.f90  module_boundary_cond
 vec_boundary_conditions_test.exe: $(VEC_BOUNDARY_CONDITIONS) Makefile
 	$(FC) $(FFLAGS) -o $@ $(VEC_BOUNDARY_CONDITIONS)
 
-w_test.exe: w_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o Makefile
-	$(FC) $(FFLAGS) -o w_test.exe w_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o
+w_assembly_test.exe: w_assembly_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -o w_assembly_test.exe w_assembly_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o
 
-w_test.o: w_test.f90  module_hexa.o module_utils.o  module_w_assembly.o Makefile
-	$(FC) $(FFLAGS) -c w_test.f90
+w_assembly_test.o: w_assembly_test.f90  module_hexa.o module_utils.o  module_w_assembly.o Makefile
+	$(FC) $(FFLAGS) -c w_assembly_test.f90
 
 module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
 	$(FC) $(FFLAGS) -c module_w_assembly.f90

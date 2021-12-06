@@ -23,7 +23,7 @@ write_array(swap23(u0{1}),'u0_test');
 write_array(swap23(u0{2}),'v0_test');
 write_array(swap23(u0{3}),'w0_test');
 
-system('./fortran/w_test.exe');
+system('./fortran/w_assembly_test.exe');
 U = swap23(read_array('U_test'));
 V = swap23(read_array('V_test'));
 W = swap23(read_array('W_test'));
