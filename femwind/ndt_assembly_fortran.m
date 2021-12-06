@@ -1,10 +1,13 @@
-function err=ndt_assembly_fortran(A,X,u0,lambda,params)
+function err=ndt_assembly_fortran(A,X,u0,lambda,params,st)
 % call fortran version and compare results
 
 sz = size(X{1});
-disp(['ndt_assembly_fortran, mesh size ',num2str(sz)])
+disp(['ndt_assembly_fortran, mesh size ',num2str(sz),' storage type ',num2str(st)])
+if st ~= 14,
+    error('ndt_assembly_fortran: only storage type 14 supported')
+end
 
-K_m=ndt_assembly(A,X,[],[],params,14);
+K_m=ndt_assembly(A,X,[],[],params,st);
 
 %Writing all arrays to text files for use by fortran tester
 write_array_nd(A,'A');

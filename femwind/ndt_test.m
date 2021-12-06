@@ -96,7 +96,7 @@ K14a_err = big(K14 - K14a)
 if abs(K14a_err)>1e-10, error('should be zero'),end
 
 disp('ndt_assembly_fortran')
-err = ndt_assembly_fortran(A,X,u0,lambda,params)
+err = ndt_assembly_fortran(A,X,u0,lambda,params,14)
 if err > 1e-6
     error('ndt_assembly_fortran error too large')
 end
