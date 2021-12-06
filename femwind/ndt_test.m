@@ -40,6 +40,16 @@ y27=ndt_mult(K27,xr);
 yn=nd_mult(K,xr);
 Kn_27_err=big(yn-y27)
 
+y14=ndt_mult(K14,xr);
+K14_err_rand=big(y14-y27)  % should be zero
+if abs(K14_err_rand)>1e-10, error('should be zero'),end
+
+disp('convert to sparse compare matrix-vector multiply')
+Ks = ndt_convert(K,'sparse');  
+ys=Ks*xr(:);
+K_Ks_rand_err=big(ys(:)-y27(:))
+if abs(K_Ks_rand_err)>1e-10, error('should be zero'),end
+
 if exist('fortran/ndt_boundary_conditions_test.exe')
     disp('testing if ndt_boundary_conditions gives same result in fortran')
     ndt_boundary_conditions_fortran(K14);
@@ -47,10 +57,7 @@ else
     warning('fortran/ndt_boundary_conditions_test.exe not available')
 end
 
-disp('multiplying st 14 by random')
-y14=ndt_mult(K14,xr);
-K14_err_rand=big(y14-y27)  % should be zero
-if abs(K14_err_rand)>1e-10, error('should be zero'),end
+disp('testing multiply vec by st 14 vs st 27')
 
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/ndt_mult_test.exe')
@@ -65,12 +72,6 @@ else
     warning('fortran/ndt_mult_test.exe not available')
 end
 
-
-disp('convert to sparse compare matrix-vector multiply')
-Ks = ndt_convert(K,'sparse');  
-ys=Ks*xr(:);
-K_Ks_rand_err=big(ys(:)-y27(:))
-if abs(K_Ks_rand_err)>1e-10, error('should be zero'),end
 
 disp('convert to sparse compare matrix-vector multiply')
 K_sparse=sparse_assembly(A,X,u0,lambda,params);
