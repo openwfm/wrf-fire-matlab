@@ -83,11 +83,20 @@ if abs(K27a_err)>1e-10, error('should be zero'),end
 
 
 K14a = ndt_assembly(A,X,u0,lambda,params,14);
-disp('multiplying st 14 by all ones')
+disp('multiplying ndt_assembly st 14 by all ones')
 x=ones(n1,n2,n3);
 y1=ndt_mult(K14,x1);
 K14a_err_zero=big(y1)  % should be zero
+if K14a_err_zero > 1e-6
+    error('residual should be zero')
+end
 
 disp('comparing st 14 with converged st 27')
 K14a_err = big(K14 - K14a)
 if abs(K14a_err)>1e-10, error('should be zero'),end
+
+disp('ndt_assembly_fortran')
+err = ndt_assembly_fortran(A,X,u0,lambda,params)
+if err > 1e-6
+    error('ndt_assembly_fortran error too large')
+end
