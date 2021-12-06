@@ -62,7 +62,7 @@ disp('testing multiply vec by st 14 vs st 27')
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/ndt_mult_test.exe')
     disp('testing if ndt_mult same result in fortran')
-    err=ndt_mult_fortran(K14,xr)
+    err=ndt_mult_fortran(K14,xr);
     if abs(err)<1e-6
         fprintf('error %g OK\n',err)
     else
@@ -72,8 +72,7 @@ else
     warning('fortran/ndt_mult_test.exe not available')
 end
 
-
-disp('convert to sparse compare matrix-vector multiply')
+disp('sparse assembly vs ndt_assembly test')
 K_sparse=sparse_assembly(A,X,u0,lambda,params);
 err_mat_sparse=big(Ks-K_sparse);
 if abs(err_mat_sparse)>1e-10, error('should be zero'),end
