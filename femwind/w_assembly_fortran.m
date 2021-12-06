@@ -1,5 +1,5 @@
-function err=w_test_fortran(A,X,u0,lambda,params) 
-% call fortran version and compare resultso
+function err=w_assembly_fortran(A,X,u0,lambda,params) 
+% call fortran version and compare results
 
 lambda2 = lambda(:);
 W_m=w_assembly(A,X,u0, lambda2,params);
