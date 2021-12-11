@@ -9,4 +9,5 @@ vec_boundary_conditions_test
 vertical_test
 p=[];
 p.test_fortran=1;
+p.femwind_fortran_test=1;
 femwind_rate_test(p)
