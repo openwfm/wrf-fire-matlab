@@ -26,7 +26,8 @@ for i = 1:9
 
     
     %copy the directory
-    cp_str = sprintf('cp -a rain1 %s',d.direct{i});
+    cp_str = sprintf('cp -a rain1_base1 %s',d.direct{i});
+    %cp_str = sprintf('cp -a rain1_base2 %s',d.direct{i});
     %cd to directory and change files
     system(cp_str);
     cd(d.direct{i});
@@ -40,6 +41,9 @@ for i = 1:9
     %system(wall_print);
     system('touch copied.txt');
     system('cp run_wrf_small_frontera.template run_wrf_frontera')
+    
+    system('./ideal.exe')
+    pause(5);
     
     %cd back up
     cd(cwd)
