@@ -24,7 +24,7 @@ for step=1:steps
         r.times=times(step,:);
         for k=n:-1:1
             r.fxlong(k)=q.fxlong(i(k),j(k));            
-            r.fxlat(k)=q.fxlong(i(k),j(k));            
+            r.fxlat(k)=q.fxlat(i(k),j(k));            
             r.fire_area(k)=p.fire_area(i(k),j(k));
         end
         break
