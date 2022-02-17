@@ -43,5 +43,4 @@ function w=read_wrfout_tign(f,ts)
     w.datestr=datestr(clock);
     s=ls('-l',f);w.ls=s(1:end-1);
     s=ls('-lL',f);w.lsL=s(1:end-1);
-
 end

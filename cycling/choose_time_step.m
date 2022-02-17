@@ -8,7 +8,7 @@ alltimes=char(t.times');
 for i = 1: nframes
     fprintf('%d :   %s  \n',i,alltimes(i,:))
 end
-in_t = input_num('Which step to use? ',nframes)
+in_t = input_num('Which step to use? ',nframes);
 ts = alltimes(in_t,:);
 
 end %function

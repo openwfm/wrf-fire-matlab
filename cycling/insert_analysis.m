@@ -13,7 +13,9 @@ if isfield(red,'red')
     F = scatteredInterpolant(red.fxlat(:),red.fxlong(:),a(:));
     a = F(red_orig.fxlat,red_orig.fxlong);
     figure,contour(red_orig.fxlong,red_orig.fxlat,a,20,'k')
-    title('resized to original grid spacing')
+    title('Analysis resized to original grid spacing')
+    xlabel('Lon')
+    ylabel('Lat')
 end
 w.analysis = w.tign_g;
 temp_a = datenum2time(a,red);

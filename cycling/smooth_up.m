@@ -1,4 +1,6 @@
-function sm_up = smooth_up(lon,lat,tign,a,b)
+function sm_up = smooth_up(tign,a,b)
+%applies gradual blurring at different contours of tign
+% a,b are optional parameters
 
 t0 = min(tign(:));
 t1 = max(tign(:));
@@ -10,7 +12,7 @@ t = linspace(t0,t1,steps);
 %compute different std. for imgausfilt
 %mx = 2;%
 if ~exist('a','var')
-    a = 100;
+    a = 300;
     b = 1/3;
 end
 mx = max(1.0,max(m,n)/a);
@@ -32,7 +34,7 @@ for i = 2:steps
     msk = logical(m2-m1);
     t_blur = imgaussfilt(tign,y(i));
     t_temp(msk) = t_blur(msk);
-    %figure(137),mesh(lon,lat,t_temp)
+    %figure(138),contour(t_temp,steps,'k')
     %pause(5/steps)
     t_diff(i) = min(t_temp(:))-t0;    
     t_temp(m2) = t_temp(m2)-i/steps*t_diff(i);

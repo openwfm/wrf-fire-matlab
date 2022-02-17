@@ -75,7 +75,6 @@ if isempty(ispan) | isempty(jspan), error('selection empty'),end
 
 % restrict simulation
 
-%commenting out next 5 lines
 red.max_tign=sim.max_tign;
 red.ispan=ispan;
 red.jspan=jspan;

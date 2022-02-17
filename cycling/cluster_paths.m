@@ -1,12 +1,13 @@
 function path_struct = cluster_paths(w,cull,grid_dist)
 % assign shortest paths, using clustering
 % inputs - w = read_wrfout_tign(f)
-%          cull - number fo using smaller data sets
+%          cull - number for using smaller data sets cull = 1 --> use all
+%          data points.
 % output - cp , struct with path info
 
 [fire_name,save_name,prefix,perim] = fire_choice();
 red = subset_domain(w);
-multi = input_num('Use multigrid? 1 = yes',1,0);
+multi = input_num('Use multigrid? 1 = yes',0,1);
 if multi
     if exist('ps_multi.mat','file')
         load ps_multi.mat
@@ -43,9 +44,12 @@ if max(size(red.tign)) > target_size
 end
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
-new_end_time = input_num('Use alternate end time? Enter datenum of new time, 0 if no.',0,1)
+new_end_time = input_num('Use alternate end time? Enter number of extra days, 0 if no.',0);
 if new_end_time ~=0
-  time_bounds(2) = new_end_time;  
+  time_bounds(2) = time_bounds(2)+new_end_time;  
+  red.max_tign = time_bounds(2);
+  red.end_datenum = time_bounds(2);
+  fprintf('New end time %s\n',datestr(time_bounds(2)));
 end
 % time_bounds(2) = 7.354591409722222e+05;
 
@@ -158,7 +162,7 @@ for i = 1:length(g)% fprintf('Detections collected \n')
         lons = mean(g(i).lon(fires));
         lats = mean(g(i).lat(fires));
         confs = mean(double(g(i).conf(fires)));
-        times = g(i).time-0.25;
+        times = g(i).time-0.05;
         frps = mean(g(i).power(fires));
         gran = i;
         pts = [lats,lons,times,confs,frps,gran];
@@ -170,7 +174,7 @@ end
 
 %can change end time for comparisons
 if new_end_time ~= 0
-    end_time = new_end_time;
+    end_time = time_bounds(2);
 else 
     end_time = red.max_tign;
 end
@@ -208,7 +212,7 @@ clst_pts =  fixpoints2grid(red,n_points);
 % just use the index numbers, maintain the l2 data coords
 clst_pts(:,3:4) = n_points(:,1:2);
 %ig_pt = [mean(clst_pts(:,3)),mean(clst_pts(:,4))];
-ig_pt = [clst_pts(1,3),clst_pts(1,4)];
+   ig_pt = [clst_pts(1,3),clst_pts(1,4)];
 for i = 1:length(clst_pts)
    pt_1 = [ig_pt(1,1),clst_pts(i,4)];
    pt_2 = [clst_pts(i,3),clst_pts(i,4)];
@@ -243,10 +247,10 @@ end
 
 %cluster the data 
 dt = 3*ceil(g(end).time - g(1).time);
-space_clusters = 100; %days
+space_clusters = 20; %days
 %more clusters for using perimeter data
 if use_perims == 1
-    space_clusters = dt*2;
+    space_clusters = dt;
 end
 
 %[s_idx,s_c] = kmeans(pts(:,1:2),space_clusters);
@@ -283,10 +287,14 @@ end
 % hold off
 
 %scatter 3d  ldistances in lat/lon directions
-figure(7),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3));
+figure(177),scatter3(cp(s_idx==1,6),cp(s_idx==1,5),pts(s_idx==1,3)-red.start_datenum);
+title('Clustering of Data')
+xlabel('East-West Distance [m]')
+ylabel('North-South Distance [m]')
+zlabel('Time [days]')
 hold on
 for i = 2:space_clusters
-  scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3));
+  scatter3(cp(s_idx==i,6),cp(s_idx==i,5),pts(s_idx==i,3)-red.start_datenum);
 end
 hold off
 
@@ -350,6 +358,14 @@ for i = 1:n
             j_point = [pts(j,1),pts(j,2)];
             a(i,j) = distance(i_point,j_point,E);
             v(i,j) = a(i,j)/max(time_diff,0.1);
+            if a(i,j) > 2e4
+                %fprintf('Points far apart  %d and %d\n',i,j)
+                a(i,j) = 0;
+                v(i,j) = 0;
+            end
+%             if v(i,j) > 2
+%                 fprintf('fast ROS beteween points %d and %d\n',i,j)
+%             end
         end
     end
 end
@@ -360,7 +376,7 @@ end
 raw_dist = a;
 fprintf('matrices done\n')
 
-%start filtering distance
+%start filtering distances and change those within same cluster
 cluster_mult = 0.25;
 for i = 1:n
     for j = 1:n
@@ -396,15 +412,22 @@ for i = 1:start_pt
             paths(path_count).c = prod(pts(p,4))^(1/length(p));
             %fprintf('%d points in path \n',length(p))
         end
-        figure(2),hold on
-        %l2 points
-        %plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
-        %grid points
-        plot3(grid_pts(p,4),grid_pts(p,3),pts(p,3)-red.start_datenum,'g');
-        for k = 1:length(p)
-            scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3)-red.start_datenum,'*r');
+        %only plot if n is less than 400
+        if n < 400
+            figure(178),hold on
+            title('Shortest Paths')
+            xlabel('Lon')
+            ylabel('Lat')
+            zlabel('Time [days]')
+            %l2 points
+            %plot3(pts(p,2),pts(p,1),pts(p,3)-red.start_datenum,':r');
+            %grid points
+            plot3(grid_pts(p,4),grid_pts(p,3),pts(p,3)-red.start_datenum,'g');
+            for k = 1:length(p)
+                scatter3(pts(p(k),2),pts(p(k),1),pts(p(k),3)-red.start_datenum,'*r');
+            end
+            hold off
         end
-        hold off
         %         % add a new point to the list by interpolation
         %         for k = 1:length(p)-1
         %             new_pt = ([pts(p(k),1),pts(p(k),2),pts(p(k),3)]+[pts(p(k+1),1),pts(p(k+1),2),pts(p(k+1),3)])/2;
@@ -421,9 +444,10 @@ for i = 1:start_pt
     %    path_struct.new_points = new_points;
     path_struct.grid_pts = grid_pts(:,3:4);
     path_struct.idx = grid_pts(:,1:2);
+    %cluster information
+    path_struct.s_idx = s_idx;
+    path_struct.s_c = s_c;
 end
-
-
 
 
 end %function

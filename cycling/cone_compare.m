@@ -1,10 +1,10 @@
-function [r1,r2,adjr0] = cone_compare(ps,tign2,str_num)
+function [r1,r2,adjr0,outer] = cone_compare(ps,tign2)
 %compares feature of fire arrival cones
-%ps = tign_try(w), tign = squish(ps)
+%ps = tign_try(w), tign2 = squish(ps)
 
 
 if isfield(ps.red,'red')
-    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1,1);
+    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1);
     if upsize
         red_orig = ps.red.red;
         %interpolate back to original size grid
@@ -29,13 +29,15 @@ st = 1;
 % tign2 = smooth_up(lon,lat,tign2);
 
 %compare areas of the two and plot over time
-area_compare(ps,tign2); 
+[ac,gs] = area_compare(ps,tign2); 
 close all
 
 %compute area of fires
-t_end = min(max(tign(:)),max(tign2(:)))-0.1;
-a1 = sum(sum(tign<t_end));
-a2 = sum(sum(tign2<t_end));
+%t_end = min(max(tign(:)),max(tign2(:)))-0.1;
+a1 = ac.area_a(end);
+a2 = ac.area_b(end);
+outer.a1 = a1;
+outer.a2 = a2;
 adjr0 = sign(a2-a1)*1/10*sqrt(abs(a1-a2)/a2);
 %adjr0 = 1/10*sqrt(abs(a1-a2)/a2);
 %make the top flate for each
@@ -122,11 +124,13 @@ td = theta1-theta2;
 td(td>pi) = td(td>pi)-2*pi;
 td(td<-pi) = td(td<-pi)+2*pi;
 td_msk = ~isnan(td);
+outer.avg_t_diff = mean(td(td_msk));
+outer.std_t_diff = std(td(td_msk));
 b_msk = abs(td)<pi/6;
 figure,histogram(td)
 format short
 str = ['05','10','20','40'];
-tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f \n Polygon Interpolation  %s % of Data',mean(td(td_msk)),std(td(td_msk)),str(str_num:str_num+1));
+tstr= sprintf('Angle difference in gradients \n Mean : %f Std deviation: %f \n Polygon Interpolation',mean(td(td_msk)),std(td(td_msk)));%,str(str_num:str_num+1));
 title(tstr)
 xlabel('Difference of angles (radians)')
 ylabel('Number')
@@ -150,7 +154,6 @@ ylabel('Number')
 % figure
 % quiver(lon(t_msk),lat(t_msk),du1(t_msk),du1(t_msk))
 % hold on
-% quiver(lon(t_msk),lat(t_msk),du2(t_msk),dv2(t_msk))
 % title('Gradients in fire surfaces')
 % legend('Forecast','Interpolated')
 
@@ -189,16 +192,18 @@ b1 = r1<cut_off;b2 = r2 < cut_off;b_msk = logical(b1.*b2);
 r_diff = r1-r2;
 %r_diff = imgaussfilt(r_diff,1/2);
 r_msk = abs(r_diff)<5;
-avg_r_diff = mean(r_diff(r_msk));
-std_r_diff = std(r_diff(r_msk));
-figure,histogram(r_diff(r_msk));
-tstr= sprintf('Differences in ROS, forecast-estimate \n Mean = %f  Std Dev. = %f \n Polygon Interpolation  %s % of Data',avg_r_diff,std_r_diff,str(str_num:str_num+1));
+avg_r_diff = mean(r_diff(b_msk));
+std_r_diff = std(r_diff(b_msk));
+outer.avg_r_diff = avg_r_diff;
+outer.std_r_diff = std_r_diff;
+figure,histogram(r_diff(b_msk));
+tstr= sprintf('Differences in ROS, forecast-estimate \n Mean = %f  Std Dev. = %f \n Polygon Interpolation  %s % of Data',avg_r_diff,std_r_diff);%,str(str_num:str_num+1));
 title(tstr)
 xlabel('ROS (m/s)')
 ylabel('Number')
-save_str = sprintf('patch_ros_diffs_%s_p',str(str_num:str_num+1));
-savefig(save_str);
-saveas(gcf,[save_str '.png']);
+%save_str = sprintf('patch_ros_diffs_%s_p',str(str_num:str_num+1));
+%savefig(save_str);
+%saveas(gcf,[save_str '.png']);
 r_fast = r_diff>0;%(avg_r_diff+1*std_r_diff);
 r_slow = r_diff<0;%(avg_r_diff-1*std_r_diff);
 % figure,scatter(lon(r_fast),lat(r_fast),'*r');
@@ -246,16 +251,15 @@ r_slow = r_diff<0;%(avg_r_diff-1*std_r_diff);
 %compute slope of terrain
 
 %compare by fuel type
-for i = 1:13
-    fuel_mask = ps.red.nfuel_cat == i;
-    msk = logical(fuel_mask.*r_msk);
-    fuel_rate_diff =  r1(msk)-r2(msk);
-    mean_frd = mean(fuel_rate_diff);
-    std_frd = std(fuel_rate_diff);
-    format short
-    fprintf('Fuel type: %d ROS difference: %f Std. Deviation: %f \n',i,mean_frd,std_frd);
-    
-end
+% for i = 1:13
+%     fuel_mask = ps.red.nfuel_cat == i;
+%     msk = logical(fuel_mask.*r_msk);
+%     fuel_rate_diff =  r1(msk)-r2(msk);
+%     mean_frd = mean(fuel_rate_diff);
+%     std_frd = std(fuel_rate_diff);
+%     format short
+%     fprintf('Fuel type: %d ROS difference: %f Std. Deviation: %f \n',i,mean_frd,std_frd);
+% end
 
 %close all
 
