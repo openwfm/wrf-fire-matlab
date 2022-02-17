@@ -200,6 +200,10 @@ do itry=1,maxtry
   call message(msg)
   if(frame0_fmw .eq. frame0_in)goto 1
   call ncclose(ncid)  
+  if(frame0_fmw .eq. -99)then
+       call message('received stop request frame=-99')
+       stop
+  endif
   call sleep(1)
   call ncopen(filename,nf90_nowrite,ncid)
 enddo
