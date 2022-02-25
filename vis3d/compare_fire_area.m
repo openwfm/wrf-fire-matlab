@@ -6,8 +6,9 @@ function r=compare_fire_area(f1,f2)
 % returns:
 %     structure with results
 
-p1 = nc2struct(f1,{'Times','FIRE_AREA'},{});
-p2 = nc2struct(f2,{'Times','FIRE_AREA'},{});
+vars={'Times','FIRE_AREA','ROS'};
+p1 = nc2struct(f1,vars,{});
+p2 = nc2struct(f2,vars,{});
 times1=char(p1.times)';
 times2=char(p2.times)';
 steps1=size(times1,1);
@@ -27,8 +28,6 @@ for step=1:steps
     px1 = fa1>0;                   % 0-1 arrays burning/not burning 
     px2 = fa2>0;                   % 0-1 arrays burning/not burning 
     dpx = px1 - px2;
-    r.file_1=f1;
-    r.file_2=f2;
     r.fire_area_1(1,step) = ssum(fa1);
     r.fire_area_2(1,step) = ssum(fa2);
     r.fire_area_set_diff(1,step) = ssum(abs(fa2-fa1));
@@ -41,8 +40,16 @@ for step=1:steps
     r.fire_pixels_diff_rel(1,step) = (ssum(px2)-ssum(px1))/((ssum(px1)+ssum(px1))/2+realmin);
     r.fire_pixels_set_diff(1,step) = ssum(abs(px2-px1));
     r.fire_pixels_set_diff_rel(1,step) = ssum(abs(px2-px1))/((ssum(px1)+ssum(px1))/2+realmin);
+    ros1=p1.ros(:,:,step);
+    ros2=p2.ros(:,:,step);
+    rosd=ros2(:)-ros1(:);
+    r.ros_diff_avg(1,step)=sum(rosd)/prod(size(rosd));
+    r.ros_diff_max(1,step)=max(rosd);
+    r.ros_diff_min(1,step)=min(rosd);
 end
 end
+%r.file_1=f1;
+%r.file_2=f2;
         
         
         
