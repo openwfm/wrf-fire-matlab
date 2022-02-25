@@ -22,7 +22,7 @@ integer ::                          &
 real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsfe(:,:), ht_fmw(:), zsf_fmw(:,:), fwh_fmw(:,:)
 
 ! variables allocated and computed here
-real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:), ht0(:)
+real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:), hth(:)
 real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:), uf(:,:), vf(:,:), wh(:,:)
 integer, pointer:: kh(:,:)
 
@@ -157,17 +157,23 @@ do k=kfds,kfte
     mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,k,1)
 enddo
 
+! heights of wind nodes in cell centers
+allocate(hth(0:kfte))
+hth(0)=0
+hth(1)=ht_fmw(1)*0.5
+do k=2,kfte
+  hth(k)=0.5*(ht_fmw(k-1)+ht_fmw(k))
+enddo
+
 ! indices to interpolate to fwh_fmw
 do j=jfts,jfte
   do i=ifts,ifte
     do k=1,kfte
-      kh(i,j)=k
-      if (ht_fmw(k) .ge. fwh_fmw(i,j))then
-        if(k>1)then
-          wh(i,j) = (ht_fmw(k) - fwh_fmw(i,j))/(ht_fmw(k) - ht_fmw(k-1)) ! weight 0 if at the top
-        else
-          wh(i,j) = (ht_fmw(k) - fwh_fmw(i,j))/(ht_fmw(k))
-        endif
+      if (hth(k) .ge. fwh_fmw(i,j))then
+        kh(i,j)=k
+        wh(i,j) = (hth(k) - fwh_fmw(i,j))/(hth(k) - hth(k-1)) ! weight 0 if at the top
+        ! write(msg,*)'i,j=',i,j,'k=',k,'hth=',hth(k),hth(k-1),'fwh=',fwh_fmw(i,j),'wh=',wh(i,j)
+        ! call message(msg)
         goto 1
       endif
     enddo
@@ -176,7 +182,7 @@ do j=jfts,jfte
   enddo
 enddo
 
-deallocate(ht_fmw,zsfe)  ! no longer needed
+deallocate(hth,ht_fmw,zsfe)  ! no longer needed
 
 if(call_femwind.gt.0)then
 call message('calling femwind_setup')
@@ -229,7 +235,19 @@ do frame0_fmw=1,mframe
     write(*,'(a)')'femwind_solve skipped'
   endif
 
-  ! interpolate to fire height
+  ! interpolate u,v to fire height
+  do j=jfts,jfte
+    do i=ifts,ifte
+       k=kh(i,j)
+       if(k>1)then
+         uf(i,j) = wh(i,j) * u(i,k,j) + (1.0 - wh(i,j) * u(i,k-1,j))
+         vf(i,j) = wh(i,j) * v(i,k,j) + (1.0 - wh(i,j) * v(i,k-1,j))
+       else
+         uf(i,j) = u(i,k,j)
+         vf(i,j) = v(i,k,j)
+       endif
+    enddo
+  enddo
   call message('TESTING ONLY: copying lowest level of input to uf vf')
   write(msg,*)"shape(uf)=",shape(uf)
   call message(msg)
