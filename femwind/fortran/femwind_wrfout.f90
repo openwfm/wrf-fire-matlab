@@ -19,7 +19,7 @@ integer ::                          &
 ! declarations of A, msize included from module femwind
 
 ! variables read from wrfout
-real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsfe(:,:), ht_fmw(:), zsf_fmw(:,:), zsfc(:,:)
+real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsfe(:,:), ht_fmw(:), zsf_fmw(:,:)
 
 ! variables allocated and computed here
 real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:)
