@@ -8,7 +8,7 @@ use module_wrfout
 
 implicit none
 
-integer::write_debug = 0,call_femwind = 0
+integer::write_debug = 0,call_femwind = 1
 
 integer ::                          &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -27,7 +27,7 @@ real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:), uf(:,:), vf(:,:), wh(:,:)
 integer, pointer:: kh(:,:)
 
 integer:: i, j, k, n(3), nx, ny, nz, nfx, nfy, nfz
-integer::ncid,frame,sr(2),frame0_fmw,mframe=100,dims(3)
+integer::ncid,frame,sr(2),frame0_fmw,mframe=10,dims(3),frame_terminate=-99
 real:: rate,A(3,3),dx,dy,zx,zy
 character(len=256)::filename, msg
 
@@ -248,13 +248,13 @@ do frame0_fmw=1,mframe
        endif
     enddo
   enddo
-  call message('TESTING ONLY: copying lowest level of input to uf vf')
-  write(msg,*)"shape(uf)=",shape(uf)
-  call message(msg)
-  write(msg,*)"shape(vf)=",shape(vf)
-  call message(msg)
-  uf = u0(ifts:ifte,1,jfts:jfte)
-  vf = v0(ifts:ifte,1,jfts:jfte)
+  ! call message('TESTING ONLY: copying lowest level of input to uf vf')
+  ! write(msg,*)"shape(uf)=",shape(uf)
+  ! call message(msg)
+  ! write(msg,*)"shape(vf)=",shape(vf)
+  ! call message(msg)
+  ! uf = u0(ifts:ifte,1,jfts:jfte)
+  ! vf = v0(ifts:ifte,1,jfts:jfte)
   call write_fire_wind(filename,uf,vf,frame0_fmw,frame=1)
 
   if(write_debug.gt.0)then
@@ -266,6 +266,10 @@ do frame0_fmw=1,mframe
   endif
 
 enddo
+
+call write_fire_wind(filename,uf,vf,frame_terminate,frame=1)
+
+print *,'femwind end'
 
 contains
 

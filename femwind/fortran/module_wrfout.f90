@@ -196,7 +196,7 @@ call message(msg)
 call ncopen(filename,nf90_nowrite,ncid)
 do itry=1,maxtry
   frame0_in = netcdf_read_int_wrf(ncid,"FRAME0_FMW",istep)
-  write(msg,*)"try ",itry," got ",frame0_in
+  write(msg,*)"try ",itry," got ",frame0_in," expecting",frame0_fmw
   call message(msg)
   if(frame0_fmw .eq. frame0_in)goto 1
   call ncclose(ncid)  
