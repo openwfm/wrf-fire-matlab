@@ -170,6 +170,35 @@ subroutine netcdf_write_2d(ncid,a,name,iframe)
 
 end subroutine netcdf_write_2d
 
+
+subroutine netcdf_write_wrf_3d(ncid,a,name,iframe)
+    implicit none
+!*** purpose
+!   write a 3d array to netcdf file with WRF ordering
+
+!*** arguments
+    integer, intent(in)::ncid                    ! open netcdf file
+    real,intent(in),dimension(:,:,:)::a  
+    character(LEN=*),intent(in):: name
+    integer, intent(in)::iframe                  ! time frame to write in 
+
+!*** local
+    integer:: i,j,k,n(3)
+    real, allocatable:: aw(:,:,:)
+!*** executable
+    n = shape(a)   
+    allocate(aw(n(1),n(3),n(2)))
+    do i = 1,n(1)
+       do k = 1,n(3)
+          do j = 1,n(2)
+             aw(i,k,j) = a(i,j,k)
+          enddo
+       enddo
+    enddo
+    call netcdf_write_3d(ncid,aw,name,iframe)
+    deallocate(aw)
+end subroutine netcdf_write_wrf_3d
+    
 subroutine netcdf_write_3d(ncid,a,name,iframe)
     implicit none
 !*** purpose

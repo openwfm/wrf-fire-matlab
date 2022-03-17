@@ -166,9 +166,9 @@ call message(msg)
 call ncopen(filename,nf90_write,ncid)
 call netcdf_write_2d(ncid,uf,"UF",istep)
 call netcdf_write_2d(ncid,vf,"VF",istep)
-!if(present(u_fmw))call netcdf_write_wrf_3d(ncid,u_fmw,"U_FMW",istep) ! diagnostics
-!if(present(v_fmw))call netcdf_write_wrf_3d(ncid,v_fmw,"V_FMW",istep)
-!if(present(w_fmw))call netcdf_write_wrf_3d(ncid,w_fmw,"W_FMW",istep)
+if(present(u_fmw))call netcdf_write_wrf_3d(ncid,u_fmw,"U_FMW",istep) ! diagnostics
+if(present(v_fmw))call netcdf_write_wrf_3d(ncid,v_fmw,"V_FMW",istep)
+if(present(w_fmw))call netcdf_write_wrf_3d(ncid,w_fmw,"W_FMW",istep)
 chsum=ieor(get_chsum_2d(uf),get_chsum_2d(vf))
 print *,'chsum=',chsum
 call netcdf_write_int(ncid,chsum,"CHSUM_FMW")
