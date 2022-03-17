@@ -265,8 +265,8 @@ do frame0_fmw=1,mframe
       do i=ifts,ifte
          k=kh(i,j)
          if(k>1)then
-           uf(i,j) = wh(i,j) * u(i,k,j) + (1.0 - wh(i,j) * u(i,k-1,j))
-           vf(i,j) = wh(i,j) * v(i,k,j) + (1.0 - wh(i,j) * v(i,k-1,j))
+           uf(i,j) = wh(i,j) * u(i,k,j) + (1.0 - wh(i,j)) * u(i,k-1,j)
+           vf(i,j) = wh(i,j) * v(i,k,j) + (1.0 - wh(i,j)) * v(i,k-1,j)
          else
            uf(i,j) = u(i,k,j)
            vf(i,j) = v(i,k,j)
