@@ -170,6 +170,42 @@ subroutine netcdf_write_2d(ncid,a,name,iframe)
 
 end subroutine netcdf_write_2d
 
+subroutine netcdf_write_3d(ncid,a,name,iframe)
+    implicit none
+!*** purpose
+!   write a 3d array to netcdf file
+
+!*** arguments
+    integer, intent(in)::ncid                    ! open netcdf file
+    real,intent(in),dimension(:,:,:)::a  
+    character(LEN=*),intent(in):: name
+    integer, intent(in)::iframe                  ! time frame to write in 
+
+!*** local
+    integer,dimension(4)::star,cnts,ends,dims
+    integer::i,j,k,varid,n(3)
+    character(len=256) msg
+
+    ! get idx
+    n=shape(a)
+    call netcdf_var_info(ncid,name,dims,varid,netcdf_msglevel)
+    write(msg,*)"array ",trim(name)," shape ",n," NetCDF dimensions ",dims
+    call message(msg)
+    
+    if(dims(1).lt.n(1).or.dims(2).lt.n(2).or.dims(3).lt.n(3))call crash("array shape too large")
+    star   = (/1,1,1,iframe/)
+    ends   = (/n(1),n(2),n(3),iframe/)
+    if(iframe.gt.dims(4))call crash('netcdf_write_2d: frame not in file')
+    cnts = ends - star + 1
+    
+    write(msg,*)"writing ",trim(name)," from ",star," to ",ends
+    call message(msg)
+ 
+    ! write to file
+    call check(nf90_put_var(ncid, varid, a, start = star, count = cnts),"nf90_put_var:"//trim(name))
+
+end subroutine netcdf_write_3d
+
 integer function l2i(l)
     implicit none
     logical, intent(in)::l
