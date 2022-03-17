@@ -1,0 +1,8 @@
+&femwind_nl
+  frame_terminate =-99, 
+  write_uvw_fmw = 1,  
+  mframe = 10 ,       
+  write_debug =0, 
+  call_femwind = 0, 
+  interpolate_uf_vf = 1
+/

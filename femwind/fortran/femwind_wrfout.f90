@@ -8,7 +8,6 @@ use module_wrfout
 
 implicit none
 
-integer::write_debug = 0,call_femwind = 1
 
 integer ::                          &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -26,15 +25,40 @@ real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:), hth(:)
 real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:), uf(:,:), vf(:,:), wh(:,:)
 integer, pointer:: kh(:,:)
 
-integer:: i, j, k, n(3), nx, ny, nz, nfx, nfy, nfz
-integer::ncid,frame,sr(2),frame0_fmw,mframe=10,dims(3),frame_terminate=-99
+integer:: i, j, k, n(3), nx, ny, nz, nfx, nfy, nfz, iu=10
+integer::ncid,sr(2),frame0_fmw,dims(3)
 real:: rate,A(3,3),dx,dy,zx,zy
 character(len=256)::filename, msg
+
+! params
+integer ::     &
+  frame = 1,             & ! frame to use in the communication file
+  frame_terminate = -99, &
+  write_uvw_fmw = 1,     &
+  mframe = 10,           & ! send code to terminate and exit after this frame
+  write_debug = 0,       &
+  call_femwind = 1,      &
+  interpolate_uf_vf = 1  
+
+ 
+namelist /femwind_nl/    &
+  frame ,                &
+  frame_terminate ,      &
+  write_uvw_fmw ,        &
+  mframe ,               & ! send code to terminate and exit after this frame
+  write_debug ,          &
+  call_femwind,          &
+  interpolate_uf_vf
 
 !*** executable
 
 filename = "wrf.nc" ! file to read from and write to
-frame = 1           ! frame in the file 
+
+! params from namelist
+open(iu,file="namelist.femwind")
+read(iu, femwind_nl)
+close(iu)
+write(*,femwind_nl)
 
 !************************************
 ! read static data 
@@ -185,9 +209,9 @@ enddo
 deallocate(hth,ht_fmw,zsfe)  ! no longer needed
 
 if(call_femwind.gt.0)then
-call message('calling femwind_setup')
-call femwind_setup(mg)    
-call message('femwind_setup done')
+  call message('calling femwind_setup')
+  call femwind_setup(mg)    
+  call message('femwind_setup done')
 endif
 
 if(write_debug.gt.0)then
@@ -204,7 +228,7 @@ endif
 do frame0_fmw=1,mframe
 
   ! read initial velocity field, loop until delivered 
-  call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,frame0_fmw,frame=1)
+  call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,frame0_fmw,frame=frame)
   
   ! copy the input data to tile sized bounds
   ! initial wind is at cell centers, indexing was already switched to ikj in reading
@@ -235,27 +259,35 @@ do frame0_fmw=1,mframe
     write(*,'(a)')'femwind_solve skipped'
   endif
 
-  ! interpolate u,v to fire height
-  do j=jfts,jfte
-    do i=ifts,ifte
-       k=kh(i,j)
-       if(k>1)then
-         uf(i,j) = wh(i,j) * u(i,k,j) + (1.0 - wh(i,j) * u(i,k-1,j))
-         vf(i,j) = wh(i,j) * v(i,k,j) + (1.0 - wh(i,j) * v(i,k-1,j))
-       else
-         uf(i,j) = u(i,k,j)
-         vf(i,j) = v(i,k,j)
-       endif
+  if(interpolate_uf_vf.gt.0)then
+    ! interpolate u,v to fire height
+    do j=jfts,jfte
+      do i=ifts,ifte
+         k=kh(i,j)
+         if(k>1)then
+           uf(i,j) = wh(i,j) * u(i,k,j) + (1.0 - wh(i,j) * u(i,k-1,j))
+           vf(i,j) = wh(i,j) * v(i,k,j) + (1.0 - wh(i,j) * v(i,k-1,j))
+         else
+           uf(i,j) = u(i,k,j)
+           vf(i,j) = v(i,k,j)
+         endif
+      enddo
     enddo
-  enddo
-  ! call message('TESTING ONLY: copying lowest level of input to uf vf')
-  ! write(msg,*)"shape(uf)=",shape(uf)
-  ! call message(msg)
-  ! write(msg,*)"shape(vf)=",shape(vf)
-  ! call message(msg)
-  ! uf = u0(ifts:ifte,1,jfts:jfte)
-  ! vf = v0(ifts:ifte,1,jfts:jfte)
-  call write_fire_wind(filename,uf,vf,frame0_fmw,frame=1)
+  else
+    call message('TESTING ONLY: copying lowest level of input to uf vf')
+    uf = u0(ifts:ifte,1,jfts:jfte)
+    vf = v0(ifts:ifte,1,jfts:jfte)
+  endif
+
+  !  write_fire_wind(filename,frame0_fmw,uf,vf,u_fmw,v_fmw,w_fmw,frame)
+  if(write_uvw_fmw.gt.0)then
+    call write_fire_wind(filename,frame0_fmw,uf,vf, &
+      u(ifts:ifte,kfts:kfte,jfts:jfte),             &
+      v(ifts:ifte,kfts:kfte,jfts:jfte),             &
+      w(ifts:ifte,kfts:kfte,jfts:jfte), frame=frame)
+  else
+    call write_fire_wind(filename,frame0_fmw,uf,vf,frame=frame)
+  endif
 
   if(write_debug.gt.0)then
     ! write output as is in 3D but with tight dimensions
@@ -267,7 +299,7 @@ do frame0_fmw=1,mframe
 
 enddo
 
-call write_fire_wind(filename,uf,vf,frame_terminate,frame=1)
+call write_fire_wind(filename,frame_terminate,uf,vf)
 
 print *,'femwind end'
 

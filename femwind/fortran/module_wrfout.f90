@@ -144,26 +144,31 @@ subroutine get_wrf_dims(ncid,sr,dims3d)
     endif
 end subroutine get_wrf_dims
 
-subroutine write_fire_wind(filename,uf,vf,frame0_fmw,frame)
+subroutine write_fire_wind(filename,frame0_fmw,uf,vf,u_fmw,v_fmw,w_fmw,frame)
 implicit none
 !*** purpose
 ! write solution 
 !*** arguments
 character(len=*), intent(in)::filename  ! open file
 real, intent(in), dimension(:,:)::uf,vf
+real, intent(in), dimension(:,:,:),optional::u_fmw,v_fmw,w_fmw
 integer, intent(in)::frame0_fmw   ! frame number 
-integer, intent(in), optional::frame ! the default frame in the file to read, default=1
+integer, intent(in), optional::frame ! the default frame in the file
 !*** local
-integer::istep=1,chsum,ncid
+integer::istep,chsum,ncid
 character(len=256)::msg
 
 !*** executable
+istep=1
 if(present(frame))istep=frame 
-write(msg,*)"writing uf vf timestep ",frame0_fmw," to ", trim(filename), " frame ",istep
+write(msg,*)"writing timestep ",frame0_fmw," to ", trim(filename), " frame ",istep
 call message(msg)
 call ncopen(filename,nf90_write,ncid)
 call netcdf_write_2d(ncid,uf,"UF",istep)
 call netcdf_write_2d(ncid,vf,"VF",istep)
+!if(present(u_fmw))call netcdf_write_wrf_3d(ncid,u_fmw,"U_FMW",istep) ! diagnostics
+!if(present(v_fmw))call netcdf_write_wrf_3d(ncid,v_fmw,"V_FMW",istep)
+!if(present(w_fmw))call netcdf_write_wrf_3d(ncid,w_fmw,"W_FMW",istep)
 chsum=ieor(get_chsum_2d(uf),get_chsum_2d(vf))
 print *,'chsum=',chsum
 call netcdf_write_int(ncid,chsum,"CHSUM_FMW")
