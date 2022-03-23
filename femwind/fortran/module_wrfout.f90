@@ -191,6 +191,8 @@ integer, intent(in), optional::frame ! the default frame in the file to read, de
 !*** local
 integer::istep=1,chsum0,sr(2),chsum0_fmw,ierr=0,maxtry=200,frame0_in,itry,ncid
 character(len=256)::msg
+real:: waitmax=200,waitsec
+integer::isleepqq=100, isleep=1
 
 !*** executable
 if(present(frame))istep=frame 
@@ -209,11 +211,16 @@ do itry=1,maxtry
        call message('received stop request frame=-99')
        stop
   endif
-  call sleep(1)
+  !call sleep(isleep)
+  write(msg,*)'try ',itry,' waiting ',isleepqq*1e-3,' sec'
+  call message(msg)
+  call sleepqq(isleepqq) ! intel fortran only 
+  if(itry * isleepqq * 1e-3 .gt. waitmax)then
+     write(msg,*)'timed out after ',waitmax,' sec waiting for frame ',frame0_fmw,' got ',frame0_in
+     call crash(trim(msg))
+  endif
   call ncopen(filename,nf90_nowrite,ncid)
 enddo
-write(msg,*)'timed out after ',maxtry,' tries waiting for frame ',frame0_fmw,' got ',frame0_in
-call crash(trim(msg))
 1 continue
 
 call get_wrf_dims(ncid,sr) ! submesh refinement factors
@@ -233,12 +240,17 @@ do itry=1,maxtry
   call message(msg)
   call ncclose(ncid)  
   if (chsum0_fmw.eq.chsum0)goto 2
-  call sleep(1)
+  !call sleep(1)
+  write(msg,*)'try ',itry,' waiting ',isleepqq*1e-3,' sec'
+  call message(msg)
+  call sleepqq(isleepqq) ! intel fortran only 
+  if(itry * isleepqq * 1e-3 .gt. waitmax)then
+     write(msg,*)'timed out after ',waitmax,' sec waiting for correct check sum'
+     call crash(trim(msg))
+  endif
   call ncopen(filename,nf90_nowrite,ncid)
 enddo
 call ncclose(ncid)  
-write(msg,*)'timed out after ',maxtry,' tries waiting for correct check sum'
-call crash(trim(msg))
 2 continue
 write(msg,*)'success check sum match for time step ',frame0_fmw
 call message(msg)
