@@ -5,7 +5,8 @@ if ~exist('timestep','var'),
     timestep=size(nc2struct(path,{'Times'},{}).times,2);
 end
 % reading wrfout variables
-p=nc2struct(path,{'U0_FMW','V0_FMW','W0_FMW','HT_FMW','ZSF'},{'DX','DY'},timestep);
+% p=nc2struct(path,{'U0_FMW','V0_FMW','W0_FMW','HT_FMW','ZSF'},{'DX','DY'},timestep);
+p=nc2struct(path,{'U0_FMW','V0_FMW','W0_FMW','HT_FMW','ZSF','U_FMW','W_FMW','V_FMW','UF','VF'},{'DX','DY'},timestep);
 % looking at sizes
 [nx,ny,nz]=size(p.u0_fmw);
 % height profile from the ground
