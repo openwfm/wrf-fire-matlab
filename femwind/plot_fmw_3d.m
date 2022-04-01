@@ -1,6 +1,6 @@
 function plot_fmw_3d(path,level,scale,stride)
 p=nc2struct(path,{'U0_FMW','V0_FMW','W0_FMW','HT_FMW','ZSF',...
-    'U_FMW','W_FMW','V_FMW','UF','VF'},{'DX','DY'},1);
+    'U_FMW','W_FMW','V_FMW','UF','VF','FWH'},{'DX','DY'},1);
 [nx,ny,nz]=size(p.u0_fmw);
 xc=zeros(nx,ny,nz);  % cell center coordinates, same as wind
 yc=zeros(nx,ny,nz);
