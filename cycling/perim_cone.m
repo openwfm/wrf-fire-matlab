@@ -1,5 +1,5 @@
 function [wz] = perim_cone(n,w)
- HEAD
+
 [x,y,z] = perim();  %in-linefunction below
 for i = 2:n
     [x1,y1,z1] = perim();
@@ -121,7 +121,7 @@ z = F(x,y);
 
 for i = 1:2
 %alpha = rand;
-z1 = smooth_up(x,y,z);
+z1 = smooth_up(z);
 z2 = imgaussfilt(z,3+rand);
 %z = alpha*z1+(1-alpha)*z2;
 z = 1/2*(z1+z2);

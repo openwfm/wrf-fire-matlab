@@ -8,7 +8,6 @@ use module_wrfout
 
 implicit none
 
-integer::write_debug = 0,call_femwind = 0
 
 integer ::                          &
     ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
@@ -19,21 +18,47 @@ integer ::                          &
 ! declarations of A, msize included from module femwind
 
 ! variables read from wrfout
-real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsfe(:,:), ht_fmw(:), zsf_fmw(:,:), zsfc(:,:)
+real, pointer:: u0_fmw(:,:,:), v0_fmw(:,:,:), w0_fmw(:,:,:), zsfe(:,:), ht_fmw(:), zsf_fmw(:,:), fwh_fmw(:,:)
 
 ! variables allocated and computed here
-real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:)
-real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:), uf(:,:), vf(:,:)
+real, pointer:: u0(:,:,:), v0(:,:,:), w0(:,:,:), hth(:)
+real, pointer:: u(:,:,:), v(:,:,:), w(:,:,:), uf(:,:), vf(:,:), wh(:,:)
+integer, pointer:: kh(:,:)
 
-integer:: i, j, k, n(3), nx, ny, nz, nfx, nfy, nfz
-integer::ncid,frame,sr(2),frame0_fmw,mframe=100,dims(3)
+integer:: i, j, k, n(3), nx, ny, nz, nfx, nfy, nfz, iu=10
+integer::ncid,sr(2),frame0_fmw,dims(3)
 real:: rate,A(3,3),dx,dy,zx,zy
 character(len=256)::filename, msg
+
+! params
+integer ::     &
+  frame = 1,             & ! frame to use in the communication file
+  frame_terminate = -99, &
+  write_uvw_fmw = 1,     &
+  mframe = 10,           & ! send code to terminate and exit after this frame
+  write_debug = 0,       &
+  call_femwind = 1,      &
+  interpolate_uf_vf = 1  
+
+ 
+namelist /femwind_nl/    &
+  frame ,                &
+  frame_terminate ,      &
+  write_uvw_fmw ,        &
+  mframe ,               & ! send code to terminate and exit after this frame
+  write_debug ,          &
+  call_femwind,          &
+  interpolate_uf_vf
 
 !*** executable
 
 filename = "wrf.nc" ! file to read from and write to
-frame = 1           ! frame in the file 
+
+! params from namelist
+open(iu,file="namelist.femwind")
+read(iu, femwind_nl)
+close(iu)
+write(*,femwind_nl)
 
 !************************************
 ! read static data 
@@ -55,8 +80,11 @@ nfx = dims(1)*sr(1)
 nfy = dims(2)*sr(2)  
 nfz = size(ht_fmw,1)
 
-! horizontal height at cell centers
+! terrain height at cell centers
 call netcdf_read_array_wrf(ncid,"ZSF",frame=frame,a2d=zsf_fmw) 
+
+! fire wind height to interpolate to at cell centers
+call netcdf_read_array_wrf(ncid,"FWH",frame=frame,a2d=fwh_fmw) 
 
 call ncclose(ncid)
 
@@ -95,7 +123,10 @@ allocate(v(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(w(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(uf(ifts:ifte,jfts:jfte))
 allocate(vf(ifts:ifte,jfts:jfte))
+allocate(kh(ifts:ifte,jfts:jfte))
+allocate(wh(ifts:ifte,jfts:jfte))
 allocate(zsfe(ifts-1:ifte+1,jfts-1:jfte+1))
+
   write(msg,*)"shape(uf)=",shape(uf)
   call message(msg)
   write(msg,*)"shape(vf)=",shape(vf)
@@ -150,12 +181,37 @@ do k=kfds,kfte
     mg(1)%dz(k)=mg(1)%Z(1,k+1,1)-mg(1)%Z(1,k,1)
 enddo
 
-deallocate(ht_fmw,zsfe)  ! no longer needed
+! heights of wind nodes in cell centers
+allocate(hth(0:kfte))
+hth(0)=0
+hth(1)=ht_fmw(1)*0.5
+do k=2,kfte
+  hth(k)=0.5*(ht_fmw(k-1)+ht_fmw(k))
+enddo
+
+! indices to interpolate to fwh_fmw
+do j=jfts,jfte
+  do i=ifts,ifte
+    do k=1,kfte
+      if (hth(k) .ge. fwh_fmw(i,j))then
+        kh(i,j)=k
+        wh(i,j) = (hth(k) - fwh_fmw(i,j))/(hth(k) - hth(k-1)) ! weight 0 if at the top
+        ! write(msg,*)'i,j=',i,j,'k=',k,'hth=',hth(k),hth(k-1),'fwh=',fwh_fmw(i,j),'wh=',wh(i,j)
+        ! call message(msg)
+        goto 1
+      endif
+    enddo
+    call crash('did not find interpolation layer') 
+1   continue 
+  enddo
+enddo
+
+deallocate(hth,ht_fmw,zsfe)  ! no longer needed
 
 if(call_femwind.gt.0)then
-call message('calling femwind_setup')
-call femwind_setup(mg)    
-call message('femwind_setup done')
+  call message('calling femwind_setup')
+  call femwind_setup(mg)    
+  call message('femwind_setup done')
 endif
 
 if(write_debug.gt.0)then
@@ -172,7 +228,7 @@ endif
 do frame0_fmw=1,mframe
 
   ! read initial velocity field, loop until delivered 
-  call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,frame0_fmw,frame=1)
+  call read_initial_wind(filename,u0_fmw,v0_fmw,w0_fmw,frame0_fmw,frame=frame)
   
   ! copy the input data to tile sized bounds
   ! initial wind is at cell centers, indexing was already switched to ikj in reading
@@ -185,28 +241,53 @@ do frame0_fmw=1,mframe
 
   ! compute/update mass consistent flow
   
-if(call_femwind.gt.0)then
-  write(*,'(a)')'calling femwind_solve'
-  call femwind_solve(  mg,&
-    ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
-    ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
-    ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
-    ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
-    u0, v0, w0,                                  & ! input arrays
-    u, v, w,                                                  & ! output arrays
-    rate)
-  write(*,'(a)')'femwind_solve returned OK'
-else
-  ! interpolate to fire height
-  call message('TESTING ONLY: copying lowest level of input to uf vf')
-  write(msg,*)"shape(uf)=",shape(uf)
-  call message(msg)
-  write(msg,*)"shape(vf)=",shape(vf)
-  call message(msg)
-  uf = u0(ifts:ifte,1,jfts:jfte)
-  vf = v0(ifts:ifte,1,jfts:jfte)
-  call write_fire_wind(filename,uf,vf,frame0_fmw,frame=1)
-endif
+  if(call_femwind.gt.0)then
+    write(*,'(a)')'calling femwind_solve'
+    call femwind_solve(  mg,&
+      ifds, ifde, kfds, kfde, jfds, jfde,                       & ! fire domain bounds
+      ifms, ifme, kfms, kfme, jfms, jfme,                       & ! fire memory bounds
+      ifps, ifpe, kfps, kfpe, jfps, jfpe,                       & ! fire patch bounds
+      ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
+      u0, v0, w0,                                  & ! input arrays
+      u, v, w,                                                  & ! output arrays
+      rate)
+    write(*,'(a)')'femwind_solve returned OK'
+  else
+    u=u0
+    v=v0
+    w=w0
+    write(*,'(a)')'femwind_solve skipped'
+  endif
+
+  if(interpolate_uf_vf.gt.0)then
+    ! interpolate u,v to fire height
+    do j=jfts,jfte
+      do i=ifts,ifte
+         k=kh(i,j)
+         if(k>1)then
+           uf(i,j) = wh(i,j) * u(i,k,j) + (1.0 - wh(i,j)) * u(i,k-1,j)
+           vf(i,j) = wh(i,j) * v(i,k,j) + (1.0 - wh(i,j)) * v(i,k-1,j)
+         else
+           uf(i,j) = u(i,k,j)
+           vf(i,j) = v(i,k,j)
+         endif
+      enddo
+    enddo
+  else
+    call message('TESTING ONLY: copying lowest level of input to uf vf')
+    uf = u0(ifts:ifte,1,jfts:jfte)
+    vf = v0(ifts:ifte,1,jfts:jfte)
+  endif
+
+  !  write_fire_wind(filename,frame0_fmw,uf,vf,u_fmw,v_fmw,w_fmw,frame)
+  if(write_uvw_fmw.gt.0)then
+    call write_fire_wind(filename,frame0_fmw,uf,vf, &
+      u(ifts:ifte,kfts:kfte,jfts:jfte),             &
+      v(ifts:ifte,kfts:kfte,jfts:jfte),             &
+      w(ifts:ifte,kfts:kfte,jfts:jfte), frame=frame)
+  else
+    call write_fire_wind(filename,frame0_fmw,uf,vf,frame=frame)
+  endif
 
   if(write_debug.gt.0)then
     ! write output as is in 3D but with tight dimensions
@@ -217,6 +298,10 @@ endif
   endif
 
 enddo
+
+call write_fire_wind(filename,frame_terminate,uf,vf)
+
+print *,'femwind end'
 
 contains
 

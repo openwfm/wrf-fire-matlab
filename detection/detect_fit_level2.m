@@ -90,7 +90,7 @@ end
 %prefix='../TIFpoint/';
 %prefix='../perimTIFs/';
 % the level2 file names processed by geotiff2mat.py
-p=sort_rsac_files(prefix); 
+
 
 if isempty(time_bounds),
     time_bounds=subset_detection_time(red,p);

@@ -9,26 +9,29 @@ FFLAGS = -g -C -I /opt/local/include
 LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -pg -O3 -I $(NETCDF)/include
 FFLAGS = -O3 -I $(NETCDF)/include
-FFLAGS = -g -C -I $(NETCDF)/include 
+#FFLAGS = -g -C -I $(NETCDF)/include 
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
-default: femwind_wrfout.exe
+default: all
 
-tests: hexa_test.exe\
+wrf: femwind_wrfout.exe
+
+tests: clean_txt\
+ hexa_test.exe\
  ndt_mult_test.exe\
  sweeps_test.exe\
  f_assembly_test.exe\
  prolongation_test.exe\
  restriction_test.exe\
  ndt_assembly_test.exe\
- w_test.exe\
+ w_assembly_test.exe\
  coarsening_icl_test.exe\
  ndt_boundary_conditions_test.exe\
  vec_boundary_conditions_test.exe\
  femwind_test.exe\
  netcdf_test.exe
 
-all: default tests
+all: wrf tests
 
 hexa_test.exe: hexa_test.o module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_utils.o
@@ -107,11 +110,11 @@ VEC_BOUNDARY_CONDITIONS = vec_boundary_conditions_test.f90  module_boundary_cond
 vec_boundary_conditions_test.exe: $(VEC_BOUNDARY_CONDITIONS) Makefile
 	$(FC) $(FFLAGS) -o $@ $(VEC_BOUNDARY_CONDITIONS)
 
-w_test.exe: w_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o Makefile
-	$(FC) $(FFLAGS) -o w_test.exe w_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o
+w_assembly_test.exe: w_assembly_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o Makefile
+	$(FC) $(FFLAGS) -o w_assembly_test.exe w_assembly_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o
 
-w_test.o: w_test.f90  module_hexa.o module_utils.o  module_w_assembly.o Makefile
-	$(FC) $(FFLAGS) -c w_test.f90
+w_assembly_test.o: w_assembly_test.f90  module_hexa.o module_utils.o  module_w_assembly.o Makefile
+	$(FC) $(FFLAGS) -c w_assembly_test.f90
 
 module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
 	$(FC) $(FFLAGS) -c module_w_assembly.f90
@@ -157,5 +160,9 @@ NETCDF_TEST = netcdf_test.f90 $(WRFOUT_MODULES) module_utils.o
 netcdf_test.exe: $(NETCDF_TEST) Makefile
 	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
 
-clean:
-	rm -rf *.mod *.o *.exe *.dSYM
+# delete test data files 
+clean_txt:
+	rm -f ../*.txt
+
+clean: clean_txt
+	rm -f *.mod *.o *.exe *.dSYM 

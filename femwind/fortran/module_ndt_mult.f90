@@ -13,7 +13,7 @@ subroutine ndt_mult(                              &
 
 implicit none
 
-!*** purpose: compute r = y - Kglo*lambda and 2-norm of r
+!*** purpose: compute r = y - K*lambda and 2-norm of r
 
 !*** arguments
 
@@ -38,13 +38,15 @@ ie = snode(ifte,ifde,+1)
 je = snode(jfte,jfde,+1)
 ke = snode(kfte,kfde,+1)
 
+print *,'ndt_mult: loop upper bounds',ie,ke,je
+
 siz = 0.
 res = 0.
 
 do j=jfts,je
   do k=kfts,ke
     do i=ifts,ie
-      t = y(i,k,j) - ( &
+      r(i,k,j) = y(i,k,j) - ( &
         kmat(i-1,k-1,j-1,14)*lambda(i-1,k-1,j-1) +  &
         kmat(i  ,k-1,j-1,13)*lambda(i  ,k-1,j-1) +  &
         kmat(i+1,k-1,j-1,12)*lambda(i+1,k-1,j-1) +  &
@@ -72,9 +74,8 @@ do j=jfts,je
         kmat(i  ,k  ,j  ,12)*lambda(i-1,k+1,j+1) +  &
         kmat(i  ,k  ,j  ,13)*lambda(i  ,k+1,j+1) +  &
         kmat(i  ,k  ,j  ,14)*lambda(i+1,k+1,j+1) )
-      r(i,k,j) = t
       siz = max(siz,abs(y(i,k,j)))
-      res = max(res,abs(t))
+      res = max(res,abs(r(i,k,j)))
     enddo
   enddo
 enddo

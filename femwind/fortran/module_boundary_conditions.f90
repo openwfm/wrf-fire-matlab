@@ -30,10 +30,19 @@ integer:: i,j,k,ie,je,ke
 
 !** executable
 
+! print *,'ndt_boundary_conditions'
+! print *,'domain',ifds, ifde, kfds, kfde, jfds, jfde
+! print *,'memory',ifms, ifme, kfms, kfme, jfms, jfme
+! print *,'patch ',ifps, ifpe, kfps, kfpe, jfps, jfpe
+! print *,'tile  ',ifts, ifte, kfts, kfte, jfts, jfte
+
+
 ! loop upper bounds
 ie = snode(ifte,ifde,+1)
 je = snode(jfte,jfde,+1)
 ke = snode(kfte,kfde,+1)
+
+! print *,'loop upper bounds',ie,ke,je
 
 ! scale
 s=0.
@@ -51,7 +60,8 @@ do j=jfts,je
     do i=ifts,ie
       ! not efficient but will be executed only once
       if(i.eq.ifds.or.i.eq.ifde+1.or.j.eq.jfds.or.j.eq.jfde+1.or.k.eq.kfde+1)then
-        ! replace the row/col (i,k,j) by scaled identity
+        ! replace row/col (i,k,j) by scaled identity
+        ! print *,'replacing row/col ',i,j,k,' by ',s
         kmat(i-1,k-1,j-1,14)=0.
         kmat(i  ,k-1,j-1,13)=0.
         kmat(i+1,k-1,j-1,12)=0.
