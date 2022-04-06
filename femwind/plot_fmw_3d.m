@@ -1,5 +1,5 @@
 function p=plot_fmw_3d(path,level,scale,stride)
-p=read_fmw_3d(path)
+p=read_fmw_3d(path,1)
 figure(1)
 plot_wind_3d({p.xcf,p.ycf,p.zcf},{p.u0_fmw,p.v0_fmw,p.w0_fmw},level,scale,stride)
 title('Initial wind')
