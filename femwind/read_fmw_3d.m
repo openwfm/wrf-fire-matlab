@@ -2,8 +2,13 @@ function p=read_fmw_3d(path,frame)
 % p=read_fmw_3d(path,frame)
 % read initial and resulting wind at cell centers and compute their coordinates
 p=nc2struct(path,{'U0_FMW','V0_FMW','W0_FMW','HT_FMW','ZSF','FWH',...
-    'U_FMW','W_FMW','V_FMW','UF','VF','FWH','U','V','W','PHB','PH'},{'DX','DY'},frame);
-
+    'U_FMW','W_FMW','V_FMW','UF','VF','FWH','U','V','W','ZS','HGT',...
+    'PHB','PH','P','PB'},{'DX','DY'},frame);
+if ~isempty(p.u0_fmw)
+    disp('fmw variables, computing derived')
+else
+    return
+end
 % WRF atm wind at cell centers (theta points) 
 % see https://wiki.openwfm.org/wiki/How_to_interpret_WRF_variables
 % cell centers coordinates
@@ -13,6 +18,7 @@ p.xc=zeros(nx,ny,nz);
 p.yc=zeros(nx,ny,nz);
 p.zc=zeros(nx,ny,nz);
 ph = p.phb + p.ph;
+p.zw=ph/9.81;
 p.zc =0.5*(ph(:,:,1:end-1)+ph(:,:,2:end))/9.81
 [p.xc(:,:,1),p.yc(:,:,1)]=ndgrid(p.dx*([1:nx]-0.5),p.dy*([1:ny]-0.5));
 for k=2:nz
@@ -47,8 +53,8 @@ end
 % fmw wind velocities
 p.uv0=sqrt(p.u0_fmw.^2+p.v0_fmw.^2);
 p.uvw0=sqrt(p.u0_fmw.^2+p.v0_fmw.^2+p.w0_fmw.^2);
-p.uv0=sqrt(p.u_fmw.^2+p.v_fmw.^2);
-p.uvw0f=sqrt(p.u_fmw.^2+p.v_fmw.^2+p.w_fmw.^2);
+p.uvf=sqrt(p.u_fmw.^2+p.v_fmw.^2);
+p.uvwf=sqrt(p.u_fmw.^2+p.v_fmw.^2+p.w_fmw.^2);
 % interpolated to fire wind height fwh
-p.uvf=sqrt(p.uf.^2+p.vf.^2);
+p.ufvf=sqrt(p.uf.^2+p.vf.^2);
 end
