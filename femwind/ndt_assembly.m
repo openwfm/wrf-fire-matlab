@@ -1,9 +1,9 @@
-function K=ndt_assembly(A,X,u0,lambda,params,m);
+function K=ndt_assembly(A,X,u0,lambda,params,st);
 % in: 
 %  A  penalty coefficients matrix, size 3x3, s.p.d.
 %  X  cell array with 3d arrays x y z coordinates of mesh vertices
 %  u0, lambda, params  not used
-%  storage scheme, 14 or 27
+%  st storage scheme, 14 or 27
 % out:
 %  K  stiffness matrix, stored as size (n1,n2,n3,3,3,3)
 
@@ -11,11 +11,11 @@ d = size(X,2);    % dimensions
 n = size(X{1});   % mesh size in nodes
 nn = prod(n);     % total nodes
 
-t = ndt_storage_table(m); 
+t = ndt_storage_table(st); 
 
 % initialize matrices
 F = zeros(nn,1);
-K = zeros(n(1),n(2),n(3),m);
+K = zeros(n(1),n(2),n(3),st);
 Xloc = zeros(3,8); 
 for ie2=1:n(2)-1  % loop over elements
     for ie3=1:n(3)-1

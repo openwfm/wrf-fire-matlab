@@ -40,6 +40,16 @@ y27=ndt_mult(K27,xr);
 yn=nd_mult(K,xr);
 Kn_27_err=big(yn-y27)
 
+y14=ndt_mult(K14,xr);
+K14_err_rand=big(y14-y27)  % should be zero
+if abs(K14_err_rand)>1e-10, error('should be zero'),end
+
+disp('convert to sparse compare matrix-vector multiply')
+Ks = ndt_convert(K,'sparse');  
+ys=Ks*xr(:);
+K_Ks_rand_err=big(ys(:)-y27(:))
+if abs(K_Ks_rand_err)>1e-10, error('should be zero'),end
+
 if exist('fortran/ndt_boundary_conditions_test.exe')
     disp('testing if ndt_boundary_conditions gives same result in fortran')
     ndt_boundary_conditions_fortran(K14);
@@ -47,15 +57,12 @@ else
     warning('fortran/ndt_boundary_conditions_test.exe not available')
 end
 
-disp('multiplying st 14 by random')
-y14=ndt_mult(K14,xr);
-K14_err_rand=big(y14-y27)  % should be zero
-if abs(K14_err_rand)>1e-10, error('should be zero'),end
+disp('testing multiply vec by st 14 vs st 27')
 
 % test same results for ndt_mult from matlab and fortran
 if exist('fortran/ndt_mult_test.exe')
     disp('testing if ndt_mult same result in fortran')
-    err=ndt_mult_fortran(K14,xr)
+    err=ndt_mult_fortran(K14,xr);
     if abs(err)<1e-6
         fprintf('error %g OK\n',err)
     else
@@ -65,14 +72,7 @@ else
     warning('fortran/ndt_mult_test.exe not available')
 end
 
-
-disp('convert to sparse compare matrix-vector multiply')
-Ks = ndt_convert(K,'sparse');  
-ys=Ks*xr(:);
-K_Ks_rand_err=big(ys(:)-y27(:))
-if abs(K_Ks_rand_err)>1e-10, error('should be zero'),end
-
-disp('convert to sparse compare matrix-vector multiply')
+disp('sparse assembly vs ndt_assembly test')
 K_sparse=sparse_assembly(A,X,u0,lambda,params);
 err_mat_sparse=big(Ks-K_sparse);
 if abs(err_mat_sparse)>1e-10, error('should be zero'),end
@@ -83,11 +83,20 @@ if abs(K27a_err)>1e-10, error('should be zero'),end
 
 
 K14a = ndt_assembly(A,X,u0,lambda,params,14);
-disp('multiplying st 14 by all ones')
+disp('multiplying ndt_assembly st 14 by all ones')
 x=ones(n1,n2,n3);
 y1=ndt_mult(K14,x1);
 K14a_err_zero=big(y1)  % should be zero
+if K14a_err_zero > 1e-6
+    error('residual should be zero')
+end
 
 disp('comparing st 14 with converged st 27')
 K14a_err = big(K14 - K14a)
 if abs(K14a_err)>1e-10, error('should be zero'),end
+
+disp('ndt_assembly_fortran')
+err = ndt_assembly_fortran(A,X,u0,lambda,params,14)
+if err > 1e-6
+    error('ndt_assembly_fortran error too large')
+end

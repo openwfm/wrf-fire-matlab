@@ -1,4 +1,4 @@
-%function err = ndt_assembly_err
+function err = ndt_assembly_test
 format compact
 % test for ndt_assembly and ndt_mult
 nel=[5,4,3]
@@ -19,6 +19,6 @@ K_m = ndt_assembly(A,X,u0,lambda,params,14);
 K = ndt_assembly_fortran(A,X,u0,lambda,params,14);
 
 err = norm(K(:) - K_m(:),inf)
-%end
+end
 
 

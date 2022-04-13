@@ -30,10 +30,10 @@ if (s(1).ne.n(1).or.s(2).ne.n(2).or.s(3).ne.n(3))call crash('ndt_mult_test: inco
 
 ifts = 1
 ifte = n(1) - 1
-jfts = 1
-jfte = n(2) - 1
 kfts = 1
-kfte = n(3) - 1
+kfte = n(2) - 1
+jfts = 1
+jfte = n(3) - 1
 
 ifds = ifts
 ifde = ifte
@@ -45,14 +45,14 @@ kfde = kfte
 msize = s(4)
 if(msize.ne.14)call crash('msize must be 14')
 ifms = ifts-1
-ifme = ifte+1
-jfms = jfts-1
-jfme = jfte+1
+ifme = ifte+2
 kfms = kfts-1
-kfme = kfte+1
+kfme = kfte+2
+jfms = jfts-1
+jfme = jfte+2
 
 ! allocate a little bigger with zeros in extra areas
-allocate(kmat(ifms:ifme,kfms:kfme,jfms:jfme,1:msize))
+allocate(Kmat(ifms:ifme,kfms:kfme,jfms:jfme,1:msize))
 allocate(   u(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(   y(ifms:ifme,kfms:kfme,jfms:jfme))
 allocate(   r(ifms:ifme,kfms:kfme,jfms:jfme))
@@ -60,17 +60,9 @@ kmat = 0.
 u = 0.
 y = 0.
 
-! copy the input data 
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
-      do jx = 1,msize
-        kmat(i,k,j,jx) = kmat_m(i,j,k,jx)
-      enddo
-      u(i,k,j)=u_m(i,j,k)
-    enddo
-  enddo
-enddo
+print *,'copying the input data'
+Kmat(1:s(1),1:s(2),1:s(3),1:s(4))=Kmat_m(1:s(1),1:s(2),1:s(3),1:s(4))
+u(1:s(1),1:s(2),1:s(3))=u_m(1:s(1),1:s(2),1:s(3))
            
 write(*,'(a)')'ntd_mult now computing r = y - Kmat*u, calling with y=0'
 call ndt_mult(  &
@@ -80,15 +72,9 @@ call ndt_mult(  &
   ifts, ifte, kfts, kfte, jfts,jfte,                        & ! fire tile bounds
   kmat, u, y, r, siz, relres)
 
-write(*,'(a,3i8)')'copying -y to array size ',n
+write(*,'(a,3i8)')'copying the resulting -y=K*u to array size ',n
 allocate(y_m(1:n(1),1:n(2),1:n(3)))
-do j=jfts,jfte
-  do k=kfts,kfte
-    do i=ifts,ifte
-      y_m(i,j,k)=-r(i,k,j)
-    enddo
-  enddo
-enddo
+y_m(1:s(1),1:s(2),1:s(3))=-r(1:s(1),1:s(2),1:s(3))
 
 call write_array_nd(reshape(y_m,(/product(n)/)),n,'y')
 

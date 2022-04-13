@@ -144,26 +144,31 @@ subroutine get_wrf_dims(ncid,sr,dims3d)
     endif
 end subroutine get_wrf_dims
 
-subroutine write_fire_wind(filename,uf,vf,frame0_fmw,frame)
+subroutine write_fire_wind(filename,frame0_fmw,uf,vf,u_fmw,v_fmw,w_fmw,frame)
 implicit none
 !*** purpose
 ! write solution 
 !*** arguments
 character(len=*), intent(in)::filename  ! open file
 real, intent(in), dimension(:,:)::uf,vf
+real, intent(in), dimension(:,:,:),optional::u_fmw,v_fmw,w_fmw
 integer, intent(in)::frame0_fmw   ! frame number 
-integer, intent(in), optional::frame ! the default frame in the file to read, default=1
+integer, intent(in), optional::frame ! the default frame in the file
 !*** local
-integer::istep=1,chsum,ncid
+integer::istep,chsum,ncid
 character(len=256)::msg
 
 !*** executable
+istep=1
 if(present(frame))istep=frame 
-write(msg,*)"writing uf vf timestep ",frame0_fmw," to ", trim(filename), " frame ",istep
+write(msg,*)"writing timestep ",frame0_fmw," to ", trim(filename), " frame ",istep
 call message(msg)
 call ncopen(filename,nf90_write,ncid)
 call netcdf_write_2d(ncid,uf,"UF",istep)
 call netcdf_write_2d(ncid,vf,"VF",istep)
+if(present(u_fmw))call netcdf_write_wrf_3d(ncid,u_fmw,"U_FMW",istep) ! diagnostics
+if(present(v_fmw))call netcdf_write_wrf_3d(ncid,v_fmw,"V_FMW",istep)
+if(present(w_fmw))call netcdf_write_wrf_3d(ncid,w_fmw,"W_FMW",istep)
 chsum=ieor(get_chsum_2d(uf),get_chsum_2d(vf))
 print *,'chsum=',chsum
 call netcdf_write_int(ncid,chsum,"CHSUM_FMW")
@@ -186,6 +191,8 @@ integer, intent(in), optional::frame ! the default frame in the file to read, de
 !*** local
 integer::istep=1,chsum0,sr(2),chsum0_fmw,ierr=0,maxtry=200,frame0_in,itry,ncid
 character(len=256)::msg
+real:: waitmax=200,waitsec
+integer::isleepqq=100, isleep=1
 
 !*** executable
 if(present(frame))istep=frame 
@@ -196,15 +203,24 @@ call message(msg)
 call ncopen(filename,nf90_nowrite,ncid)
 do itry=1,maxtry
   frame0_in = netcdf_read_int_wrf(ncid,"FRAME0_FMW",istep)
-  write(msg,*)"try ",itry," got ",frame0_in
+  write(msg,*)"try ",itry," got ",frame0_in," expecting",frame0_fmw
   call message(msg)
   if(frame0_fmw .eq. frame0_in)goto 1
   call ncclose(ncid)  
-  call sleep(1)
+  if(frame0_fmw .eq. -99)then
+       call message('received stop request frame=-99')
+       stop
+  endif
+  !call sleep(isleep)
+  write(msg,*)'try ',itry,' waiting ',isleepqq*1e-3,' sec'
+  call message(msg)
+  call sleepqq(isleepqq) ! intel fortran only 
+  if(itry * isleepqq * 1e-3 .gt. waitmax)then
+     write(msg,*)'timed out after ',waitmax,' sec waiting for frame ',frame0_fmw,' got ',frame0_in
+     call crash(trim(msg))
+  endif
   call ncopen(filename,nf90_nowrite,ncid)
 enddo
-write(msg,*)'timed out after ',maxtry,' tries waiting for frame ',frame0_fmw,' got ',frame0_in
-call crash(trim(msg))
 1 continue
 
 call get_wrf_dims(ncid,sr) ! submesh refinement factors
@@ -224,12 +240,17 @@ do itry=1,maxtry
   call message(msg)
   call ncclose(ncid)  
   if (chsum0_fmw.eq.chsum0)goto 2
-  call sleep(1)
+  !call sleep(1)
+  write(msg,*)'try ',itry,' waiting ',isleepqq*1e-3,' sec'
+  call message(msg)
+  call sleepqq(isleepqq) ! intel fortran only 
+  if(itry * isleepqq * 1e-3 .gt. waitmax)then
+     write(msg,*)'timed out after ',waitmax,' sec waiting for correct check sum'
+     call crash(trim(msg))
+  endif
   call ncopen(filename,nf90_nowrite,ncid)
 enddo
 call ncclose(ncid)  
-write(msg,*)'timed out after ',maxtry,' tries waiting for correct check sum'
-call crash(trim(msg))
 2 continue
 write(msg,*)'success check sum match for time step ',frame0_fmw
 call message(msg)
