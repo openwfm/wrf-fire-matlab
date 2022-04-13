@@ -1,6 +1,9 @@
 function p=drawfire(f,ifire,nframes)
 % p=drawfire(f)
 % show heatflux stored in wrfout
+%   f  string with wrfout, or p from previoius call to save time
+%   ifire 1 or 2 for display
+%   nframes the number of frame to take the data from
 if ischar(f)
     vars={'FIRE_AREA','FGRNHFX','LFN','TIGN_G','FUEL_FRAC','FXLONG','FXLAT','NFUEL_CAT','Times'};
     p=nc2struct(f,vars,{'DX','DY'});
