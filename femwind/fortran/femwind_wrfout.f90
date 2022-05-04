@@ -251,7 +251,7 @@ do frame0_fmw=1,mframe
       u0, v0, w0,                                  & ! input arrays
       u, v, w,                                                  & ! output arrays
       rate)
-    write(*,'(a)')'femwind_solve returned OK'
+    write(*,'(a)')'femwind_solve done'
   else
     u=u0
     v=v0
