@@ -94,12 +94,12 @@ integer::   &
     enddo
     print *,nlevels,' levels'
 
-    ! allocate grid variables
+    print *,'allocate grid variables'
     do l=1,nlevels
         call allocate_mg_level(mg(l))
     enddo
 
-    ! get coarse grid coordinates 
+    print *,'computing  coarse grid coordinates'
     do l=1,nlevels-1 
         call get_mg_dims(mg(l), &
             ifds, ifde, kfds,kfde, jfds, jfde,            & ! fire grid dimensions
@@ -134,6 +134,7 @@ integer::   &
 
     ! assemble the stiffness matrices 
     do l=1,nlevels 
+        print *,'assembling the stiffness matrix on level  ',l
         call get_mg_dims(mg(l),                         &
             ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
             ifms, ifme, kfms, kfme, jfms, jfme,         &
@@ -147,6 +148,7 @@ integer::   &
             ifts, ifte, kfts, kfte, jfts, jfte,         &      
             params%A, mg(l)%X,mg(l)%Y,mg(l)%Z, 1,              & 
             mg(l)%Kglo)        
+        print *,'applying the boundary conditions on level ',l
         call ndt_boundary_conditions(                   &
             ifds, ifde, kfds, kfde, jfds, jfde,         & ! fire grid dimensions
             ifms, ifme, kfms, kfme, jfms, jfme,         &
@@ -154,6 +156,8 @@ integer::   &
             ifts, ifte, kfts, kfte, jfts, jfte,         &      
             mg(l)%Kglo)        
     enddo
+
+    print *,'end multigrid setup'
 
 end subroutine multigrid_setup
 
