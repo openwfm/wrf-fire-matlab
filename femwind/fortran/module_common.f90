@@ -54,6 +54,72 @@ type(mg_type):: mg(max_levels+1)  ! the main multigrid structure
 
 contains
 
+subroutine read_params
+    real:: minaspect=1./3.,maxaspect=3.
+    real:: A(3,3)=reshape((/1., 0., 0.,  0., 1., 0.,  0., 0., 1./),(/3, 3/))
+    integer:: coarsest_iter=100 ! to solve the coarse problem 
+    integer:: maxit=50     ! total iterations
+    integer:: nsmooth=3    ! smoothing iterations before correction
+    integer:: nsmooth_coarse=2 ! smoothing iterations on coarse levels
+    integer:: maxit_coarse=8 ! on levels>1: 2 smoothing, coarse, 2 smoothing, coarse, 2 smoothing
+    integer:: debug_level=-1 ! multigrid level to debug up to
+    integer:: msglevel=1 ! type of messages to print  
+    integer:: print_level=2 ! multigrid level to print messages up to
+    !logical:: check_relres=.true.  ! check residual after every base iteration if to continue
+    logical:: check_relres=.false.
+    real:: restol=1e-6 ! residual tolerance to stop iterating
+    !logical:: check_reldif=.false.  ! check difference after every base iteration if to continue
+    logical:: check_reldif=.true.  ! check difference after every base iteration if to continue
+    real:: diftol_finest=1e-6 ! keep iterating while iterates change by this
+    real:: diftol_coarse=1e-1 ! keep iterating while iterates change by this on corse levels
+    real:: diftol_coarsest=1e-2 ! keep iterating while iterates change by this on corsest level
+
+    namelist/params_nml/ & 
+      minaspect, &
+      A, &
+      coarsest_iter, &
+      maxit, &
+      nsmooth, &
+      nsmooth_coarse, &
+      maxit_coarse, &
+      debug_level, &
+      msglevel, &
+      print_level, &
+      check_relres, &
+      restol, &
+      check_reldif, &
+      diftol_finest, &
+      diftol_coarse, &
+      diftol_coarsest
+
+    write(*,a)'Default parameters:'
+    write(*,nml=params_nml)
+    open(8,file='params.nml',status='old',err=9)
+    read(8,nml=params_nml)
+    close(8)
+     params%minaspect=minaspect
+     params%A=A 
+     params%coarsest_iter=coarsest_iter
+     params%maxit=maxit
+     params%nsmooth=nsmooth
+     params%nsmooth_coarse=nsmooth_coarse
+     params%maxit_coarse=maxit_coarse
+     params%debug_level=debug_level
+     params%msglevel=msglevel
+     params%print_level=print_level
+     params%check_relres=check_relres
+     params%restol=restol
+     params%check_reldif=check_reldif
+     params%diftol_finest=diftol_finest
+     params%diftol_coarse=diftol_coarse
+     params%diftol_coarsest=diftol_coarsest
+    write(*,a)'Using modified parameters:'
+    write(*,nml=params_nml)
+    return
+9   write(*,a)'Cannot open file params.nml, using defaults'
+    end subroutine read_params
+    
+
 subroutine allocate_mg_level(mg)    !allocate one multigrid level
 type(mg_type),intent(inout)::mg     !multigrid structure
 !*** local
