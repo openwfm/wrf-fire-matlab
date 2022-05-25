@@ -68,6 +68,8 @@ real,intent(out):: rate
 ! f = div(u0)
 ! f = f_assembly_fortran(A,X,U0,lambda,params);
 
+print *,'femwind solve start'
+print *,'calling f_assembly'
 call f_assembly(                                  &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           &
@@ -77,6 +79,7 @@ call f_assembly(                                  &
     u0, v0, w0,                                   &                    	
     mg(1)%f)                                        !Global load vector output  
 
+print *,'calling vec_boundary_conditions'
 call vec_boundary_conditions(                              &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           &
@@ -84,6 +87,7 @@ call vec_boundary_conditions(                              &
     ifts, ifte, kfts, kfte, jfts, jfte,           &
     mg(1)%f)
 
+print *,'calling multigrid_cycle'
 call multigrid_cycle(mg,1,rate)                        ! start multigrid from level 1
 
 if(params%debug_level >=0)call  write_array(mg(1)%lambda(ifts: ifte+1, kfts: kfte+1, jfts:jfte+1),'lambda_sol')
@@ -95,6 +99,7 @@ if(params%debug_level >=0)call  write_array(mg(1)%X(ifts: ifte+1, kfts: kfte+1, 
 if(params%debug_level >=0)call  write_array(mg(1)%Y(ifts: ifte+1, kfts: kfte+1, jfts:jfte+1),'Y_sol')
 if(params%debug_level >=0)call  write_array(mg(1)%Z(ifts: ifte+1, kfts: kfte+1, jfts:jfte+1),'Z_sol')
 
+print *,'calling w_assembly'
 call w_assembly(                                  &
     ifds, ifde, kfds, kfde, jfds, jfde,           & ! fire grid dimensions
     ifms, ifme, kfms, kfme, jfms, jfme,           &
@@ -103,6 +108,8 @@ call w_assembly(                                  &
     mg(1)%lambda, u0, v0, w0,                     &
     params%A, mg(1)%X, mg(1)%Y, mg(1)%Z,          & !Input from femwind, u0, v0, w0, Spatial Grid Data
     u, v, w)                                        ! final output  
+
+print *,'end femwind_solve'
 
 if(params%debug_level >=0)call  write_array(u(ifts: ifte, kfts: kfte, jfts:jfte),'u_sol')
 if(params%debug_level >=0)call  write_array(v(ifts: ifte, kfts: kfte, jfts:jfte),'v_sol')
