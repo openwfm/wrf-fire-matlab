@@ -19,10 +19,12 @@ type params_type
     integer:: print_level=2 ! multigrid level to print messages up to
     !logical:: check_relres=.true.  ! check residual after every base iteration if to continue
     logical:: check_relres=.false.
-    real:: restol=1e-6 ! residual tolerance to stop iterating
+    real:: restol=1e-5 ! residual tolerance to stop iterating
+    ! real:: restol=1e-6 ! residual tolerance to stop iterating
     !logical:: check_reldif=.false.  ! check difference after every base iteration if to continue
     logical:: check_reldif=.true.  ! check difference after every base iteration if to continue
-    real:: diftol_finest=1e-6 ! keep iterating while iterates change by this
+    ! real:: diftol_finest=1e-6 ! keep iterating while iterates change by this
+    real:: diftol_finest=1e-5 ! keep iterating while iterates change by this
     real:: diftol_coarse=1e-1 ! keep iterating while iterates change by this on corse levels
     real:: diftol_coarsest=1e-2 ! keep iterating while iterates change by this on corsest level
 end type
