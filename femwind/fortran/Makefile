@@ -8,8 +8,9 @@ FFLAGS = -O3 -pg
 FFLAGS = -g -C -I /opt/local/include
 LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -pg -O3 -I $(NETCDF)/include
+FFLAGSOPT = -O3 -I $(NETCDF)/include
 FFLAGS = -O3 -I $(NETCDF)/include
-#FFLAGS = -g -C -I $(NETCDF)/include 
+FFLAGS = -g -C -I $(NETCDF)/include 
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
 default: all
@@ -37,7 +38,7 @@ hexa_test.exe: hexa_test.o module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o module_utils.o
 
 module_hexa.o: module_hexa.f90 module_utils.o Makefile
-	$(FC) $(FFLAGS) -c module_hexa.f90
+	$(FC) $(FFLAGSOPT) -c module_hexa.f90
 
 hexa_test.o: hexa_test.f90 module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c hexa_test.f90
@@ -70,13 +71,13 @@ sweeps_test.o: sweeps_test.f90 module_sweeps.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c sweeps_test.f90
 
 ndt_assembly_test.exe: ndt_assembly_test.o module_ndt_assembly.o module_utils.o module_hexa.o  Makefile
-	$(FC) $(FFLAGS) -o ndt_assembly_test.exe ndt_assembly_test.o  module_ndt_assembly.o module_utils.o module_hexa.o 
+	$(FC) $(FFLAG) -o ndt_assembly_test.exe ndt_assembly_test.o  module_ndt_assembly.o module_utils.o module_hexa.o 
 
 ndt_assembly_test.o: ndt_assembly_test.f90 module_hexa.o module_utils.o module_ndt_assembly.o Makefile
 	$(FC) $(FFLAGS) -c ndt_assembly_test.f90 
 
 module_ndt_assembly.o: module_ndt_assembly.f90 module_hexa.o Makefile
-	$(FC) $(FFLAGS) -c module_ndt_assembly.f90  
+	$(FC) $(FFLAGSOPT) -c module_ndt_assembly.f90  
 
 f_assembly_test.exe: f_assembly_test.f90 module_f_assembly.o module_utils.o module_hexa.o  Makefile
 	$(FC) $(FFLAGS) -o f_assembly_test.exe f_assembly_test.f90  module_f_assembly.o module_utils.o module_hexa.o
