@@ -1,4 +1,4 @@
-function s = fuel_samps(n)
+function s = time_samps(n)
 %creates simulated data for testing and training the neural network to be
 %used in module_fr_sfire_core.F
 %Inputs -
@@ -16,6 +16,12 @@ function s = fuel_samps(n)
 %matrix for [t00, t01 t10 t11 fuel_time_cell]
 s = zeros(n,5);
 
-%create data
-for i = 1:n
+%create time data
+s(:,1:4) = 1000*randn(n,4);
+%or use uniform randoms
+%s(:,1:4) = -1000 + 2000*rand(n,4);
+
+%fuel_time constants
+s(:,5) = 8 + 2000*rand(n,1);
+
     
