@@ -6,7 +6,14 @@ function fq = fuel_quad(samp,m,n)
 %m - size of quadrature grid (m x m)
 %n - number of integrals to evaluate
 
-proc = 1; %input_num('Is data processed? 1 = yes',0);
+proc = 1; %
+%proc = input_num('Is data processed? 1 = yes',0);
+
+%transpose if samplles are from column vectors
+sz = size(samp);
+if sz(1)<sz(2)
+    samp = samp';
+end
 
 
 %corners of cell [a,b]X[a,b]
@@ -19,7 +26,7 @@ dy = dx;
 if ~exist('n','var')
     n = length(samp);
 end
-fq = zeros(n,1);
+fq = zeros(1,n);
 %loops
 tic
 for o = 1:n % outer loop
@@ -57,7 +64,7 @@ for o = 1:n % outer loop
         end % for j
     end % for i
     %multiply differencials
-    fq(o,1) = s*dx*dy;
+    fq(1,o) = s*dx*dy;
 
     %matlab integral2 method
     %intt = (1.0-x)*( (1.0-y)*tign00 + y*tign01 ) + x*( (1.0-y)*tign10 + y*tign11 );
