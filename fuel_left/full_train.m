@@ -3,7 +3,12 @@
 
 n = input_num('How many samples to create?',10000);
 %create samples
-s = time_samps(n);
+
+%from uniform distribution
+%s = time_samps(n);
+%from gaussian distribution
+s = gauss_samps(n, 0.8,0.5);
+
 %s(:,1:4) = rotate_cell(s(:,1:4));
 
 %perform integrals
@@ -26,7 +31,7 @@ y2 = net(s2');
 %set outlier values to zero or one
 y2(y2>1)=1;
 y2(y2<0)=0;
-y2 = y2';
+
 toc
 
 %scatter plot of quadrature and network outputs
