@@ -7,8 +7,8 @@
 %   s - input data.
 %   r - target data.
 
-x = s';
-t = r';
+x = s;
+t = r;
 
 % Choose a Training Function
 % For a list of all training functions type: help nntrain
