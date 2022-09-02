@@ -15,6 +15,14 @@ else %read wrfoutfile directly
     w = read_wrfout_tign(f,ts);
 end
 
+%for handling of branch develop-48 tign_g
+t_big = 3.402e+38;
+if max(w.tign_g(:)) > t_big
+    t_cap = w.itimestep*w.dt;
+    msk = w.tign_g >= t_cap;
+    w.tign_g(msk) = t_cap;
+end
+
 gs = input_num('What grid spacing?',250)
 %make the path structure
 ps1 = cluster_paths(w,1,gs);
@@ -56,7 +64,7 @@ new_w = insert_analysis(w,ps,tn);
 if cycle == 1
     %restart with wrfinput file
     wi = 'wrfinput_d0';
-    domain = input_num('Which wrfinput_d0x file to write FMC into? x = 1 ',1)
+    domain = input_num('Which wrfinput_d0x file to write FMC into? x = 1 ',1,1)
     rst = [wi,num2str(domain)];
     rst_bak = [rst,'.bak'];
     cpy_str = sprintf('cp %s %s',rst,rst_bak);
@@ -78,7 +86,7 @@ system(cpy_str)
 ncreplace(rst,'TIGN_G',new_w.analysis);
 %only change fmc content if a bigger fire has a bigger ROS
 if ros_diff*area_diff>0
-   fmc_change(fmc_adjust,rst);
+  % fmc_change(fmc_adjust,rst);
 end
 fprintf('Linking new namelist.input file\n')
 link_namelist(cycle);
