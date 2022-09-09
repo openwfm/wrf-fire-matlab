@@ -13,7 +13,6 @@ sfr_total = 0;
 %loop through the rls.out files, sum the timings
 
 %loop from 1:1 since rsl.error.oooo has all the timings
-
 for i = 1:1
     f = [outs(i).folder,'/',outs(i).name];
     fprintf('Processing file %s \n',f)
@@ -27,7 +26,9 @@ for i = 1:1
     system(write_str);
     wrf_str = sprintf('grep "Timing for main" %s > %s',f,wrf_file);
     system(wrf_str);
-    sfr_str = sprintf('grep "Timing for sfire" %s > %s',f,sfr_file);
+    %decide 
+    sfr_str = sprintf('grep -P "Timing for .*fire" %s > %s',f,sfr_file);
+    %sfr_str = sprintf('grep "Timing for fire" %s > %s',f,sfr_file);
     system(sfr_str);
     
     wrt = fopen(wrt_file,'r');

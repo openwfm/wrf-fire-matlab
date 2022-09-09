@@ -27,4 +27,4 @@ fprintf('\n!scale the output \n')
 fprintf('y1s1ymin = %3.16f \n', net.outputs{3}.processSettings{1}.ymin);
 fprintf('y1s1gain = %3.16f \n', net.outputs{3}.processSettings{1}.gain);
 fprintf('y1s1off =  %3.16f \n', net.outputs{3}.processSettings{1}.xoffset);
-fprintf('\n\n\ndone\n')
+fprintf('\n\n\n !done\n')

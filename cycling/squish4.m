@@ -55,7 +55,7 @@ t0 = min(tign(:));
 
 %ground detection usage
 if ~exist('gq','var')
-    gq = input_num('use ground detections? yes = [1]',0,1);
+    gq = input_num('use ground detections? yes = [1]',1,1);
 end
 %handling ground detections
 if gq
@@ -96,7 +96,7 @@ beta_vect = 1-exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 3;
+ground_steps = 20;
 if gq
     data_area = sum(infire(:));
     for i = 1:ground_steps
@@ -334,7 +334,7 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 6;
+ground_steps = 20;
 tign_ground = tign_new;
 if gq
     data_area = sum(infire(:));

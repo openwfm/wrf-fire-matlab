@@ -6,7 +6,7 @@ cwd = pwd;
 for i = 1:9
     
     d.cores(i) = 36*i^2;
-    d.nodes(i) = ceil(36*i^2/54);
+    d.nodes(i) = ceil(36*i^2/24);  %ceil(36*i^2/54); 3
     d.direct(i) = {[pwd,'/rain1_weak_ifire1_',num2str(i,'%02d')]};
     %d.direct(i) = {[pwd,'/rain1_weak_ifire2_',num2str(i,'%02d')]};
     if d.nodes(i) < 2
@@ -21,7 +21,7 @@ for i = 1:9
     core_print = sprintf('sed -i "s/CORE_TARGET/%s/g" run_wrf_small_frontera.template',num2str(d.cores(i)));
     node_print = sprintf('sed -i "s/NODES_TARGET/%s/g" run_wrf_small_frontera.template',num2str(d.nodes(i)))
     %wall_print = sprintf('sed -i "s/WALL_TARGET/%s/g" run_wrf_small_frontera.template',num2str(d.wall{i}))
-    queue_print = sprintf('sed -i "s/QUEUE_TARGET/%s/g" run_wrf_small_frontera.template',queue{i})
+    %queue_print = sprintf('sed -i "s/QUEUE_TARGET/%s/g" run_wrf_small_frontera.template',queue{i})
     %change queue
 
     
@@ -40,7 +40,7 @@ for i = 1:9
     system(queue_print);
     %system(wall_print);
     system('touch copied.txt');
-    system('cp run_wrf_small_frontera.template run_wrf_frontera')
+    system('cp run_wrf_kings.template run_wrf_kings')
     
     system('./ideal.exe')
     pause(5);

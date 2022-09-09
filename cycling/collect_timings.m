@@ -5,7 +5,7 @@ function [c,wrf,sfire,write,cores] = collect_timings(test_path)
 %   wrf wruns
 %output
 %   c  - struct, data structure with timings etc...
-r = dir([test_path,'/fireflux*']);
+r = dir([test_path,'/cyc_i1*']);
 n = length(r);
 for i = 1:n
    wrf_path = [r(i).folder,'/',r(i).name];
@@ -15,7 +15,7 @@ for i = 1:n
    wrf(i) = c(i).wrf;
    sfire(i) = c(i).sfire;
    write(i) = c(i).write;
-   cores(i) = str2num(c(i).name(end-2:end));
+   cores(i) = 36;%str2num(c(i).name(end-2:end));
    
 end
 

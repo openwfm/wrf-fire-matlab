@@ -125,5 +125,4 @@ end
 function ptime(ii,s,t)
         fprintf('Cycle %i %s%7.3f days %s\n',ii,s,t,datestr(t+base,'dd-mmm-yyyy HH:MM:SS'))
 end
-	
-end
+	end
