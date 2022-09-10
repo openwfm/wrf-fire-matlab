@@ -41,7 +41,7 @@ end
 %b = 2.2; %controls false positive rate  2.2 for patch
 
 %can comput false pos rate as 
-false_rate = 0.02;
+false_rate = 0.1;
 b = log(false_rate/(1-false_rate));
 
 %can compute a as

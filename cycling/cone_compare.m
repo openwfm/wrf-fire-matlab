@@ -4,7 +4,7 @@ function [r1,r2,adjr0,outer] = cone_compare(ps,tign2)
 
 
 if isfield(ps.red,'red')
-    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1);
+    upsize = input_num('Interpolate to original "red" grid? 1 = yes',1,1);
     if upsize
         red_orig = ps.red.red;
         %interpolate back to original size grid

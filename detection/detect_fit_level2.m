@@ -79,7 +79,7 @@ end
 fprintf('display bounds %g %g %g %g\n',red.disp_bounds);
 
 disp('Loading and subsetting detections')
-fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar [3]',0,1)
+fire_choice = input_num('which fire? Patch: [0], Camp: [1], Cougar [3]',0)
 if fire_choice == 1
     prefix='../campTIFs/';
 elseif fire_choice == 0
@@ -90,7 +90,7 @@ end
 %prefix='../TIFpoint/';
 %prefix='../perimTIFs/';
 % the level2 file names processed by geotiff2mat.py
-
+p = sort_rsac_files(prefix);
 
 if isempty(time_bounds),
     time_bounds=subset_detection_time(red,p);
