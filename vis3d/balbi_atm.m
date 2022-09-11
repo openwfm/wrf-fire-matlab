@@ -26,5 +26,6 @@ dp=mean(P(:,:,1)-p.psfc,'all');
 sp=mean(p.psfc,'all');
 fprintf('average difference P(:,:,1)-PSFC = %g = %g %s\n',dp,100*dp/sp,'%')
 dt=mean(T(:,:,1)-p.t2,'all');
-fprintf('average difference T(:,:1)+300 - T2 = %g\n',dt)
+mt2=big(p.t2);
+fprintf('average difference T(:,:1)+300 - T2 = %g max abs t2=%g\n',dt,mt2)
 end
