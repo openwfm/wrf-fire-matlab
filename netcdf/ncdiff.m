@@ -12,13 +12,13 @@ if ~exist('var','var'),
     v=ncdump(file1,'-q');
     for i=1:length(v),
         var=v(i).varname;
-        % try
+        try
             [relerr(i),ssq(i),p(i),name{i}]=ncdiff(file1,file2,var);
-        % catch exc
-         %    disp(exc)
-          %   relerr(i)=inf;
-           %  p(i)=1;
-        % end
+        catch exc
+             disp(exc)
+             relerr(i)=inf;
+             p(i)=1;
+        end
     end
     disp('Finished comparing files')
     disp(file1)
