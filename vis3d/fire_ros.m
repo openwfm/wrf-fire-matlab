@@ -5,7 +5,8 @@ function ros=fire_ros(fuel,speed,tanphi,fmc_g, adjr0, adjrw, adjrs)
 %       fuel    fuel description structure
 %       speed   wind speed
 %       tanphi  slope
-%       fmc_g   optional, overrides fuelmc_g from the fuel description
+%       fmc_g   optional, if not empty overrides fuelmc_g from the fuel description
+%       adjr0, adjrw, adjrs optional, adjustment factors for r0, slope factor, wind factor
 % out
 %       ros     rate of spread
 
@@ -30,11 +31,15 @@ cmbcnst=fuel.cmbcnst;             % JOULES PER KG OF DRY FUEL
 fuelheat=fuel.fuelheat;           % FUEL PARTICLE LOW HEAT CONTENT, BTU/LB
 fuelmc_g=fuel.fuelmc_g;           % FUEL PARTICLE (SURFACE) MOISTURE CONTENT, jm: 1 by weight?
 fuelmc_c=fuel.fuelmc_c;           % FUEL PARTICLE (CANOPY) MOISTURE CONTENT, 1
-% speed = speed * adjrw;
-% tanphi = tanphi * adjrs;
 
-if exist('fmc_g','var') % override moisture content by given
+% optional arguments defaults
+if nargin>=4 && ~isempty(fmc_g) % override moisture content by given
     fuelmc_g = fmc_g;
+end
+if nargin<5
+    adjr0 = 1;
+    adjrw = 1;
+    adjrs = 1;
 end
 
 % computations from CAWFE code: wf2_janice/fire_startup.m4
