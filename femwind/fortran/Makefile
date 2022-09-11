@@ -9,8 +9,8 @@ FFLAGS = -g -C -I /opt/local/include
 LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -pg -O3 -I $(NETCDF)/include
 FFLAGSOPT = -O3 -I $(NETCDF)/include
-FFLAGS = -O3 -I $(NETCDF)/include
 FFLAGS = -g -C -I $(NETCDF)/include 
+FFLAGS = -O3 -I $(NETCDF)/include
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
 default: all
