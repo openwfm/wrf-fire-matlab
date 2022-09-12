@@ -23,6 +23,7 @@ TV=(1+0.61*p.qvapor).*temp; % virtual temperature
 RHO=P./(287*TV);           % air density
 EL =(p.ph + p.phb)/9.81; % elevation at w-points
 Z = (EL(:,:,1:end-1)+EL(:,:,2:end))/2; % elevation at centers
+dZ = (-EL(:,:,1:end-1)+EL(:,:,2:end)); % thickness of layers 
 
 dp=mean(P(:,:,1)-p.psfc,'all');
 sp=mean(p.psfc,'all');
@@ -30,7 +31,7 @@ fprintf('average difference P(:,:,1)-PSFC = %g = %g %s\n',dp,100*dp/sp,'%')
 dt=mean(temp(:,:,1)-p.t2,'all');
 mt2=big(p.t2);
 fprintf('average difference temp(:,:1) - T2 = %g max abs t2=%g\n',dt,mt2)
-dz1 = mean(Z(:,:,2)-Z(:,:,1),'all');
+dz1 = mean(dZ(:,:,1),'all');
 fprintf('average thickness of the lowest layer = %g\n',dz1)
 
 end
