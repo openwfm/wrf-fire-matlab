@@ -16,4 +16,4 @@ dyy=  y(2:end-1, 3:end)-y(2:end-1, 1:end-2);
 dyn=  sqrt(dxy.^2+dyy.^2);
 dfdy=(f(2:end-1, 3:end)-f(2:end-1, 1:end-2))./dyn;
 
-bend
+end
