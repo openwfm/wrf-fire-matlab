@@ -12,7 +12,12 @@ lon  = ds['XLONG'][-1,:,:]
 lat  = ds['XLAT'][-1,:,:]
 
 print('Create a new dataset with 2d slices')
-new_ds = xr.Dataset({'pm25': pm25, 'lon':lon, 'lat':lat})
+new_ds = xr.Dataset({'pm25':pm25, 'lat':lon, 'lat':lat})
+
+# Remove the time dimension from the new dataset
+new_ds = new_ds.squeeze(drop=True)
+if 'XTIME' in new_ds:
+    new_ds = new_ds.drop_vars('XTIME')
 
 print('Create new NetCDF file',new,'and write the dataseet to it')
 new_ds.to_netcdf(new)

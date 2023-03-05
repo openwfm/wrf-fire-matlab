@@ -1,23 +1,24 @@
 # Load required packages
 library(ggplot2)
 library(raster)
+library(ncdf4)
 
-# Read in the NetCDF file
-ds <- brick("smoke.nc")
+ncfile <- nc_open("smoke.nc")
 
-# Extract the latitude, longitude, and PM2.5 data
-lat <- ds$lat
-lon <- ds$lon
-pm25 <- ds$pm25
+# Read the variables from the NetCDF file
+pm25 <- ncvar_get(ncfile, "pm25")
+lon <- ncvar_get(ncfile, "XLONG")
+lat <- ncvar_get(ncfile, "XLAT")
 
-# Convert the PM2.5 data to a raster object
-pm25_raster <- raster(t(pm25))
-extent(pm25_raster) <- extent(lon[1], lon[length(lon)], lat[length(lat)], lat[1])
+# Close the NetCDF file
+nc_close(ncfile)
 
-# Plot the raster object using ggplot2
-ggplot() + 
-  geom_raster(data = as.data.frame(pm25_raster), aes(x = lon, y = lat, fill = value)) + 
-  scale_fill_gradient(low = "white", high = "red") + 
-  coord_fixed() + 
-  theme_bw()
+print("Create a data frame with the latitude, longitude, and pm25 values")
+df <- data.frame(lat = as.vector(lat), lon = as.vector(lon), pm25 = as.vector(pm25))
+
+print("Create a scatter plot of the pm25 values at the lat/lon points")
+
+dev.new()
+plot(df$lon, df$lat, col = df$pm25)
+
 
