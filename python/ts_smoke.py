@@ -1,0 +1,39 @@
+import xarray as xr
+import numpy as np
+import sys
+
+
+pm25_vars = []
+times_vars = []
+lon_vars = []
+lat_vars = []
+new = sys.argv[-1]
+
+for file_path in sys.argv[1:-1]:
+
+    print('Reading NetCDF file',file_path)
+    ds = xr.open_dataset(file_path)
+
+    # read lowest layer
+    pm25_vars.append(ds["tr17_1"].isel(bottom_top=0))
+
+    # Get the other variables, Times, longitude, latitude
+    times_vars.append(ds["Times"])
+    lon_vars.append(ds["XLAT"])
+    lat_vars.append(ds["XLONG"])
+
+print('Concatenating the data variables along the time dimension')
+pm25 = xr.concat(pm25_vars, dim="Time")
+times = xr.concat(times_vars, dim="Time")
+lon = xr.concat(lon_vars, dim="Time")
+lat = xr.concat(lat_vars, dim="Time")
+
+del pm25_vars, times_vars, lon_vars, lat_vars 
+
+ds_new = xr.Dataset({'pm25':pm25,'times':times,'lon':lon,'lat':lat})
+
+print('Creating new NetCDF file')
+ds_new.to_netcdf(new)
+    
+    
+    
