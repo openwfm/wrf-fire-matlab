@@ -2,7 +2,6 @@ import xarray as xr
 import numpy as np
 import sys
 
-
 pm25_vars = []
 times_vars = []
 lon_vars = []
@@ -23,9 +22,13 @@ for file_path in sys.argv[1:-1]:
     lat_vars.append(ds["XLONG"])
 
 print('Concatenating the data variables along the time dimension')
+print('pm25')
 pm25 = xr.concat(pm25_vars, dim="Time")
+print('times')
 times = xr.concat(times_vars, dim="Time")
+print('lon')
 lon = xr.concat(lon_vars, dim="Time")
+print('lat')
 lat = xr.concat(lat_vars, dim="Time")
 
 del pm25_vars, times_vars, lon_vars, lat_vars 
