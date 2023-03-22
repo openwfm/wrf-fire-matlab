@@ -1,6 +1,6 @@
 import xarray as xr
 import numpy as np
-import sys
+import sys, os
 
 pm25_vars = []
 times_vars = []
@@ -18,8 +18,8 @@ for file_path in sys.argv[1:-1]:
 
     # Get the other variables, Times, longitude, latitude
     times_vars.append(ds["Times"])
-    lon_vars.append(ds["XLAT"])
-    lat_vars.append(ds["XLONG"])
+    lon_vars.append(ds["XLONG"])
+    lat_vars.append(ds["XLAT"])
 
 print('Concatenating the data variables along the time dimension')
 print('pm25')
@@ -33,9 +33,9 @@ lat = xr.concat(lat_vars, dim="Time")
 
 del pm25_vars, times_vars, lon_vars, lat_vars 
 
-ds_new = xr.Dataset({'pm25':pm25,'times':times,'lon':lon,'lat':lat})
+ds_new = xr.Dataset({'pm25':pm25,'Times':times,'XLONG':lon,'XLAT':lat})
 
-print('Creating new NetCDF file')
+print('Creating new NetCDF file',new)
 ds_new.to_netcdf(new)
     
     
