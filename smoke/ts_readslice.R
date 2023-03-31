@@ -9,6 +9,11 @@ ncfile <- nc_open("smoke.nc")
 pm25 <- ncvar_get(ncfile, "pm25")
 lon <- ncvar_get(ncfile, "XLONG")
 lat <- ncvar_get(ncfile, "XLAT")
+times <- ncvar_get(ncfile, "Times")
+cat('array pm25  size',dim(pm25),'\n')
+cat('array lon   size',dim(pm25),'\n')
+cat('array lat   size',dim(pm25),'\n')
+cat('array times size',dim(pm25),'\n')
 
 # Close the NetCDF file
 nc_close(ncfile)
