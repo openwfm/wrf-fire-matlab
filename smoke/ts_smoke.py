@@ -1,26 +1,42 @@
 import xarray as xr
+import numpy as np
+import sys, os
 
-file='wrfout.nc'
-new ='smoke.nc'
+pm25_vars = []
+times_vars = []
+lon_vars = []
+lat_vars = []
+new = sys.argv[-1]
 
-print('Open the original NetCDF file',file)
-ds = xr.open_dataset(file)
+for file_path in sys.argv[1:-1]:
 
-print('Read 2d slices from the last fram')
-pm25 = ds['tr17_1'][-1,0,:,:]
-lon  = ds['XLONG'][-1,:,:]
-lat  = ds['XLAT'][-1,:,:]
+    print('Reading NetCDF file',file_path)
+    ds = xr.open_dataset(file_path)
 
-print('Create a new dataset with 2d slices')
-new_ds = xr.Dataset({'pm25':pm25, 'lat':lon, 'lat':lat})
+    # read lowest layer
+    pm25_vars.append(ds["tr17_1"].isel(bottom_top=0))
 
-# Remove the time dimension from the new dataset
-new_ds = new_ds.squeeze(drop=True)
-if 'XTIME' in new_ds:
-    new_ds = new_ds.drop_vars('XTIME')
+    # Get the other variables, Times, longitude, latitude
+    times_vars.append(ds["Times"])
+    lon_vars.append(ds["XLONG"])
+    lat_vars.append(ds["XLAT"])
 
-print('Create new NetCDF file',new,'and write the dataseet to it')
-new_ds.to_netcdf(new)
+print('Concatenating the data variables along the time dimension')
+print('pm25')
+pm25 = xr.concat(pm25_vars, dim="Time")
+print('times')
+times = xr.concat(times_vars, dim="Time")
+print('lon')
+lon = xr.concat(lon_vars, dim="Time")
+print('lat')
+lat = xr.concat(lat_vars, dim="Time")
 
+del pm25_vars, times_vars, lon_vars, lat_vars 
 
+ds_new = xr.Dataset({'pm25':pm25,'Times':times,'XLONG':lon,'XLAT':lat})
 
+print('Creating new NetCDF file',new)
+ds_new.to_netcdf(new)
+    
+    
+    
