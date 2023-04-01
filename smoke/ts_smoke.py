@@ -8,16 +8,18 @@ pm25_vars = []
 lon_vars = []
 lat_vars = []
 argv = sys.argv
-argv=['wrfout.nc','ts_smoke.nc']
+#argv=['wrfout.nc','ts_smoke.nc']
 new_path = argv[-1]
 
-for file_path in argv[0:-1]:
+nframes = 0
+for file_path in argv[1:-1]:
     print('Reading NetCDF file',file_path)
     d = nc4.Dataset(file_path,'r')
     # extract ESMF string times
     frames = [''.join(x) for x in d.variables['Times'][:].astype(str)]
     for i in frames:
-       print(i)
+       nframes += 1
+       print(nframes,i)
     times_vars += [d.variables["Times"][:,:]]
     pm25_vars  += [d.variables["tr17_1"][:,0,:,:]]
     lon_vars   += [d.variables["XLONG"][:,:,:]]
@@ -45,8 +47,9 @@ new = nc4.Dataset(new_path, mode="w")
 new.createDimension('Time',None)
 for dim_name, dim in d.dimensions.items():
     if dim_name in ['south_north', 'west_east','DateStrLen']:
-        print('output dimension',dim_name, len(dim))
+        print('dimension',dim_name, len(dim))
         new.createDimension(dim_name, len(dim))
+print('time frames',times.shape[0])
 time_dim = new.dimensions['Time']
 tstr_dim = new.dimensions['DateStrLen']
 sn_dim = new.dimensions['south_north']
