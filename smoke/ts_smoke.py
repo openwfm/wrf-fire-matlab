@@ -3,27 +3,62 @@ import numpy as np
 from numpy import concatenate as cat
 import sys, pickle
 
-times = []
+times_vars = []
 pm25_vars = []
 lon_vars = []
 lat_vars = []
-new = sys.argv[-1]
+argv = sys.argv
+argv=['wrfout.nc','ts_smoke.nc']
+new_path = argv[-1]
 
-# file_path = "wrfout.nc"
-for file_path in sys.argv[1:-1]:
-
+for file_path in argv[0:-1]:
     print('Reading NetCDF file',file_path)
     d = nc4.Dataset(file_path,'r')
     # extract ESMF string times
     frames = [''.join(x) for x in d.variables['Times'][:].astype(str)]
     for i in frames:
        print(i)
-    times     += frames 
-    pm25_vars += [d.variables["tr17_1"][:,0,:,:]]
-    lon_vars  += [d.variables["XLONG"][:,:,:]]
-    lat_vars  += [d.variables["XLAT"][:,:,:]]
+    times_vars += [d.variables["Times"][:,:]]
+    pm25_vars  += [d.variables["tr17_1"][:,0,:,:]]
+    lon_vars   += [d.variables["XLONG"][:,:,:]]
+    lat_vars   += [d.variables["XLAT"][:,:,:]]
 
+# take the last dims; should check if same except dim_size_time[0]
+dim_size_time = d.variables["Times"][:,:].shape
+dim_name_vars = d.variables["XLONG"].dimensions
+dim_size_vars = d.variables["XLONG"][:,:,:].shape
+
+# concatenate variables 
+times = cat(times_vars,0); del times_vars
 pm25 = cat(pm25_vars,0); del pm25_vars
 lon  = cat(lon_vars,0); del lon_vars
 lat  = cat(lat_vars,0); del lat_vars
+
+print('Writing NetCDF file',new_path)
+new = nc4.Dataset(new_path, mode="w")
+
+# create dimensions
+new.createDimension('Time',None)
+for dim_name, dim in d.dimensions.items():
+    if dim_name in ['south_north', 'west_east','DateStrLen']:
+        new.createDimension(dim_name, len(dim))
+time_dim = new.dimensions['Time']
+tstr_dim = new.dimensions['DateStrLen']
+sn_dim = new.dimensions['south_north']
+we_dim = new.dimensions['west_east']
+var_dimensions = (time_dim, sn_dim, we_dim)
+
+# create variables
+times_var = new.createVariable('Times', np.uint8, (time_dim, tstr_dim))
+lon_var = new.createVariable('XLONG', np.float32, var_dimensions)
+lat_var = new.createVariable('XLAT', np.float32, var_dimensions)
+pm25_var = new.createVariable('pm25', np.float32, var_dimensions)
+
+# copy values 
+#times_var[:]=times
+#lon_var[:]=lon
+#lat_var[:]=lat
+#pm25[:]=pm25
+
+#new.close()
 
