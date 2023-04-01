@@ -3,6 +3,9 @@ library(ncdf4)  # For reading netCDF files
 library(ggplot2)
 library(dplyr)
 
+# on Mac create graphics window first
+# quartz()
+
 # Open input netCDF file
 nc_file <- nc_open("ts_smoke.nc")
 
@@ -30,8 +33,8 @@ for (i in seq_along(times)) {
 
   # Create a ggplot2 raster plot with longitude and latitude as x and y, and pm25 as the fill color
   p <- ggplot(df, aes(x=lon, y=lat, fill=pm25)) +
-    geom_raster() +
-    scale_fill_gradientn(colours = c("blue", "yellow", "red")) +
+    geom_tile() +
+    scale_fill_gradient(limits = c(0, 0.025), low = "white", high = "red") +
     labs(x="Longitude", y="Latitude", fill="PM2.5")
 
   # Add a title that includes the times[i] value
