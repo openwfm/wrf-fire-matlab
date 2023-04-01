@@ -45,6 +45,7 @@ new = nc4.Dataset(new_path, mode="w")
 new.createDimension('Time',None)
 for dim_name, dim in d.dimensions.items():
     if dim_name in ['south_north', 'west_east','DateStrLen']:
+        print('output dimension',dim_name, len(dim))
         new.createDimension(dim_name, len(dim))
 time_dim = new.dimensions['Time']
 tstr_dim = new.dimensions['DateStrLen']
