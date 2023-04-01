@@ -22,6 +22,8 @@ for file_path in argv[0:-1]:
     pm25_vars  += [d.variables["tr17_1"][:,0,:,:]]
     lon_vars   += [d.variables["XLONG"][:,:,:]]
     lat_vars   += [d.variables["XLAT"][:,:,:]]
+    print('dimensions: Times:',times_vars[-1].shape,' tr:',pm25_vars[-1].shape,
+      ' lon/lat"',lat_vars[-1].shape)
 
 # take the last metadata; should check if same except dim_size_time[0]
 dtype_times=d.variables["Times"].dtype
@@ -60,7 +62,7 @@ pm25_var = new.createVariable('pm25',   dtype_vars, var_dimensions)
 times_var[:]=times
 lon_var[:]=lon
 lat_var[:]=lat
-pm25[:]=pm25
+pm25_var[:]=pm25
 
 new.close()
 
