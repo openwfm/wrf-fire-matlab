@@ -1,29 +1,50 @@
 # Load required packages
+library(ncdf4)  # For reading netCDF files
 library(ggplot2)
-library(raster)
-library(ncdf4)
+library(dplyr)
 
-ncfile <- nc_open("ts_smoke.nc")
+# Open input netCDF file
+nc_file <- nc_open("ts_smoke.nc")
 
-# Read the variables from the NetCDF file
-pm25 <- ncvar_get(ncfile, "pm25")
-lon <- ncvar_get(ncfile, "XLONG")
-lat <- ncvar_get(ncfile, "XLAT")
-times <- ncvar_get(ncfile, "Times")
-cat('array pm25  size',dim(pm25),'\n')
-cat('array lon   size',dim(lon),'\n')
-cat('array lat   size',dim(lat),'\n')
-cat('array times size',dim(times),'\n')
+# read the variables
+lon_t <- ncvar_get(nc_file, "XLONG")
+lat_t <- ncvar_get(nc_file, "XLAT")
+times <- ncvar_get(nc_file, "Times")
+pm25_t <- ncvar_get(nc_file, "pm25")
+cat("Data dimensions are",dim(pm25_t),"\n")
 
-# Close the NetCDF file
-nc_close(ncfile)
 
-print("Create a data frame with the latitude, longitude, and pm25 values")
-df <- data.frame(lat = as.vector(lat), lon = as.vector(lon), pm25 = as.vector(pm25))
+# Loop over each time step and visualize pm25
+for (i in seq_along(times)) {
+  # Select pm25 data for the current time step
+  pm25 <- pm25_t[,,i]
+  lon <- lon_t[,,i]
+  lat <- lat_t[,,i]
+  
+  # Create a data frame from the lon, lat, and pm25 arrays
+  df <- data.frame(
+    lon = as.vector(t(matrix(lon, nrow=nrow(lon), ncol=ncol(lon)))),
+    lat = as.vector(matrix(lat, nrow=nrow(lat), ncol=ncol(lat))),
+    pm25 = as.vector(matrix(pm25, nrow=nrow(pm25), ncol=ncol(pm25)))
+  )
 
-print("Create a scatter plot of the pm25 values at the lat/lon points")
+  # Create a ggplot2 raster plot with longitude and latitude as x and y, and pm25 as the fill color
+  p <- ggplot(df, aes(x=lon, y=lat, fill=pm25)) +
+    geom_raster() +
+    scale_fill_gradientn(colours = c("blue", "yellow", "red")) +
+    labs(x="Longitude", y="Latitude", fill="PM2.5")
 
-dev.new()
-plot(df$lon, df$lat, col = df$pm25)
+  # Add a title that includes the times[i] value
+  p + ggtitle(paste("PM2.5 at time ", times[i]))
+  
+  # force display
+  print(p)
+
+  # Wait for user to press enter before plotting the next time step
+  readline("Press enter to continue...")
+}
+
+# Close netCDF file
+nc_close(nc_file)
 
 
