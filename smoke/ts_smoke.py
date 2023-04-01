@@ -23,7 +23,9 @@ for file_path in argv[0:-1]:
     lon_vars   += [d.variables["XLONG"][:,:,:]]
     lat_vars   += [d.variables["XLAT"][:,:,:]]
 
-# take the last dims; should check if same except dim_size_time[0]
+# take the last metadata; should check if same except dim_size_time[0]
+dtype_times=d.variables["Times"].dtype
+dtype_vars=d.variables["XLONG"].dtype
 dim_size_time = d.variables["Times"][:,:].shape
 dim_name_vars = d.variables["XLONG"].dimensions
 dim_size_vars = d.variables["XLONG"][:,:,:].shape
@@ -49,16 +51,16 @@ we_dim = new.dimensions['west_east']
 var_dimensions = (time_dim, sn_dim, we_dim)
 
 # create variables
-times_var = new.createVariable('Times', np.uint8, (time_dim, tstr_dim))
-lon_var = new.createVariable('XLONG', np.float32, var_dimensions)
-lat_var = new.createVariable('XLAT', np.float32, var_dimensions)
-pm25_var = new.createVariable('pm25', np.float32, var_dimensions)
+times_var = new.createVariable('Times', dtype_times, (time_dim, tstr_dim))
+lon_var = new.createVariable('XLONG',   dtype_vars, var_dimensions)
+lat_var = new.createVariable('XLAT',    dtype_vars, var_dimensions)
+pm25_var = new.createVariable('pm25',   dtype_vars, var_dimensions)
 
 # copy values 
-#times_var[:]=times
-#lon_var[:]=lon
-#lat_var[:]=lat
-#pm25[:]=pm25
+times_var[:]=times
+lon_var[:]=lon
+lat_var[:]=lat
+pm25[:]=pm25
 
-#new.close()
+new.close()
 
