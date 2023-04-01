@@ -3,7 +3,7 @@ library(ggplot2)
 library(raster)
 library(ncdf4)
 
-ncfile <- nc_open("smoke.nc")
+ncfile <- nc_open("ts_smoke.nc")
 
 # Read the variables from the NetCDF file
 pm25 <- ncvar_get(ncfile, "pm25")
@@ -11,9 +11,9 @@ lon <- ncvar_get(ncfile, "XLONG")
 lat <- ncvar_get(ncfile, "XLAT")
 times <- ncvar_get(ncfile, "Times")
 cat('array pm25  size',dim(pm25),'\n')
-cat('array lon   size',dim(pm25),'\n')
-cat('array lat   size',dim(pm25),'\n')
-cat('array times size',dim(pm25),'\n')
+cat('array lon   size',dim(lon),'\n')
+cat('array lat   size',dim(lat),'\n')
+cat('array times size',dim(times),'\n')
 
 # Close the NetCDF file
 nc_close(ncfile)
