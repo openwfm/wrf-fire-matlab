@@ -2,8 +2,14 @@
 library(ncdf4)  # For reading netCDF files
 
 print_variable_info <- function(x) {
-  cat("Variable:", deparse(substitute(x)),"class", class(x),"type",typeof(x),
-  "dimension",dim(x),"\n")
+    cat("Variable:", deparse(substitute(x)),"class", class(x),"type",typeof(x),
+    "dimension",dim(x))
+    if(is.numeric(x)) {
+      cat(" min",min(x),"max",max(x),"\n")
+    } else {
+      # The array contains non-numeric values
+      cat("\n")
+    }
 }
 
 # Open input netCDF file
