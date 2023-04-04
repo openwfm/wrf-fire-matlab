@@ -18,13 +18,15 @@ nc_file <- nc_open("ts_smoke.nc")
 # read the variables
 lon <- ncvar_get(nc_file, "XLONG")
 lat <- ncvar_get(nc_file, "XLAT")
-times <- ncvar_get(nc_file, "Times")
 pm25 <- ncvar_get(nc_file, "pm25")
+times <- ncvar_get(nc_file, "Times")
 
 print_variable_info(lon)
 print_variable_info(lat)
 print_variable_info(pm25)
 print_variable_info(times)
+cat("The first time frame is",times[1],"Zulu\n")
+cat("The last  time frame is",times[dim(times)],"Zulu\n")
 
 nc_close(nc_file)
 
