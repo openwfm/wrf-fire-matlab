@@ -1,22 +1,36 @@
-
-function ts=ts_at(lon,lat,xlon,xlat,v)
-% interpolate time series of a variable from grid to a point
-% in:
-%   lon longitude of the location to interpolate to
-%   lat latitude of the location to interpolate to
-%   xlon 2D array of longitude coordinates at grid points
-%   xlat 2D array of latitude coordinates of grid points
-%   v 3D array values. The last index is time.
-% out:
-%  ts time series of v interpolated to (lon,lat), 1D array
-
-% Method: Interpolate on a small square subgrid around the point (lon,lat). 
-% It is NOT assumed that the grid is equidistant, for example xlong xlat
-% can be coordinates in one projection while the grid is equidistant in
-% another projection. The interpolation is exact if v is linear function
-% of xlong and xlat.
-
-function ts_at_test
-% generate xlong xlat as uniform with random perturbations
-% define v=a*xlong + b*xlat for some a,b
-% verify that ts_at returns a*lon + b*lat for several random (lon,lat)
+function ts = ts_at(lon, lat, xlon, xlat, v)
+    % Check input dimensions
+    if ndims(v) ~= 3
+        error('The variable v must be a 3D array where the last dimension is time.');
+    end
+    
+    % Find the four nearest grid points
+    [numRows, numCols] = size(xlon);
+    [~, idx] = min(abs(xlon(:) - lon) + abs(xlat(:) - lat));
+    [iRow, iCol] = ind2sub([numRows, numCols], idx);
+    
+    % Define the square subgrid indices
+    iRow = max(iRow-1, 1):min(iRow+1, numRows);
+    iCol = max(iCol-1, 1):min(iCol+1, numCols);
+    
+    % Extract the subgrid coordinates
+    subXlon = xlon(iRow, iCol);
+    subXlat = xlat(iRow, iCol);
+    
+    % Initialize the output time series
+    numTimeSteps = size(v, 3);
+    ts = zeros(numTimeSteps, 1);
+    
+    % Create interpolant with coordinates
+    F = scatteredInterpolant(subXlon(:), subXlat(:), []);
+    
+    % Loop over each time step
+    for t = 1:numTimeSteps
+        % Extract the values for the current time step
+        subV = v(iRow, iCol, t);
+        
+        % Assign the values to the interpolant and interpolate
+        F.Values = subV(:);
+        ts(t) = F(lon, lat);
+    end
+end
