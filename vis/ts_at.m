@@ -21,16 +21,18 @@ function ts = ts_at(lon, lat, xlon, xlat, v)
     numTimeSteps = size(v, 3);
     ts = zeros(numTimeSteps, 1);
     
-    % Create interpolant with coordinates
-    F = scatteredInterpolant(subXlon(:), subXlat(:), []);
-    
     % Loop over each time step
     for t = 1:numTimeSteps
         % Extract the values for the current time step
         subV = v(iRow, iCol, t);
         
-        % Assign the values to the interpolant and interpolate
-        F.Values = subV(:);
+        % Flatten the subgrid values to column vectors
+        subV = subV(:);
+        
+        % Create an interpolant for the current time step
+        F = scatteredInterpolant(subXlon(:), subXlat(:), subV);
+        
+        % Perform the interpolation for the current time step
         ts(t) = F(lon, lat);
     end
 end
