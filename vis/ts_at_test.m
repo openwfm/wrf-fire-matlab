@@ -1,6 +1,19 @@
 function ts_at_test
-    % Test the ts_at function
-    
+     % TS_AT_TEST tests the TS_AT interpolation function.
+    %
+    % This function generates a synthetic dataset of variable values defined
+    % on a grid with random perturbations of coordinates 
+    % and verifies the TS_AT function by checking if the interpolation 
+    % at random points preserves linear functions
+    %
+    % No arguments.
+    %
+    % No return value.
+    %
+    % Example:
+    %   ts_at_test;  
+
+
     % Generate xlon and xlat as uniform with random perturbations
     xlon = repmat(linspace(-180, 180, 100), [100, 1]) + rand(100) - 0.5;
     xlat = repmat(linspace(-90, 90, 100)', [1, 100]) + rand(100, 1) - 0.5;

@@ -1,4 +1,27 @@
 function ts = ts_at(lon, lat, xlon, xlat, v)
+    % TS_AT interpolates time series of a variable from a grid to a point.
+    %
+    % This function performs interpolation of a variable defined on a 2D grid
+    % to a specific geographic point (longitude, latitude) over a series of 
+    % time steps.
+    %
+    % Arguments:
+    %   lon (double) - The longitude of the location to interpolate to.
+    %   lat (double) - The latitude of the location to interpolate to.
+    %   xlon (2D double array) - The longitudes of the grid points.
+    %   xlat (2D double array) - The latitudes of the grid points.
+    %   v (3D double array) - The values on the grid. The third dimension 
+    %                         is time.
+    %
+    % Returns:
+    %   ts (1D double array) - The interpolated time series of the variable 
+    %                           at the specified location.
+    %
+    % Example:
+    %   % Given a set of grid points (xlon, xlat) and variable values v(time)
+    %   lon = -120.5; lat = 34.5;
+    %   ts_values = ts_at(lon, lat, grid_lon, grid_lat, variable_values);
+
     % Check input dimensions
     if ndims(v) ~= 3
         error('The variable v must be a 3D array where the last dimension is time.');
