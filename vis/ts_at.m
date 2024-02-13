@@ -6,7 +6,7 @@ function ts = ts_at(lon, lat, xlon, xlat, v)
     % time steps.
     %
     % Arguments:
-    %   lon (double) - The longitude of the location to interpolate to.
+    %   lon (1D array) - The longitude of the location to interpolate to.
     %   lat (double) - The latitude of the location to interpolate to.
     %   xlon (2D double array) - The longitudes of the grid points.
     %   xlat (2D double array) - The latitudes of the grid points.
