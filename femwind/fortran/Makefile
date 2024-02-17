@@ -1,5 +1,7 @@
 #FC = gfortran
+#CC = gcc
 #FC = ifort
+#CC = icc
 FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow -traceback -fpe0 # intel debug
 FFLAGS = -O3 -fdefault-real-8  # gnu
 FFLAGS = -g -C -fpe0 -r8  # intel debug 
@@ -30,7 +32,8 @@ tests: clean_txt\
  ndt_boundary_conditions_test.exe\
  vec_boundary_conditions_test.exe\
  femwind_test.exe\
- netcdf_test.exe
+ netcdf_test.exe\
+ msleep_test.exe
 
 all: wrf tests
 
@@ -160,6 +163,19 @@ NETCDF_TEST = netcdf_test.f90 $(WRFOUT_MODULES) module_utils.o
 
 netcdf_test.exe: $(NETCDF_TEST) Makefile
 	$(FC) $(FFLAGS) -o $@ $(NETCDF_TEST) $(LFLAGS)
+
+msleep.o: msleep.c
+	$(CC) -c msleep.c 
+
+module_msleep.o: module_msleep.f90
+	$(FC) $(FFLAGS) -c module_msleep.f90
+
+MSLEEP = \
+  module_msleep.o \
+  msleep.o
+
+msleep_test.exe: msleep_test.f90 $(MSLEEP)
+	$(FC) -o msleep_test.exe msleep_test.f90 $(MSLEEP)
 
 # delete test data files 
 clean_txt:
