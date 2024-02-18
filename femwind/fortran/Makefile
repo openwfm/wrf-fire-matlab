@@ -150,6 +150,10 @@ FEMWIND_MODULES = \
 femwind_test.exe: femwind_test.f90 $(FEMWIND_MODULES) Makefile
 	$(FC) $(FFLAGS) -o $@ femwind_test.f90 $(FEMWIND_MODULES) 
 
+MSLEEP = \
+  module_msleep.o \
+  msleep.o
+
 WRFOUT_MODULES = \
   $(MSLEEP) \
   module_netcdf.o \
@@ -170,10 +174,6 @@ msleep.o: msleep.c
 
 module_msleep.o: module_msleep.f90
 	$(FC) $(FFLAGS) -c module_msleep.f90
-
-MSLEEP = \
-  module_msleep.o \
-  msleep.o
 
 msleep_test.exe: msleep_test.f90 $(MSLEEP)
 	$(FC) -o msleep_test.exe msleep_test.f90 $(MSLEEP)
