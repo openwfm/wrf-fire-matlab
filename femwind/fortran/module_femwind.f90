@@ -89,6 +89,7 @@ call vec_boundary_conditions(                              &
 
 print *,'calling multigrid_cycle'
 call multigrid_cycle(mg,1,rate)                        ! start multigrid from level 1
+print *,'end multigrid_cycle, rate=',rate
 
 if(params%debug_level >=0)call  write_array(mg(1)%lambda(ifts: ifte+1, kfts: kfte+1, jfts:jfte+1),'lambda_sol')
 

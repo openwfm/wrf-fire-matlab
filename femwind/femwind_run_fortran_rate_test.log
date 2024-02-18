@@ -1,0 +1,102 @@
+femwind_run_fortran_rate_test
+femwind_fortran_rate_test
+run fortran version only
+basic convergence speed test
+params = 
+  struct with fields:
+
+                         run_fortran: 0
+                          run_matlab: 1
+                femwind_fortran_test: 0
+                        test_fortran: 0
+                               level: 1
+                            graphics: 2
+                              expand: 1.2000
+                            mesh_top: 1000
+                              sc_all: [1 2]
+                             sc2_all: [1 2 4]
+                              nelem3: [50 50 10]
+                                   h: [30 30 2]
+                                   a: [1 1 1]
+                        initial_wind: 'log'
+                    roughness_height: 0.5000
+                       terrain_shape: 'hill'
+                         terrain_top: 'shift'
+                      terrain_height: 0.1000
+                              solver: '2-level'
+                               maxit: 50
+                        maxit_coarse: 8
+                       coarsest_iter: 100
+                             nsmooth: 3
+                          coarsening: '2 linear'
+                            coarse_K: 'assembly'
+                              P_by_x: 1
+                           smoothing: 'vertical sweeps'
+                              restol: 1.0000e-06
+                               exact: 0
+                               slice: 0.5000
+                       err_slice_fig: 12
+                       res_slice_fig: 13
+                      iterations_fig: 14
+                           maxaspect: 3
+                           minaspect: 0.3333
+                              levels: 15
+                         debug_level: 0
+    apply_coarse_boundary_conditions: 1
+                      nsmooth_coarse: 2
+                          save_files: 0
+                    save_file_prefix: 'femwind'
+                    in_height_stream: 175
+                         time_stream: 0
+                          st_contour: 1
+                           st_quiver: 1
+overiding p.run_fortran=     1
+overiding p.run_matlab=     0
+p = 
+  struct with fields:
+
+                         run_fortran: 1
+                          run_matlab: 0
+                femwind_fortran_test: 0
+                        test_fortran: 0
+                               level: 1
+                            graphics: -2
+                              expand: 1.2000
+                            mesh_top: 1000
+                              sc_all: 1
+                             sc2_all: 1
+                              nelem3: [50 50 10]
+                                   h: [30 30 2]
+                                   a: [1 1 1]
+                        initial_wind: 'log'
+                    roughness_height: 0.5000
+                       terrain_shape: 'hill'
+                         terrain_top: 'shift'
+                      terrain_height: 0.1000
+                              solver: '2-level'
+                               maxit: 50
+                        maxit_coarse: 8
+                       coarsest_iter: 100
+                             nsmooth: 3
+                          coarsening: '2 linear'
+                            coarse_K: 2
+                              P_by_x: 1
+                           smoothing: 'vertical sweeps'
+                              restol: 1.0000e-06
+                               exact: 0
+                               slice: 0.5000
+                       err_slice_fig: 12
+                       res_slice_fig: 13
+                      iterations_fig: 14
+                           maxaspect: 3
+                           minaspect: 0.3333
+                              levels: 15
+                         debug_level: 0
+    apply_coarse_boundary_conditions: 1
+                      nsmooth_coarse: 2
+                          save_files: 0
+                    save_file_prefix: 'femwind'
+                    in_height_stream: 175
+                         time_stream: 0
+                          st_contour: 1
+                           st_quiver: 1

@@ -1,0 +1,504 @@
+>> femwind_run_fortran_rate_test
+femwind_fortran_rate_test
+run fortran version only
+basic convergence speed test
+params = 
+  struct with fields:
+
+                         run_fortran: 0
+                          run_matlab: 1
+                femwind_fortran_test: 0
+                        test_fortran: 0
+                               level: 1
+                            graphics: 2
+                              expand: 1.2000
+                            mesh_top: 1000
+                              sc_all: [1 2]
+                             sc2_all: [1 2 4]
+                              nelem3: [50 50 10]
+                                   h: [30 30 2]
+                                   a: [1 1 1]
+                        initial_wind: 'log'
+                    roughness_height: 0.5000
+                       terrain_shape: 'hill'
+                         terrain_top: 'shift'
+                      terrain_height: 0.1000
+                              solver: '2-level'
+                               maxit: 50
+                        maxit_coarse: 8
+                       coarsest_iter: 100
+                             nsmooth: 3
+                          coarsening: '2 linear'
+                            coarse_K: 'assembly'
+                              P_by_x: 1
+                           smoothing: 'vertical sweeps'
+                              restol: 1.0000e-06
+                               exact: 0
+                               slice: 0.5000
+                       err_slice_fig: 12
+                       res_slice_fig: 13
+                      iterations_fig: 14
+                           maxaspect: 3
+                           minaspect: 0.3333
+                              levels: 15
+                         debug_level: 0
+    apply_coarse_boundary_conditions: 1
+                      nsmooth_coarse: 2
+                          save_files: 0
+                    save_file_prefix: 'femwind'
+                    in_height_stream: 175
+                         time_stream: 0
+                          st_contour: 1
+                           st_quiver: 1
+overiding p.run_fortran=     1
+overiding p.run_matlab=     0
+p = 
+  struct with fields:
+
+                         run_fortran: 1
+                          run_matlab: 0
+                femwind_fortran_test: 0
+                        test_fortran: 0
+                               level: 1
+                            graphics: -2
+                              expand: 1.2000
+                            mesh_top: 1000
+                              sc_all: 1
+                             sc2_all: 1
+                              nelem3: [50 50 10]
+                                   h: [30 30 2]
+                                   a: [1 1 1]
+                        initial_wind: 'log'
+                    roughness_height: 0.5000
+                       terrain_shape: 'hill'
+                         terrain_top: 'shift'
+                      terrain_height: 0.1000
+                              solver: '2-level'
+                               maxit: 50
+                        maxit_coarse: 8
+                       coarsest_iter: 100
+                             nsmooth: 3
+                          coarsening: '2 linear'
+                            coarse_K: 2
+                              P_by_x: 1
+                           smoothing: 'vertical sweeps'
+                              restol: 1.0000e-06
+                               exact: 0
+                               slice: 0.5000
+                       err_slice_fig: 12
+                       res_slice_fig: 13
+                      iterations_fig: 14
+                           maxaspect: 3
+                           minaspect: 0.3333
+                              levels: 15
+                         debug_level: 0
+    apply_coarse_boundary_conditions: 1
+                      nsmooth_coarse: 2
+                          save_files: 0
+                    save_file_prefix: 'femwind'
+                    in_height_stream: 175
+                         time_stream: 0
+                          st_contour: 1
+                           st_quiver: 1
+femwind_main
+given params.mesh_top>0, computing params.expand
+params = 
+  struct with fields:
+
+                         run_fortran: 1
+                          run_matlab: 0
+                femwind_fortran_test: 0
+                        test_fortran: 0
+                               level: 1
+                            graphics: -2
+                              expand: 1.8271
+                            mesh_top: 1000
+                              sc_all: 1
+                             sc2_all: 1
+                              nelem3: [50 50 10]
+                                   h: [30 30 2]
+                                   a: [1 1 1]
+                        initial_wind: 'log'
+                    roughness_height: 0.5000
+                       terrain_shape: 'hill'
+                         terrain_top: 'shift'
+                      terrain_height: 0.1000
+                              solver: '2-level'
+                               maxit: 50
+                        maxit_coarse: 8
+                       coarsest_iter: 100
+                             nsmooth: 3
+                          coarsening: '2 linear'
+                            coarse_K: 2
+                              P_by_x: 1
+                           smoothing: 'vertical sweeps'
+                              restol: 1.0000e-06
+                               exact: 0
+                               slice: 0.5000
+                       err_slice_fig: 12
+                       res_slice_fig: 13
+                      iterations_fig: 14
+                           maxaspect: 3
+                           minaspect: 0.3333
+                              levels: 15
+                         debug_level: 0
+    apply_coarse_boundary_conditions: 1
+                      nsmooth_coarse: 2
+                          save_files: 0
+                    save_file_prefix: 'femwind'
+                    in_height_stream: 175
+                         time_stream: 0
+                          st_contour: 1
+                           st_quiver: 1
+sc =
+     1
+sc2 =
+     1
+setting up test case
+nel =
+    50    50    10
+mesh of 50x50x10 cells
+regular_mesh nodes 50 50 10 step 30 30 2 expansion 1.82708 size 1500 1500 1000
+shifting mesh by terrain vertically
+initial wind log profile in x direction
+writing matrix size 51 11 51 to file X_input.txt
+writing matrix size 51 11 51 to file Y_input.txt
+writing matrix size 51 11 51 to file Z_input.txt
+writing matrix size 50 10 50 to file u0_input.txt
+writing matrix size 50 10 50 to file v0_input.txt
+writing matrix size 50 10 50 to file w0_input.txt
+writing matrix size 3 3 1 to file A_input.txt
+running ./fortran/femwind_test.exe
+reading matrix size     3    3    1 from file A_input.txt
+reading matrix size    51   11   51 from file X_input.txt
+reading matrix size    51   11   51 from file Y_input.txt
+reading matrix size    51   11   51 from file Z_input.txt
+reading matrix size    50   10   50 from file u0_input.txt
+reading matrix size    50   10   50 from file v0_input.txt
+reading matrix size    50   10   50 from file w0_input.txt
+ get_mg_dims: domain           1          50           1          10           1          50
+ get_mg_dims: memory           0          52           0          12           0          52
+ get_mg_dims: patch            1          50           1          10           1          50
+ get_mg_dims: tile             1          50           1          10           1          50
+calling femwind_setup
+ multigrid_setup received
+ level            1
+ X memory shape           53          13          53
+ Y memory shape           53          13          53
+ Z memory shape           53          13          53
+ grid size nx=          51  ny=          51  nz=          11  total ndof=       28611
+ dx=   30.0000000      dy=   30.0000000    
+ dz shape          10
+ size           10
+ dz=   2.00000000       3.65415025       6.67640591       12.1982965       22.2872009       40.7203865       74.3992081       135.932922       248.359680       453.771729    
+ multigrid level            1  grid size           51          51          11
+ coarsening_icl in: dx=   30.0000000      dy=   30.0000000      n3=          11  dz=   2.00000000       3.65415025       6.67640591       12.1982965       22.2872009       40.7203865       74.3992081       135.932922       248.359680       453.771729    
+ coarsening_icl in: A=   1.00000000       0.00000000       0.00000000       0.00000000       1.00000000       0.00000000       0.00000000       0.00000000       1.00000000      minaspect=  0.333333343      maxaspect=   3.00000000    
+ horizontal coarsening factors            1           1  because weighted height is    6.66666701E-02
+ vertical coarse layers            1           3           5           7           8           9          10          11
+ level            2
+ grid size nx=          51  ny=          51  nz=           8  total ndof=       20808
+ dx=   30.0000000      dy=   30.0000000    
+ multigrid level            2  grid size           51          51           8
+ coarsening_icl in: dx=   30.0000000      dy=   30.0000000      n3=           8  dz=   5.65415001       18.8747025       63.0075874       74.3992081       135.932922       248.359680       453.771729    
+ coarsening_icl in: A=   1.00000000       0.00000000       0.00000000       0.00000000       1.00000000       0.00000000       0.00000000       0.00000000       1.00000000      minaspect=  0.333333343      maxaspect=   3.00000000    
+ horizontal coarsening factors            1           1  because weighted height is   0.188471660    
+ vertical coarse layers            1           3           4           5           6           7           8
+ level            3
+ grid size nx=          51  ny=          51  nz=           7  total ndof=       18207
+ dx=   30.0000000      dy=   30.0000000    
+ multigrid level            3  grid size           51          51           7
+ coarsening_icl in: dx=   30.0000000      dy=   30.0000000      n3=           7  dz=   24.5288525       63.0075874       74.3992081       135.932922       248.359680       453.771729    
+ coarsening_icl in: A=   1.00000000       0.00000000       0.00000000       0.00000000       1.00000000       0.00000000       0.00000000       0.00000000       1.00000000      minaspect=  0.333333343      maxaspect=   3.00000000    
+ horizontal coarsening factors            2           2  because weighted height is   0.817628443    
+ vertical coarse layers            1           3           4           5           6           7
+ level            4
+ grid size nx=          26  ny=          26  nz=           6  total ndof=        4056
+ dx=   60.0000000      dy=   60.0000000    
+ multigrid level            4  grid size           26          26           6
+ coarsening_icl in: dx=   60.0000000      dy=   60.0000000      n3=           6  dz=   87.5364380       74.3992081       135.932922       248.359680       453.771729    
+ coarsening_icl in: A=   1.00000000       0.00000000       0.00000000       0.00000000       1.00000000       0.00000000       0.00000000       0.00000000       1.00000000      minaspect=  0.333333343      maxaspect=   3.00000000    
+ horizontal coarsening factors            2           2  because weighted height is    1.45894063    
+ vertical coarse layers            1           3           4           5           6
+ level            5
+ grid size nx=          14  ny=          14  nz=           5  total ndof=         980
+ dx=   120.000000      dy=   120.000000    
+ multigrid level            5  grid size           14          14           5
+ coarsening_icl in: dx=   120.000000      dy=   120.000000      n3=           5  dz=   161.935638       135.932922       248.359680       453.771729    
+ coarsening_icl in: A=   1.00000000       0.00000000       0.00000000       0.00000000       1.00000000       0.00000000       0.00000000       0.00000000       1.00000000      minaspect=  0.333333343      maxaspect=   3.00000000    
+ horizontal coarsening factors            2           2  because weighted height is    1.34946370    
+ vertical coarse layers            1           3           5
+ level            6
+ grid size nx=           8  ny=           8  nz=           3  total ndof=         192
+ dx=   240.000000      dy=   240.000000    
+ stopping at            5  levels because coarse ndof          192 >= fine          980  or l=            5  =            5
+           5  levels
+ allocate grid variables
+ get_mg_dims: domain           1          50           1          10           1          50
+ get_mg_dims: memory           0          52           0          12           0          52
+ get_mg_dims: patch            1          50           1          10           1          50
+ get_mg_dims: tile             1          50           1          10           1          50
+ get_mg_dims: domain           1          50           1           7           1          50
+ get_mg_dims: memory           0          52           0           9           0          52
+ get_mg_dims: patch            1          50           1           7           1          50
+ get_mg_dims: tile             1          50           1           7           1          50
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ computing  coarse grid coordinates
+ get_mg_dims: domain           1          50           1          10           1          50
+ get_mg_dims: memory           0          52           0          12           0          52
+ get_mg_dims: patch            1          50           1          10           1          50
+ get_mg_dims: tile             1          50           1          10           1          50
+ get_mg_dims: domain           1          50           1           7           1          50
+ get_mg_dims: memory           0          52           0           9           0          52
+ get_mg_dims: patch            1          50           1           7           1          50
+ get_mg_dims: tile             1          50           1           7           1          50
+ get_mg_dims: domain           1          50           1           7           1          50
+ get_mg_dims: memory           0          52           0           9           0          52
+ get_mg_dims: patch            1          50           1           7           1          50
+ get_mg_dims: tile             1          50           1           7           1          50
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ assembling the stiffness matrix on level             1
+ get_mg_dims: domain           1          50           1          10           1          50
+ get_mg_dims: memory           0          52           0          12           0          52
+ get_mg_dims: patch            1          50           1          10           1          50
+ get_mg_dims: tile             1          50           1          10           1          50
+ applying the boundary conditions on level            1
+ assembling the stiffness matrix on level             2
+ get_mg_dims: domain           1          50           1           7           1          50
+ get_mg_dims: memory           0          52           0           9           0          52
+ get_mg_dims: patch            1          50           1           7           1          50
+ get_mg_dims: tile             1          50           1           7           1          50
+ applying the boundary conditions on level            2
+ assembling the stiffness matrix on level             3
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ applying the boundary conditions on level            3
+ assembling the stiffness matrix on level             4
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ applying the boundary conditions on level            4
+ assembling the stiffness matrix on level             5
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ applying the boundary conditions on level            5
+ end multigrid setup
+femwind_setup returned OK
+calling femwind_solve
+ femwind solve start
+ calling f_assembly
+ calling vec_boundary_conditions
+ calling multigrid_cycle
+ get_mg_dims: domain           1          50           1          10           1          50
+ get_mg_dims: memory           0          52           0          12           0          52
+ get_mg_dims: patch            1          50           1          10           1          50
+ get_mg_dims: tile             1          50           1          10           1          50
+ get_mg_dims: domain           1          50           1           7           1          50
+ get_mg_dims: memory           0          52           0           9           0          52
+ get_mg_dims: patch            1          50           1           7           1          50
+ get_mg_dims: tile             1          50           1           7           1          50
+ level=           1  it=           1  coarse= F
+ level=           1  it=           1 sweeps siz=   55.0896187      rel diff=   1.00000000    
+ level=           1  it=           2  coarse= F
+ level=           1  it=           2 sweeps siz=   77.6161728      rel diff=  0.420929581    
+ level=           1  it=           3  coarse= F
+ level=           1  it=           3 sweeps siz=   96.1653442      rel diff=  0.262146086    
+ level=           1  it=           4  coarse= T
+ ndt_mult: loop upper bounds          51          11          51
+ level=           1  it=           4 mult rhsiz=   96.1653442      rel res =  0.262146086    
+ get_mg_dims: domain           1          50           1           7           1          50
+ get_mg_dims: memory           0          52           0           9           0          52
+ get_mg_dims: patch            1          50           1           7           1          50
+ get_mg_dims: tile             1          50           1           7           1          50
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ level=           2  it=           1  coarse= F
+ level=           2  it=           1 sweeps siz=   22.1208248      rel diff=   1.00000000    
+ level=           2  it=           2  coarse= F
+ level=           2  it=           2 sweeps siz=   40.7760162      rel diff=  0.457504034    
+ level=           2  it=           3  coarse= T
+ ndt_mult: loop upper bounds          51           8          51
+ level=           2  it=           3 mult rhsiz=   40.7760162      rel res =  0.457504034    
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ ndt_mult: loop upper bounds          51           7          51
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ ndt_mult: loop upper bounds          26           6          26
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ level=           2  it=           4  coarse= F
+ level=           2  it=           4 sweeps siz=   452.568817      rel diff=   2.18099989E-02
+ level            2  iteration            4  rel diff=   2.18099989E-02 < diftol=  0.100000001      exiting
+ level=           1  it=           5  coarse= F
+ level=           1  it=           5 sweeps siz=   481.933044      rel diff=   9.14990436E-03
+ level=           1  it=           6  coarse= F
+ level=           1  it=           6 sweeps siz=   480.712006      rel diff=   2.77550193E-03
+ level=           1  it=           7  coarse= F
+ level=           1  it=           7 sweeps siz=   480.433990      rel diff=   1.45134039E-03
+ level=           1  it=           8  coarse= T
+ ndt_mult: loop upper bounds          51          11          51
+ level=           1  it=           8 mult rhsiz=   480.433990      rel res =   1.45134039E-03
+ get_mg_dims: domain           1          50           1           7           1          50
+ get_mg_dims: memory           0          52           0           9           0          52
+ get_mg_dims: patch            1          50           1           7           1          50
+ get_mg_dims: tile             1          50           1           7           1          50
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ level=           2  it=           1  coarse= F
+ level=           2  it=           1 sweeps siz=   2.33332777      rel diff=   1.00000000    
+ level=           2  it=           2  coarse= F
+ level=           2  it=           2 sweeps siz=   4.24211979      rel diff=  0.449961841    
+ level=           2  it=           3  coarse= T
+ ndt_mult: loop upper bounds          51           8          51
+ level=           2  it=           3 mult rhsiz=   4.24211979      rel res =  0.449961841    
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ ndt_mult: loop upper bounds          51           7          51
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ ndt_mult: loop upper bounds          26           6          26
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ level=           2  it=           4  coarse= F
+ level=           2  it=           4 sweeps siz=   11.9383678      rel diff=   2.87540164E-02
+ level            2  iteration            4  rel diff=   2.87540164E-02 < diftol=  0.100000001      exiting
+ level=           1  it=           9  coarse= F
+ level=           1  it=           9 sweeps siz=   484.617432      rel diff=   1.08315877E-03
+ level=           1  it=          10  coarse= F
+ level=           1  it=          10 sweeps siz=   484.593109      rel diff=   5.87137940E-04
+ level=           1  it=          11  coarse= F
+ level=           1  it=          11 sweeps siz=   484.586334      rel diff=   1.35698734E-04
+ level=           1  it=          12  coarse= T
+ ndt_mult: loop upper bounds          51          11          51
+ level=           1  it=          12 mult rhsiz=   484.586334      rel res =   1.35698734E-04
+ get_mg_dims: domain           1          50           1           7           1          50
+ get_mg_dims: memory           0          52           0           9           0          52
+ get_mg_dims: patch            1          50           1           7           1          50
+ get_mg_dims: tile             1          50           1           7           1          50
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ level=           2  it=           1  coarse= F
+ level=           2  it=           1 sweeps siz=  0.169177726      rel diff=   1.00000000    
+ level=           2  it=           2  coarse= F
+ level=           2  it=           2 sweeps siz=  0.274062186      rel diff=  0.382703155    
+ level=           2  it=           3  coarse= T
+ ndt_mult: loop upper bounds          51           8          51
+ level=           2  it=           3 mult rhsiz=  0.274062186      rel res =  0.382703155    
+ get_mg_dims: domain           1          50           1           6           1          50
+ get_mg_dims: memory           0          52           0           8           0          52
+ get_mg_dims: patch            1          50           1           6           1          50
+ get_mg_dims: tile             1          50           1           6           1          50
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ ndt_mult: loop upper bounds          51           7          51
+ get_mg_dims: domain           1          25           1           5           1          25
+ get_mg_dims: memory           0          27           0           7           0          27
+ get_mg_dims: patch            1          25           1           5           1          25
+ get_mg_dims: tile             1          25           1           5           1          25
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ ndt_mult: loop upper bounds          26           6          26
+ get_mg_dims: domain           1          13           1           4           1          13
+ get_mg_dims: memory           0          15           0           6           0          15
+ get_mg_dims: patch            1          13           1           4           1          13
+ get_mg_dims: tile             1          13           1           4           1          13
+ level=           2  it=           4  coarse= F
+ level=           2  it=           4 sweeps siz=  0.615975440      rel diff=   2.51244567E-02
+ level            2  iteration            4  rel diff=   2.51244567E-02 < diftol=  0.100000001      exiting
+ level=           1  it=          13  coarse= F
+ level=           1  it=          13 sweeps siz=   484.688354      rel diff=   5.41641784E-05
+ level=           1  it=          14  coarse= F
+ level=           1  it=          14 sweeps siz=   484.687836      rel diff=   2.54844235E-05
+ level=           1  it=          15  coarse= F
+ level=           1  it=          15 sweeps siz=   484.687744      rel diff=   6.24911536E-06
+ level            1  iteration           15  rel diff=   6.24911536E-06 < diftol=   9.99999975E-06  exiting
+ end multigrid_cycle, rate=   1.00000000    
+ calling w_assembly
+ end femwind_solve
+femwind_solve returned OK
+writing matrix size    50   10   50 to file u.txt.
+writing matrix size    50   10   50 to file v.txt.
+writing matrix size    50   10   50 to file w.txt.
+writing rate.txt matrix size     1
+reading matrix size 50 10 50 from file u.txt
+reading matrix size 50 10 50 from file v.txt
+reading matrix size 50 10 50 from file w.txt
+reading matrix from file rate.txt size 1 
+femwind_fortran done rate(1,1)=1
+Error using femwind_rate_test
+something changed, expected convergence rate 0.066931 got 1 diff -0.933069
+Error in femwind_run_fortran_rate_test (line 8)

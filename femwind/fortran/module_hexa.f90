@@ -3,17 +3,18 @@ use module_utils
 
 contains
 
-subroutine hexa(A,X,u0,Kloc,Floc,Jg,iflag)
+subroutine hexa(A,X,u0,Kloc,Floc,Jg,vol,iflag)
 ! purpose: create local stiffness matrix etc for hexa 3d element
 ! in:
 !   A   coefficient matrix size 3x3, symmetric positive definite
 !   X   nodes coordinates size 3x8, one each column is one node
 !   u0   column vector of input wind at the center of the element
-!   iflags  iflags = 1 compute Kloc, iflag = 2 compute Floc, iflag = 3 compute Jg  
+!   iflag  iflag = 1 compute Kloc, iflag = 2 compute Floc, Jg, vol, iflag = 3 compute Jg  
 ! out:
 !   Kloc   local stiffness matrix
 !   Floc   local divergence load vector
-!   Jg     gradient at center of function with values V is V'*Jg          
+!   Jg     gradient at center of function with values V is Jg'*V          
+!   vol    approx volume, local divergence load is Floc = -Jg*u0*vol 
 
 implicit none
 
@@ -21,9 +22,9 @@ implicit none
 
 real, intent(in):: A(3,3), X(3,8), u0(3)    ! fortran is not case sensitive
 integer, intent(in)::iflag
-real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3)
+real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3), vol
 !*** local variables
-!real, parameter :: g = 0.5773502691896257
+real, parameter :: g = 0.5773502691896257
 real,dimension(9,3),save :: ib = reshape((/-1,-1,-1,-1,1,1,1,1,0,-1,-1,1,1,-1,-1,1,1,0,-1,1,-1,1,-1,1,-1,1,0/),(/9,3/))
 real,dimension(9,3),save :: s = reshape((/-0.5773502691896257,-0.5773502691896257,-0.5773502691896257,-0.5773502691896257&
 ,0.5773502691896257,0.5773502691896257,0.5773502691896257,0.5773502691896257,0.0,-0.5773502691896257,-0.5773502691896257&
@@ -39,7 +40,6 @@ real :: u0_tmp(3)
 integer :: i,j,k,m
 real :: detJx = 0
 real :: tmp = 0
-real :: vol = 0
 gradf = 0.
 Jg_tmp = 0.
 Jx = 0.
@@ -56,81 +56,25 @@ Jg = 0.
 !*** executable
 
 !Calculate Jg loop
-if (iflag .eq.  3) then
-
-    do i=1,9
     
-    !Calculate gradf
-    !first column of gradf
-    do j = 1,8
-    gradf(j,1) = (ib(j,1)*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
-    end do
-    !second coumn of gradf
-    do j = 1,8
-    gradf(j,2) = ((1+ib(j,1)*s(i,1))*ib(j,2)*(1+ib(j,3)*s(i,3)))/8
-    end do
-    !third column of gradf
-    do j = 1,8
-    gradf(j,3) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*ib(j,3))/8
-    end do
-    
-    Jx = matmul(X,gradf)
-    
-    !!!Compute Jx_inv!!!
-    detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
-             Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
-             Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
-    
-    if(abs(detJx).lt.tiny(detJx))then
-        print *,'detJx=',detJx
-        call crash('The Jacobian is (numerically) singular')
-    endif
-
-    Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
-    Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
-    Jx_inv(3,1) = +(1/detJx) * (Jx(2,1)*Jx(3,2) - Jx(2,2)*Jx(3,1))
-    Jx_inv(1,2) = -(1/detJx) * (Jx(1,2)*Jx(3,3) - Jx(1,3)*Jx(3,2))
-    Jx_inv(2,2) = +(1/detJx) * (Jx(1,1)*Jx(3,3) - Jx(1,3)*Jx(3,1))
-    Jx_inv(3,2) = -(1/detJx) * (Jx(1,1)*Jx(3,2) - Jx(1,2)*Jx(3,1))
-    Jx_inv(1,3) = +(1/detJx) * (Jx(1,2)*Jx(2,3) - Jx(1,3)*Jx(2,2))
-    Jx_inv(2,3) = -(1/detJx) * (Jx(1,1)*Jx(2,3) - Jx(1,3)*Jx(2,1))
-    Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
-    
-    Jg = matmul(gradf,Jx_inv)
-    
-    end do
-endif !end for computing Jg
-
-!Calculate Kloc loop
-if (iflag .eq.  1) then
-
-do i=1,9
-
 !Calculate gradf
-!first column of gradf
 do j = 1,8
-gradf(j,1) = (ib(j,1)*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
-end do
-!second coumn of gradf
-do j = 1,8
-gradf(j,2) = ((1+ib(j,1)*s(i,1))*ib(j,2)*(1+ib(j,3)*s(i,3)))/8
-end do
-!third column of gradf
-do j = 1,8
-gradf(j,3) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*ib(j,3))/8
+    gradf(j,1) = (ib(j,1)*(1+ib(j,2)*g)*(1+ib(j,3)*g))/8
+    gradf(j,2) = ((1+ib(j,1)*g)*ib(j,2)*(1+ib(j,3)*g))/8
+    gradf(j,3) = ((1+ib(j,1)*g)*(1+ib(j,2)*g)*ib(j,3))/8
 end do
 
 Jx = matmul(X,gradf)
 
 !!!Compute Jx_inv!!!
 detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
-         Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
-         Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
+Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
+Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
 
-    if(abs(detJx).lt.tiny(detJx))then
-        print *,'detJx=',detJx
-        call crash('The Jacobian is (numerically) singular')
-    endif
+if(abs(detJx).lt.tiny(detJx))then
+print *,'detJx=',detJx
+call crash('The Jacobian is (numerically) singular')
+endif
 
 Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
 Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
@@ -141,10 +85,17 @@ Jx_inv(3,2) = -(1/detJx) * (Jx(1,1)*Jx(3,2) - Jx(1,2)*Jx(3,1))
 Jx_inv(1,3) = +(1/detJx) * (Jx(1,2)*Jx(2,3) - Jx(1,3)*Jx(2,2))
 Jx_inv(2,3) = -(1/detJx) * (Jx(1,1)*Jx(2,3) - Jx(1,3)*Jx(2,1))
 Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
+
+print *,'Jx=',Jx
+print *,'gradf=',gradf
 Jg = matmul(gradf,Jx_inv)
+       
+print *,'Jg=',Jg
+
+!Calculate Kloc loop
+if (iflag .eq.  1) then
 
 !check to calc Kloc
-if (i < 9) then
 do j = 1,8
 do k = 1,3
 Jg_tran(k,j) = Jg(j,k)
@@ -155,30 +106,24 @@ A_tmp = matmul(A, Jg_tran)
 K_at_s = matmul(Jg,A_tmp)
 Kloc = Kloc+(K_at_s*abs(detJx))
 end if !end for computing Kloc
-end do !end of outter most do loop
-end if !end for computing Kloc
 
 
 !Calculate Floc loop
 if (iflag .eq. 2) then
 
-do i=1,9
+do i=9,9
 
 !Calculate gradf
 !first column of gradf
 do j = 1,8
 gradf(j,1) = (ib(j,1)*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
-end do
-!second coumn of gradf
-do j = 1,8
 gradf(j,2) = ((1+ib(j,1)*s(i,1))*ib(j,2)*(1+ib(j,3)*s(i,3)))/8
-end do
-!third column of gradf
-do j = 1,8
 gradf(j,3) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*ib(j,3))/8
 end do
 
 Jx = matmul(X,gradf)
+print *,'Jx=',Jx
+print *,'gradf=',gradf
 
 !!!Compute Jx_inv!!!
 detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
@@ -201,6 +146,7 @@ Jx_inv(2,3) = -(1/detJx) * (Jx(1,1)*Jx(2,3) - Jx(1,3)*Jx(2,1))
 Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
 
 Jg = matmul(gradf,Jx_inv)
+print *,'Jg=',Jg
 
 if(i .eq. 9) then
 vol = abs(detJx)*8

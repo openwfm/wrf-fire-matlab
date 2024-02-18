@@ -2,7 +2,7 @@ module module_wrfout
 ! *** wrf specific netcdf i/o
 
 use module_netcdf
-use IFPORT    ! intel fortran only
+use module_msleep 
 
 contains
 
@@ -191,8 +191,8 @@ integer, intent(in), optional::frame ! the default frame in the file to read, de
 !*** local
 integer::istep=1,chsum0,sr(2),chsum0_fmw,ierr=0,maxtry=200,frame0_in,itry,ncid
 character(len=256)::msg
-real:: waitmax=200,waitsec
-integer::isleepqq=100, isleep=1
+real:: waitmax=200
+integer::msec=100
 
 !*** executable
 if(present(frame))istep=frame 
@@ -211,14 +211,13 @@ do itry=1,maxtry
        call message('received stop request frame=-99')
        stop
   endif
-  !call sleep(isleep)
-  write(msg,*)'try ',itry,' waiting ',isleepqq*1e-3,' sec'
-  call message(msg)
-  call sleepqq(isleepqq) ! intel fortran only 
-  if(itry * isleepqq * 1e-3 .gt. waitmax)then
+  if(itry * msec * 1e-3 .gt. waitmax)then
      write(msg,*)'timed out after ',waitmax,' sec waiting for frame ',frame0_fmw,' got ',frame0_in
      call crash(trim(msg))
   endif
+  write(msg,*)'try ',itry,' waiting ',msec,' msec'
+  call message(msg)
+  call call_msleep(msec) 
   call ncopen(filename,nf90_nowrite,ncid)
 enddo
 1 continue
@@ -240,11 +239,10 @@ do itry=1,maxtry
   call message(msg)
   call ncclose(ncid)  
   if (chsum0_fmw.eq.chsum0)goto 2
-  !call sleep(1)
-  write(msg,*)'try ',itry,' waiting ',isleepqq*1e-3,' sec'
+  write(msg,*)'try ',itry,' waiting ',msec, ' rmsec'
   call message(msg)
-  call sleepqq(isleepqq) ! intel fortran only 
-  if(itry * isleepqq * 1e-3 .gt. waitmax)then
+  call call_msleep(msec) 
+  if(itry * msec * 1e-3 .gt. waitmax)then
      write(msg,*)'timed out after ',waitmax,' sec waiting for correct check sum'
      call crash(trim(msg))
   endif
