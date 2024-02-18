@@ -37,7 +37,7 @@ real,intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::F
 !*** local
 
 integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, k1, k2, k3, id1, id2, id3
-real :: Kloc(8,8), Floc(8), Jg(8,3)
+real :: Kloc(8,8), Floc(8), Jg(8,3), vol
 real ::  Xloc(3,8), u0loc(3) 
 integer :: kglo(8)
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
@@ -73,7 +73,7 @@ do ie2=jfts,jfte
             u0loc(2) = Yu0(ie1,ie3,ie2)
             u0loc(3) = Zu0(ie1,ie3,ie2)
             
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,2)
+            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,vol,2)
             do id2 = 0,1
                 do id3 = 0,1
                     do id1 = 0,1

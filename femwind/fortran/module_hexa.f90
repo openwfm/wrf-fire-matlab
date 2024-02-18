@@ -3,17 +3,18 @@ use module_utils
 
 contains
 
-subroutine hexa(A,X,u0,Kloc,Floc,Jg,iflag)
+subroutine hexa(A,X,u0,Kloc,Floc,Jg,vol,iflag)
 ! purpose: create local stiffness matrix etc for hexa 3d element
 ! in:
 !   A   coefficient matrix size 3x3, symmetric positive definite
 !   X   nodes coordinates size 3x8, one each column is one node
 !   u0   column vector of input wind at the center of the element
-!   iflags  iflags = 1 compute Kloc, iflag = 2 compute Floc, iflag = 3 compute Jg  
+!   iflag  iflag = 1 compute Kloc, iflag = 2 compute Floc, iflag = 3 compute Jg  
 ! out:
 !   Kloc   local stiffness matrix
 !   Floc   local divergence load vector
 !   Jg     gradient at center of function with values V is V'*Jg          
+!   vol    approx volume, local divergence load is -u0*Jg*vol 
 
 implicit none
 
@@ -21,7 +22,7 @@ implicit none
 
 real, intent(in):: A(3,3), X(3,8), u0(3)    ! fortran is not case sensitive
 integer, intent(in)::iflag
-real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3)
+real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3), vol
 !*** local variables
 !real, parameter :: g = 0.5773502691896257
 real,dimension(9,3),save :: ib = reshape((/-1,-1,-1,-1,1,1,1,1,0,-1,-1,1,1,-1,-1,1,1,0,-1,1,-1,1,-1,1,-1,1,0/),(/9,3/))
@@ -39,7 +40,6 @@ real :: u0_tmp(3)
 integer :: i,j,k,m
 real :: detJx = 0
 real :: tmp = 0
-real :: vol = 0
 gradf = 0.
 Jg_tmp = 0.
 Jx = 0.

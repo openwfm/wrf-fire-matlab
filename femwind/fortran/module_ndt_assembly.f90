@@ -38,7 +38,7 @@ real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme,1:msize)::K
 
 integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, i
 real ::  Kloc(8,8), Floc(8), Jg(8,3)
-real ::  Xloc(3,8), u0loc(3)
+real ::  Xloc(3,8), u0loc(3), vol
          
 !*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !*** integer, dimension(3,1,1), save ::iflags = reshape((/1,0,1/),(/3,1,1/)) !define iflags to construct JG and Kloc in hexa
@@ -65,7 +65,7 @@ do ie2=jfts,jfte
             !write(*,*)'Xloc='
             !write(*,'((8f9.4))')((Xloc(i,iloc),iloc=1,8),i=1,3)
 
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,iflags)
+            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,vol,iflags)
 
             !write(*,*)'Kloc='
             !write(*,'((8f9.4))')((Kloc(i,iloc),iloc=1,8),i=1,8)

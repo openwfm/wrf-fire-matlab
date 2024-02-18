@@ -52,6 +52,7 @@ real ::  Xloc(3,8), u0loc(3)
 real :: grad(3)
 real :: lambda_loc(8)
 real :: A_inv(3,3)
+real :: vol
 lambda_loc = 0.
 Xloc = 99999.
 Jg = 0.
@@ -88,7 +89,7 @@ do ie2=jfts,jfte
             !fine print *, 'local lambda is', lambda_loc 
             !print* , 'Xloc is', Xloc
             !print* , 'u0loc is', u0loc(1)  
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,3)
+            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,vol,3)
             !print*, 'Jg is', Jg
             !print*, shape(jg)
             grad = matmul(transpose(Jg),lambda_loc)
