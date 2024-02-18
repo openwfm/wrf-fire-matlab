@@ -52,7 +52,7 @@ module_utils.o: module_utils.f90  Makefile
 module_netcdf.o: module_utils.o module_netcdf.f90 Makefile
 	$(FC) $(FFLAGS) -c module_netcdf.f90
 
-module_wrfout.o: module_wrfout.f90 module_netcdf.o Makefile
+module_wrfout.o: module_wrfout.f90 module_netcdf.o module_msleep.o Makefile
 	$(FC) $(FFLAGS) -c module_wrfout.f90
 
 module_common.o: module_common.f90  module_utils.o Makefile
@@ -151,6 +151,7 @@ femwind_test.exe: femwind_test.f90 $(FEMWIND_MODULES) Makefile
 	$(FC) $(FFLAGS) -o $@ femwind_test.f90 $(FEMWIND_MODULES) 
 
 WRFOUT_MODULES = \
+  $(MSLEEP) \
   module_netcdf.o \
   module_wrfout.o
 
