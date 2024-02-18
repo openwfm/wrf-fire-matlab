@@ -25,12 +25,8 @@ integer, intent(in)::iflag
 real, intent(out):: Kloc(8,8), Floc(8), Jg(8,3), vol
 !*** local variables
 real, parameter :: g = 0.5773502691896257
-real,dimension(9,3),save :: ib = reshape((/-1,-1,-1,-1,1,1,1,1,0,-1,-1,1,1,-1,-1,1,1,0,-1,1,-1,1,-1,1,-1,1,0/),(/9,3/))
-real,dimension(9,3),save :: s = reshape((/-0.5773502691896257,-0.5773502691896257,-0.5773502691896257,-0.5773502691896257&
-,0.5773502691896257,0.5773502691896257,0.5773502691896257,0.5773502691896257,0.0,-0.5773502691896257,-0.5773502691896257&
-,0.5773502691896257,0.5773502691896257,-0.5773502691896257,-0.5773502691896257,0.5773502691896257,0.5773502691896257&
-,0.0,-0.5773502691896257,0.5773502691896257,-0.5773502691896257,0.5773502691896257,-0.5773502691896257,0.5773502691896257&
-,-0.5773502691896257,0.5773502691896257,0.0/),(/9,3/))
+real,dimension(9,3),parameter :: ib = reshape((/-1,-1,-1,-1,1,1,1,1,0,-1,-1,1,1,-1,-1,1,1,0,-1,1,-1,1,-1,1,-1,1,0/),(/9,3/))
+real,dimension(9,3),parameter :: s = g*ib 
 real :: gradf(8,3), Jg_tmp(8,3)
 real :: Jx(3,3), Jx_inv(3,3)
 real :: Jg_tran(3,8), A_tmp(3,8)
@@ -40,6 +36,8 @@ real :: u0_tmp(3)
 integer :: i,j,k,m
 real :: detJx = 0
 real :: tmp = 0
+
+!*** executable
 gradf = 0.
 Jg_tmp = 0.
 Jx = 0.
@@ -53,7 +51,6 @@ u0_tmp = 0.
 Kloc = 0.
 Floc = 0.
 Jg = 0.
-!*** executable
 
 !Calculate Jg loop
     
@@ -111,7 +108,7 @@ end if !end for computing Kloc
 !Calculate Floc loop
 if (iflag .eq. 2) then
 
-do i=9,9
+do i=1,9
 
 !Calculate gradf
 !first column of gradf
