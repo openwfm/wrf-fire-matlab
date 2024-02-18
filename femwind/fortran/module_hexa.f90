@@ -9,12 +9,12 @@ subroutine hexa(A,X,u0,Kloc,Floc,Jg,vol,iflag)
 !   A   coefficient matrix size 3x3, symmetric positive definite
 !   X   nodes coordinates size 3x8, one each column is one node
 !   u0   column vector of input wind at the center of the element
-!   iflag  iflag = 1 compute Kloc, iflag = 2 compute Floc, iflag = 3 compute Jg  
+!   iflag  iflag = 1 compute Kloc, iflag = 2 compute Floc, Jg, vol, iflag = 3 compute Jg  
 ! out:
 !   Kloc   local stiffness matrix
 !   Floc   local divergence load vector
-!   Jg     gradient at center of function with values V is V'*Jg          
-!   vol    approx volume, local divergence load is -u0*Jg*vol 
+!   Jg     gradient at center of function with values V is Jg'*V          
+!   vol    approx volume, local divergence load is Floc = -Jg*u0*vol 
 
 implicit none
 
@@ -60,44 +60,44 @@ if (iflag .eq.  3) then
 
     do i=1,9
     
-    !Calculate gradf
-    !first column of gradf
-    do j = 1,8
-    gradf(j,1) = (ib(j,1)*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
-    end do
-    !second coumn of gradf
-    do j = 1,8
-    gradf(j,2) = ((1+ib(j,1)*s(i,1))*ib(j,2)*(1+ib(j,3)*s(i,3)))/8
-    end do
-    !third column of gradf
-    do j = 1,8
-    gradf(j,3) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*ib(j,3))/8
-    end do
+        !Calculate gradf
+        !first column of gradf
+        do j = 1,8
+            gradf(j,1) = (ib(j,1)*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
+        end do
+        !second coumn of gradf
+        do j = 1,8
+            gradf(j,2) = ((1+ib(j,1)*s(i,1))*ib(j,2)*(1+ib(j,3)*s(i,3)))/8
+        end do
+        !third column of gradf
+        do j = 1,8
+            gradf(j,3) = ((1+ib(j,1)*s(i,1))*(1+ib(j,2)*s(i,2))*ib(j,3))/8
+        end do
+        
+        Jx = matmul(X,gradf)
+        
+        !!!Compute Jx_inv!!!
+        detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
+                 Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
+                 Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
+        
+        if(abs(detJx).lt.tiny(detJx))then
+            print *,'detJx=',detJx
+            call crash('The Jacobian is (numerically) singular')
+        endif
     
-    Jx = matmul(X,gradf)
-    
-    !!!Compute Jx_inv!!!
-    detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
-             Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
-             Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
-    
-    if(abs(detJx).lt.tiny(detJx))then
-        print *,'detJx=',detJx
-        call crash('The Jacobian is (numerically) singular')
-    endif
-
-    Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
-    Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
-    Jx_inv(3,1) = +(1/detJx) * (Jx(2,1)*Jx(3,2) - Jx(2,2)*Jx(3,1))
-    Jx_inv(1,2) = -(1/detJx) * (Jx(1,2)*Jx(3,3) - Jx(1,3)*Jx(3,2))
-    Jx_inv(2,2) = +(1/detJx) * (Jx(1,1)*Jx(3,3) - Jx(1,3)*Jx(3,1))
-    Jx_inv(3,2) = -(1/detJx) * (Jx(1,1)*Jx(3,2) - Jx(1,2)*Jx(3,1))
-    Jx_inv(1,3) = +(1/detJx) * (Jx(1,2)*Jx(2,3) - Jx(1,3)*Jx(2,2))
-    Jx_inv(2,3) = -(1/detJx) * (Jx(1,1)*Jx(2,3) - Jx(1,3)*Jx(2,1))
-    Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
-    
-    Jg = matmul(gradf,Jx_inv)
-    
+        Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
+        Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
+        Jx_inv(3,1) = +(1/detJx) * (Jx(2,1)*Jx(3,2) - Jx(2,2)*Jx(3,1))
+        Jx_inv(1,2) = -(1/detJx) * (Jx(1,2)*Jx(3,3) - Jx(1,3)*Jx(3,2))
+        Jx_inv(2,2) = +(1/detJx) * (Jx(1,1)*Jx(3,3) - Jx(1,3)*Jx(3,1))
+        Jx_inv(3,2) = -(1/detJx) * (Jx(1,1)*Jx(3,2) - Jx(1,2)*Jx(3,1))
+        Jx_inv(1,3) = +(1/detJx) * (Jx(1,2)*Jx(2,3) - Jx(1,3)*Jx(2,2))
+        Jx_inv(2,3) = -(1/detJx) * (Jx(1,1)*Jx(2,3) - Jx(1,3)*Jx(2,1))
+        Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
+        
+        Jg = matmul(gradf,Jx_inv)
+       
     end do
 endif !end for computing Jg
 
