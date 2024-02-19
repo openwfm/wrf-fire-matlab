@@ -1,5 +1,6 @@
 module module_hexa   ! testing only
 use module_utils
+use module_lin_alg
 
 contains
 
@@ -70,25 +71,7 @@ do i=1,9          ! loop over i quadrature nodes + center
     ! to the given element with vertice the rows of X
     Jx = matmul(X,gradf)   ! Jx = X*gradf
 
-    ! Compute Jx_inv
-    detJx = (Jx(1,1)*Jx(2,2)*Jx(3,3) - Jx(1,1)*Jx(2,3)*Jx(3,2)-&
-             Jx(1,2)*Jx(2,1)*Jx(3,3) + Jx(1,2)*Jx(2,3)*Jx(3,1)+&
-             Jx(1,3)*Jx(2,1)*Jx(3,2) - Jx(1,3)*Jx(2,2)*Jx(3,1))
-
-    if(abs(detJx).lt.tiny(detJx))then
-        print *,'detJx=',detJx
-        call crash('The Jacobian is (numerically) singular')
-    endif
-
-    Jx_inv(1,1) = +(1/detJx) * (Jx(2,2)*Jx(3,3) - Jx(2,3)*Jx(3,2))
-    Jx_inv(2,1) = -(1/detJx) * (Jx(2,1)*Jx(3,3) - Jx(2,3)*Jx(3,1))
-    Jx_inv(3,1) = +(1/detJx) * (Jx(2,1)*Jx(3,2) - Jx(2,2)*Jx(3,1))
-    Jx_inv(1,2) = -(1/detJx) * (Jx(1,2)*Jx(3,3) - Jx(1,3)*Jx(3,2))
-    Jx_inv(2,2) = +(1/detJx) * (Jx(1,1)*Jx(3,3) - Jx(1,3)*Jx(3,1))
-    Jx_inv(3,2) = -(1/detJx) * (Jx(1,1)*Jx(3,2) - Jx(1,2)*Jx(3,1))
-    Jx_inv(1,3) = +(1/detJx) * (Jx(1,2)*Jx(2,3) - Jx(1,3)*Jx(2,2))
-    Jx_inv(2,3) = -(1/detJx) * (Jx(1,1)*Jx(2,3) - Jx(1,3)*Jx(2,1))
-    Jx_inv(3,3) = +(1/detJx) * (Jx(1,1)*Jx(2,2) - Jx(1,2)*Jx(2,1))
+    call inv3(Jx, Jx_inv)  ! Jx_inv = inv(Jx)
 
     ! gradients of the mapped basis functions in element X at mapped s(i,:)
     ! from the chain rule

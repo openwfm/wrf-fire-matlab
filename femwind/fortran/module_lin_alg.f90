@@ -1,5 +1,7 @@
 module module_lin_alg
 
+use module_utils
+
 contains
 
 subroutine inv3(M, Inv_M)
@@ -16,12 +18,17 @@ real,intent(out), dimension(3,3):: Inv_M
 real, dimension(3,3)::M_T
 real :: det_M, det_M_inv
 
-!!Compute Inverse of M!!
+!!Compute Inverse of M
 det_M =   M(1,1)*(M(2,2)*M(3,3)-M(3,2)*M(2,3)) -  &
           M(1,2)*(M(1,2)*M(3,3) - M(3,1)*M(2,3))+ &
           M(1,3)*(M(2,1)*M(2,2) - M(3,1)*M(3,2))
 
-det_M_inv = 1/det_M
+if(abs(det_M).lt.10*tiny(det_M))then
+        print *,'det_M=',det_M
+        call crash('Inv3: The matrix is numerically singular')
+    endif
+
+det_M_inv = 1./det_M
 
 M_T   =  transpose(M)
 
