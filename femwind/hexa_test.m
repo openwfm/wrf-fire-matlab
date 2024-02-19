@@ -1,5 +1,6 @@
 format compact 
 A=eye(3);
+A=diag(rand(3,1));
 % lexicographic unit cube
 %    x y z
 X0 = [0 0 0  %1
