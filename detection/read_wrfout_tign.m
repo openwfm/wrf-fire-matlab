@@ -22,8 +22,15 @@ function w=read_wrfout_tign(f,ts)
                 fprintf('Found timestep %i at %s\n',i,ts)
                 frame=i;
                 break
+
             end
         end
+%         if ~isstring(ts)
+%             frame = ts;
+%         else
+%             frame = input_num('Enter frame = ? ',nframes)
+%         end
+        fprintf('Choosing frame %d \n',frame)
         if(frame==0),
             warning(['Time step ',ts,' not found'])
             w=[];
@@ -33,8 +40,8 @@ function w=read_wrfout_tign(f,ts)
         frame=nframes;
     end
 
-    w=nc2struct(f,{'Times','TIGN_G','FXLONG','FXLAT','UNIT_FXLAT','UNIT_FXLONG','LFN','UF','VF',...
-        'XLONG','XLAT','NFUEL_CAT','ITIMESTEP','FMC_G','ROS','HGT'},{'DX','DY','DT'},frame);
+    w=nc2struct(f,{'Times','FGRNHFX','TIGN_G','FXLONG','FXLAT','UNIT_FXLAT','UNIT_FXLONG','LFN','UF','VF',...
+        'XLONG','XLAT','NFUEL_CAT','ITIMESTEP','FMC_G','ROS','HGT','FUEL_FRAC','FUEL_FRAC_BURNT'},{'DX','DY','DT'},frame);
     F = scatteredInterpolant(w.xlong(:),w.xlat(:),w.hgt(:));
     w.fhgt = F(w.fxlong,w.fxlat);
     %w.fhgt = griddata(w.xlong,w.xlat,w.hgt,w.fxlong,w.fxlat);

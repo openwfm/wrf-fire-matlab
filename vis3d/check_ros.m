@@ -9,6 +9,9 @@ for k=1:nfuels
         speed=fuel(k).wind(j);
         ros=fire_ros(fuel(k),speed,0);
         err(k,j,1)=(fuel(k).ros_wind(j)-ros)/(ros+eps);
+        % ros_before=fire_ros_before(fuel(k),speed,0);
+        % fprintf('fuel=%g speed=%g ros=%g ros_before=%g\n',k,speed,ros,ros_before)
+        % if abs(ros-ros_before)>eps, error('ros different'),end
     end
     nslopes=length(fuel(k).slope);
     for j=1:nslopes

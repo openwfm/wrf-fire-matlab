@@ -11,8 +11,9 @@ paths = path_struct.paths;
 figure(fig_num)
 hold on
 
+
 for j = 1:length(paths)%length(pts)
-    c = sqrt(path_struct.paths(j).c/100);
+    %c = sqrt(path_struct.paths(j).c/100);
     plot3(pts(paths(j).p,2),pts(paths(j).p,1),pts(paths(j).p,3),'g');
     %plot3(pts(paths(j).p,2),pts(paths(j).p,1),pts(paths(j).p,3));
 end

@@ -44,7 +44,7 @@ if max(size(red.tign)) > target_size
 end
 time_bounds(2) = red.max_tign;
 time_bounds(1) = red.min_tign;
-new_end_time = input_num('Use alternate end time? Enter number of extra days, 0 if no.',0);
+new_end_time = input_num('Use alternate end time? Enter number of extra days, 0 if no.',0,1);
 if new_end_time ~=0
   time_bounds(2) = time_bounds(2)+new_end_time;  
   red.max_tign = time_bounds(2);

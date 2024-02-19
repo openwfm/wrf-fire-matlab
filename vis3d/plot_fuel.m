@@ -44,15 +44,12 @@ fprintf('maximal heat flux density (J/m^2/s) %g\n',hd/Tf)
 Tf=f.weight/0.8514; % fuel burns as exp(-t/Tf)
 
 
-if ~exist('units'),
+if nargin < 2
     units='metric';
 end
 
-if ~exist('scale'),
+if nargin < 3
     scale='direct';
-end
-if isempty(units),
-    units='metric';
 end
 
 switch scale

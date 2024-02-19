@@ -9,7 +9,12 @@ fprintf('ncdump: file %s\n',filename);
 ncid = netcdf.open(filename,'NC_NOWRITE');
 [ndims,nvars,ngatts,unlimdim] = netcdf.inq(ncid);
 for varid=1:nvars, % one variable at a time
-    var(varid)=ncvarinfo(ncid,varid-1);
+    varinfo = ncvarinfo(ncid,varid-1);
+    field_names = fieldnames(varinfo);
+    for i=1:numel(field_names)
+        field = field_names{i};
+        var(varid).(field)=varinfo.(field);
+    end
     if ~quiet,
         fprintf('%i ',varid);
         dispvarinfo(var(varid));

@@ -1,13 +1,13 @@
 function tign_new = squish4(ps,gq,da)
+% computes estimate of fire arrival time or does data assimilation
 % ps is struct with paths, red, graph,distances, etc.
 %  gq  - use ground detetcions if gq == 1
 %  da - use in data assimilation mode if da == 1
 % ps = graph_dets(w)
 
-if ~exist('a','var')
-    a = 300;
-    b = 1/3;
-end
+%smoothing parameters used in calls to smooth_up function
+a = 300;
+b = 1/3;
 
 %set flags for data assimilation mode
 if da == 1
@@ -23,8 +23,10 @@ end
 %combine l2 time with detection points fixed to grid
 pts = ps.grid_pts;
 pts(:,3) = ps.points(:,3);
-%adjust time of ignition
+%adjust time of ignition, optional - can be used to adjust fire arrival
+%          time up or down
 %pts(1,3) = pts(1,3)-1/2;
+
 %forecast
 tign = ps.red.tign;
 %experiments
@@ -32,11 +34,11 @@ tign = ps.red.tign;
 % sat_msk = tign > sat_max;
 % tign(sat_msk) = sat_max;
 
-% t_max = max(tign(:))-.1;
-% tign(tign>=t_max) =t_max+1;
+%earliest fire arrival time
 t0 = min(tign(:));
 [m,n]=size(ps.red.tign);
 
+% option to use a constant fire arrival time as intitial estimate
 % flat_tign = input_num('Use flat start? 1 = yes',0)
 % if flat_tign
 %     tign = ps.red.end_datenum*ones(m,n);
@@ -53,17 +55,13 @@ t0 = min(tign(:));
 
 %ground detection usage
 if ~exist('gq','var')
-    gq = input_num('use ground detections? yes = [1]',0,1);
+    gq = input_num('use ground detections? yes = [1]',1,1);
 end
+%handling ground detections
 if gq
+    %number of time to smooth data 
     smooth_ground = 1;%max(m,n)/50;
     fprintf('Collecting ground detection data\n')
-    
-%     k = boundary(ps.points(:,2),ps.points(:,1),1);
-%     lon_perim = ps.points(k,2);
-%     lat_perim = ps.points(k,1);
-%     in = inpolygon(ps.red.fxlat,ps.red.fxlong,lat_perim,lon_perim);
-%     infire = in;
 
     %grounds = ground_detects(ps.red);
     %[jgrid,igrid]=meshgrid([1:length(ps.red.jspan)]',[1:length(ps.red.ispan)]');
@@ -80,7 +78,7 @@ if gq
     %remove holes in mask
     %infire = inpolygon(igrid(:),jgrid(:),igrid(infire),jgrid(infire));
 end
-%try
+
 
 tmax=max(tign(:));
 tign_ground = tign;
@@ -98,7 +96,7 @@ beta_vect = 1-exp(g_likes);
 % for i = 1:pts_length
 %     g_times(i) = ps.red.tign(ps.idx(i,1),ps.idx(i,2));
 % end
-ground_steps = 3;
+ground_steps = 20;
 if gq
     data_area = sum(infire(:));
     for i = 1:ground_steps
@@ -336,7 +334,7 @@ end
 
 
 % %%% try using ground detections after paths....
-ground_steps = 6;
+ground_steps = 20;
 tign_ground = tign_new;
 if gq
     data_area = sum(infire(:));
