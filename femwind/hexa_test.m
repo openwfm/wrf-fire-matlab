@@ -28,7 +28,7 @@ X = T*X0+rand(3,1)*ones(1,8);
 
 u = rand(3,1);
 [K, F, Jg] = hexa(A,X,u);
-eig(K)  % one eigenvalue zero
+eig_K=eig(K)  % one eigenvalue zero
 
 % test F
 % for linear field mu with values V at nodes V*F should be -integral (grad mu) * u
