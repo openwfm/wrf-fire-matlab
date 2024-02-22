@@ -42,7 +42,7 @@ real :: u0_tmp(3)
 integer :: i,j,k,m
 real :: detJx = 0
 real :: tmp = 0
-logical, parameter::  p=.true.
+logical, parameter::  p=.false.
 
 !*** executable
 gradf = 0.
@@ -95,6 +95,7 @@ do i=1,9          ! loop over i quadrature nodes + center
         ! exact if the element is linear image of reference 
         ! i.e. all sides planar, and opposite sides are parallel 
         vol = abs(detJx)*8
+        if(p) print *, 'hexa: vol',vol
         ! Floc = Floc - Jg * u0 * vol;
         u0_tmp = u0*vol
         do j = 1,8
