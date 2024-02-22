@@ -42,6 +42,7 @@ real :: u0_tmp(3)
 integer :: i,j,k,m
 real :: detJx = 0
 real :: tmp = 0
+logical, parameter::  p=.true.
 
 !*** executable
 gradf = 0.
@@ -62,6 +63,7 @@ Jg = 0.
 ! bf= @(k,x) (1+ib(k,1)*x(1))*(1+ib(k,2)*x(2))*(1+ib(k,3)*x(3))/8;
 
 do i=1,9          ! loop over i quadrature nodes + center
+    if(p)print *,'hexa: i=',i
 
     do j = 1,8    ! loop over basis functions       
         gradf(j,1) = (ib(j,1)*(1+ib(j,2)*s(i,2))*(1+ib(j,3)*s(i,3)))/8
@@ -70,26 +72,23 @@ do i=1,9          ! loop over i quadrature nodes + center
     end do
     ! compute Jx = X*gradf the Jacobian at s(i,:) of the trilinear mapping
     ! from the reference element with vertices rows of ib(1:8,:) 
-    ! to the given element with vertice the rows of X
-    Jx = matmul(X,gradf)   ! Jx = X*gradf
+    ! to the given element with vertices the rows of X
+    if(p)call print_matrix('hexa: gradf',gradf)
 
-    call inv3(Jx, Jx_inv)  ! Jx_inv = inv(Jx)
+    Jx = matmul(X,gradf)   ! Jx = X*gradf
+    call inv3(Jx, Jx_inv, det = detJx)  ! Jx_inv = inv(Jx)
 
     ! gradients of the mapped basis functions in element X at mapped s(i,:)
     ! from the chain rule
     Jg = matmul(gradf,Jx_inv)  
+    if(p)call print_matrix('hexa: Jg',Jg)
     
     if (i .le. 8) then      !contribution to stiffness
-        do j = 1,8
-           do k = 1,3
-                Jg_tran(k,j) = Jg(j,k)
-            end do
-        end do
-    
-        A_tmp = matmul(A, Jg_tran)
+        A_tmp = matmul(A, transpose(Jg))
         K_at_s = matmul(Jg,A_tmp)
-        Kloc = Kloc+(K_at_s*abs(detJx))
+        Kloc = Kloc + K_at_s*abs(detJx)
     end if !end computing Kloc
+    if(p)call print_matrix('hexa: Kloc',Kloc)
 
     if (i .eq. 9) then  !Calculate Floc
         ! volume = determinant at midpoint times the volume of reference element

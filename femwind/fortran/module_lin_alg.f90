@@ -4,15 +4,17 @@ use module_utils
 
 contains
 
-subroutine inv3(M, M_inv)
+subroutine inv3(M, M_inv, det)
 !Purpose: Calculate the inverse of a 3X3 matrix
 !In:
 !M  3X3 matrix
+!det determinand of M
 !Out:
 !M_inv Inverse of M 
 implicit none
 real,intent(in), dimension(3,3):: M
 real,intent(out), dimension(3,3):: M_inv
+real,intent(out), optional:: det
 
 !Local Variables
 
@@ -28,6 +30,8 @@ real :: detM
         print *,'detM=',detM
         call crash('The matrix is numerically singular')
     endif
+  
+    if (present(det)) det = detM 
 
     detM = 1.0/detM
 
