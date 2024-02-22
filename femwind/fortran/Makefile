@@ -3,16 +3,14 @@
 #FC = ifort
 #CC = icc
 FFLAGS = -g -C --ffpe-trap=invalid,zero,overflow,underflow -traceback -fpe0 # intel debug
-FFLAGS = -O3 -fdefault-real-8  # gnu
 FFLAGS = -g -C -fpe0 -r8  # intel debug 
 FFLAGS = -g -C  -fdefault-real-8
-FFLAGS = -O3 -pg
 FFLAGS = -g -C -I /opt/local/include
 LFLAGS = -L/opt/local/lib -lnetcdf -l netcdff
 FFLAGS = -pg -O3 -I $(NETCDF)/include
 FFLAGSOPT = -O3 -I $(NETCDF)/include
 FFLAGS = -g -C -I $(NETCDF)/include 
-FFLAGS = -O3 -I $(NETCDF)/include
+#FFLAGS = -O3 -I $(NETCDF)/include
 LFLAGS = -L$(NETCDF)/lib -lnetcdf -lnetcdff
 
 default: all
@@ -45,7 +43,7 @@ hexa_test.exe: hexa_test.o module_hexa.o $(UTILS) Makefile
 	$(FC) $(FFLAGS) -o hexa_test.exe hexa_test.o module_hexa.o $(UTILS)
 
 module_hexa.o: module_hexa.f90 $(UTILS) Makefile
-	$(FC) $(FFLAGSOPT) -c module_hexa.f90
+	$(FC) $(FFLAGS) -c module_hexa.f90
 
 hexa_test.o: hexa_test.f90 module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c hexa_test.f90
@@ -85,7 +83,7 @@ ndt_assembly_test.o: ndt_assembly_test.f90 module_hexa.o module_utils.o module_n
 	$(FC) $(FFLAGS) -c ndt_assembly_test.f90 
 
 module_ndt_assembly.o: module_ndt_assembly.f90 module_hexa.o Makefile
-	$(FC) $(FFLAGSOPT) -c module_ndt_assembly.f90  
+	$(FC) $(FFLAGS) -c module_ndt_assembly.f90  
 
 F_ASSEMBLY_TEST = f_assembly_test.f90 module_f_assembly.o module_hexa.o $(UTILS)
 f_assembly_test.exe:  Makefile
@@ -131,6 +129,9 @@ module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makef
 
 module_lin_alg.o:  module_lin_alg.f90 Makefile
 	$(FC) $(FFLAGS) -c module_lin_alg.f90 
+
+lin_alg_test.exe:  lin_alg_test.f90 $(UTILS) Makefile
+	$(FC) $(LFLAGS) -o $@ lin_alg_test.f90 $(UTILS) 
 
 module_multigrid.o: module_sweeps.o module_multigrid.f90 module_coarsening.o module_ndt_mult.o module_ndt_assembly.o module_boundary_conditions.o module_common.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c  module_multigrid.f90
@@ -189,4 +190,4 @@ clean_txt:
 	rm -f ../*.txt
 
 clean: clean_txt
-	rm -f *.mod *.o *.exe *.dSYM 
+	rm -rf *.mod *.o *.exe *.dSYM 
