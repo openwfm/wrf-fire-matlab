@@ -70,6 +70,7 @@ do ie2=jfts,jfte
             do ic2=0,1
                 do ic3=0,1
                     do ic1=0,1
+                        iloc=1+ic1+2*(ic2+2*ic3);  !local index of the node in the element
                         Xloc(1,iloc)=X(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                         Xloc(2,iloc)=Y(ie1 + ic1, ie3 + ic3, ie2 + ic2)
                         Xloc(3,iloc)=Z(ie1 + ic1, ie3 + ic3, ie2 + ic2)
