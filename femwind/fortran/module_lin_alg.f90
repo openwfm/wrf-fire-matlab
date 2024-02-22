@@ -44,7 +44,7 @@ real :: detM
 end subroutine inv3
 
 subroutine print_matrix(name,A)
-character(len=1)::name
+character(len=*)::name
 real :: A(:,:)
 integer i,j
 print *,'Matrix ',trim(name),lbound(A,1),':',ubound(A,1),' by ', &

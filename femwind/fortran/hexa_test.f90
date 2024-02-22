@@ -31,12 +31,11 @@ call print_matrix('u0',u0(:,:,1))
 write(*,*)'iflag=',iflag
 
 write(*,*)'calling hexa'
-call hexa(A,X,u0,Kloc,Floc,Jg,vol,iflag)
+call hexa(A(:,:,1),X(:,:,1),u0(:,:,1),Kloc(:,:,1),Floc(:,:,1),Jg(:,:,1),vol,iflag)
 write(*,*)'hexa output'
 
 call print_matrix('Kloc',Kloc(:,:,1))
-call print_matrix('X',X(:,:,1))
-call print_matrix('u0',u0(:,:,1))
+call print_matrix('Floc',Floc(:,:,1))
 call print_matrix('Jg',Jg(:,:,1))
 write(*,*)'vol=',vol
 

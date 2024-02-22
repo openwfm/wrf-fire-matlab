@@ -10,7 +10,9 @@ subroutine hexa(A,X,u0,Kloc,Floc,Jg,vol,iflag)
 !   A   coefficient matrix size 3x3, symmetric positive definite
 !   X   element nodes coordinates, size 3x8, one each column is one node
 !   u0   column vector of input wind at the center of the element
-!   iflag  iflag = 1 compute Kloc, iflag = 2 compute Floc, Jg, vol, iflag = 3 compute Jg  
+!   iflag  ignored, compatibility only
+!          was iflag = 1 compute Kloc, iflag = 2 compute Floc, Jg, vol, iflag = 3 compute Jg  
+!           
 ! out:
 !   Kloc   local stiffness matrix
 !   Floc   local divergence load vector
@@ -77,7 +79,7 @@ do i=1,9          ! loop over i quadrature nodes + center
     ! from the chain rule
     Jg = matmul(gradf,Jx_inv)  
     
-    if (i .le. 8 .and. iflag .eq.  1) then      !contribution to stiffness
+    if (i .le. 8) then      !contribution to stiffness
         do j = 1,8
            do k = 1,3
                 Jg_tran(k,j) = Jg(j,k)
@@ -89,7 +91,7 @@ do i=1,9          ! loop over i quadrature nodes + center
         Kloc = Kloc+(K_at_s*abs(detJx))
     end if !end computing Kloc
 
-    if (i .eq. 9 .and. iflag .eq.  2) then  !Calculate Floc
+    if (i .eq. 9) then  !Calculate Floc
         ! volume = determinant at midpoint times the volume of reference element
         ! exact if the element is linear image of reference 
         ! i.e. all sides planar, and opposite sides are parallel 
