@@ -1,6 +1,6 @@
 format compact 
 A=eye(3);
-A=diag(rand(3,1));
+% A=diag(rand(3,1));
 % lexicographic unit cube
 %    x y z
 X0 = [0 0 0  %1
@@ -44,6 +44,10 @@ if exist('vrrotvec2mat')
     [K0, ~, ~] = hexa(A,X,u);
     [K1, ~, ~] = hexa(A,S*X,u);
     err_iso=norm(K0-K1,'fro')
+    if err_iso > 1e-6
+        warning(sprintf('err_iso %g too large',err_iso))
+    end
+
 else
     warning('No vrrotvec2mat, cannot test rotation invariance. Install Simulink 3D Animation.')
 end
