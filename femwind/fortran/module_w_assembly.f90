@@ -44,6 +44,7 @@ real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::U,V,W
 integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, i, k1, k2, k3
 real ::  Kloc(8,8), Floc(8), Jg(8,3)
 real ::  Xloc(3,8), u0loc(3)
+real :: JgAinvt(3,8)
 real :: grad(3)
 real :: lambda_loc(8)
 real :: A_inv(3,3)
@@ -63,6 +64,7 @@ u0loc =0.
 !** executable
 
 !print *, 'u0 vector is', u0
+call Inv3(A, A_inv)
 do ie2=jfts,jfte
     do ie3=kfts, kfte
         do ie1=ifts, ifte
@@ -77,16 +79,19 @@ do ie2=jfts,jfte
                     enddo
                 enddo
             enddo
-            u0loc(1) = u0(ie1,ie3,ie2)
-            u0loc(2) = v0(ie1, ie3,ie2)
-            u0loc(3) = w0(ie1, ie3,ie2)
+            !u0loc(1) = u0(ie1,ie3,ie2)
+            !u0loc(2) = v0(ie1, ie3,ie2)
+            !u0loc(3) = w0(ie1, ie3,ie2)
             !fine print *, 'local lambda is', lambda_loc 
             !print* , 'Xloc is', Xloc
             !print* , 'u0loc is', u0loc(1)  
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,vol,3)
+            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,vol,3)  ! need only Jg
             !print*, 'Jg is', Jg
             !print*, shape(jg)
+            JgAinvt = transpose(matmul(Jg,A_inv))
+            !
             !*** end of constant part
+            !
             do ic2=0,1
                 do ic3=0,1
                     do ic1=0,1
@@ -98,12 +103,11 @@ do ie2=jfts,jfte
                     enddo
                 enddo
             enddo
-            grad = matmul(transpose(Jg),lambda_loc)
+            !grad = matmul(transpose(Jg),lambda_loc)
             !not ok print *,'Grad before multiplication by A_inv is', grad
-  
-            call Inv3(A, A_inv)
-            grad = matmul(transpose(A_inv),grad)
+            !grad = matmul(transpose(A_inv),grad)
             ! Not ok print *,'Grad after multiplication by A_inv is', grad
+            grad = matmul(JgAinvt,lambda_loc)
             
             U(ie1, ie3, ie2)=grad(1)+ u0(ie1, ie3, ie2)
             V(ie1, ie3, ie2)=grad(2)+ v0(ie1, ie3, ie2)
