@@ -86,8 +86,8 @@ module_ndt_assembly.o: module_ndt_assembly.f90 module_hexa.o Makefile
 	$(FC) $(FFLAGS) -c module_ndt_assembly.f90  
 
 F_ASSEMBLY_TEST = f_assembly_test.f90 module_f_assembly.o module_hexa.o $(UTILS)
-f_assembly_test.exe:  Makefile
-	$(FC) $(FFLAGS) -o f_assembly_test.exe $(F_ASSEMBLY_TEST)
+f_assembly_test.exe:  $(F_ASSEMBLY_TEST) Makefile
+	$(FC) $(FFLAGS) -o f_assembly_test.exe $(F_ASSEMBLY_TEST) 
 
 module_f_assembly.o: module_f_assembly.f90 module_hexa.o module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_f_assembly.f90
@@ -118,16 +118,16 @@ VEC_BOUNDARY_CONDITIONS = vec_boundary_conditions_test.f90  module_boundary_cond
 vec_boundary_conditions_test.exe: $(VEC_BOUNDARY_CONDITIONS) Makefile
 	$(FC) $(FFLAGS) -o $@ $(VEC_BOUNDARY_CONDITIONS)
 
-w_assembly_test.exe: w_assembly_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o Makefile
+w_assembly_test.exe: w_assembly_test.o module_w_assembly.o module_hexa.o $(UTILS) Makefile
 	$(FC) $(FFLAGS) -o w_assembly_test.exe w_assembly_test.o module_w_assembly.o module_utils.o module_hexa.o module_lin_alg.o
 
 w_assembly_test.o: w_assembly_test.f90  module_hexa.o module_utils.o  module_w_assembly.o Makefile
 	$(FC) $(FFLAGS) -c w_assembly_test.f90
 
-module_w_assembly.o:  module_w_assembly.f90 module_hexa.o module_lin_alg.o Makefile
+module_w_assembly.o:  module_w_assembly.f90 module_hexa.o $(UTILS) Makefile
 	$(FC) $(FFLAGS) -c module_w_assembly.f90
 
-module_lin_alg.o:  module_lin_alg.f90 Makefile
+module_lin_alg.o:  module_lin_alg.f90  module_utils.o Makefile
 	$(FC) $(FFLAGS) -c module_lin_alg.f90 
 
 lin_alg_test.exe:  lin_alg_test.f90 $(UTILS) Makefile
