@@ -96,16 +96,18 @@ do i=1,9          ! loop over i quadrature nodes + center
         ! i.e. all sides planar, and opposite sides are parallel 
         vol = abs(detJx)*8
         if(p) print *, 'hexa: vol',vol
-        ! Floc = Floc - Jg * u0 * vol;
-        u0_tmp = u0*vol
-        do j = 1,8
-            tmp = 0
-            do k = 1,3
-                tmp = tmp+Jg(j,k)*u0_tmp(k)
-            end do
-            tmp_mat(j) = tmp        
-        end do
-        Floc = Floc-tmp_mat
+        ! Floc =  - Jg * u0 * vol;
+        !u0_tmp = u0*vol
+        !do j = 1,8
+        !    tmp = 0
+        !    do k = 1,3
+        !        tmp = tmp+Jg(j,k)*u0_tmp(k)
+        !    end do
+        !    tmp_mat(j) = tmp        
+        !end do
+        !Floc = Floc-tmp_mat
+        Floc = vol*matmul(-Jg,u0)
+        !print *,'hexa: Floc err=',maxval(abs(Floc  + tmp_mat))
     end if !end for computing Floc
 
 end do ! loop over i quadrature nodes + center
