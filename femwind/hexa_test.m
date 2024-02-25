@@ -27,7 +27,9 @@ T = rand(3);
 X = T*X0+rand(3,1)*ones(1,8);
 
 u = rand(3,1);
-[K, F, Jg] = hexa(A,X,u);
+[K, Fold, Jg, vol] = hexa(A,X,u);
+F = -vol*Jg*u;
+err_F=big(F-Fold)
 eig_K=eig(K)  % one eigenvalue zero
 
 % test F
