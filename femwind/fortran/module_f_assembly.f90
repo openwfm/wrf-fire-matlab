@@ -73,7 +73,7 @@ do ie2=jfts,jfte
             u0loc(2) = Yu0(ie1,ie3,ie2)
             u0loc(3) = Zu0(ie1,ie3,ie2)
             
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,vol,2)
+            call hexa(A,Xloc,Kloc,Jg,vol,2)
             Floc = -vol*matmul(Jg,u0loc)
             do id2 = 0,1
                 do id3 = 0,1

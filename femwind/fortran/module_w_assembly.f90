@@ -42,8 +42,8 @@ real, intent(out), dimension(ifms:ifme, kfms:kfme, jfms:jfme)::U,V,W
 !*** local
 
 integer:: ie1, ie2, ie3, ic1, ic2, ic3, iloc, i, k1, k2, k3
-real ::  Kloc(8,8), Floc(8), Jg(8,3)
-real ::  Xloc(3,8), u0loc(3)
+real ::  Kloc(8,8), Jg(8,3)
+real ::  Xloc(3,8) 
 real :: JgAinvt(3,8)
 real :: grad(3)
 real :: lambda_loc(8)
@@ -56,14 +56,10 @@ lambda_loc = 0.
 Xloc = 99999.
 Jg = 0.
 Kloc = 0.
-Floc = 0.
 grad = 0.
-u0loc =0.
        
-!*** u0loc is an input for module_hexa, but is not used to construct K. Do I need to define this?
 !** executable
 
-!print *, 'u0 vector is', u0
 call Inv3(A, A_inv)
 do ie2=jfts,jfte
     do ie3=kfts, kfte
@@ -79,15 +75,7 @@ do ie2=jfts,jfte
                     enddo
                 enddo
             enddo
-            !u0loc(1) = u0(ie1,ie3,ie2)
-            !u0loc(2) = v0(ie1, ie3,ie2)
-            !u0loc(3) = w0(ie1, ie3,ie2)
-            !fine print *, 'local lambda is', lambda_loc 
-            !print* , 'Xloc is', Xloc
-            !print* , 'u0loc is', u0loc(1)  
-            call hexa(A,Xloc,u0loc,Kloc,Floc,Jg,vol,3)  ! need only Jg
-            !print*, 'Jg is', Jg
-            !print*, shape(jg)
+            call hexa(A,Xloc,Kloc,Jg,vol,3)  ! need only Jg
             JgAinvt = transpose(matmul(Jg,A_inv))
             !
             !*** end of constant part

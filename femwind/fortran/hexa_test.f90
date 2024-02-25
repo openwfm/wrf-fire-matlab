@@ -31,7 +31,7 @@ call print_matrix('u0',u0(:,:,1))
 write(*,*)'iflag=',iflag
 
 write(*,*)'calling hexa'
-call hexa(A(:,:,1),X(:,:,1),u0(:,:,1),Kloc(:,:,1),Floc(:,:,1),Jg(:,:,1),vol,iflag)
+call hexa(A(:,:,1),X(:,:,1),Kloc(:,:,1),Jg(:,:,1),vol,iflag)
 write(*,*)'hexa output'
 
 call print_matrix('Kloc',Kloc(:,:,1))
