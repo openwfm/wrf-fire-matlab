@@ -1,5 +1,6 @@
 format compact 
 A=eye(3);
+% A=diag(rand(3,1));
 % lexicographic unit cube
 %    x y z
 X0 = [0 0 0  %1
@@ -26,8 +27,10 @@ T = rand(3);
 X = T*X0+rand(3,1)*ones(1,8);
 
 u = rand(3,1);
-[K, F, Jg] = hexa(A,X,u);
-eig(K)  % one eigenvalue zero
+[K, Fold, Jg, vol] = hexa(A,X,u);
+F = -vol*Jg*u;
+err_F=big(F-Fold)
+eig_K=eig(K)  % one eigenvalue zero
 
 % test F
 % for linear field mu with values V at nodes V*F should be -integral (grad mu) * u
@@ -43,6 +46,10 @@ if exist('vrrotvec2mat')
     [K0, ~, ~] = hexa(A,X,u);
     [K1, ~, ~] = hexa(A,S*X,u);
     err_iso=norm(K0-K1,'fro')
+    if err_iso > 1e-6
+        warning(sprintf('err_iso %g too large',err_iso))
+    end
+
 else
     warning('No vrrotvec2mat, cannot test rotation invariance. Install Simulink 3D Animation.')
 end

@@ -94,7 +94,7 @@ subroutine read_params
       diftol_coarse, &
       diftol_coarsest
 
-    write(*,a)'Default parameters:'
+    write(*,'(a)')'Default parameters:'
     write(*,nml=params_nml)
     open(8,file='params.nml',status='old',err=9)
     read(8,nml=params_nml)
@@ -115,10 +115,10 @@ subroutine read_params
      params%diftol_finest=diftol_finest
      params%diftol_coarse=diftol_coarse
      params%diftol_coarsest=diftol_coarsest
-    write(*,a)'Using modified parameters:'
+    write(*,'(a)')'Using modified parameters:'
     write(*,nml=params_nml)
     return
-9   write(*,a)'Cannot open file params.nml, using defaults'
+9   write(*,'(a)')'Cannot open file params.nml, using defaults'
     end subroutine read_params
     
 
