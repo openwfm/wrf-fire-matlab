@@ -118,7 +118,7 @@ for i=1:length(fmc_g),
 end
 if(isfield(f,'fmc_g')),
     err_fmc_g=big(ros_fmc_g-f.ros_fmc_g)
-    plot(fmc_g,ros_fmc_g*ros_conv,'r',f.fmc_g,f.ros_fmc_g*ros_conv,'b',...
+    plot(f.fmc_g,f.ros_fmc_g*ros_conv,'b',...
         f.fuelmc_g,interp1(fmc_g,ros_fmc_g*ros_conv,f.fuelmc_g),'+k')
 else
     plot(fmc_g,ros_fmc_g*ros_conv,'b')
